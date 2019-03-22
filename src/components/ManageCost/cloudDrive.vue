@@ -5061,28 +5061,20 @@ export default {
         axios({
             method:'GET',
             // url:vm.BDMSUrl+'project2/doc/documentCloudDisk',
-            // url:vm.BDMSUrl+'userGroup/getAllGroup',
-            url:vm.BDMSUrl+'userGroup/getUserGroup',
+            url:vm.BDMSUrl+'userGroup/getAllGroup',
+            // url:vm.BDMSUrl+'userGroup/getUserGroup',
             headers:{
                 'token':vm.token
             },
-            // params:{
-            //     projectId:vm.projId
-            // }
+            params:{
+                projectId:vm.projId
+            }
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
                 vm.ugList = response.data.rt
-                // vm.ugList.forEach((item)=>{
-                //     if(item.ugId == response.data.rt.selectUgId){
-                //         vm.$set(item,'checked',true)//设置checked属性，用于文件权限弹窗选择使用
-                //     }else{
-                //          vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
-                //     }
-                // })
                 vm.selectUgId = response.data.rt[0].groupId;
-                // vm.getFileTree(true);
                 vm.initPanoramaFolder(true,null)
-                // vm.getFileTree(vm.ugList[0].ugName)
+               
             }
 
         }).catch((err)=>{
@@ -5090,43 +5082,11 @@ export default {
         })
     },
     // 获取目录
-    //  getDirectory(){
-    //         var vm=this
-    //         axios({
-    //             url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
-    //             method:'get',
-    //             headers:{
-    //                 'token':vm.token
-    //             },
-    //             params:{
-    //                 projectId:vm.projId
-    //             }
-    //         }).then((response)=>{
-    //             if(response.data.cd=='0'){
-    //                 vm.DirectoryList=response.data.rt;
-    //                 vm.DirectoryList.forEach((item)=>{
-    //                     vm.$set(item,'nodeParId',1)
-    //                     vm.$set(item,'nodeId',item.code)
-    //                     vm.$set(item,'nodeName',item.name)
-    //                 })
-    //                 this.getDrawingList();
-                    
-    //                 // console.log(vm.DirectoryList);
-    //             }else{
-    //                 vm.message({
-    //                     type:'error',
-    //                     message:response.data.msg
-    //                 })
-    //             } 
-    //         })
-    // },
-        //获取图纸列表
-        getDrawingList(){
-            // this.getDirectory()
-            var vm=this;
+     getDirectory(){
+            var vm=this
             axios({
+                url:vm.BDMSUrl+'dc/drawingReview/getDirectory',
                 method:'get',
-                url:vm.BDMSUrl+'dc/drawingReview/getDrawingList',
                 headers:{
                     'token':vm.token
                 },
@@ -5135,27 +5095,59 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                     vm.drawingList=response.data.rt;
-                     vm.drawingList.forEach((item)=>{
-                         if(item.id==this.drawingFgid){
-                             this.updateDrawingName=item.drawingName;
-                             this.updateDrawingRatio=item.ratio;
-                             this.updateDrawingNumber=item.drawingNumber;
-                             this.updateDrawingHolderId=item.holderId;
-                         }
-                     })
-                    // if(vm.drawingList != null){
-                    //     vm.drawingList.forEach((item,index) => {
-                    //         vm.$set(item,'isLeaf',true)
-                    //         vm.$set(item,'nodeName',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
-                    //         vm.$set(item,'nodeId',item.id)
-                    //         vm.$set(item,'nodeParId',item.directory)
-                    //         // vm.$set(item,'code',item.id)
-                    //     });
-                    // }  
-                }
+                    vm.DirectoryList=response.data.rt;
+                    vm.DirectoryList.forEach((item)=>{
+                        vm.$set(item,'nodeParId',1)
+                        vm.$set(item,'nodeId',item.code)
+                        vm.$set(item,'nodeName',item.name)
+                    })
+                    this.getDrawingList();
+                    
+                    // console.log(vm.DirectoryList);
+                }else{
+                    vm.message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                } 
             })
-        },
+    },
+        //获取图纸列表
+        // getDrawingList(){
+        //     this.getDirectory()
+        //     var vm=this;
+        //     axios({
+        //         method:'get',
+        //         url:vm.BDMSUrl+'dc/drawingReview/getDrawingList',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             projectId:vm.projId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd=='0'){
+        //              vm.drawingList=response.data.rt;
+        //              vm.drawingList.forEach((item)=>{
+        //                  if(item.id==this.drawingFgid){
+        //                      this.updateDrawingName=item.drawingName;
+        //                      this.updateDrawingRatio=item.ratio;
+        //                      this.updateDrawingNumber=item.drawingNumber;
+        //                      this.updateDrawingHolderId=item.holderId;
+        //                  }
+        //              })
+        //             // if(vm.drawingList != null){
+        //             //     vm.drawingList.forEach((item,index) => {
+        //             //         vm.$set(item,'isLeaf',true)
+        //             //         vm.$set(item,'nodeName',item.drawingNumber+'('+this.deleteLastName(item.drawingName)+')')
+        //             //         vm.$set(item,'nodeId',item.id)
+        //             //         vm.$set(item,'nodeParId',item.directory)
+        //             //         // vm.$set(item,'code',item.id)
+        //             //     });
+        //             // }  
+        //         }
+        //     })
+        // },
          //去除后缀名
     deleteLastName(str){
         var reg = /.w+$/;   

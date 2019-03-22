@@ -17,7 +17,7 @@
                     <div class="preDiv">
                         <div class="imgDiv" @click="updataNewImage">
                             <div class="imgMask"><img class="hoverAdd" src="../../assets/hover-add.png"  /><img  src="../../assets/updata-logo.png"  /></div>
-                            <img v-if="projectImage" :src="projectImage.filePath" class="logo" style="width:200px;height:50px;"/>
+                            <img v-if="projectImage" :src="BDMSUrlQRCode+projectImage" class="logo" style="width:200px;height:50px;"/>
                             </div>
                         <!-- <div style="margin:0;">
                             <el-checkbox @change="isAsDefault()" size="small" style="margin:0;width:115px;font-size:12px;" v-model="isAsdefault">使用默认logo</el-checkbox> 
@@ -262,6 +262,7 @@ export default {
         this.getBasicSituation();//获取工程概况
         this.getProjectInitalConfig();//工程初始信息
         this.getProjectImageList();//获取工程图片列表
+        this.findProjectLogo();//获取工程logo列表
     },
     filters:{
         toLocalD(val){
@@ -654,11 +655,11 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     this.projectConfig = response.data.rt.project;
-                    this.$store.commit('changeProjectLogo',{
-                        // projectImg:response.data.rt.projectImage?response.data.rt.image[0].filePath:''
-                        projectImg:response.data.rt.image[0]
-                    })
-                     this.projectImage = response.data.rt.image[0];
+                    // this.$store.commit('changeProjectLogo',{
+                    //     // projectImg:response.data.rt.projectImage?response.data.rt.image[0].filePath:''
+                    //     projectImg:response.data.rt.image[0]
+                    // })
+                    //  this.projectImage = response.data.rt.image[0];
                      this.proName=this.projectConfig.projectName;
                     // this.projectLogoConfig = response.data.rt.projectConfig;
                     // this.isAsdefault = response.data.rt.projectConfig.confVal;
@@ -670,13 +671,36 @@ export default {
                     
                     // this.projectUseCount = response.data.rt.projectUserCount;
                    
-                    console.log(this.projectImage);
+                    // console.log(this.projectImage);
                 }else if(response.data.cd === '-1'){
                     alert(response.data.msg)
                 }else{
                     this.$router.push({
                         path:'/login'
                     })
+                }
+            })
+        },
+        //获取工程logo
+        findProjectLogo(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'findProjectLogo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                     this.$store.commit('changeProjectLogo',{
+                        // projectImg:response.data.rt.projectImage?response.data.rt.image[0].filePath:''
+                        projectImg:this.BDMSUrlQRCode+response.data.rt.path
+                    })
+                    this.projectImage =response.data.rt.path;
+
                 }
             })
         },
@@ -744,38 +768,56 @@ export default {
             this.imageType = 2;
         },
         upImgSure(){
-            let returnUrl = this.BDMSUrl+'/uploadImage?imageType='+this.imageType;
-            returnUrl = encodeURIComponent(returnUrl);
+            // let returnUrl = this.BDMSUrl+'/uploadImage?imageType='+this.imageType;
+            // returnUrl = encodeURIComponent(returnUrl);
             let formData = new FormData();
-            formData.append('projId',this.projId);
-            formData.append('type','1');
-            formData.append('userId',this.userId);
-            formData.append('modelCode','001');
-            formData.append('returnUrl',returnUrl)
-            formData.append('token',this.token);
+            // formData.append('projId',this.projId);
+            // formData.append('type','1');
+            // formData.append('userId',this.userId);
+            // formData.append('modelCode','001');
+            // formData.append('returnUrl',returnUrl)
+            // formData.append('token',this.token);
             formData.append('file',this.filesList[0]);
+            var vm=this;
             axios({
                 method:'post',
-                url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                url:vm.BDMSUrl+'api/v1/main/dcUpload',
                 headers:{
-                    'Content-Type': 'multipart/form-data'
+                    'token':vm.token
                 },
-                data:formData
-            }).then(response=>{
-                if(response.data.cd== '0'){
-                    this.getProjectImageList();
-                    this.getProjectInitalConfig();
-                    this.upImg = false;
-                    this.imageName = '未选择任何图片';
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                data:formData,
+                params:{
+                    type:this.imageType,
+                    projId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    
                 }
             })
+            // axios({
+            //     method:'post',
+            //     url:this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+            //     headers:{
+            //         'Content-Type': 'multipart/form-data'
+            //     },
+            //     data:formData
+            // }).then(response=>{
+            //     if(response.data.cd== '0'){
+            //         this.getProjectImageList();
+            //         this.getProjectInitalConfig();
+            //         this.upImg = false;
+            //         this.imageName = '未选择任何图片';
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg)
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // })
         },
+
         upImgCancle(){
             this.upImg = false;
         },

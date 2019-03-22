@@ -14,7 +14,7 @@
                   </span>
                   <span v-show="!applyShow"  class="btn" @click="addUser()">添加</span>
                   <span v-show="applyShow" class="btn2" @click="checkApplyCancle()">返回</span>
-                  <span v-show="!applyShow"  class="btn1" @click="checkApply()">查看申请</span>
+                  <!-- <span v-show="!applyShow"  class="btn1" @click="checkApply()">查看申请</span> -->
              </span>
           </h5>
 

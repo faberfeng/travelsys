@@ -2387,7 +2387,7 @@ export default{
            
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendarTemplate/info',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/calendarTemplate/info',
                 headers:{
                     'token':this.token
                 },
@@ -2411,7 +2411,7 @@ export default{
         getCalendarIndex(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'/project2/schedule/calendarIndex',
+                url:this.BDMSUrl+'schedule/calendarIndex',
                 headers:{
                     'token':this.token
                 },
@@ -2445,7 +2445,7 @@ export default{
         getTaskPriorityList(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskPriority/list',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskPriority/list',
                  headers:{
                     'token':this.token
                 },
@@ -2469,7 +2469,7 @@ export default{
         updateTPListSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskPriority/update',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskPriority/update',
                  headers:{
                     'token':this.token
                 },
@@ -2498,7 +2498,7 @@ export default{
         getTaskGroupList(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskGroup/list',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskGroup/list',
                 headers:{
                     'token':this.token
                 },
@@ -2526,7 +2526,7 @@ export default{
         loadParentCode(){
              axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/loadParentCode',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/resourceType/loadParentCode',
                 headers:{
                     'token':this.token
                 },
@@ -2554,7 +2554,7 @@ export default{
         getResourceType(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/getResouceType',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/resourceType/getResouceType',
                 headers:{
                     'token':this.token
                 },
@@ -2590,7 +2590,7 @@ export default{
             }
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/addResouceType',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/resourceType/addResouceType',
                  headers:{
                     'token':this.token
                 },
@@ -2623,7 +2623,7 @@ export default{
         deleteRTMakeSure(){
              axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/resourceType/deleteResouceType',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/resourceType/deleteResouceType',
                 headers:{
                     'token':this.token
                 },
@@ -2652,7 +2652,7 @@ export default{
         getLodeTaskCheckConfig(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/lodeTaskCheckConfig',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/lodeTaskCheckConfig',
                 headers:{
                     'token':this.token
                 },
@@ -2674,7 +2674,7 @@ export default{
         getlodeComponentCheckConfig(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/lodeComponentCheckConfig',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/lodeComponentCheckConfig',
                 headers:{
                     'token':this.token
                 },
@@ -2696,7 +2696,7 @@ export default{
         getTaskStatusList(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskStatus/list',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskStatus/list',
                 headers:{
                      'token':this.token
                 },
@@ -2731,7 +2731,7 @@ export default{
         setUseInView(index){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'/project2/schedule/setUseInView',
+                url:this.BDMSUrl+'schedule/setUseInView',
                 headers:{
                     'token':this.token
                 },
@@ -2785,7 +2785,7 @@ export default{
         updateTSColorSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskStatus/updateColor',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskStatus/updateColor',
                 headers:{
                     'token':this.token
                 },
@@ -2853,7 +2853,7 @@ export default{
                
             axios({
             method:'post',
-            url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/weekTime/add',
+            url:this.BDMSUrl+'schedule/'+this.projId+'/weekTime/add',
             headers:{
                 'token':this.token
             },
@@ -2950,7 +2950,7 @@ export default{
             weekNum = weekNum.join("")
             axios({
             method:'post',
-            url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/weekTime/update',
+            url:this.BDMSUrl+'schedule/'+this.projId+'/weekTime/update',
             headers:{
                 'token':this.token
             },
@@ -3004,7 +3004,7 @@ export default{
         deleteWTMakeSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/weekTime/delete',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/weekTime/delete',
                 headers:{
                     token:this.token
                 },
@@ -3112,7 +3112,7 @@ export default{
         deleteETMakeSure(){
              axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/exceptionDate/delete',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/exceptionDate/delete',
                 headers:{
                     token:this.token
                 },
@@ -3145,7 +3145,7 @@ export default{
             else{
                 axios({
                     method:'post',
-                   url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendarTemplate/add',
+                   url:this.BDMSUrl+'schedule/'+this.projId+'/calendarTemplate/add',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
@@ -3184,7 +3184,7 @@ export default{
             else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/calendarTemplate/update',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/calendarTemplate/update',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
@@ -3304,7 +3304,7 @@ export default{
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/exceptionDate/add',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/exceptionDate/add',
                     headers:{
                         'token':this.token
                     },
@@ -3352,7 +3352,7 @@ export default{
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/exceptionDate/update',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/exceptionDate/update',
                     headers:{
                         'token':this.token
                     },
@@ -3441,7 +3441,7 @@ export default{
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskGroup/add',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/taskGroup/add',
                     headers:{
                         'token':this.token
                     },
@@ -3478,7 +3478,7 @@ export default{
             }else{
                  axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskGroup/update',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/taskGroup/update',
                     headers:{
                         'token':this.token
                     },
@@ -3508,7 +3508,7 @@ export default{
         deleteTGMakeSure(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/taskGroup/delete',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/taskGroup/delete',
                 headers:{
                     token:this.token
                 },
@@ -3575,7 +3575,7 @@ export default{
         updateComponentCheck(){
             axios({
                     method:'post',
-                    url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/alterCheckConfig',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/alterCheckConfig',
                     headers:{
                         'token':this.token
                     },

@@ -3,7 +3,7 @@
     element-loading-background="rgba(0, 0, 0, 0.8)">
         <div id="GroupSelect">
             <select v-model="selectUgId" class="inp-search">
-                <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
+                <option :value="item.groupId" v-for="(item,index) in  ugList" :key="index" v-text="item.groupName"></option>
             </select>
             <i class="icon-sanjiao"></i>
         </div>
@@ -37,7 +37,7 @@
                                 options_status:[],//状态选项
                                 options_about:[],//相关选项 -->
                             <li class="selectItem">
-                                <span class="title">单体</span>
+                                <span class="title">层级</span>
                                 <el-select v-model="value_monomer" placeholder="请选择">
                                     <el-option
                                     v-for="item in options_monomer"
@@ -77,14 +77,17 @@
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
                                     <div class="projectListImg">
-                                        <img :src="item.createUserImg != ''?(commomHeadPictureFile+item.createUserImg):require('../../assets/people.png')">
+                                        <img :src="item.createUserImg != null?(BDMSUrl+'user/avater?userId='+item.ugId):require('../../assets/people.png')">
                                     </div> 
                                     <div class="projectListText">
                                         <span class="action_rightBox">
-                                            <span class="icon-finish" v-if="canEditMes && item.dcStatus == 1" @click="updateStatus(item.dcId,0,'完成',index)">完成</span>
-                                            <span class="icon-reconsider" v-if="canEditMes && item.dcStatus == 2" @click="updateStatus(item.dcId,1,'再议',index)">再议</span>
-                                            <span class="icon-start" v-if="canEditMes && item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
-                                            <span class="icon-delete" v-if="canDeleteMes" @click="deleteMes(item.dcId,index)"></span>
+                                            <!-- canEditMes && -->
+                                            <span class="icon-finish" v-if="item.dcStatus == 1" @click="updateStatus(item.dcId,0,'完成',index)">完成</span>
+                                            <span class="icon-reconsider" v-if=" item.dcStatus == 2" @click="updateStatus(item.dcId,1,'再议',index)">再议</span>
+                                            <span class="icon-start" v-if="item.dcStatus == 3" @click="updateStatus(item.dcId,1,'开启',index)">开启</span>
+
+                                            <span class="icon-delete"  @click="deleteMes(item.dcId,index)"></span>
+                                            <!-- v-if="canDeleteMes" -->
                                         </span>
                                         <p class="projectListTextName">{{item.createUserStr}}</p>
                                         <p class="font-color1" v-html="item.dcContent"></p>
@@ -93,28 +96,28 @@
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
                                                         <!-- <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png'):''" /> -->
-                                                        <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
+                                                        <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(val.name).toUpperCase())+'.png')" />
                                                     </span>
                                                     <span  class="item-file-detial">
-                                                        <h3 v-text="val.fileName"></h3>
-                                                        <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
-                                                        <p v-text="initData(val.uploadTime)"></p>
+                                                        <h3 v-text="val.name"></h3>
+                                                        <!-- <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
+                                                        <p v-text="initData(val.uploadTime)"></p> -->
                                                         <p class="operation">
-                                                            <span v-text="'版本'+val.version"></span>
-                                                            <i class="icon-goujian icon-search" @click="preview(val.filePath)"></i>
-                                                            <i class="icon-goujian icon-download" @click="downLoad(val.filePath)"></i>
+                                                            <!-- <span v-text="'版本'+val.version"></span> -->
+                                                            <i class="icon-goujian icon-search" @click="preview(val.path)"></i>
+                                                            <i class="icon-goujian icon-download" @click="downLoad(val.path)"></i>
                                                         </p>
                                                     </span>
                                                 </div>
                                             </li>
                                             <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <img style="object-fit: contain" :src="BDMSUrl+val.path" :title="val.name" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
                                                     <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
                                                      <i class="line"></i>
-                                                    <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                                    <i class="button-search"   @click="preview(val.path)"></i>
                                                     <i class="line"></i>
-                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                                                    <i class="button-download" @click="downLoad(val.path)"></i>
                                                 </div>
                                             </li>
                                         </ul>
@@ -135,7 +138,7 @@
                                             v-on:hide="hideSendMes" v-on:refreshcomment="getComment(item.dcId,index,item.showResponse,item.reviewCount,true,$event)"></sendMes>
                                             <ul >
                                                 <li v-for="(val,key) in CommentList" :key="key+'CommentList'" class="comments-item clearfix">
-                                                    <img :src="val.rvUserImg != ''?(QJFileManageSystemURL+val.rvUserImg):require('../../assets/people.png')" class="left">
+                                                    <img :src="val.rvUserImg != ''?(BDMSUrl+'user/avater?userId='+val.rvUser):require('../../assets/people.png')" class="left">
                                                     <div  class="center">
                                                         <span class="icon-delete" v-if="val.editable"  @click="deleteComment(val.dcId,val.id,key,index)"></span>
                                                         <p class="head">
@@ -162,28 +165,28 @@
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
                                                                                 <!-- checkIcon(left.fileExtension.toUpperCase())? -->
-                                                                                <img :src="require('../ManageCost/images/icon/'+checkIcon1(left.fileExtension.toUpperCase())+'.png')" />
+                                                                                <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(left.name).toUpperCase())+'.png')" />
                                                                             </span>
                                                                             <span  class="item-file-detial">
-                                                                                <h3 v-text="left.fileName"></h3>
-                                                                                <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
-                                                                                <p v-text="initData(left.uploadTime)"></p>
+                                                                                <h3 v-text="left.name"></h3>
+                                                                                <!-- <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
+                                                                                <p v-text="initData(left.uploadTime)"></p> -->
                                                                                 <p class="operation">
-                                                                                    <span v-text="'版本'+left.version"></span>
-                                                                                    <i class="icon-goujian icon-search" @click="preview(left.filePath)"></i>
-                                                                                    <i class="icon-goujian icon-download" @click="downLoad(left.filePath)"></i>
+                                                                                    <!-- <span v-text="'版本'+left.version"></span> -->
+                                                                                    <i class="icon-goujian icon-search" @click="preview(left.path)"></i>
+                                                                                    <i class="icon-goujian icon-download" @click="downLoad(left.path)"></i>
                                                                                 </p>
                                                                             </span>
                                                                         </div>
                                                                     </li>
                                                                     <li :class="['item-file']" v-for="(left,right) in val.attachList" :key="right+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img  style="object-fit:contain"  :src="QJFileManageSystemURL+left.relativePath" :title="left.fileName" class="item-file-attach"/>
+                                                                        <img  style="object-fit:contain"  :src="BDMSUrl+left.path" :title="left.name" class="item-file-attach"/>
                                                                         <div class="actionbox clearfix">
                                                                              <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
                                                                             <i class="line"></i>
-                                                                            <i class="button-search"  @click="preview(left.relativePath)"></i>
+                                                                            <i class="button-search"  @click="preview(left.path)"></i>
                                                                             <i class="line"></i>
-                                                                            <i class="button-download" @click="downLoad(left.relativePath)"></i>
+                                                                            <i class="button-download" @click="downLoad(left.path)"></i>
                                                                         </div>
                                                                     </li>
                                                                 </ul>
@@ -260,17 +263,17 @@
             </div> -->
             <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 2">
                 <p class="clearfix" style="padding-bottom:5px;border-bottom: 1px solid #e6e6e6;" v-if="hasAuthDelUser">
-                    <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i>
+                    <!-- <i class="icon-goujian icon-add" title="添加" @click="addContact()"></i> -->
                 </p>
                 <ul class="container-contacts">
                     <li class="member clearfix" v-for="(item,index) in contacts" :key="index">
-                        <img :src="item.imgUuid!=''?(commomHeadPictureFile+item.imgUuid):''" alt="">
+                        <img :src="item.imgUuid!=null?(BDMSUrl+'user/avater?userId='+item.userId):''" alt="">
                         <span class="member-name">
                             <h3 v-text="item.userName"></h3>
                             <p v-text="item.account"></p>
                         </span>
-                        <i class="icon-ditial" title="详情" @click="ckeckUserInfo(item.id)"></i>
-                        <i class="icon-del" title="删除" @click="deleteContact(item.id,item.userId)" v-if="hasAuthDelUser"></i>
+                        <i class="icon-ditial" title="详情" @click="ckeckUserInfo(item.userId)"></i>
+                        <!-- <i class="icon-del" title="删除" @click="deleteContact(item.id,item.userId)" v-if="hasAuthDelUser"></i> -->
                     </li>
                 </ul>
             </div>
@@ -511,16 +514,16 @@
     </div>
     <el-dialog title="联系人详情" id="contactINFO" :visible="selectContact.infoShow" @close="selectInfoCancle">
         <div class="clearfix">
-            <img :src="selectContact.infoObj.imgUuid !=''?(commomHeadPictureFile+selectContact.infoObj.imgUuid):require('../../assets/people.png')" alt="" class="img">
+            <img :src="selectContact.infoObj.userAvater !=''?(BDMSUrl+'user/avater?userId='+selectContact.infoObj.userId):require('../../assets/people.png')" alt="" class="img">
             <div class="info">
-                <h1 v-text="selectContact.infoObj.realName"></h1>
+                <h1 v-text="selectContact.infoObj.name"></h1>
                 <div class="detial">
                     <label>邮箱 :</label>
                     <span v-text="selectContact.infoObj.email"></span>
                 </div>
                 <div class="detial">
                     <label>账号 :</label>
-                    <span v-text="selectContact.infoObj.account"></span>
+                    <span v-text="selectContact.infoObj.name2"></span>
                 </div>
             </div>
         </div>
@@ -2156,7 +2159,7 @@
                 }
             }
             .container-contacts{
-                margin-top:10px; 
+                // margin-top:10px; 
                 position: absolute;
                 overflow: auto;
                 top: 32px;
@@ -3057,9 +3060,10 @@ export default {
         ],//相关选项
         showAction:false,
         IsFolderAction:null,
+
         value_monomer: '',//单体 筛选关键词
-        value_status: '-1',//单体 筛选关键词
-        value_about: '-1',//单体 筛选关键词
+        value_status: '-1',//状态 筛选关键词
+        value_about: '-1',//相关 筛选关键词
         CommunicationList:[],//消息流列表
         drawingsUploadShow:false,//添加图纸弹窗的显隐
         fileList:[],//即将上传的文件集合
@@ -3158,17 +3162,18 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.BIMServerPort=vm.$store.state.BIMServerPort;
         vm.loadingTitle();
-        var timer = setInterval(function(){
-            if(vm.defaultSubProjId != null){
-                vm.getIntoDesignPage()//进入设计协调获取信息
-                vm.getPosID()//获取posID，
-                vm.checkAuth()//获取posID，
-                vm.getFileTree()
-                clearInterval(timer)
-            }else{
-                vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
-            }
-        },100)
+        vm.getIntoDesignPage()
+        // var timer = setInterval(function(){
+        //     if(vm.defaultSubProjId != null){
+        //         vm.getIntoDesignPage()//进入设计协调获取信息
+        //         vm.getPosID()//获取posID，
+        //         vm.checkAuth()//获取posID，
+        //         // vm.getFileTree()
+        //         clearInterval(timer)
+        //     }else{
+        //         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        //     }
+        // },100)
     },
   watch:{
     //   <!-- options_monomer:[],//单体选项
@@ -3219,7 +3224,7 @@ export default {
             var vm = this 
             vm.getContacts()
             vm.getCommunicationList()//获取评论
-            vm.updateLsug()
+            // vm.updateLsug()
       },
   },
   methods:{
@@ -3237,7 +3242,7 @@ export default {
                this.TraceId =e.data.parameter[0].TraceID;
                console.log(e.data.parameter,'e.data.parameter');
                console.log(this.TraceId,'this.TraceId');
-               this.getPropertyInfo();
+            //    this.getPropertyInfo();
                break;
 			case "ViewpointSubmited":
                 // ScreenPara = e.data.parameter;
@@ -3287,6 +3292,9 @@ export default {
                 var value2 = b[property];
                 return value1 - value2;
             }
+        },
+        sliceType(val){
+            return val.substr(val.length-3)
         },
         getPropertyInfo(){
             var vm=this;
@@ -3384,7 +3392,7 @@ export default {
         }
         axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/dc/'+val+'/review/list',
+            url:vm.BDMSUrl+'design/'+val+'/review/list',
             headers:{
                 'token':vm.token
             },
@@ -3437,7 +3445,7 @@ export default {
             }).then(() => {
                   axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'project2/dc/'+dcId+'/'+dcReviewId+'/1/delete',
+                        url:vm.BDMSUrl+'design/'+dcId+'/'+dcReviewId+'/1/delete',
                         headers:{
                             'token':vm.token
                         },
@@ -3475,7 +3483,7 @@ export default {
             }).then(() => {
                   axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'project2/dc/'+dcId+'/1/delete',
+                        url:vm.BDMSUrl+'design/'+dcId+'/1/delete',
                         headers:{
                             'token':vm.token
                         },
@@ -3506,7 +3514,7 @@ export default {
         var vm = this
         axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/dc/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
+            url:vm.BDMSUrl+'design/'+vm.dcStatus.obj.dcId+'/1/updateStatus',
             headers:{
                 'token':vm.token
             },
@@ -3556,7 +3564,7 @@ export default {
           if(dcStatus != 0){
                 axios({
                     method:'POST',
-                    url:vm.BDMSUrl+'project2/dc/'+dcId+'/1/updateStatus',
+                    url:vm.BDMSUrl+'design/'+dcId+'/1/updateStatus',
                     headers:{
                         'token':vm.token
                     },
@@ -3599,7 +3607,7 @@ export default {
           var isCollect = collect?0:1
           axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/dc/'+val+'/1/collect',
+            url:vm.BDMSUrl+'design/'+val+'/1/collect',
             headers:{
                 'token':vm.token
             },
@@ -3629,7 +3637,7 @@ export default {
                 })
                 return false
             }
-            window.open(vm.QJFileManageSystemURL + filePath);
+            window.open(vm.BDMSUrl + filePath);
         },
         checkStatus(val){
             var status = "正在处理"
@@ -3652,7 +3660,7 @@ export default {
           var vm = this
           axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/dc/list',
+            url:vm.BDMSUrl+'design/list',
             headers:{
                 'token':vm.token
             },
@@ -3663,7 +3671,7 @@ export default {
                 "pageType": 1,//设计协调
                 "projId": vm.projId,
                 "status": vm.value_status,//状态 筛选
-                "subProjId": vm.defaultSubProjId,
+                // "subProjId": vm.defaultSubProjId,
                 "type": vm.value_about,//相关 筛选
                 "ugId": vm.selectUgId,
                 "userId": vm.userId
@@ -3737,7 +3745,7 @@ export default {
           var vm = this
           axios({
             method:'GET',
-            url:vm.BDMSUrl+'project2/dc/viewContactDetails',
+            url:vm.BDMSUrl+'design/viewContactDetails',
             headers:{
                 'token':vm.token
             },
@@ -4414,54 +4422,114 @@ export default {
             window.open(vm.QJFileManageSystemURL+filePath+"/preview");
         }
     },
-    getIntoDesignPage(){
+
+    getIntoCloudD(){
         var vm = this
         axios({
             method:'GET',
-            url:vm.BDMSUrl+'project2/dc/designCoordination',
+            // url:vm.BDMSUrl+'project2/doc/documentCloudDisk',
+            url:vm.BDMSUrl+'userGroup/getAllGroup',
+            // url:vm.BDMSUrl+'userGroup/getUserGroup',
             headers:{
                 'token':vm.token
             },
             params:{
-                projId:vm.projId
+                projectId:vm.projId
             }
         }).then((response)=>{
-            if(response.data.cd == 0){
-                vm.siteHolderId = response.data.rt.siteHolderId
-                vm.ugList = response.data.rt.ugList
-                vm.ugList.forEach((item)=>{
-                    if(item.ugId == response.data.rt.selectUgId){
-                        vm.$set(item,'checked',true)//设置checked属性，用于文件权限弹窗选择使用
-                    }else{
-                         vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
-                    }
-                })
-                vm.options_monomer = response.data.rt.subProjects//单体列表
-                vm.options_monomer.unshift({
-                    id:response.data.rt.siteHolderId,
-                    Name:'总体场地'
-                },)
-                vm.value_monomer = response.data.rt.siteHolderId
-                vm.selectUgId = vm.ugList[0].ugId
-                vm.getContacts()
-                vm.getCommunicationList()//获取评论
+            if(Math.ceil(response.data.cd) == 0){
+                vm.ugList = response.data.rt
+                vm.selectUgId = response.data.rt[0].groupId;
+                vm.getCatalog();
             }
-
         }).catch((err)=>{
             console.log(err)
         })
+    },
+    getCatalog(){
+        var vm=this;
+        axios({
+            url:vm.BDMSUrl+'doc/getDirectoryWithAll',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projectId:vm.projId,
+                groupId:vm.selectUgId
+            }
+        }).then((response)=>{
+            if(response.data.cd==0){
+                response.data.rt.forEach((item)=>{
+                    if(item.dirName.indexOf('@')>-1){
+                        vm.options_monomer.push(
+                            {
+                                'id':item.dirId,
+                                'Name':this.joinData(item.dirName)
+                            }
+                        )
+                    }
+                })
+                vm.value_monomer = vm.options_monomer[0].id;
+            }
+        })
+    },
+    joinData(val){
+        return val.split('@')[0]
+    },
+
+
+    getIntoDesignPage(){
+        var vm = this
+        // axios({
+        //     method:'GET',
+        //     url:vm.BDMSUrl+'project2/dc/designCoordination',
+        //     headers:{
+        //         'token':vm.token
+        //     },
+        //     params:{
+        //         projId:vm.projId
+        //     }
+        // }).then((response)=>{
+        //     if(response.data.cd == 0){
+        //         vm.siteHolderId = response.data.rt.siteHolderId
+        //         vm.ugList = response.data.rt.ugList
+        //         vm.ugList.forEach((item)=>{
+        //             if(item.ugId == response.data.rt.selectUgId){
+        //                 vm.$set(item,'checked',true)//设置checked属性，用于文件权限弹窗选择使用
+        //             }else{
+        //                  vm.$set(item,'checked',false)//设置checked属性，用于文件权限弹窗选择使用
+        //             }
+        //         })
+        //         vm.options_monomer = response.data.rt.subProjects//单体列表
+        //         vm.options_monomer.unshift({
+        //             id:response.data.rt.siteHolderId,
+        //             Name:'总体场地'
+        //         },)
+        //         vm.value_monomer = response.data.rt.siteHolderId
+        //         vm.selectUgId = vm.ugList[0].ugId
+        //         vm.getContacts()
+        //         vm.getCommunicationList()//获取评论
+        //     }
+
+        // }).catch((err)=>{
+        //     console.log(err)
+        // })
+
+        // vm.getCatalog()  //从目录中读取文件
+        vm.getIntoCloudD() //获取群组信息
+
     },
     getContacts(){
         var vm = this
         axios({
             method:'POST',
-            url:vm.BDMSUrl+'project2/dc/searchDcProjectUserList',
+            url:vm.BDMSUrl+'design/searchDcProjectUserList',
             headers:{
                 'token':vm.token
             },
             params:{
                 projId:vm.projId,
-                condition:'',
+                // condition:'',
                 ugId:vm.selectUgId
             }
         }).then((response)=>{

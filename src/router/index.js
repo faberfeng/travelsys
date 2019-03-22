@@ -162,6 +162,44 @@ const router = new Router({
         },
       ]
     },
+    //用户注册
+    {
+      path:'/registerIndex',
+      name:'register',
+      component:resolve=>require(['@/components/register/registerIndex'],resolve)
+    },
+    //注册成功
+    {
+      path:'/userRegisterSuccess',
+      name:'registerSuccess',
+      component:resolve=>require(['@/components/register/registerSuccess'],resolve)
+    },
+
+    //用户邮箱注册激活成功验证
+    {
+      path:'/user/active',
+      name:'active',
+      component:resolve=>require(['@/components/register/active'],resolve)
+    },
+    //用户管理系统登陆页
+    {
+      path:'/userLogin',
+      name:'userLogin',
+      component:resolve=>require(['@/components/userManageSystem/userLogin'],resolve)
+    },
+    //用户详情信息
+    {
+      path:'/userInformation',
+      name:'userInformation',
+      component:resolve=>require(['@/components/userManageSystem/userInformation'],resolve)
+    },
+
+    {
+      path:'/user/reActive',
+      name:'reActive',
+      component:resolve=>require(['@/components/register/reActive'],resolve)
+    },
+    //用户登录
     {
       path:'/Design',
       name:'Design',

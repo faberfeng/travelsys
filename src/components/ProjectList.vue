@@ -1,6 +1,6 @@
 <template>
 <div class="wrapper">
-    <headerCommon :username="userName" :proname="titleName"></headerCommon>
+    <headerCommon :username="userName" :proname="titleName" :userimg="userImg"></headerCommon>
       <!-- <div v-show="!noprojectShow" class="noproject">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
@@ -490,6 +490,8 @@ export default {
             citylimit: true
         },
         pathInit:'',
+        userImg:'',
+
         
       }
   },
@@ -502,6 +504,7 @@ export default {
       vm.BDMSUrl = vm.$store.state.BDMSUrl
       vm.applyIndexUrl = vm.$store.state.applyIndexUrl
       vm.shareUrl = vm.$store.state.shareUrl
+      vm.userImg=localStorage.getItem('userImg')
       var defaultSubProjId = localStorage.getItem('defaultSubProjId') 
       if(defaultSubProjId != 'undefined'){
           localStorage.removeItem('defaultSubProjId')

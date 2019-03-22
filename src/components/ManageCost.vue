@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper" ref="allHeight">
       <!--2018/3/21 付伟超修改-->
-        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' ></headerCommon>
+        <headerCommon :username='header.userName' :userid='header.userId' :proname='header.projectName' :userimg="header.userImg" ></headerCommon>
         <div class="contentBody">
             <div class="downWebGl" @click="webGlbtn">虚拟场景<i :class="[{'active':webGlShow},'webGlDownBtn']"></i></div>
             <div v-show="webGlShow" id="webgladd" class="webglBackground">
@@ -114,6 +114,7 @@ export default {
         );
         return{
             url:'http://10.252.26.240:8080/genDist/',
+
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
             header:{
@@ -187,15 +188,19 @@ export default {
             authId:'',
             moduleLists:'',
             ellist:'',
+            entId:'',
+            groupId:'',
 
 
         }
     },
     created(){
         var vm = this
-        
+
         vm.projId = localStorage.getItem('projId');//获取工程编号
         vm.subProjId=localStorage.getItem('defaultSubProjId');
+        vm.entId=localStorage.getItem('entId');
+
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.WebGlUrl=vm.$store.state.WebGlUrl;
         vm.QJFileManageSystemURL=vm.$store.state.QJFileManageSystemURL;
@@ -207,6 +212,7 @@ export default {
         vm.navigationPath = sessionStorage.getItem('navigationPath');
         // console.log(vm.navigationPath,'vm.navigationPath');
         vm.settingActive = sessionStorage.getItem('settingActive');
+        
         if(!vm.navigationPath){
             vm.navigationPath='007';
         }
@@ -219,6 +225,7 @@ export default {
         vm.getUserInfo()
         vm.getPJDetial(vm.projId);
         vm.getOnlineInfo();
+        vm.getUserGroup();
         // console.log(new Date().getTime(),'time');
         // this.getInitdata();
     },
@@ -261,7 +268,7 @@ export default {
              setTimeout(()=>{
                  app = this.$refs.iframe1.contentWindow;
                 // app = document.getElementById("webIframe").contentWindow;
-                app.postMessage({command:"Init",parameter:null},"*");
+                app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
                     // window.removeEventListener("message", (evt)=>{
                     //     this.callback(evt)},true);
             },1000)
@@ -273,23 +280,12 @@ export default {
 				{
                     let Horder='';
                     let para='';
-					 Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                     para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
-                    // console.log(para,'para000')
-                    // this.strJson.push({para:para})
+					//  Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
+                    //  para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+                    para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
                     this.strJson=para;
-                    app.postMessage({command:"EnterProject",parameter:this.strJson},"*");
                     console.log(this.strJson,'加载中');
-
-                    
-                    // console.log(para,'para0000')
-                    // para='';
-                    // this.WebGlId='';
-                    // this.WebGlType='';
-                    // this.WebGlName='';
-                    // this.WebGlUrl='';
-
-
+                    app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
 				break;
 			case "CurrentSelectedEnt":
@@ -304,6 +300,26 @@ export default {
                 this.getDrawingList();
                 break;
 		    }
+        },
+        getUserGroup(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'userGroup/getAllGroup',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    response.data.rt.forEach((item)=>{
+                        if(item.groupName=='默认群组'){
+                            this.groupId=item.groupId
+                        }
+                    })
+                }
+            })
         },
         //动态加载iframe
         CreateIframe(url){
@@ -593,8 +609,9 @@ export default {
                     projectId:vm.projId
                 }
             }).then((response)=>{
-                // vm.header.userName = response.data.rt.user.name
+                vm.header.userName = response.data.rt.user.name
                 vm.header.userId = response.data.rt.user.userId
+                vm.header.userImg=localStorage.getItem('userImg')
                 // vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
                 // localStorage.setItem('userImg',vm.header.userImg)
                 // localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
@@ -777,10 +794,10 @@ export default {
                             //     title:'/setting/pageinital',
                             //     linkUrl:'层级管理初始化'
                             // },
-                            {
-                                title:'/setting/hierarchicalManagement',
-                                linkUrl:'层级管理初始化'
-                            }
+                            // {
+                            //     title:'/setting/hierarchicalManagement',
+                            //     linkUrl:'层级管理初始化'
+                            // }
                         )
                         vm.$set(item,'routerLink',routerLink1);
                     }

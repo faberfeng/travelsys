@@ -23,7 +23,7 @@
                     <div class="commentTool" v-show="screenLeft.item == 3||screenLeft.item == 2">
                         <label style="font-size:14px; color:#999999;margin-right:4px">批注人:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="annotationUserId" class="commentSel">
-                            <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
+                            <el-option  class="commentOpt" v-for="item in allUserList" :key="item.userId" :value="item.userId" :label="item.name"></el-option>
                         </el-select>
                         <label style="font-size:14px; color:#999999;margin-right:4px" >阶段:</label>
                         <el-select style="height:30px !important;width:130px;margin-right:10px;" v-model="stage" class="commentSel">
@@ -77,7 +77,7 @@
                     </div>
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
                         <span class="item-property "  @click="drawingClick()">图<br>纸</span>
-                        <span class="item-version " @click="versionClick()">版<br>本</span>
+                        <!-- <span class="item-version " @click="versionClick()">版<br>本</span> -->
                         <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
                     </div>
             </div>
@@ -90,7 +90,7 @@
                     <p class="clearfix" v-else>
                         <i class="icon-goujian icon-delete" v-show="isOneShow||isTwoShow"  title="删除" @click="deleteFile()"></i>
                         <i class="icon-goujian icon-edit" v-show="isOneShow" title="编辑" @click="editMap()"></i>
-                        <i class="icon-goujian icon-update" v-show="isOneShow"  title="更新" @click="updateFile()"></i>
+                        <!-- <i class="icon-goujian icon-update" v-show="isOneShow"  title="更新" @click="updateFile()"></i> -->
                     </p>
                     <!-- :default-expanded-keys="expandedKeys" -->
                     <el-tree
@@ -478,6 +478,7 @@ export default {
             getHoldersList:[],//空间楼层列表
             holderId:'',//容器ID
             fileGroupId:'',//文件夹ID
+            fileUrl:'',//文件url
             paraList:{},
             deleteDrawingIds:[],
             drawingLists:[],
@@ -489,6 +490,8 @@ export default {
             previousDrawingId:'',//迁移后前面面的一个图纸ID，没有则不传
             routerList:'',
             moduleList:'',
+            fileType:"",
+            fileHeader:'',
         }
     },
     filters: {
@@ -526,7 +529,7 @@ export default {
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
-        vm.userId = localStorage.getItem('userid')
+        vm.userId = localStorage.getItem('userId')
         vm.entId = localStorage.getItem('entId')
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.getDirectory()
@@ -692,25 +695,27 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.getHoldersList=response.data.rt;
+                    var getHolder=''
+                    getHolder=response.data.rt;
+
+                    getHolder.forEach((item)=>{
+                         if(vm.checkFileDir.buildId==item.dirParId){
+                             this.getHoldersList.push({
+                                "holderId": item.dirId?item.dirId:null,
+                                "holderName": item.dirName?item.dirName:'',
+                                "holderType": "",
+                                "parentHolderId":item.dirParId?item.dirParId:null
+                             })
+                         }
+                     })
                     this.getHoldersList.unshift({ 
                         "holderId": null,
                         "holderName": "无",
                         "holderType": "",
                         "parentHolderId":null
                     })
-                     this.getHoldersList.forEach((item)=>{
-                         if(item.holderType==7){
-                             item.holderName='&nbsp&nbsp'+item.holderName
-                         }
-                         if(item.holderType==8){
-                             item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
-                         }
-                         if(item.holderType==9){
-                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
-                         }
-                     })
-                    // this.holderId=null;
+                    console.log(this.getHoldersList,'this.getHoldersList');
+                     
                 }else{
                     this.$message({
                         type:'error',
@@ -767,6 +772,7 @@ export default {
             var vm=this;
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/createDrawingDirectory',
+               
                 method:'get',
                 headers:{
                     'token':vm.token
@@ -778,10 +784,10 @@ export default {
                 if(response.data.cd=='0'){
 
                 }else{
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
+                    // this.$message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
                 } 
             })
         },
@@ -790,7 +796,8 @@ export default {
             this.allUserList=''
             var vm=this
             axios({
-                url:vm.BDMSUrl+'dc/drawingReview/getAllUser',
+                // url:vm.BDMSUrl+'dc/drawingReview/getAllUser',
+                url:vm.BDMSUrl+'user/getProjectUserList',
                 method:'post',
                 headers:{
                     'token':vm.token
@@ -801,7 +808,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                    this.allUserList=response.data.rt;
-                   this.allUserList.unshift({userId: -1, userName: "全部", account: "", userPositions: null})
+                   this.allUserList.unshift({userId: -1, name: "全部", account: "", userPositions: null})
                    this.annotationUserId=parseInt(this.userId);
                     // console.log(this.allUserList);
                 }else{
@@ -996,11 +1003,13 @@ export default {
             //  this.biaozhushow=true;
             // this.loadeds()
             //  this.isSelect=this.drawingVersionId;
+            var fileUri=''
              this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
-            vm.drawingFileUrl=this.QJFileManageSystemURL+this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+            fileUri=this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+            vm.drawingFileUrl=this.BDMSUrl+'doc/download/'+this.fileGroupId;
             this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
             console.log(this.version,'this.version12')
-            var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+            var type=(fileUri.substr(fileUri.length-3)).toString();
             console.log(type);
             this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
             console.log(this.drawingVersionId);
@@ -1035,6 +1044,35 @@ export default {
                 } 
             })
         },
+        //获取响应头部信息
+        getHeader(){
+            var vm=this;
+            // axios({
+            //     url:vm.drawingFileUrl,
+            //     headers:{
+            //         'Access-Control-Allow-Origin':'*'
+            //     },
+            //     method:'get'
+            // }).then((response)=>{
+            //     console.log(response.headers,'这是头部信息');
+            // })
+            $.ajax({
+                url:vm.drawingFileUrl,
+                type:'get',
+                dataType:"jsonp",
+                async:false,
+                // jsonp: 'callback',
+                complete:function(xhr,data){
+                    // console.log(response.headers,'这是头部信息');
+                    // console.log('000');
+                    // console.log(xhr.getAllResponseHeaders())
+                    console.log(xhr.getResponseHeader('content-disposition'))
+                    this.fileHeader=xhr.getResponseHeader('content-disposition');
+                    this.fileType=(this.fileHeader.substr(this.fileHeader.length-3)).toString();
+                }
+
+            })
+        },
         //获取图纸旋转信息
         getDrawingRotateInfo(){
              var vm=this
@@ -1059,8 +1097,10 @@ export default {
                         }
                         console.log(parseInt(this.rotate),'this.rotate');
                     }
-                     var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
-                    console.log(type);
+                    // this.getHeader();
+                    //  var type=(vm.drawingFileUrl.substr(vm.drawingFileUrl.length-3)).toString();
+                    // console.log(type);
+                    var type=(vm.fileUrl.substr(vm.fileUrl.length-3)).toString();
                     this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
                    
                     console.log(this.paraList,'this.paraList');
@@ -1393,10 +1433,10 @@ export default {
                             vm.buildIdList=[];
                             buildIdLists.forEach((item1)=>{
                                 vm.buildIdList.push({
-                                    buildId:item1.id,
-                                    name:item1.name,
+                                    buildId:item1.dirId,
+                                    name:item1.dirName,
                                     buildCode:item.code,
-                                    code:item1.id+item.code,
+                                    code:item1.dirId+item.code,
                                     disabled:true,
                                     isBuild:true
                                 })
@@ -1640,9 +1680,10 @@ export default {
                 data:drawingIdList
             }).then((response)=>{
                 if(response.data.rt){
-                    vm.versionPath=(response.data.rt)[0].fileUri;
-                    vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
-                    
+                    // vm.versionPath=(response.data.rt)[0].fileUri;
+                    // vm.drawingFileUrl=vm.QJFileManageSystemURL+vm.versionPath;
+                    vm.versionPath=(response.data.rt)[0].fgId;
+                    vm.drawingFileUrl=vm.BDMSUrl+'doc/download/'+vm.versionPath   
                     vm.getDrawingRotateInfo();
                     this.drawingLoading=false;
                 }
@@ -1690,8 +1731,9 @@ export default {
                 this.drawingFileUrl1='';
                 this.drawingFileUrl='';
             //   this.getDrawingRotateInfo();
-                this.getMaxVersionPath();
                 this.getDrawingVersionList();
+                this.getMaxVersionPath();
+               
             }
             
             
@@ -1761,6 +1803,7 @@ export default {
                     this.version=this.drawingVersionList[listLen-1].versionId;
                     this.drawingVersionId=this.drawingZxVersionId;
                     this.fileGroupId=this.drawingVersionList[0].fileGroupId;
+                    this.fileUrl=this.drawingVersionList[0].fileUri;
                     console.log(this.fileGroupId,'文件id',this.drawingVersionId)
                     // this.isSelect=this.drawingVersionId;
                     // console.log(this.drawingZxVersionId);
@@ -1859,7 +1902,8 @@ export default {
             vm.buildId=vm.checkFileDir.buildId
             if(vm.buildId){
                      vm.editDrawing.renameshow = true
-                    vm.getHolderByBuildId();
+                    // vm.getHolderByBuildId();
+                    vm.getHolders()
             }else{
                     vm.editDrawing.renameshow = true
                     // vm.getHolders()
@@ -1891,7 +1935,8 @@ export default {
             }else if(vm.checkFileDir.buildCode){
                 if(vm.buildId){
                      vm.drawingsUploadShow = true;
-                    vm.getHolderByBuildId();
+                    // vm.getHolderByBuildId();
+                    vm.getHolders();
                 }else{
                     vm.drawingsUploadShow = true;
                     // vm.getHolders()
@@ -2132,23 +2177,37 @@ export default {
             }
             vm.fileList.forEach((item,index)=>{
 
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId+(vm.buildId==null?'':'&buildId='+vm.buildId);
-                returnUrl = encodeURIComponent(returnUrl);
+                // var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.holderId+(vm.buildId==null?'':'&buildId='+vm.buildId);
+                // returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
-                formData.append('token',vm.token);
-                formData.append('projId',vm.projId);
-                formData.append('type',1);
+                // formData.append('token',vm.token);
+                // formData.append('projId',vm.projId);
+                // formData.append('type',1);
+                //  formData.append('userId',vm.userId);
+                // formData.append('modelCode','004');
+                // formData.append('returnUrl',returnUrl);
                 formData.append('file',item.file);
-                formData.append('userId',vm.userId);
-                formData.append('modelCode','004');
-                formData.append('returnUrl',returnUrl);
+               
                 // this.$refs.pdfDocument_upload.src=item.file;
                 // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
-                        url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing',
+                        // url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',
                         headers:{
+                            'token':vm.token,
                             'Content-Type': 'multipart/form-data'
+                        },
+                        params:{
+                            directory:vm.directoryId,
+                            // encodeURIComponent(item.drawingName)
+                            drawingName:item.drawingName,
+                            drawingNumber:item.drawingNo,
+                            projectId:vm.projId,
+                            ratio:item.proportion,
+                            pageNo:'',
+                            holderId:vm.holderId,
+                            buildId:vm.buildId==null?'':vm.buildId,
                         },
                         data:formData,
                     }).then((response)=>{

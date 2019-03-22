@@ -52,27 +52,27 @@
                         <li class="item-file" v-for="(val,key) in fileId" :key="key+'_file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
-                                    <img :src="require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png')" />
+                                    <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(val.name).toUpperCase())+'.png')" />
                                 </span>
                                 <span  class="item-file-detial">
-                                    <h3 v-text="val.fileName"></h3>
-                                    <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="'浏览器'"></span>上传</p>
-                                    <p v-text="initData(val.uploadTime)"></p>
+                                    <h3 v-text="val.name"></h3>
+                                    <!-- <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="'浏览器'"></span>上传</p> -->
+                                    <!-- <p v-text="initData(val.name)"></p> -->
                                     <p class="operation">
-                                        <span v-text="'版本'+val.version"></span>
+                                        <!-- <span v-text="'版本'+val.version"></span> -->
                                         <i class="icon-goujian icon-delete" @click="deleteFile(key,2)"></i>
-                                        <i class="icon-goujian icon-search" @click="preview(val.filePath)"></i>
-                                        <i class="icon-goujian icon-download" @click="downLoad(val.filePath)"></i>
+                                        <i class="icon-goujian icon-search" @click="preview(val.uri)"></i>
+                                        <i class="icon-goujian icon-download" @click="downLoad(val.uri)"></i>
                                     </p>
                                 </span>
                             </div>
                         </li>
                         <li class="item-file" v-for="(val,key) in attachId" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                            <img :src="BDMSUrl+val.uri" :title="val.name" class="item-file-attach"/>
                             <div class="actionbox clearfix">
-                                <i class="button-search"  @click="preview(val.filePath)"></i>
+                                <i class="button-search"  @click="preview(val.uri)"></i>
                                 <i class="line"></i>
-                                <i class="button-download" @click="downLoad(val.filePath)"></i>
+                                <i class="button-download" @click="downLoad(val.uri)"></i>
                                  <i class="line"></i>
                                  <i class="icon-goujian icon-delete" @click="deleteFile(key,1)"></i>
                             </div>
@@ -260,7 +260,7 @@ export default Vue.component('common-upload',{
                  var vm = this
                     axios({
                         method:'POST',
-                        url:this.BDMSUrl+'/project2/dc/uploadViewPoint/1/'+this.projId,
+                        url:this.BDMSUrl+'design/uploadViewPoint/1/'+this.projId,
                         headers:{
                             'token':vm.token
                         },
@@ -316,6 +316,9 @@ export default Vue.component('common-upload',{
                  }
             })
         },
+        sliceType(val){
+            return val.substr(val.length-3)
+        },
         checkIcon1(val){
             var vm = this
             // console.log(val,'val1111');
@@ -330,7 +333,7 @@ export default Vue.component('common-upload',{
              var vm = this
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'/project2/dc/deleteShortStmtById',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.BDMSUrl+'design/deleteShortStmtById',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
                 headers:{
                     'token':vm.token
                 },
@@ -461,7 +464,7 @@ export default Vue.component('common-upload',{
             var vm = this
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'/project2/dc/getShortStatementByUserIdAndProjId',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                url:vm.BDMSUrl+'design/getShortStatementByUserIdAndProjId',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
                 headers:{
                     'token':vm.token
                 },
@@ -485,6 +488,9 @@ export default Vue.component('common-upload',{
             // return str.replace(/(^\s*)|(\s*$)/g, ""); 
             return str.replace(/\n|\r\n/g,"<br/>") //将字符串的空格变成<br/>编译
         },
+        sliceUri(val){
+            return val.split('/')[3]
+        },
         sendInfo(){
             var vm = this
             // vm.$refs.message.value = vm.trim(vm.$refs.message.value)
@@ -498,11 +504,15 @@ export default Vue.component('common-upload',{
             var imguuid = []
             var vpListUid=[]
             vm.fileId.forEach((item,index) => {
-                fuuid.push(item.fileId+'')
+                fuuid.push({
+                    name:item.name,
+                    path:item.uri
+                })
             });
              vm.attachId.forEach((item,index) => {
                 imguuid.push({
-                    fileUuid:item.fileUuid
+                    name:item.name,
+                    path:item.uri
                 })
             });
             vm.uploadViewPointList.forEach((item,index)=>{
@@ -513,7 +523,7 @@ export default Vue.component('common-upload',{
                         uuid:item.fileUuid,
                         name:item.fileName,
                         projId:this.projId,
-                        subProjId:this.defaultSubProjId,
+                        // subProjId:this.defaultSubProjId,
                     })
             })
             // console.log(vpListUid)
@@ -526,7 +536,7 @@ export default Vue.component('common-upload',{
                         dcContent: vm.trim(vm.$refs.message.value),
                         ugId: vm.selectugid,
                         projId: vm.projId,
-                        subProjId: vm.defaultSubProjId,
+                        // subProjId: vm.defaultSubProjId,
                         builderId: vm.holderid   // 单体 holderId
                     },
                     vpList:vpListUid,//视点集合
@@ -535,7 +545,7 @@ export default Vue.component('common-upload',{
 
                 };
                 var params = {}
-                var url = '/project2/dc/add'
+                var url = '/design/add'
             }else{
                 var data = {
                     type:1,//设计协调
@@ -554,7 +564,7 @@ export default Vue.component('common-upload',{
                         pageType: 0,//固定为0
                         projId: vm.projId,
                         status: vm.valuestatus,//状态 筛选
-                        subProjId: vm.defaultSubProjId,
+                        // subProjId: vm.defaultSubProjId,
                         type: vm.valueabout,//相关 筛选
                         ugId: vm.selectugid,
                         userId: vm.userId
@@ -567,7 +577,7 @@ export default Vue.component('common-upload',{
                 var params = {
                     builderId:vm.valuemonomer
                 }
-                var url = '/project2/dc/'+vm.dcid+'/review/add'
+                var url = '/design/'+vm.dcid+'/review/add'
             }
             vm.fullscreenLoading = true;
             // console.log(data);
@@ -646,43 +656,70 @@ export default Vue.component('common-upload',{
                 }
             }
             this.Loading=true;
-            var returnUrl = vm.BDMSUrl+'project2/dc/dcUpload?ugId='+vm.selectugid+"&type="+vm.type+'&dirId=-1'
-            returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
-            formData.append('token',vm.token);
-            formData.append('projId',vm.projId);
-            formData.append('type',1);
             if(vm.type == 1){
                   formData.append('file',vm.attachList);
             }else{
                 formData.append('file',vm.filesList);
             }
-            formData.append('userId',vm.userId);
-            formData.append('modelCode','004');
-            formData.append('returnUrl',returnUrl);
             axios({
-                method:'POST',
-                url:vm.QJFileManageSystemURL+'/uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                method:'post',
+                url:this.BDMSUrl+'design/dcUpload',
                 headers:{
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'token':vm.token
                 },
-                data:formData,
+                data:formData
             }).then((response)=>{
                 if(response.data.rt){
                     if(vm.type == 1){
                          vm.attachId.push(response.data.rt)
                     }else{
-                         vm.fileId.push(response.data.rt)
+                            vm.fileId.push(response.data.rt)
                     }
                     vm.$refs.file.value = ''
                     vm.upImgCancle()
                     this.Loading=false;
-                     
                 }
-            }).catch((err)=>{
-                vm.imageName ='未选择任何文件'
-                console.log(err)
             })
+
+            // var returnUrl = vm.BDMSUrl+'project2/dc/dcUpload?ugId='+vm.selectugid+"&type="+vm.type+'&dirId=-1'
+            // returnUrl = encodeURIComponent(returnUrl);
+            // var formData = new FormData()
+            // formData.append('token',vm.token);
+            // formData.append('projId',vm.projId);
+            // formData.append('type',1);
+            // if(vm.type == 1){
+            //       formData.append('file',vm.attachList);
+            // }else{
+            //     formData.append('file',vm.filesList);
+            // }
+            // formData.append('userId',vm.userId);
+            // formData.append('modelCode','004');
+            // formData.append('returnUrl',returnUrl);
+            // axios({
+            //     method:'POST',
+            //     url:vm.QJFileManageSystemURL+'/uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+            //     headers:{
+            //         'Content-Type': 'multipart/form-data'
+            //     },
+            //     data:formData,
+            // }).then((response)=>{
+            //     if(response.data.rt){
+            //         if(vm.type == 1){
+            //              vm.attachId.push(response.data.rt)
+            //         }else{
+            //              vm.fileId.push(response.data.rt)
+            //         }
+            //         vm.$refs.file.value = ''
+            //         vm.upImgCancle()
+            //         this.Loading=false;
+                     
+            //     }
+            // }).catch((err)=>{
+            //     vm.imageName ='未选择任何文件'
+            //     console.log(err)
+            // })
             document.getElementById('fileInfo').value='';
             
            

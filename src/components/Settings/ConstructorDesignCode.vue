@@ -84,7 +84,7 @@
                         <label class="editInpText">完整标题 :</label>
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
+                    <!-- <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
                         <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
@@ -104,7 +104,7 @@
                         </select>
                         <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
-                    </div>
+                    </div> -->
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editListSureBtn">保存</button>
@@ -152,7 +152,7 @@
                         <label class="editInpText">完整标题 :</label>
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
+                    <!-- <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
                         <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
@@ -172,7 +172,7 @@
                         </select>
                         <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
-                    </div>
+                    </div> -->
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addListSureBtn">保存</button>
@@ -189,7 +189,7 @@
                         <label class="editInpText">完整标题 :</label>
                         <span v-text="totalTitle" class="editInpTextInp"></span>
                     </div>
-                    <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
+                    <!-- <div class="editBodytwo edit-item clearfix cailiaoColor"><label class="editInpText">材料索引 :</label>
                         <select class="editSelect" v-model="firstTitle" @change="materialColorChangeOne">
                             <option v-for="(item,index) in firstTitleData" :key="index">{{item}}</option>
                         </select>
@@ -209,7 +209,7 @@
                         </select>
                         <span v-if="showMaterialColorThree" class="displayColor" :style="{'background-color':materialColorThree}"></span>
                         <i class="icon-sanjiao"></i>
-                    </div>
+                    </div> -->
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="setMeterialSureBtn">保存</button>
@@ -1922,21 +1922,26 @@ export default {
                         this.addIsTrue = false;
                     }else{
                         axios({
-                            method:'post',
-                            url:vm.BDMSUrl+'project2/Config/addGenieClass',
+                            method:'get',
+                            // url:vm.BDMSUrl+'project2/Config/addGenieClass',
+                            url:vm.BDMSUrl+'projectInfo/addComponentCode',
                             headers:{
                                 token:this.token
                             },
                             params:{
-                                projId:this.projId
+                                projectId:this.projId,
+                                name:this.newTitle,
+                                code:this.totalCode,
+                                entId:this.entId
                             },
-                            data:{
-                                level:this.codeType.substr(5,1),
-                                materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
-                                number:this.totalCode,
-                                status:0,
-                                title:this.newTitle
-                            }
+                            
+                            // data:{
+                            //     level:this.codeType.substr(5,1),
+                            //     materialIndex:[this.toBeColorCode(this.firstTitle),this.toBeColorCode(this.secondTitle),this.toBeColorCode(this.thirdTitle)],
+                            //     number:this.totalCode,
+                            //     status:0,
+                            //     title:this.newTitle
+                            // }
                         }).then((response)=>{
                             if(response.data.cd == '0'){
                                 this.getProjectGenieClassByProject();
@@ -1988,7 +1993,7 @@ export default {
                 this.showT = true;
             };
             this.constructorData.forEach(item=>{
-                this.firstCodeData.push(item.number.substr(0,2));
+                this.firstCodeData.push(item.classifyCode.substr(0,2));
             })
         },
         //一级编码改变
@@ -1996,27 +2001,27 @@ export default {
             this.secondCodeData = [];
             var firstTitleDataObject = [];
             this.constructorData.forEach(item=>{
-                if(item.number.substr(0,2) == this.firstTitleText){
+                if(item.classifyCode.substr(0,2) == this.firstTitleText){
                     firstTitleDataObject = item.children;
-                    this.fTitle = item.title;
+                    this.fTitle = item.classifyName;
                 }
             });
             firstTitleDataObject.forEach(item=>{
-                this.secondCodeData.push(item.number.substr(2,2));
+                this.secondCodeData.push(item.classifyCode.substr(2,2));
             })
         },
         //二级编码改变
         secondTitleChange(){
             var firstTitleDataObject = {};
             this.constructorData.forEach(item=>{
-                if(item.number.substr(0,2) == this.firstTitleText){
+                if(item.classifyCode.substr(0,2) == this.firstTitleText){
                     firstTitleDataObject = item.children;
-                    this.fTitle = item.title;
+                    this.fTitle = item.classifyName;
                 }
             });
             firstTitleDataObject.forEach(item=>{
-                if(item.number.substr(2,2) == this.secondTitleText){
-                    this.sTitle = item.title;
+                if(item.classifyCode.substr(2,2) == this.secondTitleText){
+                    this.sTitle = item.classifyName;
                 }
             })
         },

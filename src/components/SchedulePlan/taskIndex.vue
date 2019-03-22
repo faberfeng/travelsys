@@ -7,7 +7,7 @@
     <iframe id="printLabel" name="printLabel" src="about:blank" style="display:none;"></iframe> 
     <div id="GroupSelect">
       <select v-model="selectUgId"  class="inp-search">
-        <option :value="item.ugId" v-for="(item,index) in  ugList" :key="index" v-text="item.ugName"></option>
+        <option :value="item.groupId" v-for="(item,index) in  ugList" :key="index" v-text="item.groupName"></option>
       </select>
       <i class="icon-sanjiao"></i>
     </div>
@@ -445,7 +445,7 @@
                 <label class="text1">负责群组:</label>
                 <select v-model="taskUserGroup" @change="taskUserGroupChange" class="selectGroup">
                   <option value='0'>请选择负责群组</option>
-                  <option v-for="(item,index) in ugList" :key="index" :value="item.ugId" v-text="item.ugName"></option>
+                  <option v-for="(item,index) in ugList" :key="index" :value="item.groupId" v-text="item.groupName"></option>
                 </select>
               </div>
               <div class="editBodytwoRight">
@@ -453,7 +453,7 @@
                 <select v-model="dutyUserId" class="selectGroup">
                   <option value="0">请选择</option>
                   <option v-for="(item,index) in userGroupUserList" :key="index" :value="item.userId"
-                          v-text="item.userName"></option>
+                          v-text="item.name"></option>
                 </select>
               </div>
             </div>
@@ -516,7 +516,7 @@
               <label class="text1">负责群组:</label>
               <select v-model="taskUserGroup" @change="taskUserGroupChange" class="selectGroup">
                 <option value='0'>请选择负责群组</option>
-                <option v-for="(item,index) in ugList" :key="index" :value="item.ugId" v-text="item.ugName"></option>
+                <option v-for="(item,index) in ugList" :key="index" :value="item.groupId" v-text="item.groupName"></option>
               </select>
             </div>
             <div class="editBodytwoRight">
@@ -524,7 +524,7 @@
               <select v-model="dutyUserId" class="selectGroup">
                 <option value="0">请选择</option>
                 <option v-for="(item,index) in userGroupUserList" :key="index" :value="item.userId"
-                        v-text="item.userName"></option>
+                        v-text="item.name"></option>
               </select>
             </div>
           </div>
@@ -802,7 +802,7 @@
                             <input class="upInput" type="file" ref="file" @change="imgChanged($event)"
                                    multiple="multiple">
                         </span>
-            <span class="upImgText">{{imageName}}</span>
+            <span class="upImgText" style="width:200px !important">{{imageName}}</span>
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -821,7 +821,7 @@
                             <input class="upInput" type="file" ref="file" @change="exportProjectFileChanged($event)"
                                    multiple="multiple">
                         </span>
-            <span class="upImgText">{{MppName}}</span>
+            <span class="upImgText" style="width:200px !important">{{MppName}}</span>
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -1638,7 +1638,8 @@
       vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
-      vm.getTaskIndex();
+      // vm.getTaskIndex();
+      vm.getProjectGroup();
       // vm.changeUrl();
      
       // this.getTaskList();
@@ -1717,7 +1718,7 @@
                  const app = document.getElementById('webIframe').contentWindow;
                  axios({
                     method:'post',
-                    url:this.BDMSUrl+'project2/schedule/'+this.projId+'/task/showBimData',
+                    url:this.BDMSUrl+'schedule/'+this.projId+'/task/showBimData',
                     headers:{
                       'token':vm.token
                     },
@@ -1962,13 +1963,55 @@
 
       },
       
+      //获取工程群组
+      getProjectGroup(){
+        var vm=this;
+        axios({
+          method:'get',
+          url:vm.BDMSUrl+'userGroup/getAllGroup',
+          headers:{
+            'token':this.token
+          },
+          params:{
+            projectId:vm.projId
+          }
+        }).then(response => {
+          if (response.data.cd == '0') {
+            this.selectUgId = response.data.rt[0].groupId;
+            this.ugList = response.data.rt;
+            // this.tgList = response.data.rt.tgList;
+          } else if (response.data.cd == '-1') {
+            alert(response.data.msg)
+          }
+        })
+      },
+      //获取任务组别
+      getTaskGroupList(){
+        var vm=this;
+        axios({
+          url:vm.BDMSUrl+'schedule/'+vm.projId+'/taskGroup/list',
+          method:'get',
+          headers:{
+            'token':vm.token
+          }
+        }).then((response)=>{
+          if(response.data.cd==0){
+            this.tgList=response.data.rt
+          }else{
+            this.$message({
+              type:'error',
+              message:response.data.msg
+            })
+          }
+        })
+      },
 
       //获取工程任务页面
       getTaskIndex() {
        
         axios({
           method: 'get',
-          url: this.BDMSUrl + '/project2/schedule/taskIndex',
+          url: this.BDMSUrl + 'schedule/taskIndex',
           headers: {
             'token': this.token
           },
@@ -1991,7 +2034,7 @@
         this.loading=true;
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/list',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
           headers: {
             'token': this.token
           },
@@ -2024,8 +2067,8 @@
         },
       taskUserGroupChange() {
         this.ugList.forEach((item) => {
-          if (item.ugId == this.taskUserGroup) {
-            this.taskUserGroup = item.ugId
+          if (item.groupId == this.taskUserGroup) {
+            this.taskUserGroup = item.groupId
           }
         })
         this.getUserGroupUsers()
@@ -2034,12 +2077,13 @@
       getUserGroupUsers() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/getUserGroupUsers',
+          // url: this.BDMSUrl + 'schedule/getUserGroupUsers',
+          url:this.BDMSUrl + 'userGroup/getGroupUser',
           headers: {
             'token': this.token
           },
           params: {
-            ugId: this.taskUserGroup
+            groupId: this.taskUserGroup
           }
         }).then(response => {
           if (response.data.cd == "0") {
@@ -2053,7 +2097,7 @@
       getVerifyList() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/verifyList',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/verifyList',
           headers: {
             'token': this.token
           },
@@ -2210,7 +2254,7 @@
 
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/getProjectStatusColor',
+          url: this.BDMSUrl + 'schedule/getProjectStatusColor',
           headers: {
             'token': this.token
           },
@@ -2488,7 +2532,7 @@
       getResourceTypeList() {
         axios({
           method: "post",
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/resourceType/getResouceType',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/resourceType/getResouceType',
           headers: {
             'token': this.token
           }
@@ -2516,7 +2560,7 @@
       getTaskResouceType() {
         axios({
           method: "post",
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/getResouceType',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/getResouceType',
           headers: {
             'token': this.token
           },
@@ -2541,7 +2585,7 @@
       getTaskResourceTaskList() {
         axios({
           method: "post",
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/getTaskResourceTask',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/getTaskResourceTask',
           headers: {
             'token': this.token
           },
@@ -2567,7 +2611,7 @@
         }
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/taskUserGroupList',
+          url: this.BDMSUrl + 'schedule/taskUserGroupList',
           headers: {
             'token': this.token
           },
@@ -2589,7 +2633,7 @@
       editTaskUserGroup(){
            axios({
               method:'get',
-              url:this.BDMSUrl+'/project2/schedule/editTaskUserGroup',
+              url:this.BDMSUrl+'schedule/editTaskUserGroup',
               headers:{
                   'token':this.token
               },
@@ -2636,7 +2680,7 @@
          
           axios({
               method:'post',
-              url:this.BDMSUrl+'/project2/schedule/saveTaskUserGroup',
+              url:this.BDMSUrl+'schedule/saveTaskUserGroup',
               headers:{
                   'token':this.token
               },
@@ -2692,7 +2736,7 @@
         formData.append('endDate', this.endDate);
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/report/loadManifest',
+          url: this.BDMSUrl + 'report/loadManifest',
           headers: {
             //   'content-type': 'application/json;charset=UTF-8',
             'token': this.token
@@ -2729,7 +2773,7 @@
       getLoadManifest() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/loadManifest',
+          url: this.BDMSUrl + 'schedule/loadManifest',
           headers: {
             'token': this.token
           },
@@ -2753,7 +2797,7 @@
       getEntityRelation() {
         axios({
           method: 'get',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/entityRelation/list',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/entityRelation/list',
           headers: {
             'token': this.token
           },
@@ -2780,7 +2824,7 @@
       getTask() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/' + this.taskId,
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/' + this.taskId,
           headers: {
             'token': this.token
           },
@@ -2818,6 +2862,7 @@
           this.taskParId = '0';
           this.lastNodeName = '无';
         }
+        this.getTaskGroupList();
         //   this.getTaskUserGroupList();
       },
       //网页预览
@@ -2910,7 +2955,7 @@
           this.loading=true;
           axios({
             method: 'post',
-            url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/add',
+            url: this.BDMSUrl + 'schedule/' + this.projId + '/task/add',
             headers: {
               'token': this.token
             },
@@ -3040,7 +3085,7 @@
           }
           axios({
               method:'post',
-              url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addLink',
+              url:this.BDMSUrl+'schedule/'+this.projId+'/task/addLink',
               headers:{
                   'token':this.token
               },
@@ -3079,7 +3124,7 @@
       deleteLinkTaskMakeSure() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/deleteLink',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/deleteLink',
           headers: {
             'token': this.token
           },
@@ -3159,7 +3204,7 @@
           this.loading=true;
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/update',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/update',
           headers: {
             'token': this.token
           },
@@ -3243,7 +3288,7 @@
       deleteTaskMakeSure() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/delete',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/delete',
           headers: {
             'token': this.token
           },
@@ -3311,7 +3356,7 @@
         }
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/degrade',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/degrade',
           headers: {
             'token': this.token
           },
@@ -3366,7 +3411,7 @@
         // console.log(this.selectUgId)
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/taskProgressSearch',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/taskProgressSearch',
           headers: {
             'token': this.token
           },
@@ -3474,7 +3519,7 @@
         taskValueSearch(){
              axios({
                 method:'post',
-                url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/taskValueSearch',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/task/taskValueSearch',
                 headers:{
                     'token':this.token
                 },
@@ -3547,7 +3592,7 @@
         formData.append('exportProject', this.uploadfilesList);
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/addTaskByMpp',
+          url: this.BDMSUrl + 'schedule/addTaskByMpp',
           headers: {
             'token': this.token
           },
@@ -3598,7 +3643,7 @@
         deleteVerfiy(tvId,num){
            axios({
                 method:'get',
-                url:this.BDMSUrl+'project2/schedule/'+this.projId+'/task/deleteVerify',
+                url:this.BDMSUrl+'schedule/'+this.projId+'/task/deleteVerify',
                 headers:{
                     'token':this.token
                 },
@@ -3638,7 +3683,7 @@
             }else{
               axios({
                   method:'post',
-                  url:this.BDMSUrl+'/project2/schedule/'+this.projId+'/task/addVerify',
+                  url:this.BDMSUrl+'schedule/'+this.projId+'/task/addVerify',
                   headers:{
                       'token':this.token
                   },
@@ -3820,7 +3865,7 @@
       deleteAssociationListMakeSure() {
         axios({
           method: 'get',
-          url: this.BDMSUrl + '/project2/schedule/deleteMBRelation',
+          url: this.BDMSUrl + 'schedule/deleteMBRelation',
           headers: {
             'token': this.token
           },
@@ -3858,7 +3903,7 @@
       deleteTaskResourceMakeSure() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/deleteResouceTask',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/deleteResouceTask',
           headers: {
             'token': this.token
           },
@@ -3881,7 +3926,7 @@
       addResourceTaskMakeSure() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/addResouceTask',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/addResouceTask',
           headers: {
             'token': this.token
           },
@@ -3925,7 +3970,7 @@
         this.uploadfilesList = [];
       },
       uploadFileMakeSure() {
-        var returnUrl = this.BDMSUrl + '/project2/schedule/task/fileUpload?ugId=' + this.selectUgId + '&id=' + this.taskId;
+        var returnUrl = this.BDMSUrl + 'schedule/task/fileUpload?ugId=' + this.selectUgId + '&id=' + this.taskId;
         returnUrl = encodeURIComponent(returnUrl);
         var formData = new FormData();
         formData.append('token', this.token);
@@ -3992,7 +4037,7 @@
         this.uploadPicDialog = false;
       },
       uploadPicMakeSure() {
-        var returnUrl = this.BDMSUrl + '/project2/schedule/task/attachmentUpload?id=' + this.taskId;
+        var returnUrl = this.BDMSUrl + 'schedule/task/attachmentUpload?id=' + this.taskId;
         returnUrl = encodeURIComponent(returnUrl);
         var formData = new FormData();
         formData.append('token', this.token);
@@ -4102,7 +4147,7 @@
       deleteFileMakeSure() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + '/project2/schedule/' + this.projId + '/task/deleteAttach',
+          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/deleteAttach',
           headers: {
             'token': this.token
           },
@@ -4167,7 +4212,7 @@
       updateGanttCollapse() {
         axios({
           method: 'get',
-          url: this.BDMSUrl + '/project2/schedule/updateGanttCollapse/' + this.projId,
+          url: this.BDMSUrl +'schedule/updateGanttCollapse/' + this.projId,
           headers: {
             'token': this.token
           },

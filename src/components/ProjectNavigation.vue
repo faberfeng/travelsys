@@ -1,9 +1,9 @@
 <template>
     <div id="projectNavigation">
-        <headerCommon :username="userName"></headerCommon>
+        <headerCommon :username="userName" :userimg="userImg"></headerCommon>
         <!-- <h1 v-show="companyType.length>0">产品导航</h1> -->
         <!-- v-show="noprojectShow" -->
-        <!-- <div  class="noproject" v-show="noprojectShow">
+        <div  class="noproject" v-show="noprojectShow">
             <div class="noprojectLeft"><img src='../assets/noproject.png'></div>
             <div class="noprojectRight">
                 <div class="noprojectRight_header">您的帐号尚未开通任何工程授权。</div>
@@ -13,9 +13,9 @@
                 </div>
                 <div></div>
             </div>
-        </div> -->
+        </div>
         <!-- v-show="!noprojectShow" -->
-        <div >
+        <div v-show="!noprojectShow">
             <!-- <ul id="CTypeList">
                 <li  v-for="(item,index) in companyType" :key="index" :class="[item.name == active?'active-'+item.name:'','company-item-left','company-item-left'+item.name]"  @click="selectType(item.id)">
                     <span  class="Q_title_left"></span>
@@ -59,12 +59,16 @@ export default {
             companyList:[],
             companyLists:[],
             userName:'',
+            userImg:'',
             userId:'',
             token:'',
             BDMSUrl:'',
             active:'',
             companyType:{},
-            applyIndexUrl:''
+            applyIndexUrl:'',
+            userType:'',
+            userLevel:'',
+
         }
     },
     mounted(){
@@ -72,8 +76,7 @@ export default {
         vm.token  = localStorage.getItem('token')
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         vm.applyIndexUrl = vm.$store.state.applyIndexUrl
-        vm.getProjectList();
-        
+        vm.getUserInfo();   
     },
     methods:{
         getUserInfo(){
@@ -95,8 +98,23 @@ export default {
                     // vm.userId = response.data.rt.onlineInfo.userId;
                     vm.userName = response.data.rt.user.name;
                     vm.userId = response.data.rt.user.userId;
+                    if(response.data.rt.user.userAvater==null){
+                        vm.userImg='';
+                    }else{
+                        vm.userImg=vm.BDMSUrl+'user/avater?userId='+vm.userId;
+                    }
+                    
+                    vm.userLevel=response.data.rt.user.userLevel;
                     localStorage.setItem('userName',vm.userName)
                     localStorage.setItem('userId',vm.userId)
+                    localStorage.setItem('userImg',vm.userImg)
+                    if(vm.userLevel==1){
+                        vm.getProjectList();
+                    }else if(vm.userLevel==0){
+                        this.$router.push({
+                            path:'/user/reActive'
+                        })
+                    }
                 }
             }).catch((err)=>{
                 console.log(err)
@@ -114,14 +132,19 @@ export default {
                 },
             }).then((response)=>{
                     if(response.data.cd=="0"){
-                        this.companyList=response.data.rt;
-                        localStorage.setItem('entId',response.data.rt[0].entId)
-                        localStorage.setItem('entName',response.data.rt[0].entName)
-                        vm.getUserInfo();
-                        this.$router.push({
-                            path:'/projectlist',
-                            query:{entId:this.companyList[0].entId}
-                        })
+                        if(response.data.rt.length!=0){
+                            this.companyList=response.data.rt;
+                            localStorage.setItem('entId',response.data.rt[0].entId)
+                            localStorage.setItem('entName',response.data.rt[0].entName)
+                            this.$router.push({
+                                path:'/projectlist',
+                                query:{entId:this.companyList[0].entId}
+                            })
+                            this.noprojectShow=false;
+                        }else{
+                            this.noprojectShow=true;
+                        }
+                        
                     }
             }).catch(function(error){
 

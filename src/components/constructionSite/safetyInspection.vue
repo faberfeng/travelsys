@@ -2,7 +2,7 @@
     <div id="safetyInspection" >
         <div id="GroupSelect">
              <select v-model="selectUgId" class="inp-search">
-                <option :value="item.ugId" v-for="(item,index) in ugList" :key="index" v-text="item.ugName"></option>
+                <option :value="item.groupId" v-for="(item,index) in ugList" :key="index" v-text="item.groupName"></option>
             </select>
             <i class="icon-sanjiao"></i>
         </div>
@@ -29,7 +29,7 @@
                     <label class="recordTxt" v-show="exportReportEdit" @click="exportrEportsBtn()">导出报告</label>
                     <label class="exportTxt" v-show="searchCheckEdit" @click="walkThroughBtn()">巡视记录</label>
                 </div>
-                <div class="overviewBody">
+                <!-- <div class="overviewBody">
                     <div class="overviewHead">
                         <label class="overviewHeadBtn"></label>
                         <label class="overviewHeadTxt">监测概况</label>
@@ -69,13 +69,13 @@
                             </li>
                             <li class="overviewFrameLi4">
                                 <label class="alertTxt">现场工况</label>
-                                <!-- <p>{{workingCondition}}</p> -->
+                              
                                 <p class="alertContentTxt">{{workingCondition}}</p>
                             </li>
-                            <!-- <li class="overviewFrameLi"></li> -->
+                           
                         </ul>
                     </div>
-                </div>
+                </div> -->
                 <div class="planeFigure">
                     <div class="planeFigureHead">
                         <div class="planeFigureHeadLeft">
@@ -1212,7 +1212,7 @@ export default {
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
         this.loadingTitle()
         this.getAccessUserGroup();
-        this.getPositionList();
+        // this.getPositionList();
         this.curTime();
         this.curTime1();
         setTimeout(()=>{
@@ -1296,7 +1296,7 @@ export default {
         positionValue:function(val){
             var vm=this;
             // vm.getPositionList();
-            vm.getPositionUserCount();
+            // vm.getPositionUserCount();
         }
     },
     methods:{
@@ -2867,7 +2867,8 @@ export default {
         getAccessUserGroup(){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'detectionInfo/getAccessUserGroup',
+                // url:this.BDMSUrl+'detectionInfo/getAccessUserGroup',
+                url:this.BDMSUrl+'userGroup/getAllGroup',
                 headers:{
                     'token':this.token
                 },
@@ -2878,7 +2879,7 @@ export default {
                 }).then(response=>{
                     if(response.data.cd=='0'){
                         this.ugList=response.data.rt;
-                        this.selectUgId=this.ugList[0].ugId;
+                        this.selectUgId=this.ugList[0].groupId;
                     }else if(response.data.cd=='-1'){
                         alert(response.data.msg);
                     }
