@@ -7,7 +7,7 @@
         </div>
         <div class="content" >
             <div class="info">
-                <div class="infoLeft">
+                <div class="infoLeft1">
                         {{activeTxt}}
                 </div>
             </div>
@@ -105,7 +105,7 @@ export default {
                 width: 850px;
                 height: 75px;
                 .infoLeft{
-                    width: 350px;
+                    width: 550px;
                     padding: 25px;
                     font-size: 22px;
                     font-weight: bold;

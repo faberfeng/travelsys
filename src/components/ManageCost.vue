@@ -30,6 +30,9 @@
                             </el-tabs>
                         </el-col>
                     </el-row>
+                    <div v-show="webGlShow" @click="createdMid()" class="creatMid">
+                        生成清单
+                    </div>
                     <div  class="settingsLeft" v-if="!settingsCenter" ref="settingsL">
                         <h5>工程配置中心</h5>
                         <!-- <el-menu :default-active="settingActive"  router :unique-opened="true"  @select="selectIndex">
@@ -95,6 +98,20 @@
                 </div>
             </div>
         </div>
+        <div id="edit">
+            <el-dialog title="生成清单" :visible.sync="midShow" @close="midShow=false">
+                <div class="editBody">
+                    <div class="editBodytwo imageBodyMid">
+                        <label class=" imageBodyTextMid">清单名称 :</label>
+                        <input type="text" class="inp" v-model="manifestName">
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addMidConfirm">确认</button>
+                    <button class="editBtnC" @click="midShow=false">取消</button>
+                </div>
+            </el-dialog>
+        </div>
     </div>
 </template>
 <script>
@@ -102,6 +119,8 @@ import headerCommon from './header.vue'
 import axios from 'axios'
 var app
 var responseStr=require('./json/response');
+var isOpen=0;
+var CurrentSelectedEntLists='';
 export default {
     name:'Home',
     components: {
@@ -190,6 +209,9 @@ export default {
             ellist:'',
             entId:'',
             groupId:'',
+            elementTracId:[],
+            midShow:false,
+            manifestName:'',
 
 
         }
@@ -265,13 +287,16 @@ export default {
         webGlbtn(){
             var vm=this;
             this.webGlShow=!this.webGlShow;
-             setTimeout(()=>{
-                 app = this.$refs.iframe1.contentWindow;
-                // app = document.getElementById("webIframe").contentWindow;
-                app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
-                    // window.removeEventListener("message", (evt)=>{
-                    //     this.callback(evt)},true);
-            },1000)
+            isOpen++
+            if(isOpen==1){
+                    setTimeout(()=>{
+                    app = this.$refs.iframe1.contentWindow;
+                    // app = document.getElementById("webIframe").contentWindow;
+                    app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
+                        // window.removeEventListener("message", (evt)=>{
+                        //     this.callback(evt)},true);
+                },1000)
+            }
         },
 
         callback(e){
@@ -288,7 +313,11 @@ export default {
                     app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
 				break;
-			case "CurrentSelectedEnt":
+            case "CurrentSelectedEnt":
+                {
+                    CurrentSelectedEntLists=e.data.parameter;
+                    console.log(CurrentSelectedEntLists,'选择的构件');
+                }
 				break;
 			case "ViewpointSubmited":
                 break;
@@ -300,6 +329,67 @@ export default {
                 this.getDrawingList();
                 break;
 		    }
+        },
+        //获得元素
+        getElement(level,id){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'api/v1/getElement',
+                params:{
+                    fileId:level,
+                    selectId:id,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    if(response.data.rt[response.data.rt.length-1].para2=='structure'){
+                        this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
+                    }
+                }
+            })
+        },
+        //生成清单
+        createdMid(){
+            var vm=this;
+            this.elementTracId=[];
+            CurrentSelectedEntLists.ID.forEach((item)=>{
+                vm.getElement(item.level,item.id)
+            })
+            vm.midShow=true;
+            // vm.$confirm('此操作将你选择构件生成清单, 是否继续?', '提示', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'warning'
+            // }).then((response)=>{
+            //     axios({
+            //         url:this.BDMSUrl+''
+            //     })
+            // })
+        },
+        //确认生成清单
+        addMidConfirm(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'manifest/createManifest',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                data:this.elementTracId,
+                params:{
+                    manifestName:this.manifestName
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.midShow=false;
+                    this.$message({
+                        type:'success',
+                        message:'清单生成成功'
+                    })
+                    this.elementTracId=[];
+                    this.manifestName='';
+
+                }
+            })
         },
         getUserGroup(){
             var vm=this;
@@ -1048,6 +1138,19 @@ export default {
         text-decoration: none;
         display: inline-block;
     }
+     .imageBodyMid{
+        text-align: left;
+        }
+    .imageBodyMid .imageBodyTextMid{
+            color: #666;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            display: inline-block;
+            margin-right: 20px;
+            margin-left: 94px;
+            text-align: right;
+    }
     .wrapper{
         width: 100%;
         height: 100%;
@@ -1184,6 +1287,23 @@ export default {
         width: 100%;
         position: relative;
     }
+    .creatMid{
+        position: absolute;
+        top:10px;
+        color:black;
+        font-size: 14px;
+        right: 20px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        padding: 5px;
+        border-radius: 4px;
+        
+    }
+    .creatMid :hover{
+        border:1px soild black;
+        color:#ccc;
+    }
+
     .downWebGl{
         /* position: fixed; */
         position:absolute;

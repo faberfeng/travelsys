@@ -89,8 +89,10 @@
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
-                            <span v-show="basePicEdit" :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
-                            <span :class="[{'clickStyle':isClick},'editSpotBtn']" v-show="manageEdit"  @click="editSpot()">编辑点位</span>
+                            <!-- v-show="basePicEdit" -->
+                            <span  :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
+                            <!-- v-show="manageEdit" -->
+                            <span :class="[{'clickStyle':isClick},'editSpotBtn']"   @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>

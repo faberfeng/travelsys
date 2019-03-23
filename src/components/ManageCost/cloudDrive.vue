@@ -509,7 +509,7 @@
                     <div class="titleDiv">
                     <input class="projectTitleLeftinp" v-model="newList.detailName" />
                     </div>
-                    <span class="yewulaiyuan">业务来源：</span>
+                    <!-- <span class="yewulaiyuan">业务来源：</span>
                     <div class="titleDiv">
                     <select class="projectTitleLeftinp" v-model="newList.soureFrom">
                         <option value="0">全部</option>
@@ -518,9 +518,9 @@
                         <option value="3">成本管理-报表快照</option>
                     </select>
                     <i class="downAngle"></i>
-                    </div>
+                    </div> -->
                 </div>
-                <div class="projectTitleRight">
+                <!-- <div class="projectTitleRight">
                     <p style="text-align:left;">创建时间：</p>
                     <div class="titleDiv">
                         <el-date-picker class="projectTitleLeftinp" v-model="newList.dataRange" type="daterange" range-separator="至"
@@ -536,7 +536,7 @@
                         </select>
                     <i class="downAngle"></i>
                     </div>
-                </div>
+                </div> -->
                 </div>
                 <div style="overflow:hidden;">
                     <button class="chaxun" @click="searchResult(true)">查询</button>
@@ -552,8 +552,8 @@
                         <th>清单ID</th>
                         <th>清单名称</th>
                         <th>明细数量</th>
-                        <th>业务来源</th>
-                        <th>业务状态</th>
+                        <!-- <th>业务来源</th>
+                        <th>业务状态</th> -->
                     </tr>
                     </thead>
                     <tbody>
@@ -561,12 +561,12 @@
                         <td>
                         <input type="checkbox" v-model="item.isChecked" />
                         </td>
-                        <td>{{item.type_c}}</td>
-                        <td>{{item.detailId}}</td>
-                        <td>{{item.detailName}}</td>
-                        <td>{{item.componentCount}}</td>
-                        <td>{{item.relaType_c}}</td>
-                        <td>{{item.serviceState}}</td>
+                        <td>{{item.type}}</td>
+                        <td>{{item.id}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.componentNumber}}</td>
+                        <!-- <td>{{item.relaType_c}}</td>
+                        <td>{{item.serviceState}}</td> -->
                     </tr>
                     </tbody>
                 </table>
@@ -5768,64 +5768,85 @@ export default {
         },
         //新建自定义清单查询
         searchResult(flag){
-            let rangeData = [];
-            this.newList.dataRange.forEach(item=>{
-                rangeData.push(new Date(item).toLocaleString().split(' ')[0]);
-            });
-            if(flag){
-                this.customPageDetial.currentPage =1;
-            }
-            let formData = new FormData();
-            formData.append('detailName',this.newList.detailName|| '');
-            formData.append('startDate',rangeData[0] || '');
-            formData.append('endDate',rangeData[1] || '');
-            formData.append('serviceState',this.newList.sourceSate);
-            formData.append('relaType',this.newList.soureFrom);
-            formData.append('page',this.customPageDetial.currentPage);
-            formData.append('rows',this.customPageDetial.pagePerNum);
+            var vm=this;
             axios({
+                url:vm.BDMSUrl+'manifest/getManifest',
                 method:'post',
-                url:this.BDMSUrl+'project2/report/loadManifest',
                 headers:{
-                    token:this.token
+                    'token':vm.token
                 },
                 params:{
-                    projectId:this.projId,
-                    type:3
-                },
-                data:formData
-            }).then(response=>{
-                if(response.data.cd == 0){
-                    this.customData = response.data.rt.rows;
-                    
-                    this.customPageDetial.total = response.data.rt.total;
-                    var type_c = '';
-                    var relaType_c ='';
-                    this.customData.forEach((item,index)=>{
-                        if(item.type == 1){
-                            type_c = '构件量清单';
-                        }else if(item.type == 2){
-                            type_c = '工程量清单';
-                        }else if(item.type == 3){
-                            type_c = '物料量清单';
-                        }
-                        if(item.relaType == 2){
-                            relaType_c = '进度计划-任务核实';
-                        }else if(item.relaType == 1){
-                            relaType_c = "文档管理-关联构件" ;
-                        }else if(item.relaType == 7){
-                            relaType_c = "成本管理-报表快照" ;
-                        }
+                    name:this.newList.detailName
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.customData = response.data.rt;
+                    this.customPageDetial.total=1;
+                    this.customData.forEach((item)=>{
                         Object.assign(item,{
-                            type_c:type_c,
-                            relaType_c:relaType_c,
                             isChecked:false
                         })
-                    });
-                }else{
-                    alert(response.data.msg);
+                    })
                 }
             })
+            // let rangeData = [];
+            // this.newList.dataRange.forEach(item=>{
+            //     rangeData.push(new Date(item).toLocaleString().split(' ')[0]);
+            // });
+            // if(flag){
+            //     this.customPageDetial.currentPage =1;
+            // }
+            // let formData = new FormData();
+            // formData.append('detailName',this.newList.detailName|| '');
+            // formData.append('startDate',rangeData[0] || '');
+            // formData.append('endDate',rangeData[1] || '');
+            // formData.append('serviceState',this.newList.sourceSate);
+            // formData.append('relaType',this.newList.soureFrom);
+            // formData.append('page',this.customPageDetial.currentPage);
+            // formData.append('rows',this.customPageDetial.pagePerNum);
+            // axios({
+            //     method:'post',
+            //     url:this.BDMSUrl+'project2/report/loadManifest',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         projectId:this.projId,
+            //         type:3
+            //     },
+            //     data:formData
+            // }).then(response=>{
+            //     if(response.data.cd == 0){
+            //         this.customData = response.data.rt.rows;
+                    
+            //         this.customPageDetial.total = response.data.rt.total;
+            //         var type_c = '';
+            //         var relaType_c ='';
+            //         this.customData.forEach((item,index)=>{
+            //             if(item.type == 1){
+            //                 type_c = '构件量清单';
+            //             }else if(item.type == 2){
+            //                 type_c = '工程量清单';
+            //             }else if(item.type == 3){
+            //                 type_c = '物料量清单';
+            //             }
+            //             if(item.relaType == 2){
+            //                 relaType_c = '进度计划-任务核实';
+            //             }else if(item.relaType == 1){
+            //                 relaType_c = "文档管理-关联构件" ;
+            //             }else if(item.relaType == 7){
+            //                 relaType_c = "成本管理-报表快照" ;
+            //             }
+            //             Object.assign(item,{
+            //                 type_c:type_c,
+            //                 relaType_c:relaType_c,
+            //                 isChecked:false
+            //             })
+            //         });
+            //     }else{
+            //         alert(response.data.msg);
+            //     }
+            // })
         },
         //确认
         customConfirm(){
