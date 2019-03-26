@@ -4,13 +4,13 @@
       <div class="usermanage">
           <h5 class="subtitle">岗位列表
               <span class="subSpan">
-                  <select v-model="posType" class="inp-search">
+                  <!-- <select v-model="posType" class="inp-search">
                         <option value="">全部岗位</option>
                         <option value="0">企业岗位</option>
                         <option value="1">工程内岗位</option>
                         <option value="2">合作方岗位</option>
                   </select>
-                  <i class="icon-sanjiao"></i>
+                  <i class="icon-sanjiao"></i> -->
                   <span @click="addUser()" class="btn">添加</span>
              </span>
           </h5>

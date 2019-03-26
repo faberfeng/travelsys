@@ -231,7 +231,7 @@ export default {
             projectConfig:{},
             proName:'',
             projectUseCount:'',
-            projectImage:{},
+            projectImage:null,
             projectImageList:[],//获取工程图片列表
             firstCoverImg:[],//封面图片
             header:{
@@ -715,7 +715,8 @@ export default {
                     //     this.isAsdefault = false;
                     // }
                     this.projectImage =response.data.rt.path;
-
+                }else{
+                     console.log(this.projectImage,'this.projectImage');
                 }
             })
         },

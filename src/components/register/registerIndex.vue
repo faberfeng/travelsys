@@ -62,9 +62,9 @@
                             </td>
                         </tr>
                         <tr height="50px;">
-                            <td align="right" width="135px">昵称 : </td>
+                            <td align="right" width="135px">账号 : </td>
                             <td width="265px">
-                                <input class="tdInput" v-model="nickName" @focus="focusNickName()" @blur="blurNickName()" placeholder="昵称"/>
+                                <input class="tdInput" v-model="nickName" @focus="focusNickName()" @blur="blurNickName()" placeholder="账号"/>
                             </td>
                             <td width="330px">
                                 <el-alert v-show="inputNickNameShow" title="3-20位，可由汉字、字母、数字和'_'组成" type="info" show-icon>

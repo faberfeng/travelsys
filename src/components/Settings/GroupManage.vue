@@ -57,8 +57,8 @@
       <div class="container-right">
         <h1 class="icon-title icon-qunzu">
             工程群组
-            <span class="icon icon-Top" @click="changeQR_(-1)"></span>
-            <span class="icon icon-Bottom" @click="changeQR_(1)"></span>
+            <!-- <span class="icon icon-Top" @click="changeQR_(-1)"></span>
+            <span class="icon icon-Bottom" @click="changeQR_(1)"></span> -->
             <span class="icon icon-addqun" @click="addQR"></span>
         </h1>
         <ul style="max-height:600px;overflow-y:auto;">

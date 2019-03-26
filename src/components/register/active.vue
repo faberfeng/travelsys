@@ -104,7 +104,7 @@ export default {
             .info{
                 width: 850px;
                 height: 75px;
-                .infoLeft{
+                .infoLeft1{
                     width: 550px;
                     padding: 25px;
                     font-size: 22px;

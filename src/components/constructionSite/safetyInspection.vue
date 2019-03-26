@@ -256,8 +256,8 @@
                 <div class="baseMapBody">
                     <ul class="clearfix" style="margin:0px 20px 0px 20px;">
                         <li class="baseMapBodyLi" @mouseenter="enter(item.id)" @mouseleave="leave()" @click="selectCurBaseMap(item.id)" style="padding: 0px; overflow: hidden;" v-for="(item,index) in baseMapList" :key="index">
-                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="BDMSUrl+item.relativeUri">
-                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="BDMSUrl+item.relativeUri"></pdf>
+                            <img v-show="item.relativeUri.substr(item.name.length-3)=='jpg'||item.name.substr(item.name.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="BDMSUrl+item.relativeUri">
+                            <pdf v-show="item.relativeUri.substr(item.name.length-3)=='pdf'||item.name.substr(item.name.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="BDMSUrl+item.relativeUri"></pdf>
                             <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
                                 <label class="baseMapName" v-text="item.name"></label>
                                 <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
@@ -1220,9 +1220,9 @@ export default {
         // this.getPositionList();
         this.curTime();
         this.curTime1();
-        // setTimeout(()=>{
-        //      this.getUserInfo();
-        // },200)
+        setTimeout(()=>{
+             this.getUserInfo();
+        },200)
        
   
     },
@@ -2871,7 +2871,7 @@ export default {
             axios({
                 method:'post',
                 // url:this.BDMSUrl+'detectionInfo/getAccessUserGroup',
-                url:this.BDMSUrl+'userGroup/getAllGroup',
+                url:this.BDMSUrl+'userGroup/getUserGroup',
                 headers:{
                     'token':this.token
                 },
@@ -3456,9 +3456,10 @@ export default {
                         this.angle=0;
                     }
                     
-                    var type=(this.getBaseMapInfoByBaseMapIdList.relativeUri.substr(this.getBaseMapInfoByBaseMapIdList.relativeUri.length-3)).toString();
-                   
-                    this.paramsLists={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle}
+                    var type=(this.getBaseMapInfoByBaseMapIdList.name.substr(this.getBaseMapInfoByBaseMapIdList.name.length-3)).toString();
+        
+                    this.paramsLists={type:type,source:vm.BDMSUrl+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle}
+                    // this.paramsLists={type:type,source:'./images/A1.pdf',angle:this.angle}
                    
                 }else if(response.data.cd=='-1'){
                     vm.$message({
@@ -5461,21 +5462,28 @@ export default {
                })
                return false
            }
-            var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
-            returnUrl = encodeURIComponent(returnUrl);
+            // var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
+            // returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
-            formData.append('token',vm.token);
-            formData.append('projId',vm.projId);
-             formData.append('type',1);
+            // formData.append('token',vm.token);
+            // formData.append('projId',vm.projId);
+            //  formData.append('type',1);
             formData.append('file',vm.filesList);
-            formData.append('userId',vm.userId);
-            formData.append('modelCode','006');
-            formData.append('returnUrl',returnUrl);
+            // formData.append('userId',vm.userId);
+            // formData.append('modelCode','006');
+            // formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                // url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                url:vm.BDMSUrl + 'detectionInfo/addPhotoTag',
                 headers:{
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId,
+                    userGroupId:vm.selectUgId,
+                    photoId:vm.photoId
                 },
                 data:formData,
             }).then((response)=>{
@@ -5511,21 +5519,27 @@ export default {
                })
                return false
            }
-            var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
-            returnUrl = encodeURIComponent(returnUrl);
-            var formData = new FormData()
-            formData.append('token',vm.token);
-            formData.append('projId',vm.projId);
-             formData.append('type',1);
+            // var returnUrl = vm.BDMSUrl+"detectionInfo/addPhotoTag?photoId="+vm.photoId+"&userGroupId="+vm.selectUgId+"&projectId="+vm.projId;
+            // returnUrl = encodeURIComponent(returnUrl);
+            // var formData = new FormData()
+            // formData.append('token',vm.token);
+            // formData.append('projId',vm.projId);
+            //  formData.append('type',1);
             formData.append('file',vm.filesList);
-            formData.append('userId',vm.userId);
-            formData.append('modelCode','002');
-            formData.append('returnUrl',returnUrl);
+            // formData.append('userId',vm.userId);
+            // formData.append('modelCode','002');
+            // formData.append('returnUrl',returnUrl);
             axios({
                 method:'POST',
-                url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                // url:vm.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+                url:vm.BDMSUrl + 'detectionInfo/updateTagFile',
                 headers:{
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId,
+                    photoId:vm.photoId
                 },
                 data:formData,
             }).then((response)=>{

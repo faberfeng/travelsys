@@ -1970,7 +1970,8 @@
         var vm=this;
         axios({
           method:'get',
-          url:vm.BDMSUrl+'userGroup/getAllGroup',
+          // url:vm.BDMSUrl+'userGroup/getAllGroup',
+          url:vm.BDMSUrl+'userGroup/getUserGroup',
           headers:{
             'token':this.token
           },

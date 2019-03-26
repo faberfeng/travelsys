@@ -98,6 +98,25 @@ export default new Vuex.Store({
         // iframeWebGlUrl:'http://203.156.220.3:8080/genDist/',
         // applyIndexUrl:'http://203.156.220.3:8080/arctron-usercenter/apply/applyIndex',
        
+
+
+        //内网测试（最新）
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        // BDMSUrl:'http://10.245.11.10:8080/bdms-rebuild/',//仅供文件上传使用
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"https://bim.arctron.cn/BDMSTest/#",
+        // appShareUrl:'https://bim.arctron.cn/BDMSTest/',
+        // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // iframeWebGlUrl:'https://bim.arctron.cn/BDView/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,

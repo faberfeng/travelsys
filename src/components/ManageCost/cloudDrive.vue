@@ -5064,7 +5064,7 @@ export default {
         axios({
             method:'GET',
             // url:vm.BDMSUrl+'project2/doc/documentCloudDisk',
-            url:vm.BDMSUrl+'userGroup/getAllGroup',
+            url:vm.BDMSUrl+'userGroup/getUserGroup',
             // url:vm.BDMSUrl+'userGroup/getUserGroup',
             headers:{
                 'token':vm.token
@@ -5169,8 +5169,9 @@ export default {
             }
         }).then((response)=>{
             if(response.data.cd==0){
-                vm.getPanoramaFolder(val1,val2)
+                
             }
+             vm.getPanoramaFolder(val1,val2)
         })
     },
     getPanoramaFolder(val1,val2){
