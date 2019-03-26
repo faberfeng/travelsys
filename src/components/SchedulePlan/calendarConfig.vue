@@ -170,7 +170,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="taskGroup">
+                        <!-- <div class="taskGroup">
                             <h2><span>资源类别设置</span><span id="add" @click="addResourceType"><i class=" poniter el-icon-plus" ></i>增加</span></h2>
                             <div class="groupTab">
                                 <table  border="1" width="100%">
@@ -192,7 +192,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="taskCheck">
                             <h2>任务核实</h2>
                             <div class="taskCheckSelect">

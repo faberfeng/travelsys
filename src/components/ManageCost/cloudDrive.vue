@@ -335,19 +335,19 @@
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">ID :</span>
-                            <span class="detial-text-value" v-text="item.main.pkId"></span>
+                            <span class="detial-text-value" v-text="item.id"></span>
                             </p>
-                            <p class="item-detial">
+                            <!-- <p class="item-detial">
                                 <span class="detial-text-name">状态 :</span>
                             <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-                            </p>
+                            </p> -->
                             <p class="item-detial">
                                 <span class="detial-text-name">明细 :</span>
-                            <span class="detial-text-value" v-text="item.details.length"></span>
+                            <span class="detial-text-value" v-text="item.componentNumber"></span>
                             </p>
                             <p class="item-detial">
                                 <span class="detial-text-name">名称 :</span>
-                            <span class="detial-text-value" v-text="item.main.mName"></span>
+                            <span class="detial-text-value" v-text="item.name"></span>
                             </p>
                         </li>
                     </ul>
@@ -417,7 +417,7 @@
             </div>
         </div>
         <!--下面是报表清单的编码-->
-        <common-list v-on:back="backToH" :mId="setId"   :title="'构件量清单'" v-if="showCommonList"></common-list>
+        <common-list v-on:back="backToH" :mId="setId" :type=1  :title="'构件量清单'" v-if="showCommonList"></common-list>
       <div id="edit">
         <upload :uploadshow='uploadImg.checked' v-on:hiddenupload="hiddenupload" v-on:refreshqj="refreshqj" :dirid="checkFileDir.dirId" :title="uploadtitle" :accept="acceptType"
         :fgid="QJfgid" :isqj="isqj" :ugid='selectUgId'
@@ -559,7 +559,7 @@
                     <tbody>
                     <tr v-for="(item,index) in  customData" :key="index">
                         <td>
-                        <input type="checkbox" v-model="item.isChecked" />
+                        <input type="checkbox" @change="isCheckChange" v-model="item.isChecked" />
                         </td>
                         <td>{{item.type}}</td>
                         <td>{{item.id}}</td>
@@ -2858,6 +2858,7 @@ export default {
             editCatalogAuth:false,
             panoramaUrl:'',
             haveImgBackShow:false,
+            elementTraceIds:'',
         }
     },
     created(){
@@ -4916,7 +4917,7 @@ export default {
                 if(vm.checkedFile_Folder.fileCheckedNum == 1){
                     vm.checkedItem = fileCheckList[0]
                     // console.log(vm.checkedItem,'123445');
-                    // vm.getGouJianInfo()
+                    vm.getGouJianInfo()
                     // vm.getVersion()
                 }
             }else{
@@ -4938,7 +4939,7 @@ export default {
                 vm.PointFigure.fgID = vm.fileList[val].fgId
                 vm.checkedItem = vm.fileList[val]
                 this.fgIdListById.push(vm.fileList[val].fgId)
-                // vm.getGouJianInfo()
+                vm.getGouJianInfo()
                 // vm.getVersion()
                 // vm.getDrawingIdByFgId()
             }else{
@@ -4951,6 +4952,7 @@ export default {
                 vm.checkedItem = {}
             }
         }
+        // console.log(vm.checkedItem,'vm.checkedItem00');
     },
     IntoDir(val){
         var vm = this
@@ -4983,7 +4985,7 @@ export default {
     getVersion(){
          var vm = this
          var fgId = ''
-         console.log(vm.checkedItem,'vm.checkedItem');
+        //  console.log(vm.checkedItem,'vm.checkedItem');
          if(vm.showQuanJing && vm.checkedRound){
             fgId =vm.checkedRound.ID
          }
@@ -5039,17 +5041,18 @@ export default {
          }
         axios({
             method:'GET',
-            url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/entityRelation/list',
+            url:vm.BDMSUrl+'manifest/getBindManifest',
+            // url:vm.BDMSUrl+'project2/doc/'+vm.projId+'/entityRelation/list',
             headers:{
                 'token':vm.token
             },
             params:{
-                relaId:relaId,
-                relaType:1//获取是1
+                businessId:relaId,
+                type:1//获取是1
             },
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
-                vm.GouJianItem = response.data.rt.relaList == null?{}:response.data.rt.relaList
+                vm.GouJianItem = response.data.rt == null?{}:response.data.rt
                 
             }
         }).catch((err)=>{
@@ -5541,7 +5544,7 @@ export default {
         deleteList(item){
             this.deleteDialog = true;
             this.deleteInfo = item;
-            this.removelistitem = item.main.pkId;
+            this.removelistitem = item.id;
         },
         deleteMakeSure(){
             var vm=this;
@@ -5558,13 +5561,19 @@ export default {
                 }
             axios({
                 method:'post',
-                url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+relaId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                // url:this.BDMSUrl+'model2/'+this.projId+'/entityRelation/'+this.deleteInfo.main.pkId+'/'+relaId+'/'+this.deleteInfo.main.mVersion+'/delete',
+                url:this.BDMSUrl+'manifest/deleteBind',
                 headers:{
                     token:this.token
+                },
+                params:{
+                    mid:this.deleteInfo.id,
+                    businessId:relaId,
+                    type:1
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
-                    // this.getGouJianInfo();
+                    this.getGouJianInfo();
                     this.deleteDialog = false;
                 }else{  
                     alert(response.data.msg);
@@ -5581,7 +5590,7 @@ export default {
         //清单列表
         showDetialList(item){
             console.log(item,'item0000')
-            this.setId=item.main.pkId
+            this.setId=item.id
             this.showCommonList=true;
         },
         //清单二维码
@@ -5754,7 +5763,7 @@ export default {
                   if (response.data.cd == "0") {
                     //   this.getEntityRelation();
                     this.editBySelfShow=false;
-                    // this.getGouJianInfo();
+                    this.getGouJianInfo();
                     } else if (response.data.cd == "-1") {
                       alert(response.data.msg)
                     }
@@ -5848,6 +5857,41 @@ export default {
             //     }
             // })
         },
+        //根据清单id获取traceId
+        getElementByMid(mid){
+            var vm=this;
+            var traceId=[]
+            axios({
+                url:this.BDMSUrl+'manifest/getElementByMid',
+                method:'post',
+                headers:{
+                    'token':vm.token    
+                },
+                params:{
+                    mid:mid,
+                    businessType:1
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    response.data.rt.forEach((item)=>{
+                        traceId.push(item.traceId);
+                    })
+                }
+            })
+            return traceId
+        },
+        isCheckChange(){
+            // this.elementTraceIds=[];
+            this.selectedItem={}
+            this.customData.forEach((item,index)=>{
+                if(item.isChecked == true){
+                    this.selectedItem = item;
+                    // this.elementTraceIds=this.getElementByMid(this.selectedItem.id);
+                }
+            })
+            // console.log(this.elementTraceIds,'0000');
+        },
+
         //确认
         customConfirm(){
             var vm=this;
@@ -5860,8 +5904,10 @@ export default {
                 }
             })
             var relaId = ''
+            var relaName = ''
             if(vm.showQuanJing && vm.checkedRound){
                 relaId = vm.checkedRound.ID
+                relaName = vm.checkedRound.fgName
             }
             if(!vm.showQuanJing && vm.checkedItem){
                 if(!vm.checkedItem.fgId){
@@ -5869,24 +5915,35 @@ export default {
                     return false
                 }
                 relaId = vm.checkedItem.fgId
+                relaName = vm.checkItem.fgName
+                console.log(vm.checkItem,'vm.checkItem');
             }
             if(num == 1){
+                // this.elementTraceIds=this.getElementByMid(this.selectedItem.id);
+                // console.log(this.elementTraceIds,'清单构件id')
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'project2/doc/addEntityByManifest',
+                    // url:this.BDMSUrl+'project2/doc/addEntityByManifest',
+                    // url:this.BDMSUrl+'manifest/bindElement',
+                     url:this.BDMSUrl+'manifest/bindElementWithExsistManifest',
                     headers:{
                         token:this.token
                     },
                     params:{
-                        projectId:this.projId,
-                        manifestId:this.selectedItem.detailId,
-                        relaType:this.selectedItem.relaType,
-                        relaId:relaId,
-                    }
+                        // projectId:this.projId,
+                        // manifestId:this.selectedItem.detailId,
+                        // relaType:this.selectedItem.relaType,
+                        // relaId:relaId,
+                        businessId:relaId,
+                        // businessName:'文件名',
+                        type:1,
+                        mid:this.selectedItem.id
+                    },
+                    // data:this.elementTraceIds
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.editBySelfShow = false;
-                        // this.getGouJianInfo();
+                        this.getGouJianInfo();
                         this.$message({
                             type:'success',
                             message:'添加成功!'

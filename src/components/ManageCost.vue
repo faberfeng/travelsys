@@ -243,7 +243,12 @@ export default {
             // vm.settingsCenter=false;
         };
         vm.settingsCenter = vm.$route.meta.settingsCenter?false:true
-        vm.token  = localStorage.getItem('token')
+        vm.token  = localStorage.getItem('token');
+        vm.header.userImg=localStorage.getItem('userImg');
+         vm.header.userName = localStorage.getItem('userName');
+         vm.header.userId = localStorage.getItem('userId');
+        //  response.data.rt.user.name
+        // vm.header.userId = response.data.rt.user.userId
         vm.getUserInfo()
         vm.getPJDetial(vm.projId);
         vm.getOnlineInfo();
@@ -701,7 +706,7 @@ export default {
             }).then((response)=>{
                 vm.header.userName = response.data.rt.user.name
                 vm.header.userId = response.data.rt.user.userId
-                vm.header.userImg=localStorage.getItem('userImg')
+                
                 // vm.header.userImg = response.data.rt.onlineInfo.imgUuid !=null?vm.commomHeadPictureFile+response.data.rt.onlineInfo.imgUuid:''
                 // localStorage.setItem('userImg',vm.header.userImg)
                 // localStorage.setItem('entType',response.data.rt.onlineInfo.entType)

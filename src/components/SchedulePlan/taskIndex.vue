@@ -136,7 +136,7 @@
         <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
           <span class="item-property " @click="screenLeft.item = 1">任<br>务</span>
           <span class="item-version " @click="screenLeft.item = 2">核<br>实</span>
-          <span class="item-version-3 " @click="screenLeft.item = 3;">资<br>源</span>
+          <!-- <span class="item-version-3 " @click="screenLeft.item = 3;">资<br>源</span> -->
         </div>
       </div>
       <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 1">
@@ -241,27 +241,27 @@
             <li class="goujian-item" v-for="(item,index) in relaList" :key="index">
               <p class="clearfix">
                 <i class="icon-goujian icon-add"></i>
-                <i class="icon-goujian icon-detial" title="清单详细" @click="showDetialList(item.main)"></i>
-                <i class="icon-goujian icon-QRcode" title="清单二维码" @click="qrcode(item.main.pkId)"></i>
-                <i class="icon-goujian icon-location" title="定位" @click="location(item.details)"></i>
-                <i class="icon-goujian icon-delete" title="删除" @click="deleteAssociationList(item.main.pkId)"></i>
+                <i class="icon-goujian icon-detial" title="清单详细" @click="showDetialList(item)"></i>
+                <i class="icon-goujian icon-QRcode" title="清单二维码" @click="qrcode(item)"></i>
+                <i class="icon-goujian icon-location" title="定位" @click="location(item)"></i>
+                <i class="icon-goujian icon-delete" title="删除" @click="deleteAssociationList(item.id)"></i>
               </p>
               <p class="item-detial">
                 <span class="detial-text-name">ID :</span>
-                <span class="detial-text-value" v-text="item.main.pkId"></span>
+                <span class="detial-text-value" v-text="item.id"></span>
               </p>
-              <p class="item-detial">
+              <!-- <p class="item-detial">
                 <span class="detial-text-name">状态 :</span>
                 <span class="detial-text-value"
                       v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-              </p>
+              </p> -->
               <p class="item-detial">
                 <span class="detial-text-name">明细 :</span>
-                <span class="detial-text-value" v-text="item.details.length"></span>
+                <span class="detial-text-value" v-text="item.componentNumber"></span>
               </p>
               <p class="item-detial">
                 <span class="detial-text-name">名称 :</span>
-                <span class="detial-text-value" :tilte="item.main.mName" v-text="item.main.mName"></span>
+                <span class="detial-text-value" :tilte="item.name" v-text="item.name"></span>
               </p>
             </li>
           </ul>
@@ -276,11 +276,11 @@
           </h3>
           <ul class="uploadFileUl" :class="[{'show':show.uploadFile}]">
             <li class="uploadFileLi" v-for="(item,index) in fileList" :key="index">
-              <span class="uploadFileText">{{item.fileName}}</span>
+              <span class="uploadFileText">{{item.name}}</span>
               <span class="icon">
-                  <i class="icon-goujian icon-search" @click="searchsPic(item.filePath)"></i>
-                  <i class="icon-goujian icon-download" @click="downLoadPic(item.filePath)"></i>
-                  <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
+                  <i class="icon-goujian icon-search" @click="searchsPic(item.path)"></i>
+                  <i class="icon-goujian icon-download" @click="downLoadPic(item.path)"></i>
+                  <i class="icon-goujian icon-delete" @click="deleteFile(item.id)"></i>
               </span>
             </li>
           </ul>
@@ -294,11 +294,11 @@
           </h3>
           <ul class="bindPicUl" :class="[{'show':show.bindPic}]">
             <li class="bindPicLi" v-for="(item,index) in attachList" :key="index">
-              <span class="bindPicText">{{item.fileName}}</span>
+              <span class="bindPicText">{{item.name}}</span>
               <span class="icon">
-                  <i class="icon-goujian icon-search" @click="searchs(item.relativePath)"></i>
-                  <i class="icon-goujian icon-download" @click="downLoad(item.relativePath)"></i>
-                  <i class="icon-goujian icon-delete" @click="deleteFile(item.fileId)"></i>
+                  <i class="icon-goujian icon-search" @click="searchs(item.path)"></i>
+                  <i class="icon-goujian icon-download" @click="downLoad(item.path)"></i>
+                  <i class="icon-goujian icon-delete" @click="deleteFile(item.id)"></i>
               </span>
             </li>
           </ul>
@@ -858,7 +858,7 @@
               </div>
 
             </div>
-            <div class="bindListHeadRight">
+            <!-- <div class="bindListHeadRight">
               <div>
                 <label class="listText">创建时间：</label>
               </div>
@@ -868,9 +868,9 @@
                 <el-date-picker v-model="endDate" class="time" type="date">
                 </el-date-picker>
               </div>
-            </div>
+            </div> -->
           </div>
-          <div class="bindListHead">
+          <!-- <div class="bindListHead">
             <div class="bindListHeadLeft">
               <label class="listText1">业务来源：</label>
               <select class="relaType" v-model="relaTypeValue">
@@ -885,7 +885,7 @@
                         v-text="item.label"></option>
               </select>
             </div>
-          </div>
+          </div> -->
           <div class="bindListsearchBtn">
             <button class="searchBtn" @click="loadManifestSearch">查询</button>
           </div>
@@ -901,8 +901,8 @@
                   <th>清单ID</th>
                   <th>清单名称</th>
                   <th>明细数量</th>
-                  <th>业务来源</th>
-                  <th>业务状态</th>
+                  <!-- <th>业务来源</th>
+                  <th>业务状态</th> -->
                 </tr>
                 </thead>
                 <tbody>
@@ -912,12 +912,12 @@
                     <el-checkbox v-model="item.checked"></el-checkbox>
                   </td>
                   <td v-text="parseType(item.type)"></td>
-                  <td v-text="item.detailId"></td>
-                  <td v-text="item.detailName"></td>
-                  <td v-text="item.componentCount"></td>
-                  <td v-text="parseMBSource(item.relaType)"></td>
+                  <td v-text="item.id"></td>
+                  <td v-text="item.name"></td>
+                  <td v-text="item.componentNumber"></td>
+                  <!-- <td v-text="parseMBSource(item.relaType)"></td>
                   <td v-text="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"
-                      :title="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"></td>
+                      :title="parseMStatus(item.serviceState) + '(' + item.serviceState + ')'"></td> -->
                 </tr>
                 </tbody>
               </table>
@@ -1148,6 +1148,7 @@
     data() {
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+        elementTraceIds:[],
         returnLabelUrl:'',
         routerList:'',
         moduleList:'',
@@ -1638,7 +1639,7 @@
       vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
-      // vm.getTaskIndex();
+      vm.getTaskIndex();
       vm.getProjectGroup();
       // vm.changeUrl();
      
@@ -1740,6 +1741,7 @@
                         //  console.log(ElementSummaryDataList,'ElementSummaryDataList222');
                          item.ElementSummaryList = ElementSummaryDataList;
                       })
+                      
                       console.log(this.showBimDataList,'this.showBimDataList');
                       this.progressSearchDialog=false;
                       app.postMessage({command:"UsingColorStatus",parameter:this.showBimDataList},"*");
@@ -2020,9 +2022,9 @@
           }
         }).then(response => {
           if (response.data.cd == '0') {
-            this.selectUgId = response.data.rt.selectUgId;
-            this.ugList = response.data.rt.ugList;
-            this.tgList = response.data.rt.tgList;
+            // this.selectUgId = response.data.rt.selectUgId;
+            // this.ugList = response.data.rt.ugList;
+            // this.tgList = response.data.rt.tgList;
           } else if (response.data.cd == '-1') {
             alert(response.data.msg)
           }
@@ -2237,7 +2239,7 @@
         this.getTask();
         this.getVerifyList();
         this.getEntityRelation();
-        this.getTaskResourceTaskList();
+        // this.getTaskResourceTaskList();
       },
       rowKey(row, rowIndex) {
       
@@ -2718,39 +2720,39 @@
 
       //查询清单列表
       loadManifestSearch() {
-        if (this.startDate) {
-          this.startDate = moment(this.startDate).format("YYYY-MM-DD")
-        } else {
-          this.startDate = '';
-        }
-        if (this.endDate) {
-          this.endDate = moment(this.endDate).format("YYYY-MM-DD")
-        } else {
-          this.endDate = ''
-        }
-        var formData = new FormData();
-        formData.append('relaType', this.relaTypeValue);
-        formData.append('serviceState', this.serviceStateValue);
-        formData.append('detailName', this.detailName);
-        formData.append('startDate', this.startDate);
-        formData.append('endDate', this.endDate);
+        // if (this.startDate) {
+        //   this.startDate = moment(this.startDate).format("YYYY-MM-DD")
+        // } else {
+        //   this.startDate = '';
+        // }
+        // if (this.endDate) {
+        //   this.endDate = moment(this.endDate).format("YYYY-MM-DD")
+        // } else {
+        //   this.endDate = ''
+        // }
+        // var formData = new FormData();
+        // formData.append('relaType', this.relaTypeValue);
+        // formData.append('serviceState', this.serviceStateValue);
+        // formData.append('detailName', this.detailName);
+        // formData.append('startDate', this.startDate);
+        // formData.append('endDate', this.endDate);
         axios({
           method: 'post',
-          url: this.BDMSUrl + 'report/loadManifest',
+          url: this.BDMSUrl + 'manifest/getManifest',
           headers: {
             //   'content-type': 'application/json;charset=UTF-8',
             'token': this.token
           },
           params: {
-            projectId: this.projId,
-            page: this.pageDetial_1.currentPage,
-            rows: this.pageDetial_1.pagePerNum,
-            type: 4,
-          },
-          data: formData
+            // projectId: this.projId,
+            // page: this.pageDetial_1.currentPage,
+            // rows: this.pageDetial_1.pagePerNum,
+            // type: 4,
+            name:this.detailName
+          }
         }).then(response => {
           if (response.data.cd == '0') {
-            this.pageDetial_1.total = response.data.rt.total;
+            // this.pageDetial_1.total = response.data.rt.total;
             this.loadManifestList = response.data.rt.rows;
             //   console.log(JSON.stringify(this.loadManifestList))
           } else if (response.data.cd == '-1') {
@@ -2762,31 +2764,40 @@
       checkItem(val) {
         var vm = this;
         var fileCheckList = [];
+        this.elementTraceIds=[];
         for (var i = 0; i < vm.loadManifestList.length; i++) {
-          vm.$set(vm.loadManifestList[i], 'checked', false)
+            vm.$set(vm.loadManifestList[i], 'checked', false)
         }
         vm.$set(vm.loadManifestList[val], 'checked', true)
         vm.checkedItem = vm.loadManifestList[val]
-        // console.log(JSON.stringify(vm.checkedItem))
+        // if(vm.loadManifestList[val].checked==true){
+        //   console.log('00');
+        // }
+        // this.elementTraceIds=this.getElementByMid(vm.checkedItem.id);
+        // console.log(vm.checkedItem)
+        // console.log(this.elementTraceIds,'this.elementTraceIds');
+        
       },
       //加载清单列表
       getLoadManifest() {
         axios({
           method: 'post',
-          url: this.BDMSUrl + 'schedule/loadManifest',
+          // url: this.BDMSUrl + 'schedule/loadManifest',
+          url:this.BDMSUrl +'manifest/getManifest',
           headers: {
             'token': this.token
           },
           params: {
-            projectId: this.projId,
-            page: this.pageDetial_1.currentPage,
-            rows: this.pageDetial_1.pagePerNum,
-            type: 4
+            // projectId: this.projId,
+            // page: this.pageDetial_1.currentPage,
+            // rows: this.pageDetial_1.pagePerNum,
+            // type: 4
+            name:''
           }
         }).then(response => {
           if (response.data.cd == '0') {
-            this.pageDetial_1.total = response.data.rt.total;
-            this.loadManifestList = response.data.rt.rows;
+            // this.pageDetial_1.total = response.data.rt.total;
+            this.loadManifestList = response.data.rt;
             //   console.log(JSON.stringify(this.loadManifestList))
           } else if (response.data.cd == '-1') {
             alert(response.dara.msg);
@@ -2797,18 +2808,19 @@
       getEntityRelation() {
         axios({
           method: 'get',
-          url: this.BDMSUrl + 'schedule/' + this.projId + '/entityRelation/list',
+          // url: this.BDMSUrl + 'schedule/' + this.projId + '/entityRelation/list',
+          url:this.BDMSUrl+'manifest/getBindManifest',
           headers: {
             'token': this.token
           },
           params: {
-            relaId: this.taskId,
-            relaType: 2 //获取时为2
+            businessId: this.taskId,
+            type: 2 //获取时为2
           }
         }).then(response => {
           if (response.data.cd == "0") {
-            this.entityRelationList = response.data.rt;
-            this.relaList = this.entityRelationList.relaList;
+            // this.entityRelationList = response.data.rt;
+            this.relaList = response.data.rt;
             
             //   console.log(JSON.stringify(this.relaList)+'bim');
           } else if (response.data.cd == "-1") {
@@ -3732,23 +3744,55 @@
              this.loadManifestList=[];
             this.addAssociationListDialog=false;
         },
+         //根据清单id获取traceId
+        getElementByMid(mid){
+            var vm=this;
+            var traceId=[]
+            axios({
+                url:this.BDMSUrl+'manifest/getElementByMid',
+                method:'post',
+                headers:{
+                    'token':vm.token    
+                },
+                params:{
+                    mid:mid,
+                    businessType:1
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    response.data.rt.forEach((item)=>{
+                        traceId.push(item.traceId);
+                    })
+                }
+            })
+            return traceId
+        },
+
         //添加关联清单确认
         addAssociationListMakeSure(){
+          var vm=this;
           this.loading=true;
             axios({
-                method:'get',
-                url:this.BDMSUrl+'manifest2/businessBindManifestAndUpdateStatus',
+                method:'post',
+                // url:this.BDMSUrl+'manifest2/businessBindManifestAndUpdateStatus',
+                // url:this.BDMSUrl+'manifest/bindElement',
+                url:this.BDMSUrl+'manifest/bindElementWithExsistManifest',
                 headers:{
                     'token':this.token
                 },
                 params:{
-                    bId:this.taskId,
-                    bType:2,
-                    mId:this.checkedItem.detailId,
-                    currState:this.checkedItem.serviceState,
-                    currOperate:41,
-                    projId:this.projId
-                }
+                    // bId:this.taskId,
+                    // bType:2,
+                    // mId:this.checkedItem.detailId,
+                    // currState:this.checkedItem.serviceState,
+                    // currOperate:41,
+                    // projId:this.projId
+                    businessId:this.taskId,
+                    // businessName:this.taskName,
+                    type:2,
+                    mid:vm.checkedItem.id
+                },
+                // data:this.elementTraceIds
             }).then(response=>{
                 if(response.data.cd=='0'){
                     this.addAssociationListDialog=false;
@@ -3857,23 +3901,24 @@
       deleteAssociationList(num) {
         this.deleteAssociationListDialog = true;
         this.relaList.forEach((item) => {
-          if (item.main.pkId == num) {
-            this.mId = item.main.pkId
+          if (item.id == num) {
+            this.mId = item.id
           }
         })
       },
       deleteAssociationListMakeSure() {
         axios({
           method: 'get',
-          url: this.BDMSUrl + 'schedule/deleteMBRelation',
+          // url: this.BDMSUrl + 'schedule/deleteMBRelation',
+          url:this.BDMSUrl+'manifest/deleteBind',
           headers: {
             'token': this.token
           },
           params: {
             // projId:this.projId,
-            mId: this.mId,
-            bId: this.taskId,
-            bType: 2 //业务类型
+            mid: this.mId,
+            businessId: this.taskId,
+            type: 2 //业务类型
           }
         }).then(response => {
           if (response.data.cd == '0') {
@@ -3912,7 +3957,7 @@
           }
         }).then(response => {
           if (response.data.cd == '0') {
-            this.getTaskResourceTaskList();
+            // this.getTaskResourceTaskList();
             this.deleteTaskResourceDialog = false;
             this.selectId = '';
           }
@@ -3940,7 +3985,7 @@
           }
         }).then(response => {
           if (response.data.cd == '0') {
-            this.getTaskResourceTaskList();
+            // this.getTaskResourceTaskList();
             this.addResourceTaskDialog = false;
             this.amount = '',
               this.patternValue = '',
@@ -3968,26 +4013,33 @@
       uploadFileCancle() {
         this.uploadFileDialog = false;
         this.uploadfilesList = [];
+        this.imageName='';
       },
       uploadFileMakeSure() {
-        var returnUrl = this.BDMSUrl + 'schedule/task/fileUpload?ugId=' + this.selectUgId + '&id=' + this.taskId;
-        returnUrl = encodeURIComponent(returnUrl);
+        var vm=this;
+        // var returnUrl = this.BDMSUrl + 'schedule/task/fileUpload?ugId=' + this.selectUgId + '&id=' + this.taskId;
+        // returnUrl = encodeURIComponent(returnUrl);
         var formData = new FormData();
-        formData.append('token', this.token);
-        formData.append('projId', this.projId);
-        formData.append('userId', this.userId);
+        // formData.append('token', this.token);
+        // formData.append('projId', this.projId);
+        // formData.append('userId', this.userId);
         // formData.append('id',this.taskId);
-        formData.append('type', 1);
+        // formData.append('type', 1);
         formData.append('file', this.uploadfilesList);
         // formData.append('ugId',);
-        formData.append('modelCode', '005');
-        formData.append('returnUrl', returnUrl);
+        // formData.append('modelCode', '005');
+        // formData.append('returnUrl', returnUrl);
         axios({
           method: 'post',
-          url: this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
-
+          // url: this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+          url:this.BDMSUrl+'schedule/fileUpload',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'token':vm.token
+          },
+          params:{
+            taskId:vm.taskId,
+            type:6
           },
           data: formData,
         }).then((response) => {
@@ -4035,27 +4087,36 @@
       //上传图片取消
       uploadPicCancle() {
         this.uploadPicDialog = false;
+        this.imageName='';
+
       },
       uploadPicMakeSure() {
-        var returnUrl = this.BDMSUrl + 'schedule/task/attachmentUpload?id=' + this.taskId;
-        returnUrl = encodeURIComponent(returnUrl);
+        var vm=this;
+        // var returnUrl = this.BDMSUrl + 'schedule/task/attachmentUpload?id=' + this.taskId;
+        // returnUrl = encodeURIComponent(returnUrl);
         var formData = new FormData();
-        formData.append('token', this.token);
-        formData.append('projId', this.projId);
+        // formData.append('token', this.token);
+        // formData.append('projId', this.projId);
         // formData.append('id',this.taskId);
-        formData.append('type', 1);
-        formData.append('userId', this.userId);
+        // formData.append('type', 1);
+        // formData.append('userId', this.userId);
         formData.append('file', this.uploadfilesList);
         // formData.append('ugId',this.selectUgId);
-        formData.append('modelCode', '005');
-        formData.append('returnUrl', returnUrl);
+        // formData.append('modelCode', '005');
+        // formData.append('returnUrl', returnUrl);
         axios({
           method: 'post',
-          url: this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+          // url: this.QJFileManageSystemURL + 'uploading/uploadFileInfo',
+          url:vm.BDMSUrl + 'schedule/fileUpload',
 
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'token':vm.token
 
+          },
+          params:{
+            taskId:vm.taskId,
+            type:5
           },
           data: formData,
         }).then((response) => {
@@ -4067,21 +4128,21 @@
       },
       //查看
       searchs(filePath) {
-        window.open(this.QJFileManageSystemURL + filePath + "/preview");
+        window.open(this.BDMSUrl + filePath + "/preview");
       },
       //下载
       downLoad(filePath) {
         var vm = this
-        window.open(vm.QJFileManageSystemURL + filePath + '');
+        window.open(vm.BDMSUrl + filePath + '');
       },
       //查看图片
       searchsPic(filePath) {
-        window.open(this.QJFileManageSystemURL + filePath + "/preview");
+        window.open(this.BDMSUrl + filePath + "/preview");
       },
       //下载图片
       downLoadPic(filePath) {
         var vm = this
-        window.open(vm.QJFileManageSystemURL + filePath + '');
+        window.open(vm.BDMSUrl + filePath + '');
       },
 
       //点击删除文件、图片

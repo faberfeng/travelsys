@@ -39,12 +39,13 @@
                             </div>
                         </li> -->
                         <!-- v-if="CommentShow" -->
-                        <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
+                        <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="val+'_attach'" style="padding:0;overflow: hidden;">
+                            <!-- :title="val.fileName" -->
+                            <img  style="object-fit: cover;" :src="BDMSUrl+val"  class="item-file-attach"/>
                             <div class="actionbox clearfix">
                                 <i class="button-relocation" title="定位" @click="relocation()"></i>
                                 <i class="line"></i>
-                                <i class="button-search"  @click="preview(val.filePath)"></i>
+                                <i class="button-search"  @click="preview(BDMSUrl+val)"></i>
                                  <i class="line"></i>
                                  <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
                             </div>
@@ -260,7 +261,7 @@ export default Vue.component('common-upload',{
                  var vm = this
                     axios({
                         method:'POST',
-                        url:this.BDMSUrl+'design/uploadViewPoint/1/'+this.projId,
+                        url:this.BDMSUrl+'design/uploadViewPoint/'+this.projId,
                         headers:{
                             'token':vm.token
                         },
@@ -518,11 +519,11 @@ export default Vue.component('common-upload',{
             vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
                         elementFilter:this.elementFilter,
-                        extension:item.fileExtension,
-                        relativePath:item.filePath,
-                        uuid:item.fileUuid,
-                        name:item.fileName,
-                        projId:this.projId,
+                        // extension:item.fileExtension,
+                        relativePath:item,
+                        // uuid:item.fileUuid,
+                        // name:item.fileName,
+                        // projId:this.projId,
                         // subProjId:this.defaultSubProjId,
                     })
             })

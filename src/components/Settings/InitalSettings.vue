@@ -699,6 +699,21 @@ export default {
                         // projectImg:response.data.rt.projectImage?response.data.rt.image[0].filePath:''
                         projectImg:this.BDMSUrlQRCode+response.data.rt.path
                     })
+                    this.isAsdefault = false;
+                    if(this.isAsdefault){
+                        this.$store.commit('switchLogo',{
+                            isDefaultLogo:false
+                        })
+                    }else{
+                        this.$store.commit('switchLogo',{
+                            isDefaultLogo:true
+                        })
+                    }
+                    // if(this.isAsdefault == 'true'){
+                    //     this.isAsdefault = true;
+                    // }else{
+                    //     this.isAsdefault = false;
+                    // }
                     this.projectImage =response.data.rt.path;
 
                 }
@@ -781,7 +796,7 @@ export default {
             var vm=this;
             axios({
                 method:'post',
-                url:vm.BDMSUrl+'api/v1/main/dcUpload',
+                url:vm.BDMSUrlQRCode+'api/v1/main/dcUpload',
                 headers:{
                     'token':vm.token
                 },
@@ -792,7 +807,12 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    
+                    this.getProjectImageList();
+                    this.findProjectLogo();
+                    this.upImg = false;
+                    this.imageName = '未选择任何图片';
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
                 }
             })
             // axios({

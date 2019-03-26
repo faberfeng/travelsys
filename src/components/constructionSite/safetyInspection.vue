@@ -256,15 +256,16 @@
                 <div class="baseMapBody">
                     <ul class="clearfix" style="margin:0px 20px 0px 20px;">
                         <li class="baseMapBodyLi" @mouseenter="enter(item.id)" @mouseleave="leave()" @click="selectCurBaseMap(item.id)" style="padding: 0px; overflow: hidden;" v-for="(item,index) in baseMapList" :key="index">
-                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="QJFileManageSystemURL+item.relativeUri">
-                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+item.relativeUri"></pdf>
+                            <img v-show="item.relativeUri.substr(item.relativeUri.length-3)=='jpg'||item.relativeUri.substr(item.relativeUri.length-3)=='png'" style="object-fit: contain;" class="baseMapBodyImg" :src="BDMSUrl+item.relativeUri">
+                            <pdf v-show="item.relativeUri.substr(item.relativeUri.length-3)=='pdf'||item.relativeUri.substr(item.relativeUri.length-3)=='PDF'" ref="pdfDocument" id="drawingPdf"  :src="BDMSUrl+item.relativeUri"></pdf>
                             <div class="baseMapBodyLiBottom" v-show="item.id==hoverId">
                                 <label class="baseMapName" v-text="item.name"></label>
                                 <label v-show="item.useCount!=0" class="baseMapCount" >在用{{item.useCount}}</label>
                                 <label v-show="item.useCount==0&&manageEdit" class="deleteBaseMap"  @click.stop="deleteBaseMap(item.id)"></label>
                             </div>
                         </li>
-                        <li class="uploadBaseBody" v-show="manageEdit">
+                        <!-- v-show="manageEdit" -->
+                        <li class="uploadBaseBody" >
                             <div class="uploadBaseIcon">
                                 <label for="drawingsInfo">
                                     <img style=" cursor: pointer"  src="./images/upload.png">
@@ -1200,6 +1201,7 @@ export default {
             manageEdit:false,//管理底图和点位
             routerList:'',
             moduleList:'',
+            projAuth:'',
 
         }
     },
@@ -1212,14 +1214,15 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        vm.projAuth = localStorage.getItem('projAuth');
         this.loadingTitle()
         this.getAccessUserGroup();
         // this.getPositionList();
         this.curTime();
         this.curTime1();
-        setTimeout(()=>{
-             this.getUserInfo();
-        },200)
+        // setTimeout(()=>{
+        //      this.getUserInfo();
+        // },200)
        
   
     },
@@ -1423,44 +1426,42 @@ export default {
                 vm.exportReportEdit = false;
                 vm.editInspectWordEdit = false;
                 vm.searchInspectDetailEdit = false;
-                axios({
-                    method:'GET',
-                    url:vm.BDMSUrl+'project2/getOnlineInfo',
-                    params:{
-                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
-                    },
-                    headers:{
-                        'accept':'application/json;charset=UTF-8',
-                        'token':vm.token,
-                    },
-                }).then((response)=>{
-                    var id = localStorage.getItem('projId');
-                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
-                    
-                    if(vm.projAuth1.indexOf("00600801") > 0){
-                        vm.basePicEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00600901") > 0){
-                        // alert('00600901')
-                        vm.searchCheckEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00601001") > 0){
-                        vm.exportReportEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00601101") > 0){
-                        vm.editInspectWordEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00601201") > 0){
-                        vm.searchInspectDetailEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00601204") > 0){
-                        vm.importDataEdit = true
-                    }
-                    if(vm.projAuth1.indexOf("00601202") > 0){
-                        vm.manageEdit = true
-                    }
-                    // this.checkAuth();
-                })
+                if(vm.projAuth.indexOf("00600801") > 0){
+                    vm.basePicEdit = true
+                }
+                if(vm.projAuth.indexOf("00600901") > 0){
+                    // alert('00600901')
+                    vm.searchCheckEdit = true
+                }
+                if(vm.projAuth.indexOf("00601001") > 0){
+                    vm.exportReportEdit = true
+                }
+                if(vm.projAuth.indexOf("00601101") > 0){
+                    vm.editInspectWordEdit = true
+                }
+                if(vm.projAuth.indexOf("00601201") > 0){
+                    vm.searchInspectDetailEdit = true
+                }
+                if(vm.projAuth.indexOf("00601204") > 0){
+                    vm.importDataEdit = true
+                }
+                if(vm.projAuth.indexOf("00601202") > 0){
+                    vm.manageEdit = true
+                }
+                // axios({
+                //     method:'GET',
+                //     url:vm.BDMSUrl+'project2/getOnlineInfo',
+                //     params:{
+                //         refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                //     },
+                //     headers:{
+                //         'accept':'application/json;charset=UTF-8',
+                //         'token':vm.token,
+                //     },
+                // }).then((response)=>{
+                //     var id = localStorage.getItem('projId');
+                //     vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                // })
         },
         // checkAuth(){
         //     var vm = this
@@ -3272,21 +3273,28 @@ export default {
             reader.readAsDataURL(list[0]);
             vm.fileList=list[0];
             vm.fileListName=list[0].name.replace(/\s*/g,"");
-            var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
-            returnUrl = encodeURIComponent(returnUrl);
+            // var returnUrl = vm.BDMSUrl+'detectionInfo/addBaseMap?userGroupId='+vm.selectUgId+'&name='+vm.fileListName+'&pageNo='+vm.pageNo;
+            // returnUrl = encodeURIComponent(returnUrl);
             var formData = new FormData()
-            formData.append('token',vm.token);
-            formData.append('projId',vm.projId);
-            formData.append('type',1);
+            // formData.append('token',vm.token);
+            // formData.append('projId',vm.projId);
+            // formData.append('type',1);
             formData.append('file',vm.fileList);
-            formData.append('userId',vm.userId);
-            formData.append('modelCode','006');
-            formData.append('returnUrl',returnUrl);
+            // formData.append('userId',vm.userId);
+            // formData.append('modelCode','006');
+            // formData.append('returnUrl',returnUrl);
             axios({
                     method:'POST',
-                    url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                    // url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',
+                    url:vm.BDMSUrl+'detectionInfo/addBaseMap',
                     headers:{
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        'token':vm.token
+                    },
+                    params:{
+                        userGroupId:vm.selectUgId,
+                        name:vm.fileListName,
+                        pageNo:vm.pageNo
                     },
                     data:formData,
                     }).then((response)=>{
@@ -3355,6 +3363,7 @@ export default {
                     // if(!this.curBaseMapUrl){
                         this.baseMapList.forEach((item)=>{
                             if(item.isUsed==1){
+                                // this.BDMSUrl+
                                 this.curBaseMapUrl=item.relativeUri;
                                 this.monitorBaseMapId=item.id;
                                 this.getBaseMapInfoByBaseMapId();

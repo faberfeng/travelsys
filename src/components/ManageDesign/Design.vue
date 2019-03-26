@@ -110,7 +110,7 @@
                                                     </span>
                                                 </div>
                                             </li>
-                                            <li :class="['item-file']" v-for="(val,key) in item.attachList" :key="key+'attach'" style="padding:0;overflow: hidden;">
+                                            <li :class="['item-file']" v-for="(val,key1) in item.attachList" :key="key1+'attach'" style="padding:0;overflow: hidden;">
                                                 <img style="object-fit: contain" :src="BDMSUrl+val.path" :title="val.name" class="item-file-attach"/>
                                                 <div class="actionbox clearfix">
                                                     <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
@@ -118,6 +118,16 @@
                                                     <i class="button-search"   @click="preview(val.path)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.path)"></i>
+                                                </div>
+                                            </li>
+                                            <li :class="['item-file']" v-for="(val,key) in item.viewPointInfo" :key="key+'attach1'" style="padding:0;overflow: hidden;">
+                                                <img style="object-fit: contain" :src="BDMSUrl+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                <div class="actionbox clearfix">
+                                                    <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                     <i class="line"></i>
+                                                    <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                                    <i class="line"></i>
+                                                    <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                 </div>
                                             </li>
                                         </ul>
@@ -187,6 +197,16 @@
                                                                             <i class="button-search"  @click="preview(left.path)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(left.path)"></i>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li :class="['item-file']" v-for="(val,key) in item.viewPointInfo" :key="key+'attach1'" style="padding:0;overflow: hidden;">
+                                                                        <img style="object-fit: contain" :src="BDMSUrl+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                                                                        <div class="actionbox clearfix">
+                                                                            <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                                                            <i class="line"></i>
+                                                                            <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                                                            <i class="line"></i>
+                                                                            <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                                         </div>
                                                                     </li>
                                                                 </ul>

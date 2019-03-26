@@ -26,7 +26,7 @@
                                 <ul class="left-item-box">
                                     <li class="item clearfix">
                                         <span class="left">清单编号</span>
-                                        <span class="right" v-text="ManifestInfo.pkId"></span>
+                                        <span class="right" v-text="ManifestInfo.id"></span>
                                     </li>
                                         <li class="item clearfix">
                                         <span class="left">创建用户</span>
@@ -52,7 +52,7 @@
 
                                         <li class="item clearfix">
                                         <span class="left">清单名称</span>
-                                        <span class="right" v-text="ManifestInfo.mName"></span>
+                                        <span class="right" v-text="ManifestInfo.name"></span>
                                     </li>
                                         <li class="item clearfix">
                                         <span class="left">业务状态</span>
@@ -77,7 +77,8 @@
                                     </li>
                                 </ul>
                                 <div class="right-QRcode">
-                                    <img :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(ManifestInfo.pkId, 7) " alt="">
+                                    <!-- QRCode2/getQRimage/QR-QD-' -->
+                                    <img :src="BDMSUrl+'manifest/qr/QR-QD-' + addZero(ManifestInfo.id, 7) " alt="">
                                 </div>
                             </div>
                             <p class="header clearfix"  style="margin-top:30px;">
@@ -2353,7 +2354,7 @@ var app
 var CurrentSelectPara
 var CurrentSelectedEntList
 export default Vue.component('common-list',{
-    props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne','orderListDetailId','isShowWuzi','isDinghuo','dingHuoObj','isShowFahuo','isFahuo','faHuoObj','isShowcheck','isShowreceipt','checkReceiptObj','showEditallcheck','showEditallreceipt','isShowWuliao','wuliaoObj'],
+    props:['mId','type','title','rType','bId','isGongChengLiang','manifestIdOne','orderListDetailId','isShowWuzi','isDinghuo','dingHuoObj','isShowFahuo','isFahuo','faHuoObj','isShowcheck','isShowreceipt','checkReceiptObj','showEditallcheck','showEditallreceipt','isShowWuliao','wuliaoObj'],
     data(){
         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
@@ -2487,12 +2488,12 @@ export default Vue.component('common-list',{
                 {
                     name:'序号',
                     show:true,
-                    prop:'pkId',
+                    prop:'id',
                 },
                 {
-                    name:'所在单体',
+                    name:'单体Id',
                     show:true,
-                    prop:'dBuild',
+                    prop:'traceId',
                 },
                 {
                     name:'所在分区',
@@ -2518,7 +2519,8 @@ export default Vue.component('common-list',{
                     name:'业务状态',
                     show:true,
                     prop:'dState_format',
-                }, {
+                },
+                 {
                     name:'单位',
                     show:true,
                     prop:'dUnit',
@@ -2886,7 +2888,8 @@ export default Vue.component('common-list',{
             vm.showEditAllCheck = vm.showEditallcheck;
             vm.showEditAllReceipt = vm.showEditallreceipt;
             console.log(vm.CheckReceiptObj);
-            vm.getIntoLists();
+            // vm.getIntoLists();
+            vm.getManifestInfoByMId();
     }, 
     mounted(){
         var vm = this
@@ -2915,14 +2918,14 @@ export default Vue.component('common-list',{
             var vm = this
             vm.findManifestDetailList()
         },
-        'pageOrder.currentPage':function(val,oldval){
-            var vm = this
-            vm.findComponentList()
-        },
-        'pageOrder.pagePerNum':function(val,oldval){
-            var vm = this
-            vm.findComponentList()
-        },
+        // 'pageOrder.currentPage':function(val,oldval){
+        //     var vm = this
+        //     vm.findComponentList()
+        // },
+        // 'pageOrder.pagePerNum':function(val,oldval){
+        //     var vm = this
+        //     vm.findComponentList()
+        // },
     },
     methods:{
         callback(e){
@@ -3735,9 +3738,9 @@ export default Vue.component('common-list',{
                 message:'请打开顶部的虚拟场景'
             })
             }else{
-            this.TraceID=String(scope.row.dTraceId);
-            this.HolderPath=JSON.parse(scope.row.dHolderPath);
-            this.GCCode=scope.row.dGCCode;
+            this.TraceID=String(scope.row.traceId);
+            this.HolderPath=JSON.parse(scope.row.holderPath);
+            this.GCCode=scope.row.code;
             const para={"TraceID":this.TraceID,"HolderPath":this.HolderPath,"GCCode":this.GCCode}
             console.log(para)
             const app = document.getElementById('webIframe').contentWindow;
@@ -4206,9 +4209,11 @@ export default Vue.component('common-list',{
             * 
             * **/
                 params = {
-                    mId:vm.manifestId,
+                    manifestId:vm.manifestId
                 }
-                url = 'manifest2/getManifestInfoByMId';
+                // url = 'manifest2/getManifestInfoByMId';
+                // url = 'manifest/getElementByMid';
+                url = 'manifest/getManifestById';
                 ways = 'POST';
             }
             axios({
@@ -4230,21 +4235,21 @@ export default Vue.component('common-list',{
                         }else{
                             vm.ManifestInfo = response.data.rt ; 
                         }
-                        if(vm.ManifestInfo.mType == 2){
+                        if(vm.ManifestInfo.type == 2){
                             Object.assign(vm.ManifestInfo,{
                                 _mType:'工程量清单'
                             })
-                        }else if(vm.ManifestInfo.mType == 1){
+                        }else if(vm.ManifestInfo.type == 1){
                             Object.assign(vm.ManifestInfo,{
                                 _mType:'构件量清单'
                             })
-                        }else if(vm.ManifestInfo.mType == 3){
+                        }else if(vm.ManifestInfo.type == 3){
                             Object.assign(vm.ManifestInfo,{
                                 _mType:'物料量清单'
                             })
                         }
                         vm.findManifestDetailList(2);
-                        vm.findComponentList(2);
+                        // vm.findComponentList(2);
                     }
                     
                     }else if(response.data.cd == '-1'){
@@ -4306,17 +4311,20 @@ export default Vue.component('common-list',{
             }
             axios({
                 method:'POST',
-                url:vm.BDMSUrl+'manifest2/findManifestDetailList',
+                // url:vm.BDMSUrl+'manifest2/findManifestDetailList',
+                url:vm.BDMSUrl+'manifest/getElementByMid',
                 headers:{
                     token:vm.token
                 },
                 params:{
-                    projectId:vm.projId,
-                    manifestId:manifestId,
-                    page:page,
-                    rows:rows,
-                    showType:showType,//显示类型 1 逐个显示 2 合并显示
-                    currentColumns:'',
+                    // projectId:vm.projId,
+                    // manifestId:manifestId,
+                    // page:page,
+                    // rows:rows,
+                    // showType:showType,//显示类型 1 逐个显示 2 合并显示
+                    // currentColumns:'',
+                    businessType:vm.type,
+                    mid:vm.manifestId 
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
@@ -4333,9 +4341,11 @@ export default Vue.component('common-list',{
                             if(response.data.rt.rows != null){
                                 vm.S_Label_quantitiesList = response.data.rt.rows;
                                 this.copyS_Label_quantitiesList = response.data.rt.rows;
+                               
                             }else{
                                 vm.S_Label_quantitiesList = [];
                             }
+                             console.log('1')
                         }else if(isDialog == 0){
                             if(response.data.rt.rows != null){
                                 vm.S_quantitiesList = response.data.rt.rows;
@@ -4344,22 +4354,26 @@ export default Vue.component('common-list',{
                                     vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                     vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
                                 });
+                                
                             }else{
                                 vm.S_quantitiesList = [];
                             }
+                            console.log('2')
                         }else if(isDialog == 2){
-                            if(response.data.rt.rows != null){
-                                vm.S_Label_quantitiesList = response.data.rt.rows
-                                this.copyS_Label_quantitiesList = response.data.rt.rows;
-                                vm.S_quantitiesList = response.data.rt.rows
-                                vm.S_quantitiesList.forEach((element,index) => {
-                                    vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
-                                    vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
-                                });
+                            if(response.data.rt != null){
+                                vm.S_Label_quantitiesList = response.data.rt
+                                this.copyS_Label_quantitiesList = response.data.rt;
+                                vm.S_quantitiesList = response.data.rt
+                                // vm.S_quantitiesList.forEach((element,index) => {
+                                //     vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
+                                //     vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态
+                                // });
+                                
                             }else{
                                 vm.S_Label_quantitiesList = []
                                 vm.S_quantitiesList = []
                             }
+                            console.log('3')
                         }
                     }
                 }else {
