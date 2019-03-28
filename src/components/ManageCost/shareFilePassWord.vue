@@ -8,7 +8,7 @@
                 </div>
                 <div class="headerText">工程云盘</div>
                 <div class="headerInfo">
-                    <a class="userCenter" href="http://bdms.arctron.cn/arctron-usercenter">用户中心</a>
+                    <a class="userCenter" href="http://10.245.11.10:8080/bdms/#/userLogin">用户中心</a>
                     <span class="appDownLoad" href="">客户端下载</span>
                 </div>
             </el-col>
@@ -20,9 +20,9 @@
                 </div>
                 <div class="center_frame">
                     <div class="center_frame_top">
-                        <img  v-if="userImg!=QJFileManageSystemURL1" class="userImg" :src="userImg"/>
-                        <img v-if="userImg==QJFileManageSystemURL1" class="userImg" src='../../assets/people.png'>
-                        <label class="userItem"><label class="userItem_bold" v-text="user.realName"></label>给你加密分享了文件</label>
+                        <img   class="userImg" :src="userImg"/>
+                        <!-- <img v-if="userImg==QJFileManageSystemURL1" class="userImg" src='../../assets/people.png'> -->
+                        <label class="userItem"><label class="userItem_bold" v-text="user"></label>给你加密分享了文件</label>
                     </div>
                     <div class="center_frame_bottom">
                         <div class="pass_word">请输入访问密码</div>
@@ -46,6 +46,7 @@ export default{
             passwordValue:'',
             appShareUrl:'',
             shareUrl:'',
+            shareUserId:'',
         }
     },
     created(){
@@ -55,7 +56,7 @@ export default{
         vm.QJFileManageSystemURL1 = vm.$store.state.QJFileManageSystemURL1;
          vm.appShareUrl=vm.$store.state.appShareUrl;
          vm.shareUrl=vm.$store.state.shareUrl;
-        vm.judgeUserAgent();
+        // vm.judgeUserAgent();
     },
     mounted(){
         this.searchShareFile();
@@ -75,31 +76,42 @@ export default{
             this.shareNo=this.shareNo.replace(new RegExp(str), "")
             axios({
                 method:'get',
-                url:this.BDMSUrl+'project2/doc/share/'+this.shareNo
+                // url:this.BDMSUrl+'project2/doc/share/'+this.shareNo
+                url:this.BDMSUrl+'doc/getShareInfo',
+                params:{
+                    shareNo:this.shareNo
+                }
             }).then((response)=>{
-                if(response.data.cd=='10002'){
-                    this.qjShareGroup=response.data.rt.qjShareGroup
-                    this.user=response.data.rt.user
-                    this.userImg=this.trim(this.user.imgUuid)
-                    console.log(this.userImg);
+                if(response.data.cd=='0'){
+                    // this.qjShareGroup=response.data.rt.qjShareGroup
+                    this.user=response.data.rt.shareUserName;
+                    this.shareUserId=response.data.rt.shareUserId;
+                    this.userImg=this.BDMSUrl+'doc/download/'+this.shareUserId;
+                    // this.userImg=this.trim(this.user.imgUuid)
+                    // console.log(this.userImg);
                 }
             })
         },
         getFilePathByPassWord(){
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/doc/getFilePathByPassWord',
-                params:{
-                    passWord:this.passwordValue
-                }
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    this.passwordShowNo=response.data.rt;
-                    this.$router.push({
-                        path:`/cloud/share/${this.passwordShowNo}`,query:{shareName:this.$route.query.shareName}
-                    })
-                }
+
+            this.$router.push({
+                path:`/cloud/share/${this.shareNo}`,query:{shareName:this.$route.query.shareName,passWord:this.passwordValue}
             })
+
+            // axios({
+            //     method:'post',
+            //     url:this.BDMSUrl+'project2/doc/getFilePathByPassWord',
+            //     params:{
+            //         passWord:this.passwordValue
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd=='0'){
+            //         this.passwordShowNo=response.data.rt;
+            //         this.$router.push({
+            //             path:`/cloud/share/${this.passwordShowNo}`,query:{shareName:this.$route.query.shareName}
+            //         })
+            //     }
+            // })
         }
     }
 }

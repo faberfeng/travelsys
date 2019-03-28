@@ -1297,7 +1297,7 @@ export default {
         top:10px;
         color:black;
         font-size: 14px;
-        right: 20px;
+        right: 188px;
         cursor: pointer;
         border: 1px solid #ccc;
         padding: 5px;

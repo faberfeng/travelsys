@@ -5,7 +5,7 @@
                 <el-carousel :interval="3000" arrow="always" height="242px" width="340px">
                     <img style="width:340px;height:237px" src="../../assets/nopic.jpg"/>
                     <el-carousel-item v-for="(item,index) in projectImageList" :key="index">
-                        <img style="width:340px;height:242px" :src="item.filePath"/>
+                        <img style="width:340px;height:242px" :src="BDMSUrl+item.path"/>
                         </el-carousel-item>
                 </el-carousel>
             </div>

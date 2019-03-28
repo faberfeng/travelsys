@@ -170,19 +170,19 @@
                     <div class="editBodyone">
                         <label class="editInpText">观测员</label>
                         <select v-model="observerId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">计算员</label>
                         <select v-model="calculatorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">核查员</label>
                         <select v-model="inspectorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                 </div>
@@ -711,6 +711,8 @@ export default Vue.component('commonDetail',{
             importDataEdit:false,
             exportDataEdit:false,
             editAlertEdit:false,
+            projAuth:'',
+
 
         }
     },
@@ -721,6 +723,7 @@ export default Vue.component('commonDetail',{
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
+        vm.projAuth = localStorage.getItem('projAuth');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         //  vm.projAuth = localStorage.getItem('projAuth')
@@ -732,8 +735,8 @@ export default Vue.component('commonDetail',{
         this.getBaseMapInfoByBaseMapId();
         this.getDetailPointInfo();
         this.getDetectionItemCollectWay();
-        // this.checkAuth();
-        this.getUserInfo();
+        this.checkAuth();
+        // this.getUserInfo();
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
     },
@@ -868,25 +871,25 @@ export default Vue.component('commonDetail',{
                 }).then((response)=>{
                     var id = localStorage.getItem('projId');
                     vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
-                    this.checkAuth();
+                   
                 })
             
             },
         checkAuth(){
             var vm=this;
-            if(vm.projAuth1.indexOf("00601202") > 0){
+            if(vm.projAuth.indexOf("00601202") > 0){
               vm.manageEdit = true
             }
-            if(vm.projAuth1.indexOf("00601203") > 0){
+            if(vm.projAuth.indexOf("00601203") > 0){
                 vm.editInspectMethodEdit = true
             }
-            if(vm.projAuth1.indexOf("00601204") > 0){
+            if(vm.projAuth.indexOf("00601204") > 0){
                 vm.importDataEdit = true
             }
-            if(vm.projAuth1.indexOf("00601205") > 0){
+            if(vm.projAuth.indexOf("00601205") > 0){
                 vm.exportDataEdit = true
             }
-            if(vm.projAuth1.indexOf("00601206") > 0){
+            if(vm.projAuth.indexOf("00601206") > 0){
                 vm.editAlertEdit = true
             }
         },
@@ -1200,9 +1203,9 @@ export default Vue.component('commonDetail',{
                     if(this.angle==null){
                         this.angle=0;
                     }
-                    var type=(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.substr(this.getBaseMapInfoByBaseMapIdInfo.relativeUri.length-3)).toString();
+                    var type=(this.getBaseMapInfoByBaseMapIdInfo.name.substr(this.getBaseMapInfoByBaseMapIdInfo.name.length-3)).toString();
                     // console.log(type);
-                    this.paramsInfo={type:type,source:vm.QJFileManageSystemURL+this.getBaseMapInfoByBaseMapIdInfo.relativeUri,angle:this.angle}
+                    this.paramsInfo={type:type,source:vm.BDMSUrl+this.getBaseMapInfoByBaseMapIdInfo.relativeUri,angle:this.angle}
                     // console.log(this.paramsLists,'this.paramsLists');
                 }else if(response.data.cd=='-1'){
                     vm.$message({
@@ -1378,12 +1381,13 @@ export default Vue.component('commonDetail',{
             var vm=this;
             axios({
                 method:'post',
-                url:this.BDMSUrl+'detectionInfo/getUserByUserGroup',
+                // url:this.BDMSUrl+'detectionInfo/getUserByUserGroup',
+                url:this.BDMSUrl+'userGroup/getGroupUser',
                 headers:{
                     'token':this.token
                 },
                 params:{
-                    userGroupId:this.userGroupId
+                    groupId:this.userGroupId
                      
                 }
             }).then((response)=>{

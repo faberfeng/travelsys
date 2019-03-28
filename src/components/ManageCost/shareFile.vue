@@ -8,7 +8,7 @@
                 </div>
                 <div class="headerText">工程云盘</div>
                 <div class="headerInfo">
-                    <a class="userCenter" href="http://bdms.arctron.cn/arctron-usercenter">用户中心</a>
+                    <a class="userCenter" href="http://10.245.11.10:8080/bdms/#/userLogin">用户中心</a>
                     <span class="appDownLoad" href="">客户端下载</span>
                 </div>
             </el-col>
@@ -25,34 +25,34 @@
                 <ul id="file-container" class="clearfix" style="padding: 0px 10px 15px 20px;">
                     <li :class="[{'item-file-active':item.checked},'item-file','file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)" ></label>
-                        <input type="checkbox" :id='item.fileId+"file"' class="el-checkbox__original" v-model="item.checked">
+                        <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
-                            <img :src="require('./images/icon/'+item.icon)" />
+                            <img :src="require('./images/icon/'+item.extension+'.png')" />
                             </span>
                             <span  class="item-file-detial">
-                                <h3 v-text="item.fgName"></h3>
-                                <p>由<span class="text-name" v-text="item.uploadUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p>
+                                <h3 v-text="item.fileName"></h3>
+                                <!-- <p>由<span class="text-name" v-text="item.uploadUser"></span>通过<span v-text="item.uploadFromExplorer == 1?'浏览器':'手机端'"></span>上传</p> -->
                                 <p v-text="initData(item.uploadTime)"></p>
                                 <p class="operation">
-                                    <span v-text="'版本'+item.version"></span>
-                                    <i class="icon-goujian icon-search" @click="view(item.filePath,item.fileName)"></i>
-                                    <i class="icon-goujian icon-download" @click="downLoad(item.filePath)"></i>
+                                    <!-- <span v-text="'版本'+item.version"></span> -->
+                                    <i class="icon-goujian icon-search" @click="view(item.fgId,item.fileName)"></i>
+                                    <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
                                 </p>
                             </span>
                         </div>
                     </li>
                     <!-- @click="checkItem(index)" -->
                     <!-- @click="IntoDir(item.nodeId)" -->
-                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'"    @click="intoDir(item.nodeId)">
+                    <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'"    @click="intoDir(item.dirId)">
                         <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
-                        <input type="checkbox" :id='item.nodeId+"file"' class="el-checkbox__original" v-model="item.checked">
+                        <input type="checkbox" :id='item.dirId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image item-folder-image">
                             <img :src="require('./images/folderBig.png')" />
                             </span>
                             <span  class="item-file-detial">
-                                <h3 v-text="item.nodeName"></h3>
+                                <h3 v-text="item.dirName"></h3>
                             </span>
                         </div>
                     </li>
@@ -66,7 +66,7 @@
                 </div>
                 <div :class="[screenLeft.item == 1?'active-version':'active-version-3']">
                     <span class="item-version " @click="screenLeft.item = 1">属<br>性</span>
-                    <span class="item-version-3  " @click="screenLeft.item = 2">版<br>本</span>
+                    <!-- <span class="item-version-3  " @click="screenLeft.item = 2">版<br>本</span> -->
                 </div>
             </div>
             <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 1">
@@ -78,27 +78,27 @@
                 <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]">
                     <li class="detial-item clearfix">
                         <span class="detial-text-name">文件名</span>
-                        <span class="detial-text-value" v-text="checkedItem.fgName"></span>
+                        <span class="detial-text-value" v-text="checkedItem.fileName"></span>
                     </li>
-                        <li class="detial-item clearfix">
-                        <span class="detial-text-name">版本</span>
-                        <span class="detial-text-value" v-text="checkedItem.version"></span>
-                    </li>
+                    <!-- <li class="detial-item clearfix">
+                            <span class="detial-text-name">版本</span>
+                            <span class="detial-text-value" v-text="checkedItem.version"></span>
+                    </li> -->
                         <li class="detial-item clearfix">
                         <span class="detial-text-name">上传人</span>
-                        <span class="detial-text-value" v-text="checkedItem.uploadUser"></span>
+                        <span class="detial-text-value" v-text="checkedItem.uploadUserName"></span>
                     </li>
                         <li class="detial-item clearfix">
                         <span class="detial-text-name">上传时间</span>
                         <span class="detial-text-value" v-text="initData(checkedItem.uploadTime)"></span>
                     </li>
                         <li class="detial-item clearfix">
-                        <span class="detial-text-name">更新人</span>
-                        <span class="detial-text-value" v-text="checkedItem.updateUser"></span>
+                        <span class="detial-text-name">分享人</span>
+                        <span class="detial-text-value" v-text="checkedItem.shareUserName"></span>
                     </li>
                         <li class="detial-item clearfix">
-                        <span class="detial-text-name">更新时间</span>
-                        <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
+                        <span class="detial-text-name">分享时间</span>
+                        <span class="detial-text-value" v-text="initData(checkedItem.shareTime)"></span>
                     </li>
                 </ul>  
             </div> 
@@ -165,6 +165,7 @@ export default {
             GMDUrl:'',
             shareUrl:'',
             appShareUrl:'',
+            passWord:null,
         }
     },
     created(){
@@ -174,10 +175,11 @@ export default {
         vm.shareUrl=vm.$store.state.shareUrl;
         vm.appShareUrl=vm.$store.state.appShareUrl;
         this.GMDUrl = this.$store.state.GMDUrl;
+        this.passWord=this.$route.query.passWord;
         // this.intoDir();
         console.log(this.$route.query.shareName,'this.$route.query.shareName')
         console.log(this.$route.path,'this.$route.path');
-        this.judgeUserAgent();
+        // this.judgeUserAgent();
         this.showShareFilesOrFolder();
     },
     watch:{
@@ -206,13 +208,18 @@ export default {
             // this.shareNo=JSON.parse(this.shareNo)
              axios({
                 method:'post',
-                url:this.BDMSUrl+'project2/doc/showShareFilesOrFolder',
+                // url:this.BDMSUrl+'project2/doc/showShareFilesOrFolder',
+                url:this.BDMSUrl+'doc/getShareFiles',
                 // params:{shareNo:'59351cb8-03d5-48f7-beb6-0e3019056a6f'}
-                params:{shareNo:"'"+this.shareNo+"'"}
+                params:{
+                        shareNo:this.shareNo,
+                        password:this.passWord
+                    }
+
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.fileGroupBeanList=response.data.rt.fileGroupBeanList;
-                    this.nodeList=response.data.rt.nodeList;
+                    this.fileGroupBeanList=response.data.rt.fileList;
+                    this.nodeList=response.data.rt.directoryList;
                     console.log(this.fileGroupBeanList,'7777');
                     if(this.fileGroupBeanList){
                         this.fileGroupBeanList.forEach((item)=>{
@@ -229,6 +236,11 @@ export default {
                             })
                             // this.fileListName=this.folderList[0].nodeName;
                     }
+                }else{
+                    this.$message({
+                        type:'info',
+                        message:response.data.msg
+                    })
                 }
             })
         },
@@ -337,7 +349,7 @@ export default {
                 })
                 return false
             }
-            window.open(vm.QJFileManageSystemURL + filePath+'');
+            window.open(vm.BDMSUrl+'/doc/download/'+filePath);
         },
         downLoadVersion(filePath){
             //latestFile(fileId,fgId,"下载了文件"+fileName);
@@ -367,18 +379,24 @@ export default {
             // this.shareNo=this.$route.path
             // var str="/cloud/share/"
             // this.shareNo=this.shareNo.replace(new RegExp(str), "")
+            this.folderList=[];
+            this.fileList=[];
             this.backshow=true;
             axios({
                 method:'POST',
-                url:this.BDMSUrl+'project2/doc/showShareFilesAndFolder',
+                // url:this.BDMSUrl+'project2/doc/showShareFilesAndFolder',
+                url:this.BDMSUrl+'doc/getShareFolderAndFile',
                 params:{
-                    dirId:val
+                    dirId:val,
+                    shareNo:vm.shareNo,
+                    password:this.passWord
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     // console.log(response.data.rt,'0000');
-                    this.fileList=response.data.rt.fileGroupBeanList;
-                    this.folderList=[];
+                    this.fileList=response.data.rt.fileList;
+                    this.folderList=response.data.rt.directoryList;
+                    
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:"error",

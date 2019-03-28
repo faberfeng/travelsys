@@ -222,19 +222,19 @@
                     <div class="editBodyone">
                         <label class="editInpText">观测员</label>
                         <select v-model="observerId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">计算员</label>
                         <select v-model="calculatorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText">核查员</label>
                         <select v-model="inspectorId" class="editPersonInput">
-                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.userName"></option>
+                            <option v-for="(item,index) in userGroupList" :key="index" :value="item.userId" v-text="item.name"></option>
                         </select>
                     </div>
                 </div>
@@ -974,6 +974,7 @@ export default Vue.component('commonPitch-detail',{
                 editInspectMethodEdit:false,
                 exportDataEdit:false,
                 editAlertEdit:false,
+                projAuth:'',
 
 
 
@@ -988,12 +989,14 @@ export default Vue.component('commonPitch-detail',{
             vm.userId  = localStorage.getItem('userid');
             vm.BDMSUrl = vm.$store.state.BDMSUrl;
             vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+            this.projAuth=localStorage.getItem('projAuth');
             vm.getPitchBaseInfo();
             vm.getDetectionItemCollectWay();
             this.getItemDutyUser();
             this.getAlertArguments();
             this.getUserByUserGroup();
-            this.getUserInfo();
+            // this.getUserInfo();
+            this.checkAuth();
         },
         filters:{
         shifouChange(val){
@@ -1097,16 +1100,16 @@ export default Vue.component('commonPitch-detail',{
             // if(vm.projAuth1.indexOf("00601202") > 0){
             //   vm.manageEdit = true
             // }
-            if(vm.projAuth1.indexOf("00601203") > 0){
+            if(vm.projAuth.indexOf("00601203") > 0){
                 vm.editInspectMethodEdit = true
             }
-            if(vm.projAuth1.indexOf("00601204") > 0){
+            if(vm.projAuth.indexOf("00601204") > 0){
                 vm.importDataEdit = true
             }
-            if(vm.projAuth1.indexOf("00601205") > 0){
+            if(vm.projAuth.indexOf("00601205") > 0){
                 vm.exportDataEdit = true
             }
-            if(vm.projAuth1.indexOf("00601206") > 0){
+            if(vm.projAuth.indexOf("00601206") > 0){
                 vm.editAlertEdit = true
             }
         },
@@ -1124,13 +1127,12 @@ export default Vue.component('commonPitch-detail',{
                 var vm=this;
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'detectionInfo/getUserByUserGroup',
+                    url:this.BDMSUrl+'userGroup/getGroupUser',
                     headers:{
                         'token':this.token
                     },
                     params:{
-                        userGroupId:this.userGroupId
-                        
+                        groupId:this.userGroupId
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){

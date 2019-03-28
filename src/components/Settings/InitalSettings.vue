@@ -55,9 +55,9 @@
                 <!--封面图片-->
                 <li v-if="projectImageList.length>0" class="imgLi" v-for="(item,index) in projectImageList" :key="index">
                     <div>
-                        <img :src="item.filePath"/>
+                        <img :src="BDMSUrlQRCode+item.path"/>
                     </div>
-                    <div class="imgBottom"><label @click="setAsCover(index)"><div class="setAsLogo"></div>{{item.text}}</label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
+                    <div class="imgBottom"><label @click="setAsCover(index)"><div class="setAsLogo"></div><label style="width:80px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{item.imgName}}</label></label><span @click="deleteImage(index)"><div class="bottomDelete"></div>删除</span></div>
                 </li>
                 <!--上传图片-->
                 <li class="imgLi" @click='updataCoverImg'>
@@ -571,16 +571,17 @@ export default {
         },
         //确认删除
         deleteImageSure(){
+            var vm=this;
             axios({
-                method:'post',
-                url:this.BDMSUrl+"deleteProjectImage",
+                method:'get',
+                url:vm.BDMSUrlQRCode+'api/v1/main/deleteProjectImage',
                 headers:{
                     'token':this.token
                 },
                 params:{
-                    projId:this.projId,
-                    imageId:this.projectImageList[this.deleteImageIndex].id,
-                    fileId:this.projectImageList[this.deleteImageIndex].fileId,
+                    // projId:this.projId,
+                    id:this.projectImageList[this.deleteImageIndex].id,
+                    // fileId:this.projectImageList[this.deleteImageIndex].fileId,
                 }
             }).then((response)=>{
                 if(response.data.cd == '0'){
@@ -755,18 +756,22 @@ export default {
         //设为封面
         setAsCover(number){
             axios({
-                method:'post',
-                url:this.BDMSUrl+'setProjectCover',
+                method:'get',
+                url:this.BDMSUrlQRCode+'api/v1/main/setCover',
                 headers:{
                     'token':this.token
                 },
                 params:{
                     projId:this.projId,
-                    fileId:this.projectImageList[number].id
+                    id:this.projectImageList[number].id
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    alert('设置成功')
+                    this.$message({
+                        type:"success",
+                        message:'设置成功'
+                    })
+                    // alert('设置成功')
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg);
                 }else{

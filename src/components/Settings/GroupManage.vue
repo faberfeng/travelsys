@@ -21,13 +21,13 @@
                   <span class="title-left">创立时间:</span>
                   <span class="info-title">{{ugEdit.time | toLocalD}}</span>
               </p>
-               <p class="title-box">
+               <!-- <p class="title-box">
                   <span class="title-left">群组标签:</span>
                    <span class="title-right">
                      <input type="text"  v-model="ugEdit.tag"  placeholder="请输入" class="title-right-icon" :disabled="canEditlabel">
                      <span  class="title-right-edit-icon" @click="allowChangeLabel"></span>
                   </span>
-              </p>
+              </p> -->
                 <p class="title-box">
                   <span class="title-left">群组状态:</span>
                   <span class="info-title">
@@ -110,9 +110,9 @@
                             <span class="check-name" v-text="item.name+'-'+item.count"></span>
                             <span class="check-title" v-text="item.name"></span>
                           </p>
-                          <p>
+                          <!-- <p>
                             <span class="check-title" v-for="(val,key) in item.userPositions" :key="key+'pos'" v-text="val.posName+' '"></span>
-                          </p>
+                          </p> -->
                           <span class="icon icon-cancleUser" @click="removeUserAdd(item.id)"></span>
                       </li>
                   </ul>
@@ -254,13 +254,13 @@ export default {
                 if(response.data.cd == 0){
                     vm.$notify({
                         type: 'success',
-                        message: '添加'+userName+'为群组用户成功',
+                        message: '添加群组用户成功',
                         duration:4000
                     })
                 }else{
                     vm.$notify({
                         type: 'warning',
-                        message: '添加'+userName+'为群组用户失败!'+response.data.msg,
+                        message: '添加群组用户失败!'+response.data.msg,
                         duration:0
                     })
                 }
@@ -335,7 +335,7 @@ export default {
                var vm = this
                /**判断群组名称是否为 默认群组**/
                var isDefaultCompany =  vm.ugList.some((item)=>{ 
-                    if(vm.activeugID == item.ugId && item.ugName.indexOf('默认群组') >-1){
+                    if(vm.activeugID == item.groupId && item.groupName.indexOf('默认群组') >-1){
                         return true
                     }else{
                         return false
@@ -359,17 +359,18 @@ export default {
                         }
                     }
                 }
-               for(var i=0;i<vm.userListDEL.length;i++){
+            //    for(var i=0;i<vm.userListDEL.length;i++){}
                     axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'project2/Config/delUserGroupUser',
+                        // url:vm.BDMSUrl+'project2/Config/delUserGroupUser',
+                        url:vm.BDMSUrl+'userGroup/deleteGroupUser',
                         headers:{
                             'token':vm.token
                         },
                         params:{
-                            userId:vm.userListDEL[i],
-                            ugId:vm.activeugID,//正在查看的群组ID
-                        }
+                            groupId:vm.activeugID,//正在查看的群组ID
+                        },
+                        data:vm.userListDEL,
                     }).then((response)=>{
                         if(response.data.cd == '0'){
                             vm.getQRuser(vm.activeugID)
@@ -383,7 +384,7 @@ export default {
                     }).catch((err)=>{
                         console.log(err)
                     })
-                }
+                
                 vm.userListDEL = []
             },
             pushUserID(id){
@@ -403,14 +404,17 @@ export default {
                     }).then(({ value }) => {
                         axios({
                                 method:'POST',
-                                url:vm.BDMSUrl+'config/userGroup/renameGroupNameNode',
+                                // url:vm.BDMSUrl+'config/userGroup/renameGroupNameNode',
+                                url:vm.BDMSUrl+'userGroup/rename',
                                 headers:{
                                     'token':vm.token
                                 },
-                                data:{
-                                    projId:vm.projId,
-                                    ugId:vm.activeugID,//正在查看的群组ID
-                                    ugName:value,
+                                params:{
+                                    // projId:vm.projId,
+                                    // ugId:vm.activeugID,//正在查看的群组ID
+                                    // ugName:value,
+                                    groupId:vm.activeugID,
+                                    name:value
                                 }
                             }).then((response)=>{
                                 if(response.data.cd == 0){
@@ -418,8 +422,10 @@ export default {
                                         type: 'success',
                                         message: '修改群组名称成功'
                                     });
+                                    // vm.changeQR(vm.activeugID,vm.activeugIDkey)
+                                    vm.getQunList();
                                     vm.changeQR(vm.activeugID,vm.activeugIDkey)
-                                    vm.getQunListOnce()
+                                    // vm.getQunListOnce()
                                 }
                             }).catch((err)=>{
                                 console.log(err)
@@ -560,12 +566,13 @@ export default {
                 }).then(() => {
                     axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'config/userGroup/delGroupNode',
+                        // url:vm.BDMSUrl+'config/userGroup/delGroupNode',
+                        url:vm.BDMSUrl+'userGroup/deleteGroup',
                         headers:{
                             'token':vm.token
                         },
                         params:{
-                            ugId:ugId
+                            groupId:ugId
                         }
                     }).then((response)=>{
                         if(response.data.cd == 0){

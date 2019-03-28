@@ -2200,7 +2200,6 @@ export default {
                         },
                         params:{
                             directory:vm.directoryId,
-                            // encodeURIComponent(item.drawingName)
                             drawingName:item.drawingName,
                             drawingNumber:item.drawingNo,
                             projectId:vm.projId,

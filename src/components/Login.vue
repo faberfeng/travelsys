@@ -28,7 +28,7 @@
                     </form>
                     <button class="login"  @click="Login">登录</button>
                     <div class="loginInfo">
-                        <a class="loginInfoLeft" href="https://bim.arctron.cn/BDMSTest/#/registerIndex" target="blank">立即注册</a>
+                        <a class="loginInfoLeft" href="http://10.245.11.10:8080/bdms/#/registerIndex" target="blank">立即注册</a>
                         <!-- <a class="loginInfoRight" href="http://bdms.arctron.cn/arctron-usercenter/register/forgetPwd" target="blank">忘记密码</a> -->
                     </div>
                     <button class="loginWidthYun" style="display:none">云华建账号登陆</button>

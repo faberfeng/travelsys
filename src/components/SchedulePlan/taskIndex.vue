@@ -342,17 +342,17 @@
         <div class="editBody">
           <ul>
             <li v-for="(item,index) in relaList1" :key="index" class="item-label clearfix">
-              <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(item.main.pkId, 7)" alt="">
+              <img class="img_left" :src="BDMSUrl+'manifest/qr/QR-QD-' + addZero(item.id, 7)" alt="">
               <div class="right">
                 <p class="item-list clearfix">
                   <span class="text-left">清单ID：</span>
-                  <span class="text-right" v-text="item.main.pkId"></span>
+                  <span class="text-right" v-text="item.id"></span>
                 </p>
                 <p class="item-list clearfix">
                   <span class="text-left">清单名称：</span>
-                  <span class="text-right" v-text="item.main.mName"></span>
+                  <span class="text-right" v-text="item.name"></span>
                 </p>
-                <p class="item-list clearfix">
+                <!-- <p class="item-list clearfix">
                   <span class="text-left">生成方式：</span>
                   <span class="text-right" v-text="parseMGSource(item.main.mGSource)"></span>
                 </p>
@@ -367,14 +367,14 @@
                 <p class="item-list clearfix">
                   <span class="text-left">创建时间：</span>
                   <span class="text-right">{{item.main.createTime | timeChange}}</span>
-                </p>
-                <p class="item-list clearfix">
+                </p> -->
+                <!-- <p class="item-list clearfix">
                   <span class="text-left">清单版本：</span>
                   <span class="text-right" v-text="item.main.mVersion"></span>
-                </p>
+                </p> -->
                 <p class="item-list clearfix">
                   <span class="text-left">明细数量：</span>
-                  <span class="text-right" v-text="item.details.length"></span>
+                  <span class="text-right" v-text="item.componentNumber"></span>
                 </p>
               </div>
             </li>
@@ -1110,8 +1110,11 @@
       </el-dialog>
     </div>
     <!--下面是报表清单的编码-->
-    <common-list v-on:back="backToH" :mId="checkList.pkId" rType="7"  :bId='checkItem.pkId' :title="'构件量清单'"
-                 v-if="showCommonList"></common-list>
+    <!-- <common-list v-on:back="backToH" :mId="checkList.pkId" rType="7"  :bId='checkItem.pkId' :title="'构件量清单'"
+                 v-if="showCommonList"></common-list> -->
+
+    <!--下面是报表清单的编码-->
+    <common-list v-on:back="backToH" :mId="checkList.id" :type=2  :title="'构件量清单'" v-if="showCommonList"></common-list>
   </div>
 </template>
 
@@ -1137,7 +1140,8 @@
   import './Gantt/libs/jquery/svg/jquery.svg.min.js'
   import './Gantt/libs/jquery/svg/jquery.svgdom.1.8.js'
   import {GanttMaster} from './Gantt/ganttMaster.js'
-  import commonList from './qingdan.vue'
+  // import commonList from './qingdan.vue'
+  import commonList from '../planCost/qingDan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
   var app
@@ -3749,6 +3753,7 @@
         getElementByMid(mid){
             var vm=this;
             var traceId=[]
+            var para=[]
             axios({
                 url:this.BDMSUrl+'manifest/getElementByMid',
                 method:'post',
@@ -3757,16 +3762,32 @@
                 },
                 params:{
                     mid:mid,
-                    businessType:1
+                    businessType:2
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
                     response.data.rt.forEach((item)=>{
-                        traceId.push(item.traceId);
+                        para.push({
+                          "TraceID":String(item.traceId)
+                        });
                     })
+                     console.log(para,'多点定位数据');
+                     const app = document.getElementById('webIframe').contentWindow;
+                    app.postMessage({command:"LookAtEntities",parameter:para},"*");
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
                 }
             })
-            return traceId
+            //  traceId.forEach((item)=>{
+            //     para.push({
+            //       "TraceID":String(item),
+            //       // "HolderPath":JSON.parse(item.dHolderPath),
+            //       // "GCCode":item.dGCCode
+            //     })
+            //   })
+            // console.log(traceId,'traceId')
+             
+            // return traceId
         },
 
         //添加关联清单确认
@@ -3866,8 +3887,9 @@
       qrcode(val) {
         this.labelListShow = true;
         this.labelPkId=val;
+        console.log(this.relaList,'this.relaList');
         this.relaList.forEach((item) => {
-          if (item.main.pkId == val) {
+          if (item.id == val.id) {
             this.relaList1 = [];
             this.relaList1.push(item);
             console.log(this.relaList1,'relaList1');
@@ -3887,15 +3909,17 @@
                 })
             }else{
               // console.log(value,'多点定位数据');
-              var para=[];
-              value.forEach((item)=>{
-                para.push({
-                  "TraceID":String(item.dTraceId),
-                  "HolderPath":JSON.parse(item.dHolderPath),
-                  "GCCode":item.dGCCode
-                })
-              })
-              console.log(para,'多点定位数据');
+             this.getElementByMid(value.id);
+
+              // var para=[];
+              // this.elementTraceIds.forEach((item)=>{
+              //   para.push({
+              //     "TraceID":String(item),
+              //     // "HolderPath":JSON.parse(item.dHolderPath),
+              //     // "GCCode":item.dGCCode
+              //   })
+              // })
+              // console.log(para,'多点定位数据');
             }
       },
       //将清单与任务解除关联关系

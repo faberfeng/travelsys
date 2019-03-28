@@ -1286,7 +1286,7 @@ export default {
              this.paramsLists='';
              this.picMark==false;
              this.drawItemId='';
-            vm.getDetectionSummary();
+            // vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getBaseMapList();
@@ -1306,7 +1306,7 @@ export default {
     },
     methods:{
          callback(e){
-            console.log(e.data,'e.data.command');
+            // console.log(e.data,'e.data.command');
             switch(e.data.command){
                 // console.log()
                 case "CurrentSelectedLabel":
@@ -2853,7 +2853,7 @@ export default {
             // vm.pageSize=10;
             // vm.pageNum1=2;
             vm.currentPage1=1;
-            vm.getDetectionSummary();
+            // vm.getDetectionSummary();
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getMonitorItem();
@@ -3933,7 +3933,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     if(this.$refs.commonDetailRef){
                         this.$refs.commonDetailRef.getAllMonitorPoint();
                         this.$refs.commonDetailRef.getPointDatas();
@@ -3987,7 +3987,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     if(this.$refs.commonDetailRef){
                         this.$refs.commonDetailRef.getAllMonitorPoint();
                         this.$refs.commonDetailRef.getPointDatas();
@@ -4044,7 +4044,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     if(this.$refs.commonDetailRef){
                         this.$refs.commonDetailRef.getAllMonitorPoint();
                         this.$refs.commonDetailRef.getPointDatas();
@@ -4108,7 +4108,7 @@ export default {
                    vm.excelSheetInfoLength=0;
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     this.$refs.commonPitchDetailRef.getPitchBaseInfo();
                     this.$message({
                         type:'success',
@@ -4163,7 +4163,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     if(this.$refs.commonDetailRef){
                         this.$refs.commonDetailRef.getAllMonitorPoint();
                         this.$refs.commonDetailRef.getPointDatas();
@@ -4230,7 +4230,7 @@ export default {
                    vm.inputWorkingCondition='';//现场工况
                    this.getMonitorMainTable();
                     this.getMonitorItem();
-                    this.getDetectionSummary();
+                    // this.getDetectionSummary();
                     if(this.$refs.commonDetailRef){
                         this.$refs.commonDetailRef.getAllMonitorPoint();
                         this.$refs.commonDetailRef.getPointDatas();

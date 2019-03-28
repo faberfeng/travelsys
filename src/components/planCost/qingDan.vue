@@ -24,11 +24,11 @@
                             </p>
                             <div v-show="topExpend.isExpend" style="background:#fafafa;position: relative;">
                                 <ul class="left-item-box">
-                                    <li class="item clearfix">
+                                    <li class="item clearfix" style="margin-bottom:40px;margin-top:50px">
                                         <span class="left">清单编号</span>
                                         <span class="right" v-text="ManifestInfo.id"></span>
                                     </li>
-                                        <li class="item clearfix">
+                                        <!-- <li class="item clearfix">
                                         <span class="left">创建用户</span>
                                         <span class="right"  v-text="ManifestInfo.creator"></span>
                                     </li>
@@ -48,30 +48,30 @@
                                         <li class="item clearfix">
                                         <span class="left">版本号</span>
                                         <span class="right" v-text="ManifestInfo.mVersion"></span>
-                                    </li>
+                                    </li> -->
 
-                                        <li class="item clearfix">
+                                        <li class="item clearfix" style="margin-bottom:40px;margin-top:50px">
                                         <span class="left">清单名称</span>
                                         <span class="right" v-text="ManifestInfo.name"></span>
                                     </li>
-                                        <li class="item clearfix">
+                                        <!-- <li class="item clearfix">
                                         <span class="left">业务状态</span>
                                         <span class="right"  v-text="parseMStatus(ManifestInfo.mStatus)+'('+ ManifestInfo.mStatus +')'"></span>
                                     </li>
                                         <li class="item clearfix">
                                         <span class="left">修改时间</span>
                                         <span class="right" v-text="initData(ManifestInfo.updateTime)"></span>
-                                    </li>
+                                    </li> -->
 
-                                        <li class="item clearfix" style="margin-bottom:0;">
+                                        <!-- <li class="item clearfix" style="margin-bottom:0;">
                                         <span class="left">生成方式</span>
                                         <span class="right" v-text="parseMGSource(ManifestInfo.mGSource)"></span>
                                     </li>
                                         <li class="item clearfix" style="margin-bottom:0;">
                                         <span class="left">创建时间</span>
                                         <span class="right"  v-text="initData(ManifestInfo.createTime)"></span>
-                                    </li>
-                                        <li class="item clearfix" style="margin-bottom:0;">
+                                    </li> -->
+                                    <li class="item clearfix" style="margin-bottom:40px;margin-top:50px">
                                         <span class="left">清单类型</span>
                                         <span class="right" v-text="ManifestInfo._mType"></span>
                                     </li>
@@ -823,10 +823,10 @@
                             <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
                         </h3>
                         <ul id="basicAtt" :class="[{'show':show.basicAttributes},'Att']">
-                            <li class="detial-item clearfix">
+                            <!-- <li class="detial-item clearfix">
                                 <span class="detial-text-name">清单及序号</span>
                                 <span class="detial-text-value" v-text="checkedItem.manifestId+'-'+checkedItem.detailId" :title="checkedItem.manifestId+'-'+checkedItem.detailId"></span>
-                            </li>
+                            </li> -->
                             <li class="detial-item clearfix">
                                 <span class="detial-text-name">可追溯ID</span>
                                 <span class="detial-text-value" v-text="checkedItem.traceId" :title="checkedItem.traceId"></span>
@@ -855,10 +855,10 @@
                                 <span class="detial-text-name">修改时间</span>
                                 <span class="detial-text-value" v-text="initData(checkedItem.detailUpdateTime)" :title="initData(checkedItem.detailUpdateTime)"></span>
                             </li>
-                            <li class="detial-item clearfix">
+                            <!-- <li class="detial-item clearfix">
                                 <span class="detial-text-name">业务状态</span>
                                 <span class="detial-text-value" v-text="parseMStatus(checkedItem.status) + '(' + checkedItem.status + ')'" :title="parseMStatus(checkedItem.status) + '(' + checkedItem.status + ')'"></span>
-                            </li>
+                            </li> -->
                         </ul>
                         <h3 class="header-attribute" style="margin-top: 33px;">
                             <i class="trrangle"></i>
@@ -927,15 +927,15 @@
                  <div class="editBody">
                     <ul>
                         <li v-for="(item,index) in S_Label_quantitiesList" :key="index" class="item-label clearfix">
-                            <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-MX-' + addZero(item.pkId, 7)" alt="">
+                            <img class="img_left" :src="BDMSUrl+'manifest/qr/QR-MX-' + addZero(item.id, 7)" alt="">
                             <div class="right">
                                 <p class="item-list clearfix">
                                     <span class="text-left">可追踪ID：</span>
-                                    <span class="text-right" v-text="testIfIsNull(null,null,item.dTraceId)"></span>
+                                    <span class="text-right" v-text="testIfIsNull(null,null,item.traceId)"></span>
                                 </p>
                                 <p class="item-list clearfix">
                                     <span class="text-left">构件名称：</span>
-                                   <span class="text-right" v-text="testIfIsNull(null,null,item.dName)"></span>
+                                   <span class="text-right" v-text="testIfIsNull(null,null,item.name)"></span>
                                 </p>
                                 <p class="item-list clearfix">
                                     <span class="text-left">所在单体：</span>
@@ -3685,21 +3685,22 @@ export default Vue.component('common-list',{
             var vm = this
             vm.screenLeft.show = true
             if(scope.row){
-                var pkId = scope.row.pkId
+                var pkId = scope.row.id
                 var tag = 1
             }else if(scope.pkId){
-                var pkId = scope.pkId
+                var pkId = scope.id
                 var tag = 2
             }
             axios({
                 method:'GET',
-                url:vm.BDMSUrl+'show2/getEntityDetailInfo',
+                // url:vm.BDMSUrl+'show2/getEntityDetailInfo',
+                url:vm.BDMSUrl+'manifest/getElementById',
                 headers:{
                     token:vm.token
                 },
                 params:{
-                    detailId:pkId,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
-                    projectId:vm.projId
+                    id:pkId,//类型 1 企业物料产品库显示列 2 清单明细基本信息显示列 3 订货清单明细显示列
+                    // projectId:vm.projId
                 }
             }).then(response=>{
                 vm.checkedItem = {}
@@ -4363,7 +4364,8 @@ export default Vue.component('common-list',{
                             if(response.data.rt != null){
                                 vm.S_Label_quantitiesList = response.data.rt
                                 this.copyS_Label_quantitiesList = response.data.rt;
-                                vm.S_quantitiesList = response.data.rt
+                                vm.S_quantitiesList = response.data.rt;
+                                this.detailNum=response.data.rt.length;
                                 // vm.S_quantitiesList.forEach((element,index) => {
                                 //     vm.$set(element,'SerialNumber',vm.pageDetial.pagePerNum*(vm.pageDetial.currentPage-1)+index+1)//列表序号
                                 //     vm.$set(element,'dState_format',vm.parseMStatus(element.dState)+ "(" + element.dState + ")")//业务状态

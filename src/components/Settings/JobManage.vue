@@ -30,9 +30,9 @@
                             <td v-text="typePosType(val.posType)"></td>
                             <!-- <td v-text="val.posAuthNameList"></td> -->
                             <td>
-                                <span v-if="!(val.posType == 2 || (val.posName == '工程管理员' && val.posType == 1))"
+                                <span v-if="!((val.posName == '工程管理员' && val.posType == 3))"
                                  class="editIcon" @click="addUser(val.posType,val.posName,val.id,val.auths)"></span>
-                                <span v-if="!(val.posType == 2 || (val.posType == '工程管理员' && val.posType == 1)) && !(val.posType == 3 && val.posType == 4)" 
+                                <span v-if="!(val.posType == 4 || (val.posName == '工程管理员' && val.posType == 3)) && !(val.posType == 2 && val.posType == 1)" 
                                 class="deleteIcon" @click="deleteJob(val.id)"></span>
                             </td>
                         </tr>
@@ -119,11 +119,12 @@
                 node-key="authCode"
                 :default-expanded-keys="jobTree_opend"
                 :default-checked-keys="jobTree_checked"
-                :check-strictly="true"
+               
                 ref="tree_job"
                 highlight-current
                 :props="defaultProps">
                 </el-tree>
+                 <!-- :check-strictly="true" -->
                 <!--  -->
             </div>
             <span slot="footer" class="dialog-footer">   
@@ -376,11 +377,14 @@ export default {
                 var jobTree_checked = [];
                  for(var i =0;i<auth.length;i++){
                         jobTree_checked.push(auth[i].authCode)
-                    }
-                vm.jobTree_checked=jobTree_checked;
+                    
+                }
+                    // [jobTree_checked[jobTree_checked.length-1]]
+
+                vm.jobTree_checked= jobTree_checked;
                 vm.getJobShuXingTu()//获取某val的权限
                
-                console.log(vm.jobTree_checked);
+                console.log(vm.jobTree_checked,'回来的数组');
             }else{
                 vm.isD = false
                 vm.jobDetial.posName = '';
@@ -411,14 +415,17 @@ export default {
             //var checkCode = [];
             console.log(vm.jobDetial)
             this.checkCode=[];
-            this.checkCode=vm.$refs.tree_job.getCheckedKeys();
+            this.checkCode=vm.$refs.tree_job.getCheckedKeys().concat(vm.$refs.tree_job.getHalfCheckedKeys());
+            // this.checkCode=vm.$refs.tree_job.getCheckedKeys();
+            console.log(this.checkCode,'全部数据');
+            // console.log(vm.$refs.tree_job.getHalfCheckedKeys(),'半选数据');
             // var all1 = vm.$refs.tree_job.getCheckedKeys();
             // var all=[];
             // var all= vm.$refs.tree_job.getHalfCheckedKeys();
             // console.log(all,'alll');
             // console.log(all1,'all1');
             // this.checkCode=all1.concat(all);
-            console.log(this.checkCode,'this.checkCode')
+            // console.log(this.checkCode,'this.checkCode')
             if(vm.jobID == 0){
                 var flag = this.jobList.some(item=>{
                     if(item.posName == this.jobDetial.posName){
@@ -430,7 +437,7 @@ export default {
             }else{
                 flag = false
             }
-                    if(flag){
+            if(flag){
                     alert('岗位不能重复添加!');
                 }else{
                     if(this.jobDetial.posName == ''){
@@ -517,18 +524,23 @@ export default {
             }).then(() => {
                 axios({
                     method:'POST',
-                    url:vm.BDMSUrl+'project2/Config/delProjectPosition',
+                    // url:vm.BDMSUrl+'project2/Config/delProjectPosition',
+                    url:vm.BDMSUrl+'position/deletePosition',
                     headers:{
                         'token':vm.token
                     },
-                    data:[key]
+                    // data:[key]
+                    params:{
+                        positionId:key
+                    }
                 }).then((response)=>{
                     if(response.data.cd == 0){
                         vm.$message({
                             type: 'success',
                             message: '删除成功!'
                         });
-                        vm.getInfo();
+                        // vm.getInfo();
+                        vm.getInfoList();
                         // if(this.pageDetial.currentPage > Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum)){
                         //     this.pageDetial.currentPage = Math.ceil(this.pageDetial.total/this.pageDetial.pagePerNum);
                         // }

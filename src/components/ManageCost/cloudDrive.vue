@@ -213,7 +213,7 @@
             <div v-show="screenLeft.show"  v-if="screenLeft.item == 1" class="screenRight_1">
                  <p class="clearfix">
                     <i class="icon-goujian icon-add" v-if="fileNewAndrename" title="添加" @click="addFile"></i>
-                    <i class="icon-goujian icon-authrity" v-if="editCatalogAuth"  title="权限" @click="authrityFile"></i>
+                    <!-- <i class="icon-goujian icon-authrity" v-if="editCatalogAuth"  title="权限" @click="authrityFile"></i> -->
                     <i class="icon-goujian icon-delete" v-if="fileCopyAndCutAndDelete" title="删除" @click="deleteFile"></i>
                     <i class="icon-goujian icon-edit" v-if="fileNewAndrename"  title="重命名" @click="renameFile"></i>
                 </p>
@@ -330,7 +330,7 @@
                                 <!-- @click="showDetialList(item)" -->
                                 <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
                                 <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
-                                <i class="icon-goujian icon-location" @click="goToLocation"></i>
+                                <i class="icon-goujian icon-location" @click="goToLocation(item)"></i>
                                 <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
                             </p>
                             <p class="item-detial">
@@ -637,21 +637,22 @@
             <div class="editBody">
                 <ul style="padding:0 20px">
                     <li class="item-label clearfix">
-                        <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-QD-' + addZero(biaoqianInfo.pkId, 7)" alt="二维码">
+                        <img class="img_left" :src="BDMSUrl+'manifest/qr/QR-QD-' + addZero(biaoqianInfo.id, 7)" alt="二维码">
                         <div class="right">
                             <p class="item-list clearfix">
                                 <span class="text-left">清单ID：</span>
-                                <span class="text-right" v-text="biaoqianInfo.pkId"></span>
+                                <span class="text-right" v-text="biaoqianInfo.id"></span>
                             </p>
                             <p class="item-list clearfix">
                                 <span class="text-left">清单名称：</span>
-                                <span class="text-right" v-text="biaoqianInfo.mName"></span>
+                                <span class="text-right" v-text="biaoqianInfo.name"></span>
                             </p>
+                            
                             <p class="item-list clearfix">
                                 <span class="text-left">生成方式：</span>
-                                <span class="text-right" v-text="biaoqianInfo.mGSource_"></span>
+                                <span class="text-right">{{'构件量清单'}}</span>
                             </p>
-                            <p class="item-list clearfix">
+                            <!-- <p class="item-list clearfix">
                                 <span class="text-left">源自业务：</span>
                                 <span class="text-right" v-text="biaoqianInfo.mBSource_"></span>
                             </p>
@@ -666,17 +667,17 @@
                             <p class="item-list clearfix">
                                 <span class="text-left">变更版本：</span>
                                 <span class="text-right" v-text="biaoqianInfo.mVersion"></span>
-                            </p>
-                            <p class="item-list clearfix">
+                            </p> -->
+                            <!-- <p class="item-list clearfix">
                                 <span class="text-left">明细数量：</span>
                                 <span class="text-right" v-text="biaoqianInfo.manifestDetailCount"></span>
-                            </p>
+                            </p> -->
                         </div>
                     </li>
                 </ul>
             </div>
             <div slot="footer" class="dialog-footer">
-               <button class="editBtnS" @click="labelListConfirm(biaoqianInfo.pkId)">网页预览</button>
+               <button class="editBtnS" @click="labelListConfirm(biaoqianInfo.id)">网页预览</button>
                     <button class="editBtnC" @click="printLabelList">打印当前页标签</button>
             </div>
         </el-dialog>
@@ -2906,7 +2907,7 @@ export default {
 
         // vm.getFileTree()
        
-        // vm.createDrawingDirectory()
+        vm.createDrawingDirectory()
         // vm.getHolders()
         // this.intoDir()
     },
@@ -3121,6 +3122,7 @@ export default {
        //获取单体分区楼层三个级别的容器信息
         getHolders(){
             var vm=this;
+            this.getHoldersList=[];
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getHolders',
                 method:'get',
@@ -3132,23 +3134,45 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    this.getHoldersList=response.data.rt;
-                   this.getHoldersList.unshift({ 
-                        "holderId": null,
-                        "holderName": "无",
-                        "holderType": ""
-                    })
-                     this.getHoldersList.forEach((item)=>{
-                         if(item.holderType==7){
-                             item.holderName='&nbsp&nbsp'+item.holderName
-                         }
-                         if(item.holderType==8){
-                             item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
-                         }
-                         if(item.holderType==9){
-                              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
-                         }
-                     })
+                //     this.getHoldersList=response.data.rt;
+                //    this.getHoldersList.unshift({ 
+                //         "holderId": null,
+                //         "holderName": "无",
+                //         "holderType": ""
+                //     })
+                //      this.getHoldersList.forEach((item)=>{
+                //          if(item.holderType==7){
+                //              item.holderName='&nbsp&nbsp'+item.holderName
+                //          }
+                //          if(item.holderType==8){
+                //              item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                //          }
+                //          if(item.holderType==9){
+                //               item.holderName='&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'+item.holderName
+                //          }
+                //      })
+
+
+                        var getHolder=''
+                        getHolder=response.data.rt;
+
+                        getHolder.forEach((item)=>{
+                            if(vm.checkFileDir.buildId==item.dirParId){
+                                this.getHoldersList.push({
+                                    "holderId": item.dirId?item.dirId:null,
+                                    "holderName": item.dirName?item.dirName:'',
+                                    "holderType": "",
+                                    "parentHolderId":item.dirParId?item.dirParId:null
+                                })
+                            }
+                        })
+                        this.getHoldersList.unshift({ 
+                            "holderId": null,
+                            "holderName": "无",
+                            "holderType": "",
+                            "parentHolderId":null
+                        })
+                        console.log(this.getHoldersList,'this.getHoldersList');
                 }else{
                     this.$message({
                         type:'error',
@@ -3248,23 +3272,35 @@ export default {
                 }
             }
             vm.drawingFileList.forEach((item,index)=>{
-                var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId)
-                returnUrl = encodeURIComponent(returnUrl);
+                // var returnUrl = vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31Code+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+'&holderId='+vm.getHolderId+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId)
+                // returnUrl = encodeURIComponent(returnUrl);
                 var formData = new FormData()
-                formData.append('token',vm.token);
-                formData.append('projId',vm.projId);
-                formData.append('type',1);
+                // formData.append('token',vm.token);
+                // formData.append('projId',vm.projId);
+                // formData.append('type',1);
                 formData.append('file',item.file);
-                formData.append('userId',vm.userId);
-                formData.append('modelCode','004');
-                formData.append('returnUrl',returnUrl);
+                // formData.append('userId',vm.userId);
+                // formData.append('modelCode','004');
+                // formData.append('returnUrl',returnUrl);
                 // this.$refs.pdfDocument_upload.src=item.file;
                 // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
-                        url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',//vm.QJFileManageSystemURL + 'uploading/uploadFileInfo'
+                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing',
+                        // url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',
                         headers:{
-                            'Content-Type': 'multipart/form-data'
+                            'Content-Type': 'multipart/form-data',
+                            'token':vm.token
+                        },
+                        params:{
+                            directory:vm.checkFileDir.t31code,
+                            drawingName:item.drawingName,
+                            drawingNumber:item.drawingNo,
+                            projectId:vm.projId,
+                            ratio:item.proportion,
+                            pageNo:'',
+                            holderId:vm.getHolderId,
+                            buildId:vm.checkFileDir.buildId==null?'':vm.checkFileDir.buildId,
                         },
                         data:formData,
                     }).then((response)=>{
@@ -3272,8 +3308,11 @@ export default {
                             vm.drawingsUploadShow = false
                             vm.drawingFileList = []
                             vm.getHolderId=''
+
                             if(vm.showQuanJing){
-                                vm.searchFileGroupInfo(vm.checkFileDir.nodeId)
+                                // vm.searchFileGroupInfo(vm.checkFileDir.nodeId)
+                                vm.getPanoramaFgId(vm.checkFileDir.dirId)
+                                vm.getPanoramaPoint(vm.checkFileDir.dirId)
                             }else{
                                     vm.getInfo()
                             }
@@ -3480,7 +3519,7 @@ export default {
       },
       renameFile(){
          var vm = this
-        if(vm.checkFileDir.isAutoCreated == 1){
+        if(vm.checkFileDir.isAutoCreated == 1||vm.checkFileDir.isDrawing == 1){
             vm.$message({
             type: 'error',
             message: '系统文件，不能操作！'
@@ -3493,7 +3532,7 @@ export default {
       },
       deleteFile(){
         var vm = this
-         if(vm.checkFileDir.isAutoCreated == 1){
+         if(vm.checkFileDir.isAutoCreated == 1 || vm.checkFileDir.isDrawing == 1){
             vm.$message({
             type: 'error',
             message: '系统文件，不能操作！'
@@ -3507,32 +3546,39 @@ export default {
         }).then(() => {
             var dirIds=[];
             dirIds.push(vm.checkFileDir.dirId);
-            axios({
-                method:'post',
-                // url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
-                url:vm.BDMSUrl+'doc/deleteDirectory',
-                headers:{
-                    'token':vm.token
-                },
-                data:dirIds
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    vm.$message({
-                        type:'success',
-                        message:'文件夹删除成功'
-                    })
-                    // vm.getFileTree(true,null)
-                    vm.initPanoramaFolder(null,null)
-                    vm.firstTime = 0
-                }else if(response.data.cd == -1){
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
+            if(dirIds.length!=0){
+                axios({
+                    method:'post',
+                    // url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
+                    url:vm.BDMSUrl+'doc/deleteDirectory',
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:dirIds
+                }).then((response)=>{
+                    if(Math.ceil(response.data.cd) == 0){
+                        vm.$message({
+                            type:'success',
+                            message:'文件夹删除成功'
+                        })
+                        // vm.getFileTree(true,null)
+                        vm.initPanoramaFolder(null,null)
+                        vm.firstTime = 0
+                    }else if(response.data.cd == -1){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            }else{
+                this.$message({
+                    type:'info',
+                    message:'请勾选一个文件删除'
+                })
+            }
         }).catch(() => {
           vm.$message({
             type: 'info',
@@ -3543,7 +3589,7 @@ export default {
       },
       authrityFile(){
         var vm = this
-        if(vm.checkFileDir.isAutoCreated == 1){
+        if(vm.checkFileDir.isAutoCreated == 1 || vm.checkFileDir.isDrawing == 1){
             vm.$message({
             type: 'error',
             message: '系统文件，不能操作！'
@@ -3634,12 +3680,13 @@ export default {
       },
       uploadfile(){
         var vm = this
-        if(!vm.showQuanJing&&vm.checkFileDir.isDrawing==null&&vm.checkFileDir.t31Code==null){
+        if(!vm.showQuanJing&&vm.checkFileDir.isDrawing==null&&vm.checkFileDir.t31code==null){
             vm.updateImg('文件上传',false,0,'',1)//非点位类型是0
         }else if(vm.checkFileDir.isDrawing==1){
              if(vm.checkFileDir.buildId){
                      vm.drawingsUploadShow=true;
-                    vm.getHolderByBuildId();
+                    // vm.getHolderByBuildId();
+                    vm.getHolders()
                 }else{
                     vm.drawingsUploadShow = true;
                     // vm.getHolders()
@@ -3833,7 +3880,7 @@ export default {
             } else {
                 for(var i=0;i<vm.fileList.length;i++){
                     if(vm.fileList[i].checked){
-                        if(vm.fileList[i].isAutoCreated == 1 && val){
+                        if(vm.fileList[i].isAutoCreated == 1 && val ){
                             vm.$message({
                                 type: 'error',
                                 message: '"'+vm.fileList[i].fgName+'"'+'为系统文件，不能操作！'
@@ -3975,7 +4022,7 @@ export default {
                 // vm.sharePath.path = response.data.rt.url
                 vm.sharePathNo=response.data.rt.shareNo
                 
-                vm.sharePath.password = response.data.rt.password?response.data.rt.key:''
+                vm.sharePath.password = response.data.rt.key?response.data.rt.key:''
                 if(vm.sharePath.password!=''){
                     vm.sharePath.path=vm.shareUrl+'/cloud/sharePassword/'+vm.sharePathNo
                 }else {
@@ -4048,7 +4095,7 @@ export default {
             })
         }else{
             for(var i=0;i<vm.fileList.length;i++){
-                if(vm.fileList[i].checked && vm.fileList[i].isAutoCreated == 1){
+                if(vm.fileList[i].checked && vm.fileList[i].isAutoCreated == 1 ){
                     vm.$message({
                         type:'error',
                         message:'系统文件，不能操作！'
@@ -4258,7 +4305,7 @@ export default {
             }else{
                 for(var i=0;i<vm.fileList.length;i++){
                     if(vm.fileList[i].checked){
-                        if (vm.fileList[i].isAutoCreated == 1) {
+                        if (vm.fileList[i].isAutoCreated == 1||vm.fileList[i].isDrawing==1) {
                             vm.$message({
                                 type:'error',
                                 message:'系统文件，不能操作！'
@@ -4473,7 +4520,7 @@ export default {
           }else{
               this.showBtn=true;
           }
-          if(vm.checkFileDir.isDrawing==1&&vm.checkFileDir.t31Code==null){
+          if(vm.checkFileDir.isDrawing==1&&vm.checkFileDir.t31code==null){
               this.systemDrawFile=false;
           }else{
               this.systemDrawFile=true;
@@ -4745,7 +4792,7 @@ export default {
     },
     downLoadWithURL(fileId,fileName){
          var vm = this
-        // if(fileId)vm.latestFile(fileId,"下载了文件"+fileName)
+        if(fileId)vm.latestFile(fileId,"下载了文件"+fileName)
         // window.open(vm.QJFileManageSystemURL + url +'')
     },
     latestFile(fileId,log){
@@ -4908,7 +4955,7 @@ export default {
                     vm.checkedFile_Folder.folderCheckedNum++
                 }
             }
-            // vm.getDrawingIdByFgId()
+            vm.getDrawingIdByFgId()
             if(file){
                 console.log(this.fgIdListById,'fgIdList000');
                 vm.PointFigure.oldname = vm.fileList[val].fgName
@@ -4941,7 +4988,7 @@ export default {
                 this.fgIdListById.push(vm.fileList[val].fgId)
                 vm.getGouJianInfo()
                 // vm.getVersion()
-                // vm.getDrawingIdByFgId()
+                vm.getDrawingIdByFgId()
             }else{
                  vm.checkedFile_Folder.folder = true
                 vm.checkedFile_Folder.folderCheckedNum = 1
@@ -5262,7 +5309,7 @@ export default {
                             isDrawing: item.isDrawing,
                             projId: vm.projId,
                             remark: null,
-                            t31code: item.t31Code,
+                            t31code: item.t31code,
                             ugId: null,
                             updateTime: null
                         })
@@ -5539,8 +5586,26 @@ export default {
         }
     },
         //
-        goToLocation(){
-            alert('虚拟场景面板未打开，请打开虚拟场景面板。');
+        goToLocation(value){
+             if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+              // console.log(value,'多点定位数据');
+             this.getElementByMid(value.id);
+
+              // var para=[];
+              // this.elementTraceIds.forEach((item)=>{
+              //   para.push({
+              //     "TraceID":String(item),
+              //     // "HolderPath":JSON.parse(item.dHolderPath),
+              //     // "GCCode":item.dGCCode
+              //   })
+              // })
+              // console.log(para,'多点定位数据');
+            }
         },
         deleteList(item){
             this.deleteDialog = true;
@@ -5598,23 +5663,25 @@ export default {
         viewListQrcode(item){
             axios({
                 method:'post',
-                url:this.BDMSUrl+'manifest2/getManifestInfoByMId',
+                // url:this.BDMSUrl+'manifest2/getManifestInfoByMId',\
+                url:this.BDMSUrl+'manifest/getManifestById',
                 headers:{
                     token:this.token
                 },
                 params:{
-                    mId:item.main.pkId
+                    // mId:item.main.pkId
+                    manifestId:item.id
                 }
             }).then(response=>{
                 if(response.data.cd == 0){
                     this.isbiaoqianshow = true;
                     this.biaoqianInfo = response.data.rt;
                     
-                    Object.assign(this.biaoqianInfo,{
-                        mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
-                        mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
+                    // Object.assign(this.biaoqianInfo,{
+                    //     mBSource_:this.parseMBSource(this.biaoqianInfo.mBSource),
+                    //     mGSource_:this.parseMGSource(this.biaoqianInfo.mGSource)
 
-                    })
+                    // })
                     console.log(this.biaoqianInfo,'this.biaoqianInfo');
                 }else{
                     alert(response.data.msg);
@@ -5683,8 +5750,8 @@ export default {
             var tabelTitle = vm.projName + '清单标签'
             var keyList = '["清单ID","清单名称","生成方式","业务来源","创建用户","创建时间","清单版本","明细数量"]'
             var item=vm.biaoqianInfo;
-                var valueList = '["' + (item.pkId ? item.pkId : "") + '","'
-                    + (item.mName ? item.mName : "") + '","' + (item.mGSource ? vm.parseMGSource(item.mGSource) : "") + '","'
+                var valueList = '["' + (item.id ? item.id : "") + '","'
+                    + (item.name ? item.name : "") + '","' + (item.mGSource ? vm.parseMGSource(item.mGSource) : "") + '","'
                     + (item.mBSource ? vm.parseMBSource(item.mBSource) : "") + '","' + (item.creator ? item.creator : "") + '","' +
                     (item.createTime ? vm.timeChanges(item.createTime) : "") + '","' + (item.mVersion ? item.mVersion : "") + '","'
                     + (item.manifestDetailCount ? item.manifestDetailCount : "") + '"]'
@@ -5862,6 +5929,7 @@ export default {
         getElementByMid(mid){
             var vm=this;
             var traceId=[]
+            var para=[]
             axios({
                 url:this.BDMSUrl+'manifest/getElementByMid',
                 method:'post',
@@ -5875,8 +5943,15 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     response.data.rt.forEach((item)=>{
-                        traceId.push(item.traceId);
+                        para.push({
+                          "TraceID":String(item.traceId)
+                        });
                     })
+                     console.log(para,'多点定位数据');
+                     const app = document.getElementById('webIframe').contentWindow;
+                    app.postMessage({command:"LookAtEntities",parameter:para},"*");
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
                 }
             })
             return traceId
