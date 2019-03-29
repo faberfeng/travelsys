@@ -100,13 +100,19 @@
                             <img id="fz_img_for_site1" src="./images/site1.png" style="display:none"/>
                         </div>
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
+                            <span v-show="startpointShow">
+                                <label style="font-size:14px;">起始测点编号:</label>
+                                <input type="text" @change="pointNameChange" class="pointName" v-model="pointNameValue" placeholder="测点-sp" />
+                                <input type="text" @change="pointNumChange" class="pointNum" v-model="pointNumValue" placeholder="编号-01" />
+                            </span>
                             <span id="inspectContentSel">
                                 <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
                                     <option v-for="(item,index) in monitorMainItemList" :key="index" :value="item.id" v-text="item.name"></option>
+                                    
                                 </select>
                                 <i class="icon-sanjiao"></i>
-                                
                             </span>
+                            <!-- v-show="startpointShow" -->
                             <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
@@ -141,13 +147,21 @@
                         </div>
                         <div class="leftTopMonitorContent">
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
-                            <ul>
+                            <el-tree 
+                            :highlight-current="true"
+                            :show-checkbox="true"
+                            @check="checkChange()"
+                            :default-checked-keys="defaultCheckedKeys"
+                            id="contentTree" ref="contentTree" :data="getDetectionDirectoryListLeft" node-key="id" :props="defaultProps">
+
+                            </el-tree>
+                            <!-- <ul>
                                 <li v-for="(item,index) in monitorMainItemList" :key="index">
                                     <el-checkbox v-model="item.spotNum" @change="checkboxChange()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">
                                         {{item.name}}
                                     </el-checkbox>
                                 </li>
-                            </ul>
+                            </ul> -->
                             
                         </div>
                         <div class="rightBottomCheck">
@@ -166,6 +180,7 @@
                         </div>
                         <div class="inspectTableHeadRight">
                             <div class="addData" v-show="importDataEdit" @click="batchExport()">数据导入</div>
+                            <div class="addInspectContent"  @click="configureMonitorItemBtn()">配置监测目录</div>
                             <div class="addInspectContent" v-show="editInspectWordEdit" @click="addMonitorItemBtn()">新增监测内容</div>
                         </div>
                     </div>
@@ -277,10 +292,49 @@
                     </ul>
                 </div>
             </el-dialog>
+            <el-dialog title="配置监测目录" :visible="configureContentShow" @close="configContentCancle()">
+                <div @click="addContent()" class="addContent">
+                        新增目录
+                </div>
+                <div class="configTable">
+                    <table  border="1" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>目录名称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in getDetectionDirectoryList" :key="index">
+                                <td>{{item.name}}</td>
+                                <td>
+                                    <button @click="deleteContent(item.id)" class="actionBtn deleteBtn"></button>
+                                    <button @click="editContent(item.id)" class="actionBtn editBtn"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <!-- <button class="editBtnS" @click="configContentMakeSure()" >确定</button> -->
+                    <button class="editBtnC" @click="configContentCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="新增监测目录" :visible="addContentShow"  @close="addContentCancle()">
+                 <div class="editBodyone">
+                     <label class="editInpText">目录名称:</label>
+                     <input class="inp" style="height:32px !important" v-model="contentName" placeholder="请输入" /></div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="addContentMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="addContentCancle()" >取消</button>
+                </div>
+            </el-dialog>
             <el-dialog title="新增监测内容" :visible="addInspectContentShow" @close="addInspectContentCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName" placeholder="请输入" /></div>
-                    <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
+                    <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="directoryType" ><option v-for="(item,index) in getDetectionDirectoryLists" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName" placeholder="请输入" /></div>
+                    <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" @change="typeChange(monitorType)" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
+                    <div class="editBodytwo"><label class="editInpText">类型标记:</label><select class="editSelect" v-model="typeTagValue" ><option v-for="(item,index) in selectTypeTagList" :value="item.value" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao"></i></div>
                     <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram" placeholder="两个字母" /></div>
                     <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword" placeholder="与导入Excel表名匹配" /></div>
                     <div  class="editBodytwo editBodytwo1"  v-show="monitorType==5?false:true&&false"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
@@ -718,6 +772,10 @@ export default {
                 this.callback(evt)},true
         );
         return{
+            defaultProps:{
+                children:'children',
+                label: 'name'
+            },
             loadings:false,
             typeSpotShow:false,
             sheetValue:'aaa',
@@ -744,6 +802,7 @@ export default {
             recentAlertAmount:0,
             totalAlertAmount:0,
             editSpotShow:false,
+            startpointShow:false,
             toolShow:false,
             broken:0,
             alert:'',
@@ -752,6 +811,9 @@ export default {
             baseMapShow:false,
             baseMapMonitor:false,
             addInspectContentShow:false,//增加监测内容弹框
+            configureContentShow:false,//配置目录内容弹框
+            addContentShow:false,//新增目录
+            contentName:'',
             editInspectContentShow:false,//编辑监测内容弹框
             importGatherDataShow:false,//导入采集数据
             matchKeyWord:'',//匹配关键字
@@ -920,6 +982,8 @@ export default {
             setSpotPicShow:false,//是否为上传图片标记
             monitorName:'',//监测名称
             monitorType:1,//监测类型
+            directoryType:null,
+            
             monitorLogogram:'',
             monitorKeyword:'',
             monitorId:'',
@@ -960,6 +1024,8 @@ export default {
             pageNum1:1,
             monitorMainTableListLength:0,//监测内容总表长度
             monitorMainItemList:'',//绘制底图内容
+            monitorMainItemLists:[],//左边树形图
+            defaultCheckedKeys:[],//默认选中数组
             hoverId:'',//移动底图上的ID
             curBaseMapUrl:'',//目前底图首页
             monitorBaseMapUrl:'',//监测底图设置
@@ -1023,6 +1089,7 @@ export default {
             pointIdName:[],//选中监测点名称
             drawItemId:'',//图纸项目ID
             drawItemType:'',//图纸类型改变
+            drawItemTagType:'',//类型标记
             monitorPointInfo:[],//所有图纸监测点信息
             measureType:'',//虚拟场景测点type
             measureId:'',//虚拟场景测点id
@@ -1202,6 +1269,149 @@ export default {
             routerList:'',
             moduleList:'',
             projAuth:'',
+            getDetectionDirectoryListLeft:[],
+            getDetectionDirectoryList:'',
+            getDetectionDirectoryLists:[],
+            pointNameValue:'',//测点名称
+            pointNumValue:'',//编号
+            typeTagValue:'',
+            typeTagList:[
+                {
+                    value:'CX',
+                    name:'围护体测斜',
+                    type:5
+                },
+                {
+                    value:'TX',
+                    name:'土体测斜',
+                    type:5
+                },
+               
+                {
+                    value:'ZL',
+                    name:'支撑轴力',
+                    type:4
+                },
+                {
+                    value:'YL',
+                    name:'墙(桩)内力',
+                    type:4
+                },
+                {
+                    value:'TY',
+                    name:'土压力',
+                    type:4
+                 },
+                 {
+                     value:'SY',
+                     name:'孔隙水压力',
+                     type:4
+                 },
+                 {
+                     value:'LZ',
+                     name:'立柱竖向位移',
+                     type:2
+                 },
+                  {
+                     value:'F',
+                     name:'房屋竖向位移',
+                     type:2
+                 },
+                 {
+                     value:'DB',
+                     name:'地表竖向位移',
+                     type:2
+                 },
+                 {
+                     value:'CYS',
+                     name:'坑外承压水位',
+                     type:3
+                 },
+                {
+                    value:'W',
+                    name:'围护顶竖向及水平位移',
+                    type:2
+                },
+                 {
+                     value:'DL',
+                     name:'电力管线竖向及水平位移',
+                      type:2
+                 },
+                 {
+                     value:'MQ',
+                     name:'煤气管线竖向及水平位移',
+                      type:2
+                 },
+                 {
+                     value:'SS',
+                     name:'上水管线竖向及水平位移',
+                      type:2
+                 },
+                 {
+                     value:'DX',
+                     name:'电信管线竖向及水平位移',
+                      type:2
+                 },
+                 {
+                     value:'XX',
+                     name:'信息管线竖向及水平位移',
+                      type:2
+                 },
+                 {
+                     value:'YS',
+                     name:'其他管线竖向及水平',
+                      type:2
+                 },
+
+
+                 {
+                    value:'W',
+                    name:'围护顶竖向及水平位移',
+                    type:1
+                },
+                 {
+                     value:'DL',
+                     name:'电力管线竖向及水平位移',
+                      type:1
+                 },
+                 {
+                     value:'MQ',
+                     name:'煤气管线竖向及水平位移',
+                      type:1
+                 },
+                 {
+                     value:'SS',
+                     name:'上水管线竖向及水平位移',
+                      type:1
+                 },
+                 {
+                     value:'DX',
+                     name:'电信管线竖向及水平位移',
+                      type:1
+                 },
+                 {
+                     value:'XX',
+                     name:'信息管线竖向及水平位移',
+                      type:1
+                 },
+                 {
+                     value:'YS',
+                     name:'其他管线竖向及水平',
+                      type:1
+                 },
+                 {
+                     value:'QX',
+                     name:'建筑物倾斜',
+                     type:5
+                 },
+                 {
+                     value:'FC',
+                     name:'分程沉降',
+                     type:2
+                 }
+            ],
+            selectTypeTagList:[],
+            
 
         }
     },
@@ -1293,6 +1503,8 @@ export default {
             vm.getMonitorItem();
             vm.getTagList();
             vm.getAllMonitorPoint();
+            vm.getDetectionDirectory();
+            vm.getDetectionDirectorys();
             // vm.getBaseMapList();
            
             // vm.getBaseMapInfoByBaseMapId();
@@ -1418,7 +1630,17 @@ export default {
                 return value1 - value2;
             }
         },
-      
+        typeChange(val){
+            this.selectTypeTagList=[];
+            this.typeTagList.forEach((item)=>{
+                if(item.type==val){
+                    this.selectTypeTagList.push(item);
+                }
+            })
+            this.typeTagValue=this.selectTypeTagList[0].value
+            console.log(this.selectTypeTagList,'选择的数据')
+        },
+
         getUserInfo(){
                 var vm = this;
                 vm.basePicEdit = false;
@@ -1578,6 +1800,24 @@ export default {
             }
            
         },
+
+        //起始测点编号触发
+
+        //测点
+        pointNameChange(){
+
+        },
+        //编号
+        pointNumChange(){
+            var reg = /[^0-9.]/g
+            if(!reg.test(this.pointNumValue)){
+                // console.log('000');
+                this.$message({
+                    type:'info',
+                    message:'请输入数字'
+                })
+            }
+        },
         add(val){
             var vm=this;
        
@@ -1714,6 +1954,7 @@ export default {
             this.monitorMainItemList.forEach((item)=>{
                 if(item.id==this.drawItemId){
                     this.drawItemType=item.type;
+                    this.drawItemTagType=item.sign; //这个是类型标记，一共有20种，分别有编号。
                 }
             })
             if(this.isClick1==true){
@@ -3185,18 +3426,51 @@ export default {
             if(this.alist==[]){
                 this.editSpotShow=false;
             }else if(this.alist!=[]){
+                // axios({
+                //         method:'POST',
+                //         url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
+                //         headers:{
+                //             'token':vm.token
+                //         },
+                //         params:{
+                //             userGroupId:vm.selectUgId
+                //         },
+                //         data:alist
+                //     }).then((response)=>{
+                //         if(response.data.cd=='0'){
+                //             this.$message({
+                //                 type:'success',
+                //                 message:'保存监测点成功'
+                //             })
+                //              this.$refs.pic.setDrawCancel();
+                //             this.getMonitorMainTable();
+                //             this.getAllMonitorPoint();
+                //             if(this.picMark==true){
+                //                 setTimeout(()=>{
+                //                         this.getTagList();
+                //                     },400)
+                //                 }
+                //                 this.startpointShow=false;
+                //         }else if(response.data.cd=='-1'){
+                        
+                //             // this.$message({
+                //             //     type:'error',
+                //             //     message:response.data.msg
+                //             // })
+                //         }
+                //     })
+                // }
+
                 axios({
-                        method:'POST',
-                        url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
-                        headers:{
-                            'token':vm.token
-                        },
-                        params:{
-                            userGroupId:vm.selectUgId
-                        },
-                        data:alist
-                    }).then((response)=>{
-                        if(response.data.cd=='0'){
+                    url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
+                    method:'POST',
+                    headers:{
+                        'token':vm.token
+                    },
+                    baseMapId:vm.monitorBaseMapId,
+                    infos:alist,
+                }).then((response)=>{
+                   if(response.data.cd=='0'){
                             this.$message({
                                 type:'success',
                                 message:'保存监测点成功'
@@ -3209,15 +3483,16 @@ export default {
                                         this.getTagList();
                                     },400)
                                 }
+                                this.startpointShow=false;
                         }else if(response.data.cd=='-1'){
                         
-                            // this.$message({
-                            //     type:'error',
-                            //     message:response.data.msg
-                            // })
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
                         }
-                    })
-                }
+                })
+            }
 
 
         },
@@ -3235,11 +3510,15 @@ export default {
             this.isClick8=false;
               this.$refs.pic.Max_Select = 8;
             this.$refs.pic.Max_type = 2;
+            this.startpointShow=false;
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){
                 this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].id,this.monitorMainItemList[i].spotNum);
             }
+        },
+        checkChange(){
+            console.log(this.$refs.contentTree.getCheckedNodes(),'选中节点');
         },
         displaySpot(){
             this.$refs.pic.enableLabel(this.displaySpotNum);
@@ -3457,9 +3736,10 @@ export default {
                     }
                     
                     var type=(this.getBaseMapInfoByBaseMapIdList.name.substr(this.getBaseMapInfoByBaseMapIdList.name.length-3)).toString();
+                    // console.log(vm.BDMSUrl+this.getBaseMapInfoByBaseMapIdList.relativeUri,'pic');
         
                     this.paramsLists={type:type,source:vm.BDMSUrl+this.getBaseMapInfoByBaseMapIdList.relativeUri,angle:this.angle}
-                    // this.paramsLists={type:type,source:'./images/A1.pdf',angle:this.angle}
+                    // this.paramsLists={type:type,source:'file:///D:/files/A1.pdf',angle:this.angle}
                    
                 }else if(response.data.cd=='-1'){
                     vm.$message({
@@ -3504,6 +3784,166 @@ export default {
         addMonitorItemBtn(){
              var vm=this;
             vm.addInspectContentShow=true;
+            vm.typeChange(vm.monitorType);
+        },
+        //配置监测目录
+        configureMonitorItemBtn(){
+            var vm=this;
+            vm.configureContentShow=true;
+            this.getDetectionDirectory();
+        },
+        //获取监测
+        getDetectionDirectoryListL(val){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getDetectionDirectory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getDetectionDirectoryListLeft=response.data.rt;
+
+                    this.getDetectionDirectoryListLeft.forEach((item)=>{
+                        vm.$set(item,'disabled',true);
+                        var a=[]
+                         val.forEach((item1)=>{
+                             if(item.id==item1.directoryId){
+                                    a.push(item1);
+                                }
+                                vm.$set(item,'children',a)
+                             })
+                    })
+                    console.log(this.getDetectionDirectoryListLeft,'树形结构');
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
+        },
+
+        //获取监测目录
+        getDetectionDirectory(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getDetectionDirectory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getDetectionDirectoryList=response.data.rt;
+                   
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+
+        getDetectionDirectorys(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getDetectionDirectory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    userGroupId:vm.selectUgId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getDetectionDirectoryLists=response.data.rt;
+                    this.getDetectionDirectoryLists.unshift({
+                        id:null,
+                        name:'无',
+                        userGroupId:vm.selectUgId
+                    })
+                    
+                }else{
+                    this.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+        },
+
+        //取消监测目录
+        configContentCancle(){
+            var vm=this;
+             vm.configureContentShow=false;
+        },
+        //新增目录
+        addContent(){
+            this.addContentShow=true;
+
+        },
+        addContentMakeSure(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/createDetectionDirectory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    name:vm.contentName,
+                    userGroupId:vm.selectUgId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                        this.getDetectionDirectory()
+                        this.addContentShow=false;
+                }
+            })
+            
+
+        },
+        addContentCancle(){
+            this.addContentShow=false;
+            this.contentName='';
+        },
+        configContentMakeSure(){
+            var vm=this;
+        },
+        //删除目录
+        deleteContent(id){
+            var vm=this;
+            vm.$confirm('您要删除当前所选目录？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:vm.BDMSUrl+'detectionInfo/deleteDetectionDirectory',
+                    method:'GET',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd=='0'){
+                        this.getDetectionDirectory()
+                    }
+                })
+            })
+        },
+        //编辑目录
+        editContent(){
+
         },
         //数据导入
         batchExport(){
@@ -3550,7 +3990,9 @@ export default {
                         logogram:vm.monitorLogogram,
                         userGroupId:vm.selectUgId,
                         keyword:vm.monitorKeyword,
-                        baseMapId:vm.monitorBaseMapId
+                        baseMapId:vm.monitorBaseMapId,
+                        directoryId:vm.directoryType,
+                        sign:vm.typeTag
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
@@ -3562,6 +4004,7 @@ export default {
                         this.monitorLogogram='';
                         this.monitorKeyword='';
                         this.currentPage1=1;
+                        vm.typeTag='CX'
                         // this.monitorBaseMapId='';
                         this.$message({
                             type:'success',
@@ -5313,6 +5756,7 @@ export default {
         //单点触发绘图
         drawingOneSpot(){
             this.$refs.pic.setDrawCancel();
+            this.startpointShow=true;
             if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -5338,6 +5782,7 @@ export default {
         //多点触发绘图
         drawingSpots(){
             this.$refs.pic.setDrawCancel();
+            this.startpointShow=true;
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -5744,10 +6189,13 @@ export default {
                     this.monitorMainItemList=response.data.rt;
                     this.monitorMainItemList.forEach((item,index)=>{
                         this.$set(item,'spotNum',true)
+                        this.defaultCheckedKeys.push(item.id);
                     })
+
+                    // defaultCheckedKeys
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
-                   
+                    this.getDetectionDirectoryListL(this.monitorMainItemList);
                 }
             })
         },
@@ -6215,7 +6663,7 @@ export default {
     
 }
 </script>
-<style lang="less">
+<style lang="less" scope>
   *{
         margin: 0;
         padding: 0;
@@ -6261,6 +6709,56 @@ export default {
             overflow: hidden;
             content: '';
         }
+
+               /*
+            修改eleUI树形组件
+        */
+        // .el-tree-node:focus .el-tree-node__content{
+        //     background-color: transparent;
+        // }
+        .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+                background: none;
+        }
+        .el-tree{
+                color: red;
+                background:none;
+        }
+        // .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+
+        // }
+        .el-checkbox__input.is-disabled .el-checkbox__inner{
+            display: none;
+        }
+        .el-tree-node__content>.el-checkbox{
+                margin-right: 2px;
+        }
+        .el-tree-node__content>.el-tree-node__expand-icon{
+            padding:4px;
+        }
+        // .el-tree--highlight-current .el-tree-node.is-current .elselect{
+        //         background-color: #000;
+        // }
+        // .el-tree-node__label{
+        //     font-size: 12px;
+        //     color: #666666;
+        //     // padding-left: 22px; 
+        //     position: relative;
+        // }
+        // .el-icon-caret-right:before{
+        //     content: "\E604";
+        //     color: #999999;
+        //     font-weight: bold;
+        // }
+      
+        // .is-leaf:before{
+        //     content: ""!important;
+        //     // width: 12px;
+        //     color: #999999;
+        //     display:inline-block;
+        //     font-weight: bold;
+        // }
+
+
         #GroupSelect {
             display: inline-block;
             float: right;
@@ -6642,6 +7140,23 @@ export default {
                         .planeFigureHeadRightHide{
                             float:right;
                             // position: relative;
+                            .pointName{
+                                width: 70px;
+                                height:26px;
+                                // background: #fafafa;
+                                padding-left: 6px;
+                                // box-sizing: border-box;
+
+                            }
+                            .pointNum{
+                                width: 70px;
+                                height:26px;
+
+                                // background: #fafafa;
+                                padding-left: 6px;
+                                margin-right:5px;
+                                // box-sizing: border-box;
+                            }
                             #inspectContentSel{
                                 // display: inline-block;
                                 // float: right;
@@ -6655,16 +7170,17 @@ export default {
                                     width: 175px;
                                     height: 26px;
                                     border: 1px solid #cccccc;
-                                    // position: relative;
+                                    position: relative;
                                     background: #fafafa;
                                     padding-left: 10px;
                                     padding-right: 20px;
                                     box-sizing: border-box;
                                     margin-right: 15px;
-                                    float: left;
+                                    // float: left;
                                     color: #333333;
                                     font-size: 14px;
                                     outline: none;
+                                    
                                 }
                                 .icon-sanjiao{
                                         display: block;
@@ -6674,8 +7190,8 @@ export default {
                                         background-image: url('../Settings/images/sanjiao.png');
                                         background-size: 100% 100%;
                                         content: '';
-                                        top: 9px;
-                                        right: 280px;
+                                        top: 5px;
+                                        right: 30px;
                                 }
                                 
 
@@ -6952,7 +7468,7 @@ export default {
                         .leftTopMonitorContent{
                             position: absolute;
                             top:30px;
-                            left:30px;
+                            left:35px;
                             z-index:11;
                             ul{
                                 height: 500px;
@@ -7075,10 +7591,6 @@ export default {
                                             background: url('./images/overviewdown.png') no-repeat 0 0;
                                         }
 
-
-
-
-
                                     }
                                 }
                             }
@@ -7171,12 +7683,79 @@ export default {
             }
         }
         #edit{
+            .addContent{
+                width: 80px;
+                height:30px;
+                padding:4px;
+                background:#ff5257;
+                // border:1px solid #fcfcfc;
+                border-radius: 2px;
+                float: right;
+                margin-right:15px;
+                margin-bottom: 10px;
+                color:#fff;
+                cursor: pointer;
+            }
+            .configTable{
+                width:96%;
+                margin:0 auto;
+                table{
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                    thead{
+                         background: #f2f2f2;
+                        th{
+                            padding-left: 6px;
+                            padding-right: 15px;
+                            height: 32px;
+                            text-align: center;
+                            box-sizing: border-box;
+                            border-right: 1px solid #e6e6e6;
+                            font-size: 14px;
+                            color: #333333;
+                            font-weight: normal;
+                            // td{
+
+                            // }
+                        }
+                    }
+                    tbody{
+                        tr{
+                            td{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 32px;
+                                text-align: center;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 14px;
+                                color: #333333;
+                                .actionBtn{
+                                    width: 18px;
+                                    height: 18px;
+                                    border: none;
+                                    cursor: pointer;
+                                    margin-left: 10px;
+                                }
+                                .deleteBtn{
+                                    background: url('../../assets/delete.png') no-repeat 0 0;
+                                }
+                                .editBtn{
+                                    background: url('./images/overviewedit.png') no-repeat 0 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             .editBtnSstyle{
                 position:absolute;
                 bottom:40px;
                 left:44px;
 
             }
+
             .upInput{
                     display: none;
                 }
@@ -7333,7 +7912,18 @@ export default {
                 background-image: url('../Settings/images/sanjiao.png');
                 background-size: 100% 100%;
                 content: '';
-                top: 174px;
+                top: 224px;
+                right: 293px;
+            }
+            .icon-sanjiaoT {
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 118px;
                 right: 293px;
             }
             .inpSmall{

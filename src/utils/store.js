@@ -106,6 +106,7 @@ export default new Vuex.Store({
         QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
         commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
         BDMSUrl:'http://10.245.11.10:8080/bdms-rebuild/',//仅供文件上传使用
+        // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
         WebGlUrl:"https://bim.arctron.cn",
         GMDUrl:"https://bim.arctron.cn",
         shareUrl:"http://10.245.11.10:8080/bdms/#",
