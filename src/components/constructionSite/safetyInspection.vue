@@ -1958,9 +1958,9 @@ export default {
                 }
             })
             if(this.isClick1==true){
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
             }else if(this.isClick2==true){
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
             }
         },
         picView_status_changed(status,list){

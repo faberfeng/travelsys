@@ -1908,7 +1908,11 @@ export default {
             this.drawing = false;
             this.needChangeBroken = false;
         },
-        setDrawStatus(status,drawtype,drawItemId,count,color,userData){
+        setHeader(prefix,startNo){
+            this.prefix = prefix;
+            this.startNo = startNo;
+        },
+        setDrawStatus(status,drawtype,drawItemTagType,drawItemId,count,color,userData){
             this.status = "none";
             this.drawStatus = status;
             this.drawtype = "";
@@ -1919,6 +1923,7 @@ export default {
             this.drawItemId = drawItemId;
             this.drawtypeNum = drawtype;
             this.drawMaxCount = count;
+            this.drawItemTagType = drawItemTagType;
             this.drawing = true;
             if(color){
                 this.baseColor = color;
@@ -2027,7 +2032,10 @@ export default {
                             data:"none",
                             pointName:"new point",
                             typeNum:this.drawtypeNum,                    //  type,
-                            userData:this.userData
+                            userData:this.userData,
+                            prefix:this.prefix,
+                            startNo: (this.startNo != undefined)?this.startNo++:0,
+                            drawItemTagType:this.drawItemTagType
                         };
             return item;
         },
@@ -2102,6 +2110,9 @@ export default {
                 item.pointName = this.drawList[i].pointName;
                 item.type = this.drawList[i].typeNum;
                 item.plotInfo = JSON.stringify(this.drawList[i]);
+                item.prefix = this.drawList[i].prefix;
+                item.startNo = this.drawList[i].startNo;
+                item.drawItemTagType = this.drawList[i].drawItemTagType;
                 
                 // if(item.type == 5){continue;}
 
