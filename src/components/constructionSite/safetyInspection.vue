@@ -5848,7 +5848,7 @@ export default {
         drawingSpots(){
             this.$refs.pic.setDrawCancel();
             this.startpointShow=true;
-            this.drawPointType="morePoint" //这是表示单点,drawPointType="onePoint"表示单点
+            this.drawPointType="morePoint" //这是表示多点,drawPointType="morePoint"表示多点
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
@@ -6230,8 +6230,6 @@ export default {
                     })
 
                     //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
-
-                    
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
