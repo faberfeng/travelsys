@@ -308,8 +308,8 @@
                             <tr v-for="(item,index) in getDetectionDirectoryList" :key="index">
                                 <td>{{item.name}}</td>
                                 <td>
+                                    <button @click="editContent(item.id,item.name)" class="actionBtn editBtn"></button>
                                     <button @click="deleteContent(item.id)" class="actionBtn deleteBtn"></button>
-                                    <button @click="editContent(item.id)" class="actionBtn editBtn"></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -329,6 +329,17 @@
                     <button class="editBtnC" @click="addContentCancle()" >取消</button>
                 </div>
             </el-dialog>
+
+             <el-dialog title="编辑监测目录" :visible="editContentShow"  @close="editContentCancle()">
+                 <div class="editBodyone">
+                     <label class="editInpText">目录名称:</label>
+                     <input class="inp" style="height:32px !important" v-model="editcontentName" placeholder="请输入" /></div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="editContentMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="editContentCancle()" >取消</button>
+                </div>
+            </el-dialog>
+
             <el-dialog title="新增监测内容" :visible="addInspectContentShow" @close="addInspectContentCancle()">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="directoryType" ><option v-for="(item,index) in getDetectionDirectoryLists" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
@@ -813,7 +824,10 @@ export default {
             addInspectContentShow:false,//增加监测内容弹框
             configureContentShow:false,//配置目录内容弹框
             addContentShow:false,//新增目录
+            editContentShow:false,//编辑目录
             contentName:'',
+            editcontentName:'',
+            contentId:'',
             editInspectContentShow:false,//编辑监测内容弹框
             importGatherDataShow:false,//导入采集数据
             matchKeyWord:'',//匹配关键字
@@ -3814,6 +3828,9 @@ export default {
                              if(item.id==item1.directoryId){
                                     a.push(item1);
                                 }
+                            // if(){
+
+                            // }
                                 vm.$set(item,'children',a)
                              })
                     })
@@ -3904,6 +3921,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                         this.getDetectionDirectory()
+                        this.getMonitorItem()
                         this.addContentShow=false;
                 }
             })
@@ -3913,6 +3931,31 @@ export default {
         addContentCancle(){
             this.addContentShow=false;
             this.contentName='';
+        },
+        editContentCancle(){
+            this.editContentShow=false;
+            this.editcontentName='';
+        },
+        editContentMakeSure(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'detectionInfo/updateDetectionDirectory',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:this.contentId,
+                    name:this.editcontentName
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.getDetectionDirectory();
+                    this.getMonitorItem();
+                    this.editContentShow=false;
+                }
+            })
+
         },
         configContentMakeSure(){
             var vm=this;
@@ -3942,8 +3985,10 @@ export default {
             })
         },
         //编辑目录
-        editContent(){
-
+        editContent(id,name){
+            this.contentId=id;
+            this.editcontentName=name;
+            this.editContentShow=true;
         },
         //数据导入
         batchExport(){
