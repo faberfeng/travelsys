@@ -1824,13 +1824,14 @@ export default {
         //编号
         pointNumChange(){
             var reg = /[^0-9.]/g
-            if(!reg.test(this.pointNumValue)){
+            if(reg.test(this.pointNumValue)){
                 // console.log('000');
                 this.$message({
                     type:'info',
                     message:'请输入数字'
                 })
             }
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue);
         },
         add(val){
             var vm=this;
@@ -3429,6 +3430,7 @@ export default {
             this.isClick8=false;
             var alist=[];
             var list = this.$refs.pic.saveList();
+            console.log(list,'list1111');
             // var list1=this.
            
             list.forEach((item)=>{
@@ -3475,37 +3477,37 @@ export default {
                 //     })
                 // }
 
-                axios({
-                    url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
-                    method:'POST',
-                    headers:{
-                        'token':vm.token
-                    },
-                    baseMapId:vm.monitorBaseMapId,
-                    infos:alist,
-                }).then((response)=>{
-                   if(response.data.cd=='0'){
-                            this.$message({
-                                type:'success',
-                                message:'保存监测点成功'
-                            })
-                             this.$refs.pic.setDrawCancel();
-                            this.getMonitorMainTable();
-                            this.getAllMonitorPoint();
-                            if(this.picMark==true){
-                                setTimeout(()=>{
-                                        this.getTagList();
-                                    },400)
-                                }
-                                this.startpointShow=false;
-                        }else if(response.data.cd=='-1'){
+                // axios({
+                //     url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
+                //     method:'POST',
+                //     headers:{
+                //         'token':vm.token
+                //     },
+                //     baseMapId:vm.monitorBaseMapId,
+                //     infos:alist,
+                // }).then((response)=>{
+                //    if(response.data.cd=='0'){
+                //             this.$message({
+                //                 type:'success',
+                //                 message:'保存监测点成功'
+                //             })
+                //              this.$refs.pic.setDrawCancel();
+                //             this.getMonitorMainTable();
+                //             this.getAllMonitorPoint();
+                //             if(this.picMark==true){
+                //                 setTimeout(()=>{
+                //                         this.getTagList();
+                //                     },400)
+                //                 }
+                //                 this.startpointShow=false;
+                //         }else if(response.data.cd=='-1'){
                         
-                            this.$message({
-                                type:'error',
-                                message:response.data.msg
-                            })
-                        }
-                })
+                //             this.$message({
+                //                 type:'error',
+                //                 message:response.data.msg
+                //             })
+                //         }
+                // })
             }
 
 
@@ -3522,6 +3524,8 @@ export default {
             this.isClick6=false;
             this.isClick7=false;
             this.isClick8=false;
+            this.pointNameValue='';
+            this.pointNumValue='';
               this.$refs.pic.Max_Select = 8;
             this.$refs.pic.Max_type = 2;
             this.startpointShow=false;
