@@ -5812,7 +5812,7 @@ export default {
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,1);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
                 this.monitorMainItemList.forEach((item)=>{
                     if(item.id==this.drawItemId){
                         item.spotNum=true;
@@ -5838,7 +5838,7 @@ export default {
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemId,2);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
                 this.isClick1=false;
                 this.isClick2=true;
                 this.isClick3=false;
@@ -5858,7 +5858,7 @@ export default {
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("text",10000,10000,2);
+                this.$refs.pic.setDrawStatus("text",10000,10000,10000,2);
                 this.isClick1=false;
                 this.isClick2=false;
                 this.isClick3=true;
