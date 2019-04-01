@@ -993,6 +993,7 @@ export default {
             isClick7:false,
             isClick8:false,
             hoverShow:false,
+            drawPointType:'',//绘画点位类型 'onePoint'表示单点，'morePoint'表示多点
             setSpotPicShow:false,//是否为上传图片标记
             monitorName:'',//监测名称
             monitorType:1,//监测类型
@@ -1831,6 +1832,7 @@ export default {
                     message:'请输入数字'
                 })
             }
+            console.log(this.pointNameValue,this.pointNumValue,'测点编号');
             this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue);
         },
         add(val){
@@ -3429,15 +3431,24 @@ export default {
             this.isClick7=false;
             this.isClick8=false;
             var alist=[];
+            var blist=[];
             var list = this.$refs.pic.saveList();
             console.log(list,'list1111');
             // var list1=this.
            
             list.forEach((item)=>{
                  if(item.id.length==undefined){
-                    alist.push(item);
+                    alist.push(item)
+                    blist.push({
+                        'itemId':item.itemId,
+                        'plotInfos':item.plotInfos,
+                        'pointGroupIds':null,
+                        'prefix':item.prefix,
+                        'startNo':item.startNo
+                    });
                 }
             })
+            console.log(blist,'添加点位数据');
             
             if(this.alist==[]){
                 this.editSpotShow=false;
@@ -3477,37 +3488,40 @@ export default {
                 //     })
                 // }
 
-                // axios({
-                //     url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
-                //     method:'POST',
-                //     headers:{
-                //         'token':vm.token
-                //     },
-                //     baseMapId:vm.monitorBaseMapId,
-                //     infos:alist,
-                // }).then((response)=>{
-                //    if(response.data.cd=='0'){
-                //             this.$message({
-                //                 type:'success',
-                //                 message:'保存监测点成功'
-                //             })
-                //              this.$refs.pic.setDrawCancel();
-                //             this.getMonitorMainTable();
-                //             this.getAllMonitorPoint();
-                //             if(this.picMark==true){
-                //                 setTimeout(()=>{
-                //                         this.getTagList();
-                //                     },400)
-                //                 }
-                //                 this.startpointShow=false;
-                //         }else if(response.data.cd=='-1'){
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
+                    method:'POST',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.monitorBaseMapId,
+                    },
+                    data:blist
+                    // infos:blist,
+                }).then((response)=>{
+                   if(response.data.cd=='0'){
+                            this.$message({
+                                type:'success',
+                                message:'保存监测点成功'
+                            })
+                             this.$refs.pic.setDrawCancel();
+                            this.getMonitorMainTable();
+                            this.getAllMonitorPoint();
+                            if(this.picMark==true){
+                                setTimeout(()=>{
+                                        this.getTagList();
+                                    },400)
+                                }
+                                this.startpointShow=false;
+                        }else if(response.data.cd=='-1'){
                         
-                //             this.$message({
-                //                 type:'error',
-                //                 message:response.data.msg
-                //             })
-                //         }
-                // })
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                })
             }
 
 
@@ -5806,18 +5820,20 @@ export default {
         drawingOneSpot(){
             this.$refs.pic.setDrawCancel();
             this.startpointShow=true;
+            this.drawPointType="onePoint" //这是表示单点,drawPointType="onePoint"表示单点
             if(this.drawItemId==''){
                this.$message({
                     type:'info',
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1,this.drawPointType);
                 this.monitorMainItemList.forEach((item)=>{
                     if(item.id==this.drawItemId){
                         item.spotNum=true;
                     }
                 })
+                
                 this.isClick1=true;
                 this.isClick2=false;
                 this.isClick3=false;
@@ -5832,13 +5848,14 @@ export default {
         drawingSpots(){
             this.$refs.pic.setDrawCancel();
             this.startpointShow=true;
+            this.drawPointType="morePoint" //这是表示单点,drawPointType="onePoint"表示单点
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2,this.drawPointType);
                 this.isClick1=false;
                 this.isClick2=true;
                 this.isClick3=false;

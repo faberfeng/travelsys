@@ -4416,7 +4416,7 @@ export default {
             })
         }else{
                 const app = document.getElementById('webIframe').contentWindow;
-                app.postMessage({command:"Init",parameter:null},"*");
+                // app.postMessage({command:"Init",parameter:null},"*");
                 app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
