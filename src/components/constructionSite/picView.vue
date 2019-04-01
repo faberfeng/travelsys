@@ -1908,9 +1908,10 @@ export default {
             this.drawing = false;
             this.needChangeBroken = false;
         },
-        setHeader(prefix,startNo){
+        setHeader(prefix,startNo,value){
             this.prefix = prefix;
             this.startNo = startNo;
+            this.Koeffzient = value;
         },
         setDrawStatus(status,drawtype,drawItemTagType,drawItemId,count,color,userData){
             this.status = "none";
@@ -2035,7 +2036,8 @@ export default {
                             userData:this.userData,
                             prefix:this.prefix,
                             startNo: (this.startNo != undefined)?this.startNo++:0,
-                            drawItemTagType:this.drawItemTagType
+                            drawItemTagType:this.drawItemTagType,
+                            drawMaxCount:this.drawMaxCount
                         };
             return item;
         },
@@ -2113,6 +2115,7 @@ export default {
                 item.prefix = this.drawList[i].prefix;
                 item.startNo = this.drawList[i].startNo;
                 item.drawItemTagType = this.drawList[i].drawItemTagType;
+                item.drawMaxCount = this.drawList[i].drawMaxCount;
                 
                 // if(item.type == 5){continue;}
 
