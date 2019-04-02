@@ -1912,6 +1912,8 @@ export default {
             this.prefix = prefix;
             this.startNo = startNo;
             this.Koeffzient = value;
+
+            console.log(this.prefix,this.startNo,this.Koeffzient);
         },
         setDrawStatus(status,drawtype,drawItemTagType,drawItemId,count,color,userData){
             this.status = "none";
@@ -2039,6 +2041,7 @@ export default {
                             drawItemTagType:this.drawItemTagType,
                             drawMaxCount:this.drawMaxCount
                         };
+            console.log(item);
             return item;
         },
         enableType(drawtype,drawItemId,status){

@@ -33,7 +33,7 @@
                 <li v-for="(item,index) in projectStationInfoList" :key="index">
                     <div class="projectListInfo">
                         <div class="projectListImg">
-                            <img :src="item.userImg?(commomHeadPictureFile+item.userImg):require('../../assets/people.png')">
+                            <img :src="item.userImg?(BDMSUrl+'user/avater?userId='+item.userId):require('../../assets/people.png')">
                         </div> 
                         <div class="projectListText">
                             <p class="title">
@@ -206,6 +206,7 @@ export default {
                 }else{
                     if(response.data.rt.rows){
                         this.projectStationInfoList = response.data.rt.rows;
+
                          this.tabdataShow1=false;
                     }else if(response.data.rt.rows.length!=0){
                        

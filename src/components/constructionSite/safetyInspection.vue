@@ -88,8 +88,14 @@
                             <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
                         </div>
+                        <div class="block">
+                            <span class="demonstration">图例缩放比例</span>
+                            <el-slider v-model="scaleValue"></el-slider>
+                        </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
+                            <span v-if="isBindPoint" class="bottomMap" @click="editPointNum()">编辑编号</span>
+                            <span v-if="isBindPoint" class="bottomMap" @click="bindPoint()">绑定</span>
                             <span  :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
                             <!-- v-show="manageEdit" -->
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"   @click="editSpot()">编辑点位</span>
@@ -102,8 +108,8 @@
                         <div class="planeFigureHeadRightHide" v-show="editSpotShow" >
                             <span v-show="startpointShow">
                                 <label style="font-size:14px;">起始测点编号:</label>
-                                <input type="text" @change="pointNameChange" class="pointName" v-model="pointNameValue" placeholder="测点-sp" />
-                                <input type="text" @change="pointNumChange" class="pointNum" v-model="pointNumValue" placeholder="编号-01" />
+                                <input type="text" @mouseout="pointNameChange" @change="pointNameChange" class="pointName" v-model="pointNameValue" placeholder="测点-sp" />
+                                <input type="text" @mouseout="pointNumChange"  @change="pointNumChange" class="pointNum" v-model="pointNumValue" placeholder="编号-01" />
                             </span>
                             <span id="inspectContentSel">
                                 <select v-model="drawItemId" @change="changeType()"  class="inspectSel">
@@ -114,6 +120,7 @@
                             </span>
                             <!-- v-show="startpointShow" -->
                             <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
+                            
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText2']" @click="drawingText">文字</span>
@@ -359,6 +366,28 @@
                     <button class="editBtnC" @click="addInspectContentCancle()" >取消</button>
                 </div>
             </el-dialog>
+
+             <el-dialog title="绑定监测内容" :visible="bindInspectContentShow" @close="bindInspectContentCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="drawItemId" @change="changeType()" ><option v-for="(item,index) in monitorMainItemList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="bindMonitorItem()" >确定</button>
+                    <button class="editBtnC" @click="bindInspectContentCancle()" >取消</button>
+                </div>
+            </el-dialog>
+
+             <el-dialog title="编辑编号" :visible="bindSpotNumShow" @close="bindSpotNumCancle()">
+                <div class="editBody">
+                    <div class="editBodyone"><label class="editInpText">修改的测点:</label><select class="editSelect" v-model="editSpotNum" @change="changeSpot()" ><option v-for="(item,index) in editSpotNumList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                </div>
+                <div class="editBodytwo"><label class="editInpText">新测点编号:</label><input class="inpSmall" style="height:32px !important" v-model="newSpotNum" /></div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="bindSpotNumMakeSure()" >确定</button>
+                    <button class="editBtnC" @click="bindSpotNumCancle()" >取消</button>
+                </div>
+            </el-dialog>
+
             <el-dialog title="监测内容更名" :visible="editInspectContentShow" @close="editInspectContentCancle()">
                 <div class="editBody">
                     <div class="editBodyone"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName1" placeholder="请输入" /></div>
@@ -787,6 +816,7 @@ export default {
                 children:'children',
                 label: 'name'
             },
+            isBindPoint:false,
             loadings:false,
             typeSpotShow:false,
             sheetValue:'aaa',
@@ -822,6 +852,11 @@ export default {
             baseMapShow:false,
             baseMapMonitor:false,
             addInspectContentShow:false,//增加监测内容弹框
+            bindInspectContentShow:false,//绑定监测内容
+            bindSpotNumShow:false,//编辑点位编号
+            newSpotNum:'',//新点位编号
+            editSpotNum:"",
+            editSpotNumList:[],
             configureContentShow:false,//配置目录内容弹框
             addContentShow:false,//新增目录
             editContentShow:false,//编辑目录
@@ -1289,6 +1324,7 @@ export default {
             getDetectionDirectoryLists:[],
             pointNameValue:'',//测点名称
             pointNumValue:'',//编号
+            scaleValue:0,//比例尺
             typeTagValue:'',
             typeTagList:[
                 {
@@ -1426,8 +1462,7 @@ export default {
                  }
             ],
             selectTypeTagList:[],
-            
-
+            dataList:[],
         }
     },
     created(){
@@ -1820,7 +1855,7 @@ export default {
 
         //测点
         pointNameChange(){
-
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
         },
         //编号
         pointNumChange(){
@@ -1833,7 +1868,7 @@ export default {
                 })
             }
             console.log(this.pointNameValue,this.pointNumValue,'测点编号');
-            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue);
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
         },
         add(val){
             var vm=this;
@@ -1972,6 +2007,9 @@ export default {
                 if(item.id==this.drawItemId){
                     this.drawItemType=item.type;
                     this.drawItemTagType=item.sign; //这个是类型标记，一共有20种，分别有编号。
+                    this.pointNameValue=item.logogram;
+                    this.pointNumValue='01';
+                    this.drawItemName=item
                 }
             })
             if(this.isClick1==true){
@@ -1981,7 +2019,13 @@ export default {
             }
         },
         picView_status_changed(status,list){
+            console.log(list,'选中的东西');
             this.listLength=list.length;
+            if(this.listLength==1){
+                this.isBindPoint=true;
+            }else{
+                this.isBindPoint=false;
+            }
             if(status==true){
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
@@ -1992,8 +2036,6 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
-                    
-
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
@@ -3419,6 +3461,43 @@ export default {
             this.$refs.pic.Max_type = 1000000;
             // this.isClick=true;
         },
+        returnData(array){
+            let plotInfo=[];
+            let pointGroupIds=[];
+            array.forEach((item)=>{
+                plotInfo.push(item.plotInfo);
+                pointGroupIds.push(item.pointGroupIds);
+            })
+             let currentList={
+                'itemId':array[0].itemId,
+                'plotInfos':plotInfo,
+                'pointGroupIds':pointGroupIds,
+                'prefix':array[0].prefix,
+                'startNo':array[0].startNo
+            };
+            return currentList;
+        },
+        //绑定点位
+        bindPoint(){
+             this.bindInspectContentShow=true;
+            // this.$confirm('该点位是否需要绑定？', '提示', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'info'
+            // }).then(()=>{
+
+
+            // })
+           
+
+        },
+        //编辑点位编号
+        editPointNum(){
+            this.editSpotNumList=this.getPointByPointGroupId(this.pointId);
+            this.editSpotNum=this.editSpotNumList[0].id;
+            this.newSpotNum=this.editSpotNumList[0].name;
+            this.bindSpotNumShow=true;
+        },
         saveDraw(){
             var vm=this;
             this.editSpotShow=false;
@@ -3432,24 +3511,54 @@ export default {
             this.isClick8=false;
             var alist=[];
             var blist=[];
+            var clist=[];
+            var dlist=[];
+            var map=new Map();
             var list = this.$refs.pic.saveList();
             console.log(list,'list1111');
             // var list1=this.
-           
             list.forEach((item)=>{
+                 vm.$set(item,'pointGroupIds',null);
+            })
+            list.forEach((item,index,array)=>{
                  if(item.id.length==undefined){
                     alist.push(item)
-                    blist.push({
-                        'itemId':item.itemId,
-                        'plotInfos':item.plotInfos,
-                        'pointGroupIds':null,
-                        'prefix':item.prefix,
-                        'startNo':item.startNo
-                    });
+                    if(item.drawMaxCount==1){
+                        blist.push({
+                            'itemId':item.itemId,
+                            'plotInfos':[item.plotInfo],
+                            'pointGroupIds':[item.pointGroupIds],
+                            'prefix':item.prefix,
+                            'startNo':item.startNo
+                        });
+                    }else if(item.drawMaxCount==2){
+                         clist.push(item)
+                    }
+
                 }
             })
-            console.log(blist,'添加点位数据');
-            
+            for(var i=0;i < clist.length;i++){
+                var itemId=clist[i].itemId;
+                if(!map.has(itemId)){
+                    var array=new Array();
+                    array.push(clist[i]);
+                    map.set(itemId,array)
+                }else{
+                    var array= map.get(itemId);
+                    array.push(clist[i]);
+                    map.set(itemId,array);
+                }
+            }
+            //  console.log(map,'map000');
+             var a='';
+             var b=[];
+             map.forEach((value, key, mapObject)=>{
+                a=this.returnData(value);
+                b.push(a);
+             })
+             console.log(b,'bbbb');
+             dlist=blist.concat(b);
+            console.log(dlist,'添加点位数据');
             if(this.alist==[]){
                 this.editSpotShow=false;
             }else if(this.alist!=[]){
@@ -3497,7 +3606,7 @@ export default {
                     params:{
                         baseMapId:vm.monitorBaseMapId,
                     },
-                    data:blist
+                    data:dlist
                     // infos:blist,
                 }).then((response)=>{
                    if(response.data.cd=='0'){
@@ -3817,12 +3926,14 @@ export default {
              var vm=this;
             vm.addInspectContentShow=true;
             vm.typeChange(vm.monitorType);
+            this.getDetectionDirectoryLists();
         },
         //配置监测目录
         configureMonitorItemBtn(){
             var vm=this;
             vm.configureContentShow=true;
             this.getDetectionDirectory();
+            this.getDetectionDirectorys();
         },
         //获取监测
         getDetectionDirectoryListL(val){
@@ -3939,6 +4050,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                         this.getDetectionDirectory()
+                        this.getDetectionDirectorys();
                         this.getMonitorItem()
                         this.addContentShow=false;
                 }
@@ -3969,6 +4081,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getDetectionDirectory();
+                    this.getDetectionDirectorys();
                     this.getMonitorItem();
                     this.editContentShow=false;
                 }
@@ -3997,7 +4110,8 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
-                        this.getDetectionDirectory()
+                        this.getDetectionDirectory();
+                        this.getDetectionDirectorys();
                     }
                 })
             })
@@ -4020,6 +4134,161 @@ export default {
             this.monitorLogogram='';
             this.monitorKeyword='';
             // this.monitorBaseMapId='';
+        },
+        bindInspectContentCancle(){
+            var vm=this;
+            vm.bindInspectContentShow=false;
+        },
+        changeSpot(){
+            this.editSpotNumList.forEach((item)=>{
+                if(this.editSpotNum==item.id){
+                    this.editSpotType=item.type;
+                    this.newSpotNum=item.name;
+                }
+            })
+
+        },
+
+        //绑定点位编号取消
+        bindSpotNumCancle(){
+            this.bindSpotNumShow=false;
+            this.newSpotNum='';
+        },
+        //确认点位
+        bindSpotNumMakeSure(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/renamePointAndSeqName',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:this.editSpotNum,
+                    type:this.editSpotType,
+                    name:this.newSpotNum,
+                }
+            }).then((response)=>{
+                this.bindSpotNumShow=false;
+                this.getAllMonitorPoint();
+            })
+        },
+        returnPlots(val){
+                var data='';
+                this.monitorPointInfo.forEach((item)=>{
+                    if(item.id==val){
+                        data=item.plotInfo
+                    }
+                })
+                return data;
+        },
+        //一个点位绑定其他监测内容
+        bindMonitorItem(){
+            var vm=this;
+            // this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
+            var alist=[];
+            var blist=[];
+
+            // var list = this.$refs.pic.saveList();
+            // console.log(list,'list1111');
+            // list.forEach((item,index,array)=>{
+            //      if(item.id.length==undefined){
+            //         alist.push(item)
+            //         if(item.drawMaxCount==1){
+            //             blist.push({
+            //                 'itemId':item.itemId,
+            //                 'plotInfos':[item.plotInfo],
+            //                 'pointGroupIds':[this.pointId],
+            //                 'prefix':item.prefix,
+            //                 'startNo':item.startNo
+            //             });
+            //         }
+            //     }
+            // })
+
+            blist.push({
+                'itemId':this.drawItemId,
+                'plotInfos':[this.returnPlots(this.pointId)],
+                'pointGroupIds':[this.pointId],
+                'prefix':this.pointNameValue,
+                'startNo':this.pointNumValue
+            });
+            console.log(blist,'blist00');
+           axios({
+                    url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
+                    method:'POST',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        baseMapId:vm.monitorBaseMapId,
+                    },
+                    data:blist
+                    // infos:blist,
+                }).then((response)=>{
+                   if(response.data.cd=='0'){
+                            this.$message({
+                                type:'success',
+                                message:'绑定监测点成功'
+                            })
+                             this.$refs.pic.setDrawCancel();
+                            this.getMonitorMainTable();
+                            this.getAllMonitorPoint();
+                            if(this.picMark==true){
+                                setTimeout(()=>{
+                                        this.getTagList();
+                                    },400)
+                                }
+                                // this.startpointShow=false;
+                                this.bindInspectContentShow=false;
+                        }else if(response.data.cd=='-1'){
+                            this.$message({
+                                type:'error',
+                                message:response.data.msg
+                            })
+                        }
+                })
+        },
+        //获取测点集合内的测点信息
+        getPointByPointGroupId(id){
+            var vm=this;
+            $.ajax({
+                type:'get',
+                url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
+                data:{
+                    pointGroupId:id //该测点的数据
+                },
+                headers: {
+                    'token':vm.token
+                },
+                async:false,
+                success:function(response){
+                    vm.dataList=response.rt
+                    console.log(response.rt);
+
+                }
+            })
+            return vm.dataList;
+        },
+        //获取监测项目最后一个点位名称
+        getMaxPointNameByItemId(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.drawItemId,
+                    baseMapId:vm.monitorBaseMapId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+
+                }else{
+
+                }
+            })
+
         },
         //新增监测内容
         addMonitorItem(){
@@ -5821,19 +6090,22 @@ export default {
             this.$refs.pic.setDrawCancel();
             this.startpointShow=true;
             this.drawPointType="onePoint" //这是表示单点,drawPointType="onePoint"表示单点
+            this.changeType();
+            // this.pointNameValue=this.monitorMainItemList[0].logogram;//初始化测点编号
+            // this.pointNumValue='01';//初始化测点编号
             if(this.drawItemId==''){
                this.$message({
                     type:'info',
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1,this.drawPointType);
+                this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
                 this.monitorMainItemList.forEach((item)=>{
                     if(item.id==this.drawItemId){
                         item.spotNum=true;
                     }
                 })
-                
                 this.isClick1=true;
                 this.isClick2=false;
                 this.isClick3=false;
@@ -5849,13 +6121,17 @@ export default {
             this.$refs.pic.setDrawCancel();
             this.startpointShow=true;
             this.drawPointType="morePoint" //这是表示多点,drawPointType="morePoint"表示多点
+            this.changeType();
+            // this.pointNameValue=this.monitorMainItemList[0].logogram;//初始化测点编号
+            // this.pointNumValue='01';//初始化测点编号
              if(this.drawItemId==''){
                this.$message({
                     type:'info',
                     message:'请先添加监测内容'
                 })
             }else{
-                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2,this.drawPointType);
+                this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
+                this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
                 this.isClick1=false;
                 this.isClick2=true;
                 this.isClick3=false;
@@ -6209,27 +6485,31 @@ export default {
             var vm=this;
             axios({
                 method:'get',
-                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                url:vm.BDMSUrl+'detectionInfo/getPointGroups',
+                // url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    userGroupId:vm.selectUgId
+                    // userGroupId:vm.selectUgId,
+                    baseMapId:vm.monitorBaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
                     this.monitorPointInfo.forEach((item)=>{
-                        if(item.data==null){
-                            return;
-                        }else{
-                             item.data=parseFloat(item.data).toFixed(3);
-                        }
+                        // if(item.data==null){
+                        //     return;
+                        // }else{
+                        //      item.data=parseFloat(item.data).toFixed(3);
+                        // }
                         // console.log(item.data,'item.data');
                         // item.data.toFixed(3)
+                        vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
                     })
+                   
 
-                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
@@ -6259,6 +6539,8 @@ export default {
                     // defaultCheckedKeys
                     this.drawItemId=this.monitorMainItemList[0].id;
                     this.drawItemType=this.monitorMainItemList[0].type;
+                    this.pointNameValue=this.monitorMainItemList[0].logogram;
+                    this.pointNumValue='01';
                     this.getDetectionDirectoryListL(this.monitorMainItemList);
                 }
             })
@@ -7128,6 +7410,18 @@ export default {
                                     }
 
                         }
+                        .block{
+                            width: 200px;
+                            height: 20px;
+                            display: inline-block;
+                            position: absolute;
+                            left: 17%;
+                            top:-15px;
+                             .demonstration{
+                                 display: inline-block;
+                            }
+                        }
+                       
                         .planeFigureHeadRight{
                             float: right;
                             .exportSaveBtn{
