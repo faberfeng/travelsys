@@ -136,10 +136,12 @@ export default {
                             this.companyList=response.data.rt;
                             localStorage.setItem('entId',response.data.rt[0].entId)
                             localStorage.setItem('entName',response.data.rt[0].entName)
+                            localStorage.setItem('responseAuthInfo',response.data.rt[0].authInfo);
                             this.$router.push({
                                 path:'/projectlist',
                                 query:{entId:this.companyList[0].entId}
                             })
+
                             this.noprojectShow=false;
                         }else{
                             this.noprojectShow=true;

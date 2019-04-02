@@ -90,7 +90,7 @@
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
-                            <el-slider v-model="scaleValue"></el-slider>
+                            <el-slider v-model="scaleValue" :max="5" :min="0.1"></el-slider>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
@@ -197,6 +197,7 @@
                             <tr>
                                 <th rowspan="2">序号</th>
                                 <th rowspan="2">监测类型</th>
+
                                 <th rowspan="2">监测内容</th>
                                 <th rowspan="2">简写</th>
                                 <th rowspan="2">测点数</th>
@@ -1483,8 +1484,6 @@ export default {
         setTimeout(()=>{
              this.getUserInfo();
         },200)
-       
-  
     },
     filters:{
         monitorTypeChange(val){
@@ -1601,10 +1600,8 @@ export default {
                                         // this.measureType=item.type;
                                         // console.log(this.measureId,this.measureType);
                                         // this.commonDetailShow=true;
-                                         
                                     }
                                 })
-                                
                             }
                         }
                     }
@@ -3496,6 +3493,7 @@ export default {
             this.editSpotNumList=this.getPointByPointGroupId(this.pointId);
             this.editSpotNum=this.editSpotNumList[0].id;
             this.newSpotNum=this.editSpotNumList[0].name;
+            this.editSpotType=this.editSpotNumList[0].type;
             this.bindSpotNumShow=true;
         },
         saveDraw(){
@@ -4156,6 +4154,7 @@ export default {
         },
         //确认点位
         bindSpotNumMakeSure(){
+            var vm=this;
             axios({
                 url:this.BDMSUrl+'detectionInfo/renamePointAndSeqName',
                 headers:{
@@ -4262,8 +4261,6 @@ export default {
                 async:false,
                 success:function(response){
                     vm.dataList=response.rt
-                    console.log(response.rt);
-
                 }
             })
             return vm.dataList;
@@ -6507,9 +6504,7 @@ export default {
                         // item.data.toFixed(3)
                         vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
                     })
-                   
-
-                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
@@ -7415,13 +7410,14 @@ export default {
                             height: 20px;
                             display: inline-block;
                             position: absolute;
-                            left: 17%;
-                            top:-15px;
+                            right: 1%;
+                            top:55px;
+                            z-index:100;
                              .demonstration{
                                  display: inline-block;
+                                 color:red;
                             }
                         }
-                       
                         .planeFigureHeadRight{
                             float: right;
                             .exportSaveBtn{

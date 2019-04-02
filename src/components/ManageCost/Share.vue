@@ -1791,6 +1791,7 @@ export default {
         deleteDialog:false,
         deleteInfo:'',
         removelistitem:'',
+        // userCenterUrl:'',
       }
   },
   created(){
@@ -1802,6 +1803,7 @@ export default {
         vm.shareUrl=vm.$store.state.shareUrl;
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.WebGlUrl = this.$store.state.GMDUrl;
+        // this.userCenterUrl=this.$store.state.userCenterUrl;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         this.loadingTitle();
         vm.getIntoShareList()

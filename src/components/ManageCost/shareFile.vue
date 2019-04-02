@@ -8,7 +8,7 @@
                 </div>
                 <div class="headerText">工程云盘</div>
                 <div class="headerInfo">
-                    <a class="userCenter" href="http://10.245.11.10:8080/bdms/#/userLogin">用户中心</a>
+                    <a class="userCenter" :href="userCenterUrl">用户中心</a>
                     <span class="appDownLoad" href="">客户端下载</span>
                 </div>
             </el-col>
@@ -166,6 +166,7 @@ export default {
             shareUrl:'',
             appShareUrl:'',
             passWord:null,
+            userCenterUrl:'',
         }
     },
     created(){
@@ -176,10 +177,11 @@ export default {
         vm.appShareUrl=vm.$store.state.appShareUrl;
         this.GMDUrl = this.$store.state.GMDUrl;
         this.passWord=this.$route.query.passWord;
+        this.userCenterUrl=this.$store.state.userCenterUrl;
         // this.intoDir();
         console.log(this.$route.query.shareName,'this.$route.query.shareName')
         console.log(this.$route.path,'this.$route.path');
-        // this.judgeUserAgent();
+        this.judgeUserAgent();
         this.showShareFilesOrFolder();
     },
     watch:{
