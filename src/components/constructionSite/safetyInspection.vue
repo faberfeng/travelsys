@@ -90,7 +90,7 @@
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
-                            <el-slider v-model="scaleValue"></el-slider>
+                            <el-slider v-model="scaleValue" :max="5" :min="0.1"></el-slider>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
@@ -1484,8 +1484,6 @@ export default {
         setTimeout(()=>{
              this.getUserInfo();
         },200)
-       
-  
     },
     filters:{
         monitorTypeChange(val){
@@ -1602,10 +1600,8 @@ export default {
                                         // this.measureType=item.type;
                                         // console.log(this.measureId,this.measureType);
                                         // this.commonDetailShow=true;
-                                         
                                     }
                                 })
-                                
                             }
                         }
                     }
@@ -3497,6 +3493,7 @@ export default {
             this.editSpotNumList=this.getPointByPointGroupId(this.pointId);
             this.editSpotNum=this.editSpotNumList[0].id;
             this.newSpotNum=this.editSpotNumList[0].name;
+            this.editSpotType=this.editSpotNumList[0].type;
             this.bindSpotNumShow=true;
         },
         saveDraw(){
@@ -4157,6 +4154,7 @@ export default {
         },
         //确认点位
         bindSpotNumMakeSure(){
+            var vm=this;
             axios({
                 url:this.BDMSUrl+'detectionInfo/renamePointAndSeqName',
                 headers:{
@@ -7414,7 +7412,7 @@ export default {
                             position: absolute;
                             right: 1%;
                             top:55px;
-                            z-index:10000;
+                            z-index:100;
                              .demonstration{
                                  display: inline-block;
                                  color:red;
