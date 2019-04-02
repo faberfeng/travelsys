@@ -2041,7 +2041,7 @@ export default {
                             drawItemTagType:this.drawItemTagType,
                             drawMaxCount:this.drawMaxCount
                         };
-            console.log(item);
+            // console.log(item);
             return item;
         },
         enableType(drawtype,drawItemId,status){
@@ -2156,7 +2156,8 @@ export default {
                             text:plotInfo.text,
                             display:true,
                             typeNum:list[i].type,                               //  type
-                            userData:plotInfo.userData
+                            userData:plotInfo.userData,
+                            pointGroupData:list[i].pointGroupData
                         };
                 this.drawList.push(item);
 
