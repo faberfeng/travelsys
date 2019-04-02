@@ -101,22 +101,22 @@ export default new Vuex.Store({
 
 
         //内网测试（最新BDWork）
-        BIMServerPort:'443',
-        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
-        commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
-        BDMSUrl:'http://10.245.11.10:8080/bdms-rebuild/',//仅供文件上传使用
-        // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
-        WebGlUrl:"https://bim.arctron.cn",
-        GMDUrl:"https://bim.arctron.cn",
-        shareUrl:"http://10.245.11.10:8080/bdms/#",
-        appShareUrl:'http://10.245.11.10:8080/bdms/',
-        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
-        iframeWebGlUrl:'http://10.245.11.10:8080/BDView/',
-        applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
-        messageUrl:'http://42.159.153.210:8079',
-        webSocketUrl:"ws://42.159.153.210:16800/websocket",
-        qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        // BDMSUrl:'http://10.245.11.10:8080/bdms-rebuild/',//仅供文件上传使用
+        // // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"http://10.245.11.10:8080/bdms/#",
+        // appShareUrl:'http://10.245.11.10:8080/bdms/',
+        // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // iframeWebGlUrl:'http://10.245.11.10:8080/BDView/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
 
 
         //外网测试（最新BDWork）
@@ -137,8 +137,9 @@ export default new Vuex.Store({
         messageUrl:'http://42.159.153.210:8079',
         webSocketUrl:"ws://42.159.153.210:16800/websocket",
         qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
-
-
+        loginUrl:"http://42.159.153.210:8080/bdms/#/registerIndex",
+        userCenterUrl:'http://42.159.153.210:8080/bdms/#/userLogin',
+        
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,

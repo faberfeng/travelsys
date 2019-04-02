@@ -8,7 +8,7 @@
                 </div>
                 <div class="headerText">工程云盘</div>
                 <div class="headerInfo">
-                    <a class="userCenter" href="http://10.245.11.10:8080/bdms/#/userLogin">用户中心</a>
+                    <a class="userCenter" :href="userCenterUrl">用户中心</a>
                     <span class="appDownLoad" href="">客户端下载</span>
                 </div>
             </el-col>
@@ -47,6 +47,7 @@ export default{
             appShareUrl:'',
             shareUrl:'',
             shareUserId:'',
+            userCenterUrl:'',
         }
     },
     created(){
@@ -56,7 +57,8 @@ export default{
         vm.QJFileManageSystemURL1 = vm.$store.state.QJFileManageSystemURL1;
          vm.appShareUrl=vm.$store.state.appShareUrl;
          vm.shareUrl=vm.$store.state.shareUrl;
-        // vm.judgeUserAgent();
+         vm.userCenterUrl=vm.$store.state.userCenterUrl;
+        vm.judgeUserAgent();
     },
     mounted(){
         this.searchShareFile();

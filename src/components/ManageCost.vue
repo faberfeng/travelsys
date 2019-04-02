@@ -118,7 +118,9 @@
 import headerCommon from './header.vue'
 import axios from 'axios'
 var app
-var responseStr=require('./json/response');
+// var responseStr=require('./json/response');
+// var responseStr=require('./json/response1');
+
 var isOpen=0;
 var CurrentSelectedEntLists='';
 export default {
@@ -212,6 +214,7 @@ export default {
             elementTracId:[],
             midShow:false,
             manifestName:'',
+            responseStr:'',
 
 
         }
@@ -247,9 +250,10 @@ export default {
         vm.header.userImg=localStorage.getItem('userImg');
          vm.header.userName = localStorage.getItem('userName');
          vm.header.userId = localStorage.getItem('userId');
+         vm.responseStr=localStorage.getItem('responseAuthInfo');
         //  response.data.rt.user.name
         // vm.header.userId = response.data.rt.user.userId
-        vm.getUserInfo()
+        // vm.getUserInfo()
         vm.getPJDetial(vm.projId);
         vm.getOnlineInfo();
         vm.getUserGroup();
@@ -677,9 +681,10 @@ export default {
                     
                     // vm.getInitdata();
                 }
-            }).catch((err)=>{
-                console.log(err)
-            }) 
+            })
+            // .catch((err)=>{
+            //     console.log(err)
+            // }) 
         },
         //排序函数
         compare(property) {
@@ -719,6 +724,7 @@ export default {
         getUserInfo(){
             var vm = this
             this.getMenusLists=[];
+            // console.log(this.responseStr,'this.responseStr');
             // axios({
             //     method:'GET',
             //     url:vm.BDMSUrl+'project2/getOnlineInfo',
@@ -734,7 +740,7 @@ export default {
                 
             {
                 var response={
-                    data:responseStr
+                    data:JSON.parse(vm.responseStr)
                 }
                 // var id = localStorage.getItem('projId');
                 // vm.header.userName = response.data.rt.onlineInfo.userName
@@ -767,9 +773,11 @@ export default {
                 // var id = localStorage.getItem('projId');
                 //  localStorage.setItem('entId',response.data.rt.onlineInfo.entId)
                 // localStorage.setItem('projAuth',response.data.rt.onlineInfo.projAuth[id])
+
                 
                 localStorage.setItem('moduleList',JSON.stringify(response.data.rt.onlineInfo.moduleList))
                 this.moduleLists=response.data.rt.onlineInfo.moduleList;
+                // console.log(JSON.parse(response.data).rt,'this.moduleLists');
                 
                 var str=[]
                 this.moduleLists.forEach((item)=>{
@@ -860,10 +868,6 @@ export default {
                         })
                     }
                     this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00104')
-                    // console.log(this.ellist,'ellist0000');
-            // }).catch((err)=>{
-            //     console.log(err)
-            // })
             }
         },
         getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4){

@@ -197,6 +197,7 @@
                             <tr>
                                 <th rowspan="2">序号</th>
                                 <th rowspan="2">监测类型</th>
+
                                 <th rowspan="2">监测内容</th>
                                 <th rowspan="2">简写</th>
                                 <th rowspan="2">测点数</th>
@@ -4262,8 +4263,6 @@ export default {
                 async:false,
                 success:function(response){
                     vm.dataList=response.rt
-                    console.log(response.rt);
-
                 }
             })
             return vm.dataList;
@@ -6507,9 +6506,7 @@ export default {
                         // item.data.toFixed(3)
                         vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
                     })
-                   
-
-                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }
@@ -7415,13 +7412,14 @@ export default {
                             height: 20px;
                             display: inline-block;
                             position: absolute;
-                            left: 17%;
-                            top:-15px;
+                            right: 1%;
+                            top:55px;
+                            z-index:10000;
                              .demonstration{
                                  display: inline-block;
+                                 color:red;
                             }
                         }
-                       
                         .planeFigureHeadRight{
                             float: right;
                             .exportSaveBtn{
