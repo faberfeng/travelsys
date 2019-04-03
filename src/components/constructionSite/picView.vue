@@ -1118,7 +1118,15 @@ export default {
                             }
 
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
+                                var drawItemTagType = this.drawItemTagType;
+                                var data = "";
+                                var name = "";
+                                if(this.drawList[i].pointGroupData){
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    data = this.drawList[i].pointGroupData[0].data;
+                                    name = this.drawList[i].pointGroupData[0].name;
+                                }
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                                 
                             }
@@ -1133,7 +1141,15 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
+                                var drawItemTagType = this.drawItemTagType;
+                                var data = "";
+                                var name = "";
+                                if(this.drawList[i].pointGroupData){
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    data = this.drawList[i].pointGroupData[0].data;
+                                    name = this.drawList[i].pointGroupData[0].name;
+                                }
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
@@ -1147,7 +1163,15 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
+                                var drawItemTagType = this.drawItemTagType;
+                                var data = "";
+                                var name = "";
+                                if(this.drawList[i].pointGroupData){
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    data = this.drawList[i].pointGroupData[0].data;
+                                    name = this.drawList[i].pointGroupData[0].name;
+                                }
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
                         
@@ -1161,7 +1185,15 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].itemName,this.drawList[i].pointGroupData[0].drawItemTagType);
+                                var drawItemTagType = this.drawItemTagType;
+                                var data = "";
+                                var name = "";
+                                if(this.drawList[i].pointGroupData){
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    data = this.drawList[i].pointGroupData[0].data;
+                                    name = this.drawList[i].pointGroupData[0].name;
+                                }
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
