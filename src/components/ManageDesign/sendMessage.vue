@@ -670,7 +670,10 @@ export default Vue.component('common-upload',{
                     'Content-Type': 'multipart/form-data',
                     'token':vm.token
                 },
-                data:formData
+                data:formData,
+                params:{
+                    projectId:vm.projId
+                }
             }).then((response)=>{
                 if(response.data.rt){
                     if(vm.type == 1){

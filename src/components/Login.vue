@@ -146,6 +146,13 @@ export default {
                 }
                  this.loadingShow=false;
             })
+            // setTimeout(()=>{
+            //     this.loadingShow=false;
+            //     this.$message({
+            //         type:'error',
+            //         message:'网络可能中断'
+            //     })
+            // },20000)
         }
     }
 }

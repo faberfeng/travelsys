@@ -2304,7 +2304,7 @@ export default{
         // this.checkedItem();
         this.getTaskPriorityList();//获取工程任务优先级
         this.getTaskGroupList();//获取工程任务组别列表
-        this.getResourceType();//获取资源类别
+        // this.getResourceType();//获取资源类别
         this.getLodeTaskCheckConfig();//获取任务核实配置信息
         this.getlodeComponentCheckConfig();//获取构件完工核实配置信息
         this.getTaskStatusList();//获取工程任务状态列表

@@ -587,7 +587,7 @@
             <span id="searchWay2"><el-radio v-model="radio" label="2">某个时间段</el-radio></span>
           </div>
           <div class="progressSearchTime">
-            <div class="left" v-show="radio==2">
+            <div class="left" v-show="radio=='2'">
               <label class="startText">开始时间:</label>
               <el-date-picker v-model="taskProgressStart" type="date"
                               placeholder="选择日期">
@@ -722,7 +722,7 @@
             <span id="searchWay2"><el-radio v-model="radio" label="2">某个时间段</el-radio></span>
           </div>
           <div class="progressSearchTime">
-            <div class="left" v-show="radio==2">
+            <div class="left" v-show="radio=='2'">
               <label class="startText">开始时间:</label>
               <el-date-picker v-model="valueSearchStart" type="date"
                               placeholder="选择日期">
@@ -1163,7 +1163,7 @@
         labelPkId:'',
         ListHeaderShow: false,//列表头
         tvValue: 0,//silder初始值
-        radio: 1,
+        radio:'1',
         token: '',
         projId: '',
         BDMSUrl: '',
@@ -3403,7 +3403,7 @@
       progressSearch() {
         this.progressSearchDialog = true;
         this.selectType = this.TypeList[0].value;
-        this.radio = 2;
+        this.radio = '1';
       },
       selectChange() {
         this.compCount1 = 0;
@@ -3530,7 +3530,7 @@
         valueSearch(){
             this.valueSearchDialog=true;
             this.selectValueType=this.valueTypeList[0].value;
-            this.radio=2;
+            this.radio='1';
         },
 
         taskValueSearch(){
@@ -4064,7 +4064,8 @@
           },
           params:{
             taskId:vm.taskId,
-            type:6
+            type:6,
+            projectId:vm.projId
           },
           data: formData,
         }).then((response) => {
@@ -4141,7 +4142,8 @@
           },
           params:{
             taskId:vm.taskId,
-            type:5
+            type:5,
+            projectId:vm.projId
           },
           data: formData,
         }).then((response) => {

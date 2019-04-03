@@ -849,6 +849,7 @@ export default {
             broken:0,
             alert:'',
             listLength:'',//判断选择了几条点位
+            plotGroup:"",//选中当前数组
             picMarkName:'',
             baseMapShow:false,
             baseMapMonitor:false,
@@ -2019,13 +2020,14 @@ export default {
         picView_status_changed(status,list){
             console.log(list,'选中的东西');
             this.listLength=list.length;
-            this.plotGroup=list[0].pointGroupData;
+            
             if(this.listLength==1){
                 this.isBindPoint=true;
             }else{
                 this.isBindPoint=false;
             }
             if(status==true){
+                this.plotGroup=list[0].pointGroupData;
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
                 this.broken=list[0].isBroken;
@@ -3492,11 +3494,7 @@ export default {
         },
         //编辑点位编号
         editPointNum(){
-            this.editSpotNumList=this.getPointByPointGroupId(this.pointId);
-            this.editSpotNum=this.editSpotNumList[0].id;
-            this.newSpotNum=this.editSpotNumList[0].name;
-            this.editSpotType=this.editSpotNumList[0].type;
-            this.bindSpotNumShow=true;
+            this.getPointByPointGroupIds(this.pointId);
         },
         saveDraw(){
             var vm=this;
@@ -4170,6 +4168,7 @@ export default {
             }).then((response)=>{
                 this.bindSpotNumShow=false;
                 this.getAllMonitorPoint();
+                this.isBindPoint=false;
             })
         },
         returnPlots(val){
@@ -4204,13 +4203,18 @@ export default {
             //         }
             //     }
             // })
-
+            // var plotData=[];
+            // var groupIds=[];
+            // this.plotGroup.forEach((item)=>{
+            //     plotData.push();
+            //     groupIds.push();
+            // })
             blist.push({
-                'itemId':this.drawItemId,
-                'plotInfos':[this.returnPlots(this.pointId)],
-                'pointGroupIds':[this.pointId],
-                'prefix':this.pointNameValue,
-                'startNo':this.pointNumValue
+                    'itemId':this.drawItemId,
+                    'plotInfos':[this.returnPlots(this.pointId)],
+                    'pointGroupIds':[this.pointId],
+                    'prefix':this.pointNameValue,
+                    'startNo':this.pointNumValue
             });
             console.log(blist,'blist00');
            axios({
@@ -4240,6 +4244,7 @@ export default {
                                 }
                                 // this.startpointShow=false;
                                 this.bindInspectContentShow=false;
+                                this.isBindPoint=false;
                         }else if(response.data.cd=='-1'){
                             this.$message({
                                 type:'error',
@@ -4247,6 +4252,26 @@ export default {
                             })
                         }
                 })
+        },
+        //
+        getPointByPointGroupIds(id){
+            var vm=this;
+            var data=[];
+            data.push(id);
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                data:data,
+            }).then((response)=>{
+                 this.editSpotNumList=response.data.rt;
+                    this.editSpotNum=this.editSpotNumList[0].id;
+                    this.newSpotNum=this.editSpotNumList[0].name;
+                    this.editSpotType=this.editSpotNumList[0].type;
+                    this.bindSpotNumShow=true;
+            })
         },
         //获取测点集合内的测点信息
         getPointByPointGroupId(data){
@@ -4294,11 +4319,11 @@ export default {
                 },
                 data:data,
             }).then((response)=>{
-                 vm.dataList=response.data.rt;
-                 console.log(vm.dataList,'vm.dataList');
+                 vm.dataLists=response.data.rt;
+                 console.log(vm.dataLists,'vm.dataList');
                  this.monitorPointInfo.forEach((item)=>{
                       var a=[]
-                     vm.dataList.forEach((item1)=>{
+                     vm.dataLists.forEach((item1)=>{
                         
                          if(item.id==item1.pointGroupId){
                              a.push(item1);
@@ -6424,9 +6449,22 @@ export default {
                 this.isClick6=true;
                 this.isClick7=false;
                 this.isClick8=false;
-                if(this.picMarkName!="Select_img_Mark")
-                {
-                    this.$refs.pic.deleteDraw();
+                if(this.picMarkName!="Select_img_Mark"){
+                    // this.$refs.pic.deleteDraw();
+                    axios({
+                        url:vm.BDMSUrl+'detectionInfo/deletePointGroup',
+                        method:'post',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            id:this.pointId
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd==0){
+                            this.getAllMonitorPoint();
+                        }
+                    })
                 }
                 if(this.picMarkName=="Select_img_Mark"){
                  
@@ -6542,25 +6580,11 @@ export default {
                     this.monitorPointInfo=response.data.rt;
                     var data=[];
                     this.monitorPointInfo.forEach((item)=>{
-                        // if(item.data==null){
-                        //     return;
-                        // }else{
-                        //      item.data=parseFloat(item.data).toFixed(3);
-                        // }
-                        // console.log(item.data,'item.data');
-                        // item.data.toFixed(3)
-                        // vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
-
-                        // this.getPointByPointGroupId(item.id);
                         data.push(item.id);
                     })
                     this.getPointByPointGroupId(data);
 
                     //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
-                    
-                    // setTimeout(()=>{
-                    //         
-                    // },2000)
                     
                     // this.getTagList();
                 }
