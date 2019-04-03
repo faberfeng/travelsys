@@ -90,7 +90,7 @@
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
-                            <el-slider v-model="scaleValue" :max="5" :min="0.1"></el-slider>
+                            <el-slider v-model="scaleValue" :max="5" :min="0.1" :step="0.1"></el-slider>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
