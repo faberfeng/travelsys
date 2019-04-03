@@ -1646,7 +1646,7 @@ export default {
                 }
             }
         },
-        drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+        drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
@@ -1691,7 +1691,7 @@ export default {
                 }
             }
         },
-        drawForce(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+        drawForce(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
@@ -1723,9 +1723,14 @@ export default {
                 }
             }
         },
-        drawSlanting(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+        drawSlanting(drawcontext,position_,scale,radius,color,isSelected,data,pointName,){
             var position = this.rotate_XY_display(position_);
             var color_="";
+
+            if(type == "CX"){color = 'rgb(255,255,4)';}
+            if(type == "TX"){color = 'rgb(0,0,0)';}
+            if(type == "QX"){color = 'rgb(5,255,5)';}
+
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
@@ -1735,40 +1740,66 @@ export default {
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI / 2,
-                Math.PI);
-            drawcontext.lineTo(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale);
-            drawcontext.stroke();
-            drawcontext.fill();
+            if(type == "CX" || type == "TX" ){
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI / 2 * 3,
-                2 * Math.PI);
-            drawcontext.lineTo(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale);
-            drawcontext.stroke();
-            drawcontext.fill();
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    Math.PI / 2,
+                    Math.PI);
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale);
+                drawcontext.stroke();
+                drawcontext.fill();
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                2 * Math.PI);
-            this.drawcontext.stroke();
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    Math.PI / 2 * 3,
+                    2 * Math.PI);
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale);
+                drawcontext.stroke();
+                drawcontext.fill();
+
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale ,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    0,
+                    2 * Math.PI);
+                drawcontext.stroke();
+            }
+
+            if(type == "QX"){
+                drawcontext.beginPath();
+                
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale / 2,
+                    position.y * this.ResolutionScale * this.scale + radius * scale);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale);
+                
+                drawcontext.closePath();//结束路径状态
+        　　　　　//绘制状态
+                drawcontext.fillStyle=color;//填充颜色
+                drawcontext.fill();//
+
+                drawcontext.stroke();
+            }
 
             if(this.displayLabel){
                 if(data){
