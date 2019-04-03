@@ -4297,8 +4297,9 @@ export default {
                  vm.dataList=response.data.rt;
                  console.log(vm.dataList,'vm.dataList');
                  this.monitorPointInfo.forEach((item)=>{
+                      var a=[]
                      vm.dataList.forEach((item1)=>{
-                         var a=[]
+                        
                          if(item.id==item1.pointGroupId){
                              a.push(item1);
                             vm.$set(item,'pointGroupData',a);
@@ -4306,7 +4307,7 @@ export default {
                      })
                  })
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
-                //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                 console.log(this.monitorPointInfo,'this.monitorPointInfo');
                 //  vm.dataLists.push(vm.dataList);
             })
             // console.log(vm.dataLists,'vm.dataLists');
@@ -6244,8 +6245,7 @@ export default {
         fileChanged(file){
             var vm = this
             vm.filesList = vm.$refs.file.files[0] //[]
-            vm.imageName = vm.filesList.name
-           
+            vm.imageName = vm.filesList.name 
         },
         //取消上传图片
         upImgCancle(){
