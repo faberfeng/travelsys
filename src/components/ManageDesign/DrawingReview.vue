@@ -907,7 +907,7 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
-            this.$refs.pic.setDrawStatus('none',101,0,2,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('none',101,null,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
              this.annotationUserId=parseInt(this.userId);
         },
@@ -918,7 +918,7 @@ export default {
                 this.stage='1';//阶段
             }
 
-            this.$refs.pic.setDrawStatus('none',102,0,2,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('none',102,null,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
         },
@@ -929,7 +929,7 @@ export default {
                 this.stage='1';//阶段
             }
 
-            this.$refs.pic.setDrawStatus('none',103,0,2,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('none',103,null,0,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
         },
@@ -940,7 +940,7 @@ export default {
                 this.stage='1';//阶段
             }
 
-            this.$refs.pic.setDrawStatus('none',104,0,10000,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('none',104,null,0,10000,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
         },
@@ -951,7 +951,7 @@ export default {
                 this.stage='1';//阶段
             }
 
-            this.$refs.pic.setDrawStatus('text',10000,10000,2,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('text',10000,null,10000,2,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
         },
@@ -962,7 +962,7 @@ export default {
             if(this.stage=='-1'){
                 this.stage='1';//阶段
             }
-            this.$refs.pic.setDrawStatus('none',105,0,1,{r:255,g:0,b:0});
+            this.$refs.pic.setDrawStatus('none',105,null,0,1,{r:255,g:0,b:0});
             this.isMark='0';//标记
             this.annotationUserId=parseInt(this.userId);
         },
