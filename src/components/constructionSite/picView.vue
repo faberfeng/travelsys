@@ -2138,13 +2138,13 @@ export default {
             for(let i = 0; i < this.drawList.length;i++){
                 var item = {};
 
-                item.data = this.drawList[i].pointGroupData[0].data;
+                item.data = this.drawList[i].data;
                 item.itemId = this.drawList[i].ItemId;
                 item.id = this.drawList[i].ID_out;
                 item.isAlert = this.drawList[i].isAlert;
                 item.isBroken = this.drawList[i].isBroken;
                 item.itemName = this.drawList[i].itemName;
-                item.pointName = this.drawList[i].pointGroupData[0].name;
+                item.pointName = this.drawList[i].name;
                 item.type = this.drawList[i].typeNum;
                 item.plotInfo = JSON.stringify(this.drawList[i]);
                 item.prefix = this.drawList[i].prefix;
