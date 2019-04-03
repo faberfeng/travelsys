@@ -90,7 +90,7 @@
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
-                            <el-slider v-model="scaleValue" :max="5" :min="0.1"></el-slider>
+                            <el-slider v-model="scaleValue" :max="5" :min="0.1" :step="0.1"></el-slider>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
@@ -197,7 +197,7 @@
                             <tr>
                                 <th rowspan="2">序号</th>
                                 <th rowspan="2">监测类型</th>
-
+                                <th rowspan="2">类型标记</th>
                                 <th rowspan="2">监测内容</th>
                                 <th rowspan="2">简写</th>
                                 <th rowspan="2">测点数</th>
@@ -219,6 +219,7 @@
                                 <tr v-for="(item,index) in monitorMainTableList1" :key="index">
                                     <td v-text="index+1"></td>
                                     <td>{{item.type|monitorTypeChange()}}</td>
+                                    <td>{{item.sign}}</td>
                                     <td v-text="item.name"></td>
                                     <td v-text="item.logogram"></td>
                                     <td v-text="item.count"></td>
@@ -3621,6 +3622,7 @@ export default {
                                     },400)
                                 }
                                 this.startpointShow=false;
+                                this.isBindPoint=false;
                         }else if(response.data.cd=='-1'){
                         
                             this.$message({
@@ -3650,6 +3652,7 @@ export default {
               this.$refs.pic.Max_Select = 8;
             this.$refs.pic.Max_type = 2;
             this.startpointShow=false;
+            this.isBindPoint=false;
         },
         checkboxChange(){
             for(let i = 0; i < this.monitorMainItemList.length;i++){
