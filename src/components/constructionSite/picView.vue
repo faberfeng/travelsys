@@ -1118,7 +1118,7 @@ export default {
                             }
 
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                                 
                             }
@@ -1133,7 +1133,7 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
@@ -1147,7 +1147,7 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].pointName);
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
                                 this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
                         
@@ -1161,7 +1161,7 @@ export default {
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].data,this.drawList[i].itemName);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].itemName);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
@@ -1578,7 +1578,7 @@ export default {
             drawcontext.stroke();
 
         },
-        drawMove(drawcontext,position_,scale,radius,color,isSelected,data,pointName){
+        drawMove(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
             if(!isSelected){
@@ -2106,13 +2106,13 @@ export default {
             for(let i = 0; i < this.drawList.length;i++){
                 var item = {};
 
-                item.data = this.drawList[i].data;
+                item.data = this.drawList[i].pointGroupData[0].data;
                 item.itemId = this.drawList[i].ItemId;
                 item.id = this.drawList[i].ID_out;
                 item.isAlert = this.drawList[i].isAlert;
                 item.isBroken = this.drawList[i].isBroken;
                 item.itemName = this.drawList[i].itemName;
-                item.pointName = this.drawList[i].pointName;
+                item.pointName = this.drawList[i].pointGroupData[0].name;
                 item.type = this.drawList[i].typeNum;
                 item.plotInfo = JSON.stringify(this.drawList[i]);
                 item.prefix = this.drawList[i].prefix;
