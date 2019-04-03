@@ -1071,16 +1071,16 @@ export default {
                 let color = this.baseColor;
                 switch(this.drawtype){
                     case "move":
-                        this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                        this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                         break;
                     case "level":
-                        this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                        this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                         break;
                     case "force":
-                        this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                        this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                         break;
                     case "slanting":
-                        this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                        this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                         break;
                     case "Mark":
                         this.drawMark(this.drawcontext,this.lastMovePostion,false,1,this.baseColor);
@@ -1113,12 +1113,12 @@ export default {
                             if(this.drawing){
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[this.drawList.length - 1].position.length - 1],this.lastMovePostion);
-                                    this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                                    this.drawMove(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                                 }
                             }
 
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
+                                this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                                 
                             }
@@ -1129,11 +1129,11 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                                    this.drawLevel(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
+                                this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
@@ -1143,11 +1143,11 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                                    this.drawForce(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name);
+                                this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].pointGroupData[0].name,this.drawList[i].pointGroupData[0].drawItemTagType);
                                 this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
                         
@@ -1157,11 +1157,11 @@ export default {
                                 
                                 if(this.drawMaxCount == 2 && this.drawList[this.drawList.length - 1].position.length > 0 && this.drawCount != this.drawMaxCount && this.drawtype == this.drawList[i].type){
                                     this.drawLine(this.drawcontext,this.drawList[this.drawList.length - 1].position[this.drawList[i].position.length - 1],this.lastMovePostion);
-                                    this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","");
+                                    this.drawSlanting(this.drawcontext,this.lastMovePostion,this.pointScale,7.5,color,false,"","",this.drawItemTagType);
                                 }
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
-                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].itemName);
+                                this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,this.drawList[i].pointGroupData[0].data,this.drawList[i].itemName,this.drawList[i].pointGroupData[0].drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
                         
