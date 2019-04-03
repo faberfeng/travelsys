@@ -1122,7 +1122,7 @@ export default {
                                 var data = "";
                                 var name = "";
                                 if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
@@ -1145,7 +1145,7 @@ export default {
                                 var data = "";
                                 var name = "";
                                 if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
@@ -1167,7 +1167,7 @@ export default {
                                 var data = "";
                                 var name = "";
                                 if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
@@ -1189,7 +1189,7 @@ export default {
                                 var data = "";
                                 var name = "";
                                 if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].drawItemTagType;
+                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
@@ -1613,6 +1613,20 @@ export default {
         drawMove(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
+
+            if(type == "W" ){color.r =   0;color.g = 255;color.b = 255;}
+            if(type == "LZ"){color.r = 255;color.g =   0;color.b = 255;}
+            if(type == "DB"){color.r =   0;color.g =   0;color.b =   0;}
+            if(type == "F" ){color.r = 255;color.g =   0;color.b =   0;}
+            if(type == "FC"){color.r =   0;color.g = 255;color.b = 255;}
+            if(type == "YS"){color.r =   0;color.g =   0;color.b =   0;}
+            if(type == ""  ){color.r =   0;color.g =   0;color.b =   0;}
+            if(type == "DL"){color.r =   0;color.g = 255;color.b =   0;}
+            if(type == "MQ"){color.r = 255;color.g =   0;color.b = 255;}
+            if(type == "SS"){color.r =   0;color.g = 255;color.b = 255;}
+            if(type == "DX"){color.r =   0;color.g =   0;color.b = 255;}
+            if(type == "SS"){color.r = 255;color.g = 127;color.b = 127;}
+
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
@@ -1622,15 +1636,64 @@ export default {
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                2*Math.PI);
-            drawcontext.stroke();
-            drawcontext.fill();
+            if(type != "LZ" && type != "FC"){
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale * this.ResolutionScale * this.Koeffzient,
+                    0,
+                    2*Math.PI);
+                drawcontext.stroke();
+                drawcontext.fill();
+            }
+
+            if(type == "LZ"){
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    0,
+                    2*Math.PI);
+                drawcontext.stroke();
+
+                drawcontext.beginPath();
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale - radius * scale);
+                
+                drawcontext.closePath();//结束路径状态
+                drawcontext.fill();
+
+                drawcontext.stroke();
+            }
+
+            if(type == "FC"){
+                
+                drawcontext.lineWidth= radius * scale / 2;
+
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale / 4 * 3,
+                    0,
+                    2*Math.PI);
+                drawcontext.stroke();
+                
+                // drawcontext.fill();
+
+                drawcontext.stroke();
+            }
 
             if(this.displayLabel){
                 if(data){
@@ -1649,6 +1712,10 @@ export default {
         drawLevel(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
+
+            if(type == "SW" ){color.r =   0;color.g =   0;color.b = 255;}
+            if(type == "CYS"){color.r =   0;color.g =   0;color.b = 255;}
+
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
@@ -1658,24 +1725,83 @@ export default {
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                0,
-                Math.PI);
-            drawcontext.stroke();
-            drawcontext.fill();
+            if(type == "SW" ){
 
-            drawcontext.beginPath();
-            drawcontext.arc(
-                position.x * this.ResolutionScale * this.scale ,
-                position.y * this.ResolutionScale * this.scale,
-                radius * scale,
-                Math.PI,
-                2 * Math.PI);
-            drawcontext.stroke();
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale ,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    0,
+                    Math.PI);
+                drawcontext.stroke();
+                drawcontext.fill();
+
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale ,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    Math.PI,
+                    2 * Math.PI);
+                drawcontext.stroke();
+            }
+
+            if(type == "CYS" ){
+
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale ,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    0,
+                    Math.PI);
+                drawcontext.stroke();
+                drawcontext.fill();
+
+                drawcontext.beginPath();
+                drawcontext.arc(
+                    position.x * this.ResolutionScale * this.scale ,
+                    position.y * this.ResolutionScale * this.scale,
+                    radius * scale,
+                    Math.PI,
+                    2 * Math.PI);
+
+                drawcontext.stroke();
+
+                drawcontext.beginPath();
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 5 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 ),
+                );
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 5 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 ),
+                );
+                drawcontext.stroke();
+
+                drawcontext.beginPath();
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 3 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 ),
+                );
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 3 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 ),
+                );
+                drawcontext.stroke();
+
+                 drawcontext.beginPath();
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 2.2 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 ),
+                );
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 2.2 ),
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 ),
+                );
+                drawcontext.stroke();
+            }
 
             if(this.displayLabel){
                 if(data){
@@ -1694,6 +1820,12 @@ export default {
         drawForce(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
+
+            if(type == "ZL"){color.r =   0;color.g = 255;color.b = 0;}
+            if(type == "YL"){color.r =   0;color.g = 255;color.b = 0;}
+            if(type == "TY"){color.r =   0;color.g = 255;color.b = 0;}
+            if(type == "SY"){color.r =   0;color.g = 255;color.b = 0;}
+
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
             }else{
@@ -1703,11 +1835,72 @@ export default {
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            drawcontext.fillRect(
-            position.x * this.ResolutionScale * this.scale - radius * scale,
-            position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
-            radius * scale * 2,
-            radius * 0.75 * scale * 2);
+            if(type == "ZL"){
+
+                drawcontext.fillRect(
+                position.x * this.ResolutionScale * this.scale - radius * scale,
+                position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
+                radius * scale * 2,
+                radius * 0.75 * scale * 2);
+            }
+
+            if(type == "YL"){
+
+                drawcontext.beginPath();
+                drawcontext.moveTo(
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2);
+
+                drawcontext.lineTo(
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale + radius * scale);
+                
+                drawcontext.closePath();//结束路径状态
+                drawcontext.fill();
+
+                drawcontext.stroke();
+            }
+
+            if(type == "TY"){
+
+                drawcontext.fillRect(
+                position.x * this.ResolutionScale * this.scale - radius * scale,
+                position.y * this.ResolutionScale * this.scale - radius * 0.25 * scale,
+                radius * scale * 2,
+                radius * 0.5 * scale * 2);
+
+                drawcontext.beginPath();
+                
+                drawcontext.rect(
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2,
+                    radius * scale,
+                    radius * scale);
+
+                drawcontext.stroke();
+            }
+
+            if(type == "SY"){
+                drawcontext.fillRect(
+                position.x * this.ResolutionScale * this.scale - radius * scale / 2,
+                position.y * this.ResolutionScale * this.scale - radius * 0.0 * scale,
+                radius * scale,
+                radius * 0.5 * scale * 2);
+
+                drawcontext.beginPath();
+                
+                drawcontext.rect(
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
+                    position.y * this.ResolutionScale * this.scale - radius * scale,
+                    radius * scale,
+                    radius * scale * 2);
+
+                drawcontext.stroke();
+            }
 
             if(this.displayLabel){
                 if(data){
@@ -1723,13 +1916,13 @@ export default {
                 }
             }
         },
-        drawSlanting(drawcontext,position_,scale,radius,color,isSelected,data,pointName,){
+        drawSlanting(drawcontext,position_,scale,radius,color,isSelected,data,pointName,type){
             var position = this.rotate_XY_display(position_);
             var color_="";
 
-            if(type == "CX"){color = 'rgb(255,255,4)';}
-            if(type == "TX"){color = 'rgb(0,0,0)';}
-            if(type == "QX"){color = 'rgb(5,255,5)';}
+            if(type == "CX"){color.r = 255;color.g = 0;color.b = 0;}
+            if(type == "TX"){color.r = 0;color.g = 0;color.b = 0;}
+            if(type == "QX"){color.r = 0;color.g = 255;color.b = 0;}
 
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1782,21 +1975,19 @@ export default {
                 drawcontext.beginPath();
                 
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
+                    position.x * this.ResolutionScale * this.scale + radius * scale / 2,
                     position.y * this.ResolutionScale * this.scale - radius * scale);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale / 2,
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
                     position.y * this.ResolutionScale * this.scale + radius * scale);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale / 2,
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
                     position.y * this.ResolutionScale * this.scale - radius * scale);
                 
                 drawcontext.closePath();//结束路径状态
-        　　　　　//绘制状态
-                drawcontext.fillStyle=color;//填充颜色
-                drawcontext.fill();//
+                drawcontext.fill();
 
                 drawcontext.stroke();
             }
@@ -1975,6 +2166,8 @@ export default {
             this.prefix = prefix;
             this.startNo = startNo;
             this.Koeffzient = value;
+
+            this.Refresh();
 
             console.log(this.prefix,this.startNo,this.Koeffzient);
         },
