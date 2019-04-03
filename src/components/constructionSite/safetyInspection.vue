@@ -779,10 +779,10 @@
                     <button class="editBtnC"  @click="exportReport(selectUgId,consultValue,userValue,monitorCompany,monitorBaseMapId)" >生成</button>
                 </div>
             </el-dialog>
-             <el-dialog title="测点变化曲线" :visible="moreSpotShow" @close="moreSpotCancle()">
+             <el-dialog title="测点变化曲线"  :visible="moreSpotShow" @close="moreSpotCancle()">
                     <div v-if="moreSpotShow">
-                        <vue-highcharts v-show="typeSpotShow"  id="spotChangeLine" style="max-height:500px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
-                        <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:500px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
+                        <vue-highcharts v-show="typeSpotShow"  id="spotChangeLine" style="max-height:600px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                        <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:600px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
                     </div>
             </el-dialog>
         </div>
@@ -4280,41 +4280,6 @@ export default {
         //获取测点集合内的测点信息
         getPointByPointGroupId(data){
             var vm=this;
-// 返回一个promise对象
-            // return new Promise((resolve, reject) => {
-            //     axios({
-            //             url: vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
-            //             method: 'post',
-            //             headers:{
-            //                 'token':vm.token
-            //             },
-            //             data: id
-            //         }).then((res) => {
-            //             resolve(res.data);
-            //             // console.log(res);
-            //             }).catch(function (error) {
-            //             reject(error);
-            //             // console.log(error);
-            //         });
-            // });
-  
-
-
-            // $.ajax({
-            //     type:'POST',
-            //     url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
-            //     dataType:'json',
-            //     data:data, //该测点的数据
-            //     headers: {
-            //          'token':vm.token,
-            //         'Content-Type': 'application/x-www-form-urlencoded'
-            //     },
-            //     async:false,
-            //     success:function(response){
-            //             vm.dataList=response.rt
-            //     }
-            // })
-            // return vm.dataList;
             axios({
                 url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
                 method:'post',
@@ -4336,10 +4301,8 @@ export default {
                      })
                  })
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
-                 console.log(this.monitorPointInfo,'this.monitorPointInfo');
-                //  vm.dataLists.push(vm.dataList);
+                 console.log(this.monitorPointInfo,'this.monitorPointInfo');  
             })
-            // console.log(vm.dataLists,'vm.dataLists');
         },
         //获取监测项目最后一个点位名称
         getMaxPointNameByItemId(){
