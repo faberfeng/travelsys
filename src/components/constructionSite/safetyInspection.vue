@@ -2012,6 +2012,7 @@ export default {
                     this.drawItemName=item
                 }
             })
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
             if(this.isClick1==true){
                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,1);
             }else if(this.isClick2==true){
@@ -4396,7 +4397,7 @@ export default {
                         keyword:vm.monitorKeyword,
                         baseMapId:vm.monitorBaseMapId,
                         directoryId:vm.directoryType,
-                        sign:vm.typeTag
+                        sign:vm.typeTagValue
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
@@ -4408,7 +4409,7 @@ export default {
                         this.monitorLogogram='';
                         this.monitorKeyword='';
                         this.currentPage1=1;
-                        vm.typeTag='CX'
+                        vm.typeTagValue=''
                         // this.monitorBaseMapId='';
                         this.$message({
                             type:'success',
@@ -6466,6 +6467,12 @@ export default {
                     }).then((response)=>{
                         if(response.data.cd==0){
                             this.getAllMonitorPoint();
+                            this.getMonitorMainTable();
+                            this.isClick6=false;
+                            this.$message({
+                                type:'sucess',
+                                message:'删除点位集合成功'
+                            })
                         }
                     })
                 }
