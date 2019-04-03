@@ -77,7 +77,7 @@
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
                                     <div class="projectListImg">
-                                        <img :src="item.createUserImg != null?(BDMSUrl+'user/avater?userId='+item.ugId):require('../../assets/people.png')">
+                                        <img :src="item.createUserImg != null?(BDMSUrl+'user/avater?userId='+item.createUser):require('../../assets/people.png')">
                                     </div> 
                                     <div class="projectListText">
                                         <span class="action_rightBox">

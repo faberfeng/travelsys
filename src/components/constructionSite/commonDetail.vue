@@ -127,6 +127,7 @@
                                 <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
+                                    <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <button title="定位" class="location actionBtn"></button>
                                     <button title="曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
                                 </td>
@@ -480,6 +481,7 @@ export default Vue.component('commonDetail',{
             getPointDatasList1:[],
             getPointDatasListLength:0,//数据表格长度
             pointId:'',//监测id
+            currentPointId:'',//当前点位id
             pointName:'',//监测名称
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
@@ -528,6 +530,7 @@ export default Vue.component('commonDetail',{
             saveDrawShow:false,
             pageSize:10,
             monitorPointInfo:'',
+            dataLists:'',
             getDetailPointInfoList:'',
             getImportHistoryList:'',//获取导入历史
             isAlertNum:0,
@@ -731,7 +734,7 @@ export default Vue.component('commonDetail',{
         this.getUserByUserGroup();
         this.getItemDutyUser();
         this.getMonitorItem();
-        this.getAlertArguments();
+        // this.getAlertArguments();
         this.getBaseMapInfoByBaseMapId();
         this.getDetailPointInfo();
         this.getDetectionItemCollectWay();
@@ -1257,21 +1260,56 @@ export default Vue.component('commonDetail',{
             var vm=this;
             axios({
                 method:'post',
-                url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                // url:vm.BDMSUrl+'detectionInfo/getAllMonitorPoint',
+                url:vm.BDMSUrl+'detectionInfo/getPointGroups',
                 headers:{
                     'token':vm.token
                 },
                 params:{
-                    userGroupId:vm.userGroupId
+                    // userGroupId:vm.userGroupId,
+                    baseMapId:vm.itemSubmitbaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
-                    this.isAlert=this.monitorPointInfo[0].isAlert;
-                    this.isBroken=this.monitorPointInfo[0].isBroken;
-                    this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    var data=[];
+                    this.monitorPointInfo.forEach((item)=>{
+                        data.push(item.id);
+                    })
+                    this.getPointByPointGroupId(data);
+
+                    // this.isAlert=this.monitorPointInfo[0].isAlert;
+                    // this.isBroken=this.monitorPointInfo[0].isBroken;
+                    // this.$refs.pic.loadPoints(this.monitorPointInfo);
                     this.displayInspectSpot();
                 }
+            })
+        },
+         getPointByPointGroupId(data){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
+                method:'post',
+                headers:{
+                    'token':vm.token
+                },
+                data:data,
+            }).then((response)=>{
+                 vm.dataLists=response.data.rt;
+                //  console.log(vm.dataLists,'vm.dataList');
+                 this.monitorPointInfo.forEach((item)=>{
+                      var a=[]
+                     vm.dataLists.forEach((item1)=>{
+                        
+                         if(item.id==item1.pointGroupId){
+                             a.push(item1);
+                            vm.$set(item,'pointGroupData',a);
+                         }
+                     })
+                 })
+                  this.$refs.pic.loadPoints(this.monitorPointInfo);
+                  this.displayInspectSpot()
+                 console.log(this.monitorPointInfo,'this.monitorPointInfo');  
             })
         },
         drawFinish(){
@@ -1473,8 +1511,11 @@ export default Vue.component('commonDetail',{
             
         },
         //获取警报参数
-        getAlertArguments(){
+        getAlertArguments(id){
             var vm=this;
+            this.variationAlertTotal='';
+            this.variationAlertDay='';
+            this.variationAlertHour='';
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getAlertArguments',
@@ -1482,7 +1523,8 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.itemMonitorId
+                    itemId:this.itemMonitorId,
+                    pointId:id
                 }
             }).then((response)=>{
                 if(response.data.rt){
@@ -1503,23 +1545,38 @@ export default Vue.component('commonDetail',{
         },
         //编辑警报参数
         editAlertArgumentsMakeSure(){
+            
             var vm=this;
+            var data={};
+            if(this.currentPointId){
+                data={
+                    itemId:this.itemMonitorId,
+                    variationAlertTotal:this.variationAlertTotal,
+                    variationAlertDay:this.variationAlertDay,
+                    variationAlertHour:this.variationAlertHour,
+                    pointId:this.currentPointId
+                }
+            }else{
+                data={
+                    itemId:this.itemMonitorId,
+                    variationAlertTotal:this.variationAlertTotal,
+                    variationAlertDay:this.variationAlertDay,
+                    variationAlertHour:this.variationAlertHour
+                }
+            }
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/editAlertArguments',
                 headers:{
                     'token':this.token
                 },
-                params:{
-                    itemId:this.itemMonitorId,
-                    variationAlertTotal:this.variationAlertTotal,
-                    variationAlertDay:this.variationAlertDay,
-                    variationAlertHour:this.variationAlertHour
-                }
+                params:data
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.editAlertValueShow=false;
-                    this.getAlertArguments();
+                    if(this.currentPointId){
+                         this.getAlertArguments(this.currentPointId);
+                    }
                     this.getAllMonitorPoint();
                     this.getDetailPointInfo();
                     this.$message({
@@ -1534,9 +1591,18 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        editWarn(id){
+            this.currentPointId=id;
+            this.editAlertValueShow=true;
+            this.getAlertArguments(id);
+        },
         editAlertValueBtn(){
             this.editAlertValueShow=true;
-            this.getAlertArguments();
+            this.variationAlertTotal='';
+            this.variationAlertDay='';
+            this.variationAlertHour='';
+            this.currentPointId='';
+            // this.getAlertArguments();
         },
 
         //编辑相关人员
