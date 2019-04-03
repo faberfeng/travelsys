@@ -4249,10 +4249,8 @@ export default {
                 })
         },
         //获取测点集合内的测点信息
-        getPointByPointGroupId(id){
+        getPointByPointGroupId(data){
             var vm=this;
-            var data=[];
-            data.push(id);
 // 返回一个promise对象
             // return new Promise((resolve, reject) => {
             //     axios({
@@ -4297,13 +4295,18 @@ export default {
                 data:data,
             }).then((response)=>{
                  vm.dataList=response.data.rt;
+                 console.log(vm.dataList,'vm.dataList');
                  this.monitorPointInfo.forEach((item)=>{
                      vm.dataList.forEach((item1)=>{
+                         var a=[]
                          if(item.id==item1.pointGroupId){
-                             vm.$set(item,'pointGroupData',item1)
+                             a.push(item1);
+                            vm.$set(item,'pointGroupData',a);
                          }
                      })
                  })
+                  this.$refs.pic.loadPoints(this.monitorPointInfo);
+                //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
                 //  vm.dataLists.push(vm.dataList);
             })
             // console.log(vm.dataLists,'vm.dataLists');
@@ -6537,6 +6540,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
+                    var data=[];
                     this.monitorPointInfo.forEach((item)=>{
                         // if(item.data==null){
                         //     return;
@@ -6546,10 +6550,18 @@ export default {
                         // console.log(item.data,'item.data');
                         // item.data.toFixed(3)
                         // vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
-                        this.getPointByPointGroupId(item.id);
+
+                        // this.getPointByPointGroupId(item.id);
+                        data.push(item.id);
                     })
-                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
-                    this.$refs.pic.loadPoints(this.monitorPointInfo);
+                    this.getPointByPointGroupId(data);
+
+                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    
+                    // setTimeout(()=>{
+                    //         
+                    // },2000)
+                    
                     // this.getTagList();
                 }
             })
