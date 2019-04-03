@@ -1464,6 +1464,7 @@ export default {
             ],
             selectTypeTagList:[],
             dataList:[],
+            dataLists:[],
         }
     },
     created(){
@@ -2018,6 +2019,7 @@ export default {
         picView_status_changed(status,list){
             console.log(list,'选中的东西');
             this.listLength=list.length;
+            this.plotGroup=list[0].pointGroupData;
             if(this.listLength==1){
                 this.isBindPoint=true;
             }else{
@@ -4249,21 +4251,62 @@ export default {
         //获取测点集合内的测点信息
         getPointByPointGroupId(id){
             var vm=this;
-            $.ajax({
-                type:'get',
+            var data=[];
+            data.push(id);
+// 返回一个promise对象
+            // return new Promise((resolve, reject) => {
+            //     axios({
+            //             url: vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
+            //             method: 'post',
+            //             headers:{
+            //                 'token':vm.token
+            //             },
+            //             data: id
+            //         }).then((res) => {
+            //             resolve(res.data);
+            //             // console.log(res);
+            //             }).catch(function (error) {
+            //             reject(error);
+            //             // console.log(error);
+            //         });
+            // });
+  
+
+
+            // $.ajax({
+            //     type:'POST',
+            //     url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
+            //     dataType:'json',
+            //     data:data, //该测点的数据
+            //     headers: {
+            //          'token':vm.token,
+            //         'Content-Type': 'application/x-www-form-urlencoded'
+            //     },
+            //     async:false,
+            //     success:function(response){
+            //             vm.dataList=response.rt
+            //     }
+            // })
+            // return vm.dataList;
+            axios({
                 url:vm.BDMSUrl+'detectionInfo/getPointByPointGroupId',
-                data:{
-                    pointGroupId:id //该测点的数据
-                },
-                headers: {
+                method:'post',
+                headers:{
                     'token':vm.token
                 },
-                async:false,
-                success:function(response){
-                    vm.dataList=response.rt
-                }
+                data:data,
+            }).then((response)=>{
+                 vm.dataList=response.data.rt;
+                 this.monitorPointInfo.forEach((item)=>{
+                     vm.dataList.forEach((item1)=>{
+                         if(item.id==item1.pointGroupId){
+                             vm.$set(item,'pointGroupData',item1)
+                         }
+                     })
+                 })
+                //  vm.dataLists.push(vm.dataList);
             })
-            return vm.dataList;
+            // console.log(vm.dataLists,'vm.dataLists');
         },
         //获取监测项目最后一个点位名称
         getMaxPointNameByItemId(){
@@ -6502,9 +6545,10 @@ export default {
                         // }
                         // console.log(item.data,'item.data');
                         // item.data.toFixed(3)
-                        vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
+                        // vm.$set(item,'pointGroupData',this.getPointByPointGroupId(item.id));
+                        this.getPointByPointGroupId(item.id);
                     })
-                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                     console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     this.$refs.pic.loadPoints(this.monitorPointInfo);
                     // this.getTagList();
                 }

@@ -76,7 +76,8 @@
                             <!-- checkedRound.checked || -->
                             <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
                             <!-- checkedRound.checked || -->
-                            <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&outsideShare" @click="shareURL">分享</li>
+                            <!-- &&outsideShare -->
+                            <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)" @click="shareURL">分享</li>
                             <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
                         </ul>
                     </p>

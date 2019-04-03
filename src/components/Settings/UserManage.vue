@@ -45,7 +45,7 @@
                         <td v-text="val.remark"></td>
                         <td>
                             <span class="editIcon" @click="addUser(val.name2,val.userId,val.remark)"></span>
-                            <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.id)"></span>
+                            <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.userId)"></span>
                         </td>
                     </tr>
                 </tbody>
@@ -1519,18 +1519,20 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                var arr = [key]
-                    console.log(arr)
+                // var arr = [key]
+                    // console.log(arr)
                     axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'project2/Config/delProjectUser',
+                        // url:vm.BDMSUrl+'project2/Config/delProjectUser',
+                        url:vm.BDMSUrl+'user/deleteUser',
                         headers:{
                             'token':vm.token
                         },
                         params:{
-                          projId:vm.projId  
+                          projectId:vm.projId,
+                          userId:key
                         },
-                        data:arr
+                        // data:arr
                     }).then((response)=>{
                         vm.$message({
                             type: 'success',
@@ -1541,10 +1543,10 @@ export default {
                         console.log(err)
                     })
             }).catch(() => {
-            vm.$message({
-                type: 'info',
-                message: '已取消删除'
-            });          
+                vm.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
             });
         }
   }
