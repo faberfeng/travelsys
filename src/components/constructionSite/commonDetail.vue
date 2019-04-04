@@ -245,7 +245,7 @@
                     </ul>
                 </div>
             </el-dialog>
-            <el-dialog title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()">
+            <el-dialog width="1000px" title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()" >
                     <div style="margin-bottom:20px;">
                         <el-date-picker
                             v-model="selectValue"
@@ -270,7 +270,7 @@
                     </div>
                     
                     <div v-if="spotChangeLineShow">
-                        <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                        <vue-highcharts  id="spotChangeLine" style="max-height:900px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
             </el-dialog>
             <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
@@ -958,9 +958,9 @@ export default Vue.component('commonDetail',{
         displayInspectSpot(){
             // console.log(this.commonMonitorMainItemList);
              for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
-                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].id,this.commonMonitorMainItemList[i].spotNum);
+                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].sign,this.commonMonitorMainItemList[i].spotNum);
             }
-            this.$refs.pic.enableType(this.itemMonitorType,this.itemMonitorId,true);
+            this.$refs.pic.enableType(this.itemMonitorType,this.itemSubmitSign,true);
             // console.log('触发')
         },
         baseMapCancle(){
@@ -1369,12 +1369,15 @@ export default Vue.component('commonDetail',{
                     this.monitorPointInfo.forEach((item)=>{
                         data.push(item.id);
                     })
-                    this.getPointByPointGroupId(data);
+                    if(data.length>0){
+                        this.getPointByPointGroupId(data);
+                    }
+                    
 
                     // this.isAlert=this.monitorPointInfo[0].isAlert;
                     // this.isBroken=this.monitorPointInfo[0].isBroken;
                     // this.$refs.pic.loadPoints(this.monitorPointInfo);
-                    this.displayInspectSpot();
+                    // this.displayInspectSpot();
                 }
             })
         },
@@ -2460,9 +2463,7 @@ export default Vue.component('commonDetail',{
         font-style:normal
     }
     li{list-style: none}
-    #edit .el-dialog{
-        width: 800px !important;
-    }
+    #edit 
     select.autoImport{
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
                 /*很关键：将默认的select选择框样式清除*/  
@@ -2919,6 +2920,13 @@ export default Vue.component('commonDetail',{
 
         }
         #edit{
+            .el-dialog__wrapper{
+                .el-dialog{
+                    width: 900px;
+                }
+
+            }
+            
             .searchBtn{
                 display: inline-block;
                 width: 54px;

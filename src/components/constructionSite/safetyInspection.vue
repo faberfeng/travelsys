@@ -374,7 +374,7 @@
 
              <el-dialog title="绑定监测内容" :visible="bindInspectContentShow" @close="bindInspectContentCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="drawItemId" @change="changeType()" ><option v-for="(item,index) in monitorMainItemList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                    <div class="editBodyone"><label class="editInpText" style="margin-left:80px;">监测目录:</label><select class="editSelect" style="width:270px;" v-model="drawItemId" @change="changeType()" ><option v-for="(item,index) in monitorMainItemList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="bindMonitorItem()" >确定</button>
@@ -6620,9 +6620,9 @@ export default {
                     this.monitorPointInfo.forEach((item)=>{
                         data.push(item.id);
                     })
-                     
-                    this.getPointByPointGroupId(data);
-
+                    if(data.length>0){
+                        this.getPointByPointGroupId(data);
+                    }
                     //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     
                     // this.getTagList();
@@ -8402,7 +8402,7 @@ export default {
                 background-size: 100% 100%;
                 content: '';
                 top: 118px;
-                right: 293px;
+                right: 204px;
             }
             .inpSmall{
                 width: 120px;
