@@ -235,7 +235,7 @@
                                         <button title="编辑" v-show="editInspectWordEdit" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
                                         <button title="上移" v-show="editInspectWordEdit" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
                                         <button title="下移" v-show="editInspectWordEdit" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" v-show="searchInspectDetailEdit" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count)"></button>
+                                        <button title="详情" v-show="searchInspectDetailEdit" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count,item.sign)"></button>
                                         <button title="导入" v-show="importDataEdit" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
@@ -273,7 +273,7 @@
             <!-- 以下是巡视报告 -->
             <walkThrough v-if="walkThroughShow" v-on:back="backToH" :userSelectId="selectUgId"></walkThrough>
             <!-- 以下是除斜度的其他详情页 -->
-            <commonDetail v-if="commonDetailShow" ref="commonDetailRef" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :paramsListsSub="paramsLists" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType"></commonDetail>
+            <commonDetail v-if="commonDetailShow" ref="commonDetailRef" v-on:back="backToH" v-on:baseMapEmit="getBaseMapListBtn()"  v-on:importDataShow="importDataShow" :projctName="surveyName" :paramsListsSub="paramsLists" :itemMonitorKeyWord="itemSubmitKeyWord" :itemSubmitbaseMapId="itemSubmitbaseMapId" :itemSubmitCount="itemSubmitCount" :userGroupId="selectUgId" :itemMonitorId="detailMonitorId" :itemMonitorType="itemType" :itemSubmitSign="itemSign"></commonDetail>
         </div>
         <div id="edit">
             <el-dialog title="底图管理" :visible="baseMapShow" @close="baseMapCancle()" width="740px">
@@ -1794,7 +1794,8 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getBaseMapList();
+                    // this.getBaseMapList();
+                    this.getBaseMapInfoByBaseMapId();
                 }
             })
         },
@@ -3808,7 +3809,7 @@ export default {
                                 // this.BDMSUrl+
                                 this.curBaseMapUrl=item.relativeUri;
                                 this.monitorBaseMapId=item.id;
-                                this.scaleValue=item.zoom;
+                                // this.scaleValue=item.zoom;
                                 this.getBaseMapInfoByBaseMapId();
                                 this.getAllMonitorPoint();
 
@@ -3895,6 +3896,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.getBaseMapInfoByBaseMapIdList=response.data.rt;
                     this.angle=this.getBaseMapInfoByBaseMapIdList.rotate;
+                    this.scaleValue=this.getBaseMapInfoByBaseMapIdList.zoom;
                     if(this.angle==null){
                         this.angle=0;
                     }
@@ -4322,6 +4324,7 @@ export default {
                      })
                  })
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
+                  this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                  console.log(this.monitorPointInfo,'this.monitorPointInfo');  
             })
         },
@@ -5962,13 +5965,15 @@ export default {
             })
         },
         //监测内容详情页
-        detail(keyword,id,type,name,baseMapId,count){
+        detail(keyword,id,type,name,baseMapId,count,sign){
             this.surveyName=name;
             this.detailMonitorId=id;
             this.itemType=type;
             this.itemSubmitKeyWord=keyword;
             this.itemSubmitbaseMapId=this.monitorBaseMapId;
             this.itemSubmitCount=count;
+            this.itemSign=sign;
+
             if(type==5){
                 this.pitchDetailShow=true;
             }else{
@@ -6572,10 +6577,12 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
+                    console.log(this.monitorPointInfo,'this.monitorPointInfo');
                     var data=[];
                     this.monitorPointInfo.forEach((item)=>{
                         data.push(item.id);
                     })
+                     
                     this.getPointByPointGroupId(data);
 
                     //  console.log(this.monitorPointInfo,'this.monitorPointInfo');

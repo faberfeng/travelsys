@@ -438,7 +438,7 @@ import pdf from 'vue-pdf'
 import data from '../Settings/js/date';
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonDetail',{
-    props:['projctName','itemMonitorId','itemMonitorType','userGroupId','itemMonitorKeyWord','paramsListsSub','itemSubmitbaseMapId','itemSubmitCount'],
+    props:['projctName','itemMonitorId','itemSubmitSign','itemMonitorType','userGroupId','itemMonitorKeyWord','paramsListsSub','itemSubmitbaseMapId','itemSubmitCount'],
     components:{
             pdf,picView,VueHighcharts
     },
@@ -944,7 +944,7 @@ export default Vue.component('commonDetail',{
             this.isClick7=false;
             this.isClick8=false;
             this.saveDrawShow=true;
-            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,1);
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemSubmitSign,this.itemMonitorId,1);
             
         },
         //连续
@@ -960,7 +960,7 @@ export default Vue.component('commonDetail',{
             this.isClick7=false;
             this.isClick8=false;
             this.saveDrawShow=true;
-            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemMonitorId,2);
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemSubmitSign,this.itemMonitorId,2);
             
         },
         //文字
