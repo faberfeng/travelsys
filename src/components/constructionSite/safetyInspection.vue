@@ -153,15 +153,17 @@
                             <picView ref="pic" @load_points="getAllMonitorPoint" @finish="drawFinish" @status_changed="picView_status_changed" :para="paramsLists" @Broken_changed="brokenChanged"   @Image_Mark="add"></picView>
                         </div>
                         <div class="leftTopMonitorContent">
+                            <fileTree ref="fileTree" id="fileTree" @clickIcon="clickIcon"  @clickCheck="checkboxChange" :treeData="getDetectionDirectoryListLeft"></fileTree>
+
                             <!-- <el-checkbox v-model="spotNum0" style="display:block;width:120px;text-align:left">周边管线水平位移</el-checkbox> -->
-                            <el-tree 
+                            <!-- <el-tree 
                             :highlight-current="true"
                             :show-checkbox="true"
                             @check="checkChange()"
                             :default-checked-keys="defaultCheckedKeys"
                             id="contentTree" ref="contentTree" :data="getDetectionDirectoryListLeft" node-key="id" :props="defaultProps">
 
-                            </el-tree>
+                            </el-tree> -->
                             <!-- <ul>
                                 <li v-for="(item,index) in monitorMainItemList" :key="index">
                                     <el-checkbox v-model="item.spotNum" @change="checkboxChange()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">
@@ -357,11 +359,12 @@
                     <div class="editBodytwo"><label class="editInpText">类型标记:</label><select class="editSelect" v-model="typeTagValue" ><option v-for="(item,index) in selectTypeTagList" :value="item.value" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao"></i></div>
                     <div class="editBodytwo"><label class="editInpText">简写:</label><input class="inpSmall" style="height:32px !important" v-model="monitorLogogram" placeholder="两个字母" /></div>
                     <div class="editBodytwo" v-show="monitorType==5?false:true"><label class="editInpText">关键词:</label><input class="inp" style="height:32px !important" v-model="monitorKeyword" placeholder="与导入Excel表名匹配" /></div>
-                    <div  class="editBodytwo editBodytwo1"  v-show="monitorType==5?false:true&&false"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
-                        <!-- <img v-show="monitorBaseMapId" style="object-fit: contain;" class="addbaseMapImg" :src="QJFileManageSystemURL+monitorBaseMapUrl" > -->
+                    <!-- <div  class="editBodytwo editBodytwo1"  v-show="monitorType==5?false:true&&false"><label class="editInpText editInpText1">底图:</label><div class="addbaseMap" @mouseenter="changeActive()" @mouseleave="removeActive()">
+                        
                         <img v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='jpg'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='png'" class="addbaseMapImg" style="object-fit: contain;" :src="QJFileManageSystemURL+monitorBaseMapUrl">
                         <pdf v-show="monitorBaseMapId&monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='pdf'||monitorBaseMapUrl.substr(monitorBaseMapUrl.length-3)=='PDF'" class="addbaseMapImg" ref="pdfDocument" id="drawingPdf"  :src="QJFileManageSystemURL+monitorBaseMapUrl"></pdf>
-                        <div class="addbaseMapHover" v-show="hoverShow"><label class="hoverTxt" @click="clickChange()">点击更换</label></div></div></div>
+                        <div class="addbaseMapHover" v-show="hoverShow"><label class="hoverTxt" @click="clickChange()">点击更换</label></div></div>
+                    </div> -->
                 </div>
                 <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="addMonitorItem()" >确定</button>
@@ -803,10 +806,11 @@ import commonDetail from './commonDetail.vue'//除斜度的详情页
 import picView from './picView.vue'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import fileTree from './fileTree.vue' //树形组件
 var echarts = require('echarts');
 export default {
     components: {
-        pdf,commonPitchDetail,commonDetail,walkThrough,picView,VueHighcharts,jsPDF,html2canvas
+        pdf,commonPitchDetail,commonDetail,walkThrough,picView,VueHighcharts,jsPDF,html2canvas,fileTree
     },
     name:'safetyInspection',
     data(){
@@ -1323,6 +1327,8 @@ export default {
             moduleList:'',
             projAuth:'',
             getDetectionDirectoryListLeft:[],
+            flodShow:true,
+            clickId:'',
             getDetectionDirectoryList:'',
             getDetectionDirectoryLists:[],
             pointNameValue:'',//测点名称
@@ -2028,8 +2034,9 @@ export default {
                 if(item.id==this.drawItemId){
                     this.drawItemType=item.type;
                     this.drawItemTagType=item.sign; //这个是类型标记，一共有20种，分别有编号。
-                    this.pointNameValue=item.logogram;
-                    this.pointNumValue='01';
+                    // this.pointNameValue=item.logogram;
+                    // this.pointNumValue='01';
+                    this.getMaxPointNameByItemId(this.drawItemId);
                     this.drawItemName=item
                 }
             })
@@ -3676,7 +3683,9 @@ export default {
             this.startpointShow=false;
             this.isBindPoint=false;
         },
-        checkboxChange(){
+        checkboxChange(data){
+            console.log(data,'data');
+
             for(let i = 0; i < this.monitorMainItemList.length;i++){
                 this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].id,this.monitorMainItemList[i].spotNum);
             }
@@ -3951,7 +3960,7 @@ export default {
              var vm=this;
             vm.addInspectContentShow=true;
             vm.typeChange(vm.monitorType);
-            this.getDetectionDirectoryLists();
+            this.getDetectionDirectorys();
         },
         //配置监测目录
         configureMonitorItemBtn(){
@@ -3959,6 +3968,13 @@ export default {
             vm.configureContentShow=true;
             this.getDetectionDirectory();
             this.getDetectionDirectorys();
+        },
+        clickIcon(data){
+            if(data.children.length>0&&data.children){
+                data.disabled=!data.disabled
+            }
+            // this.flodShow=!this.flodShow;
+            // this.clickId=data;
         },
         //获取监测
         getDetectionDirectoryListL(val){
@@ -3976,15 +3992,12 @@ export default {
                     this.getDetectionDirectoryListLeft=response.data.rt;
 
                     this.getDetectionDirectoryListLeft.forEach((item)=>{
-                        vm.$set(item,'disabled',true);
+                        vm.$set(item,'disabled',false);
                         var a=[]
                          val.forEach((item1)=>{
                              if(item.id==item1.directoryId){
                                     a.push(item1);
                                 }
-                            // if(){
-
-                            // }
                                 vm.$set(item,'children',a)
                              })
                     })
@@ -6147,6 +6160,26 @@ export default {
                 this.addMonitorPoint()
             }
         },
+        //获取监测项目最后一个点位名称
+        getMaxPointNameByItemId(id){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:id,
+                    baseMapId:vm.monitorBaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.pointNameValue=response.data.rt.split('-')[0];
+                    this.pointNumValue=response.data.rt.split('-')[1];
+                }
+            })
+        },
+
         //单点触发绘图
         drawingOneSpot(){
             this.$refs.pic.setDrawCancel();
@@ -7905,12 +7938,17 @@ export default {
                             top:30px;
                             left:35px;
                             z-index:11;
-                            ul{
+                            #fileTree{
                                 height: 500px;
                                 overflow: auto;
                                 width: 200px;
-                                
                             }
+                            // ul{
+                            //     height: 500px;
+                            //     overflow: auto;
+                            //     width: 200px;
+                                
+                            // }
 
                         }
                         .rightBottomCheck{
