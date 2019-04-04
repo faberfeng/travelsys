@@ -8,8 +8,11 @@
         </div>
         <div class="projectBody">
             <div class="projectBodyHead">
+                <div class="block">
+                        <span class="demonstration">图例缩放比例</span>
+                        <el-slider v-model="scaleValue" :max="100" :min="1" :step="1" @change="updateBaseMapZoom()"></el-slider>
+                </div>
                 <div class="headLeft" v-show="manageEdit">
-                    
                     <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
@@ -243,6 +246,29 @@
                 </div>
             </el-dialog>
             <el-dialog title="测点变化曲线" :visible="spotChangeLineShow" @close="spotChangeLineCancle()">
+                    <div style="margin-bottom:20px;">
+                        <el-date-picker
+                            v-model="selectValue"
+                            type="datetimerange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期">                         
+                        </el-date-picker>
+                        <span class="searchBtn" @click="makeSureData()">确认</span>
+
+                        <!-- <el-date-picker
+                            v-model="startValue"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+
+                         <el-date-picker
+                            v-model="endValue"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker> -->
+                    </div>
+                    
                     <div v-if="spotChangeLineShow">
                         <vue-highcharts  id="spotChangeLine" style="max-height:500px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
@@ -448,6 +474,9 @@ export default Vue.component('commonDetail',{
         //         this.callback(evt)},true
         // );
         return{
+            startValue:'',
+            endValue:'',
+            selectValue:'',
             broken:0,
             alert:'',
             nodeId:'',//华环的项目id
@@ -860,6 +889,27 @@ export default Vue.component('commonDetail',{
         //         break;
         //     }
         // },
+        makeSureData(){
+            var vm=this;
+            console.log(this.selectValue,'this.startValue');
+            this.startValue=this.selectValue[0];
+            this.endValue=this.selectValue[1];
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getPointChartData',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    startDate:this.startValue,
+                    endDate:this.endValue,
+                    pointId:this.pointId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    console.log(response.data.rt);
+                }
+            })
+        },
         getUserInfo(){
                 var vm = this
                 axios({
@@ -948,6 +998,26 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd==0){
                     this.pointNameValue=response.data.rt.split('-')[0];
                     this.pointNumValue=response.data.rt.split('-')[1];
+                }
+            })
+        },
+        updateBaseMapZoom(){
+            var vm=this;
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
+            axios({
+                url:this.BDMSUrl+'detectionInfo/updateBaseMapZoom',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:this.monitorBaseMapId,
+                    zoom:this.scaleValue
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    // this.getBaseMapList();
+                    // this.getBaseMapInfoByBaseMapId();
                 }
             })
         },
@@ -2440,6 +2510,19 @@ export default Vue.component('commonDetail',{
                 height: 32px;
                 margin-top:26px;
                 position: relative;
+                .block{
+                    width: 200px;
+                    height: 20px;
+                    display: inline-block;
+                    position: absolute;
+                    right: 1%;
+                    top:55px;
+                    z-index:100;
+                    .demonstration{
+                            display: inline-block;
+                            color:red;
+                    }
+                }
                 .headLeft{
                     // float: right;
                     position: absolute;
@@ -2836,6 +2919,18 @@ export default Vue.component('commonDetail',{
 
         }
         #edit{
+            .searchBtn{
+                display: inline-block;
+                width: 54px;
+                height: 26px;
+                border: 1px solid #f2f2f2;
+                background: #fc3439;
+                font-size: 14px;
+                line-height: 26px;
+                color: #f2f2f2;
+                border-radius: 3px;
+                cursor: pointer;
+            }
             .editPersonInput{
                 width: 200px;
                 border-radius: 2px;
