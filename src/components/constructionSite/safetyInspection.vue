@@ -2036,7 +2036,7 @@ export default {
                     this.drawItemTagType=item.sign; //这个是类型标记，一共有20种，分别有编号。
                     // this.pointNameValue=item.logogram;
                     // this.pointNumValue='01';
-                    this.getMaxPointNameByItemId(this.drawItemId);
+                    this.getMaxPointNameByItemId(this.drawItemId,item.logogram,'01');
                     this.drawItemName=item
                 }
             })
@@ -4342,27 +4342,26 @@ export default {
             })
         },
         //获取监测项目最后一个点位名称
-        getMaxPointNameByItemId(){
-            var vm=this;
-            axios({
-                url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
-                method:'get',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    itemId:vm.drawItemId,
-                    baseMapId:vm.monitorBaseMapId
-                }
-            }).then((response)=>{
-                if(response.data.cd==0){
+        // getMaxPointNameByItemId(){
+        //     var vm=this;
+        //     axios({
+        //         url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
+        //         method:'get',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         params:{
+        //             itemId:vm.drawItemId,
+        //             baseMapId:vm.monitorBaseMapId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd==0){
 
-                }else{
+        //         }else{
 
-                }
-            })
-
-        },
+        //         }
+        //     })
+        // },
         //新增监测内容
         addMonitorItem(){
             var vm=this;
@@ -6161,7 +6160,7 @@ export default {
             }
         },
         //获取监测项目最后一个点位名称
-        getMaxPointNameByItemId(id){
+        getMaxPointNameByItemId(id,name,num){
             var vm=this;
             axios({
                 url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
@@ -6174,8 +6173,14 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.pointNameValue=response.data.rt.split('-')[0];
-                    this.pointNumValue=response.data.rt.split('-')[1];
+                    if(response.data.rt){
+                        this.pointNameValue=response.data.rt.split('-')[0];
+                        this.pointNumValue=response.data.rt.split('-')[1];
+                    }else{
+                        this.pointNameValue=name;
+                        this.pointNumValue=num;
+                    }
+                    
                 }
             })
         },
