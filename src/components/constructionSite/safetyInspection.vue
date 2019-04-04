@@ -3687,7 +3687,7 @@ export default {
             console.log(data,'data');
 
             for(let i = 0; i < this.monitorMainItemList.length;i++){
-                this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].id,this.monitorMainItemList[i].spotNum);
+                this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].sign,this.monitorMainItemList[i].spotNum);
             }
         },
         checkChange(){
