@@ -90,7 +90,7 @@
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
-                            <el-slider v-model="scaleValue" :max="5" :min="0.1" :step="0.1"></el-slider>
+                            <el-slider v-model="scaleValue" :max="100" :min="1" :step="1" @change="updateBaseMapZoom()"></el-slider>
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
@@ -1327,7 +1327,7 @@ export default {
             getDetectionDirectoryLists:[],
             pointNameValue:'',//测点名称
             pointNumValue:'',//编号
-            scaleValue:0,//比例尺
+            scaleValue:1,//比例尺
             typeTagValue:'',
             typeTagList:[
                 {
@@ -1779,6 +1779,26 @@ export default {
         timeMethod(val) {
             return moment(val).format("YYYY-MM-DD HH:mm:ss");
         },
+        updateBaseMapZoom(){
+            var vm=this;
+            this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
+            axios({
+                url:this.BDMSUrl+'detectionInfo/updateBaseMapZoom',
+                method:'get',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    id:this.monitorBaseMapId,
+                    zoom:this.scaleValue
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getBaseMapList();
+                }
+            })
+        },
+        
         //当前时间
         curTime(){
             var date = new Date();
@@ -3788,6 +3808,7 @@ export default {
                                 // this.BDMSUrl+
                                 this.curBaseMapUrl=item.relativeUri;
                                 this.monitorBaseMapId=item.id;
+                                this.scaleValue=item.zoom;
                                 this.getBaseMapInfoByBaseMapId();
                                 this.getAllMonitorPoint();
 
