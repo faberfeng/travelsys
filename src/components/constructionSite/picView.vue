@@ -1172,7 +1172,7 @@ export default {
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
                                 this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,data,name,drawItemTagType);
-                                this.drawForce(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
+                                this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
                         
                         break;
@@ -1626,6 +1626,7 @@ export default {
             if(type == "SS"){color.r =   0;color.g = 255;color.b = 255;}
             if(type == "DX"){color.r =   0;color.g =   0;color.b = 255;}
             if(type == "SS"){color.r = 255;color.g = 127;color.b = 127;}
+            if(type == undefined){}
 
             if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
@@ -1636,12 +1637,12 @@ export default {
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
 
-            if(type != "LZ" && type != "FC"){
+            if((type != "LZ" && type != "FC") || type == undefined){
                 drawcontext.beginPath();
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
