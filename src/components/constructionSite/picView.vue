@@ -1654,23 +1654,23 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
 
                 drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2 * this.ResolutionScale * this.Koeffzient,
-                    position.y * this.ResolutionScale * this.scale + radius * scale / 2 * this.ResolutionScale * this.Koeffzient);
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2 * this.ResolutionScale * this.Koeffzient,
-                    position.y * this.ResolutionScale * this.scale + radius * scale / 2 * this.ResolutionScale * this.Koeffzient);
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale ,
-                    position.y * this.ResolutionScale * this.scale - radius * scale * this.ResolutionScale * this.Koeffzient);
+                    position.x * this.ResolutionScale * this.scale,
+                    position.y * this.ResolutionScale * this.scale - radius * scale);
                 
                 drawcontext.closePath();//结束路径状态
                 drawcontext.fill();
@@ -1680,13 +1680,13 @@ export default {
 
             if(type == "FC"){
                 
-                drawcontext.lineWidth= radius * scale / 2 * this.ResolutionScale * this.Koeffzient;
+                drawcontext.lineWidth= radius * scale ;
 
                 drawcontext.beginPath();
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale / 4 * 3 * this.ResolutionScale * this.Koeffzient,
+                    radius * scale / 4 * 3,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
@@ -2301,7 +2301,7 @@ export default {
             // console.log(item);
             return item;
         },
-        enableType(drawtype,drawItemId,status){
+        enableType(drawtype,sign,status){
             // switch(drawtype){
             //     case 1: //  位移
             //         this.drawtype_move = status;
@@ -2320,9 +2320,19 @@ export default {
             //         break;
             // }
 
+
+            // for(let i = 0; i < this.drawList.length;i++){
+            //     if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
+            //         this.drawList[i].display = status;
+            //     }
+            // }
+
             for(let i = 0; i < this.drawList.length;i++){
-                if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
-                    this.drawList[i].display = status;
+
+                if(this.drawList[i].pointGroupData){
+                    if(this.drawList[i].pointGroupData[0].type == drawtype && this.drawList[i].pointGroupData[0].sign == sign){
+                        this.drawList[i].display = status;
+                    }
                 }
             }
 
