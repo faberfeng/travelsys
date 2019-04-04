@@ -7,6 +7,13 @@
             <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @dblclick="Select_item" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
             <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
+            <div ref="listItem" style="position:absolute;top:0px;left:0px;border:thick solid #000000:background:#ffffff">
+                <ul>
+                    <li v-for="(item,index) in pointGroupDataList" :key="index">
+                        <span>{{item.name}} - {{item.data}}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div ref="number_input" style="width:200px;height:36px;border:1px solid red;display:none;position:absolute;background-color:rgba(255,255,255,1)">
             <input ref="number_input_input"  type = "text" style="position:absolute;left:2px;height:30px;top:2px;width:120px"/>
@@ -39,7 +46,9 @@ export default {
             old_para:"",
             drawList:[],
             pointScale:1.0,
-            Refresh_timer:0
+            Refresh_timer:0,
+            pointGroupDataList:[],
+            pointContentShow:false,
         }
     },
     destroyed(){
@@ -323,12 +332,13 @@ export default {
             // console.log(e.layerX / this.ResolutionScale / this.scale,e.layerY / this.ResolutionScale / this.scale);
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
+            this.$refs.listItem.style.display = "none";
 
             var position_temp = this.rotate_XY(X,Y);
             X = position_temp.x;
             Y = position_temp.y;
 
-            if(e.button == 0){
+            if(e.button == 0 || e.button == 2){
                 this.lastPostion = {x:X,y:Y};
                 
                     if(this.drawCount > 0 && this.drawing){ //  绘制标记
@@ -500,10 +510,17 @@ export default {
                                     if(this.drawList[i].SID == SID){
                                         this.SelectedList.push(this.drawList[i]);
                                         this.SelectedList[0].Selected = true;
+                                        
                                     }
                                 }
                             
                                 if(SID > 0){
+                                    if(e.button == 2){
+                                        this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                        this.$refs.listItem.style.display = "block";
+                                        this.$refs.listItem.style.top = e.layerY + "px";
+                                        this.$refs.listItem.style.left = e.layerX  + "px";
+                                    }
                                     this.$emit('status_changed',true,this.SelectedList);
                                 }else{
                                     this.$emit('status_changed',false,this.SelectedList);
@@ -546,6 +563,12 @@ export default {
                                     this.SelectedList[0].Selected = true;
 
                                     if(SID > 0){
+                                        if(e.button == 2){
+                                            this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                            this.$refs.listItem.style.display = "block";
+                                            this.$refs.listItem.style.top = e.layerY + "px";
+                                            this.$refs.listItem.style.left = e.layerX  + "px";
+                                        }
                                         this.$emit('status_changed',true,this.SelectedList);
                                     }else{
                                         this.$emit('status_changed',false,this.SelectedList);
@@ -623,6 +646,13 @@ export default {
                                 }
 
                                 if(SID > 0){
+                                    if(e.button == 2){
+                                        this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                        this.$refs.listItem.style.display = "block";
+                                        this.$refs.listItem.style.top = e.layerY + "px";
+                                        this.$refs.listItem.style.left = e.layerX  + "px";
+
+                                    }
                                     this.$emit('status_changed',true,this.SelectedList);
                                 }else{
                                     this.$emit('status_changed',false,this.SelectedList);
@@ -654,6 +684,8 @@ export default {
                     }
                 
             }
+
+            
         },
         Selected2(id){
 
@@ -2333,7 +2365,7 @@ export default {
             for(let i = 0; i < this.drawList.length;i++){
 
                 if(this.drawList[i].pointGroupData){
-                    if(this.drawList[i].pointGroupData[0].type == drawtype && this.drawList[i].pointGroupData[0].sign == sign){
+                    if(this.drawList[i].pointGroupData[0].itemType == drawtype && this.drawList[i].pointGroupData[0].sign == sign){
                         this.drawList[i].display = status;
                     }
                 }
