@@ -1642,7 +1642,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * this.scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
@@ -1654,23 +1654,23 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
 
                 drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2,
-                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2,
-                    position.y * this.ResolutionScale * this.scale + radius * scale / 2);
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale + radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.lineTo(
                     position.x * this.ResolutionScale * this.scale,
-                    position.y * this.ResolutionScale * this.scale - radius * scale);
+                    position.y * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient);
                 
                 drawcontext.closePath();//结束路径状态
                 drawcontext.fill();
@@ -1680,13 +1680,13 @@ export default {
 
             if(type == "FC"){
                 
-                drawcontext.lineWidth= radius * scale ;
+                drawcontext.lineWidth= radius * scale * this.scale * this.ResolutionScale * this.Koeffzient / 5 * 3;
 
                 drawcontext.beginPath();
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale / 4 * 3,
+                    radius * scale / 4 * 3 * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     2*Math.PI);
                 drawcontext.stroke();
@@ -1700,13 +1700,13 @@ export default {
                 if(data){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale * this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale + 10* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
 
                 if(pointName){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale * this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale - 4 * this.scale * this.ResolutionScale * this.Koeffzient);
                 }
             }
         },
@@ -1732,7 +1732,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale ,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     Math.PI);
                 drawcontext.stroke();
@@ -1742,7 +1742,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale ,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     Math.PI,
                     2 * Math.PI);
                 drawcontext.stroke();
@@ -1752,9 +1752,9 @@ export default {
 
                 drawcontext.beginPath();
                 drawcontext.arc(
-                    position.x * this.ResolutionScale * this.scale ,
+                    position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     Math.PI);
                 drawcontext.stroke();
@@ -1764,7 +1764,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale ,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     Math.PI,
                     2 * Math.PI);
 
@@ -1772,34 +1772,34 @@ export default {
 
                 drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 5 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 ),
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 5 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 5 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 ),
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 5 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 5 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.stroke();
 
                 drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 3 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 ),
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 3 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 3 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 ),
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 3 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 3 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.stroke();
 
                  drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 2.2 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 ),
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sin( Math.PI / 2.2 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 2.2 ),
-                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 ),
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sin( Math.PI / 2.2 )* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale * Math.cos( Math.PI / 2.2 )* this.scale * this.ResolutionScale * this.Koeffzient,
                 );
                 drawcontext.stroke();
             }
@@ -1808,13 +1808,13 @@ export default {
                 if(data){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale + 10* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
 
                 if(pointName){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale - 4* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
             }
         },
@@ -1839,26 +1839,26 @@ export default {
             if(type == "ZL"){
 
                 drawcontext.fillRect(
-                position.x * this.ResolutionScale * this.scale - radius * scale,
-                position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale,
-                radius * scale * 2,
-                radius * 0.75 * scale * 2);
+                position.x * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * scale * 2 * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * 0.75 * scale * 2 * this.scale * this.ResolutionScale * this.Koeffzient);
             }
 
             if(type == "YL"){
 
                 drawcontext.beginPath();
                 drawcontext.moveTo(
-                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2,
-                    position.y * this.ResolutionScale * this.scale - radius * scale / 2);
+                    position.x * this.ResolutionScale * this.scale - radius * scale * Math.sqrt(3) / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.lineTo(
-                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2,
-                    position.y * this.ResolutionScale * this.scale - radius * scale / 2);
+                    position.x * this.ResolutionScale * this.scale + radius * scale * Math.sqrt(3) / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.lineTo(
                     position.x * this.ResolutionScale * this.scale,
-                    position.y * this.ResolutionScale * this.scale + radius * scale);
+                    position.y * this.ResolutionScale * this.scale + radius * scale* this.scale * this.ResolutionScale * this.Koeffzient);
                 
                 drawcontext.closePath();//结束路径状态
                 drawcontext.fill();
@@ -1869,36 +1869,36 @@ export default {
             if(type == "TY"){
 
                 drawcontext.fillRect(
-                position.x * this.ResolutionScale * this.scale - radius * scale,
-                position.y * this.ResolutionScale * this.scale - radius * 0.25 * scale,
-                radius * scale * 2,
-                radius * 0.5 * scale * 2);
+                position.x * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                position.y * this.ResolutionScale * this.scale - radius * 0.25 * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * scale * 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * 0.5 * scale * 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.beginPath();
                 
                 drawcontext.rect(
-                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
-                    position.y * this.ResolutionScale * this.scale - radius * scale / 2,
-                    radius * scale,
-                    radius * scale);
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.stroke();
             }
 
             if(type == "SY"){
                 drawcontext.fillRect(
-                position.x * this.ResolutionScale * this.scale - radius * scale / 2,
-                position.y * this.ResolutionScale * this.scale - radius * 0.0 * scale,
-                radius * scale,
-                radius * 0.5 * scale * 2);
+                position.x * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                position.y * this.ResolutionScale * this.scale - radius * 0.0 * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * scale * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * 0.5 * scale * 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.beginPath();
                 
                 drawcontext.rect(
-                    position.x * this.ResolutionScale * this.scale - radius * scale / 2,
-                    position.y * this.ResolutionScale * this.scale - radius * scale,
-                    radius * scale,
-                    radius * scale * 2);
+                    position.x * this.ResolutionScale * this.scale - radius * scale / 2* this.scale * this.ResolutionScale * this.Koeffzient,
+                    position.y * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale* this.scale * this.ResolutionScale * this.Koeffzient,
+                    radius * scale * 2* this.scale * this.ResolutionScale * this.Koeffzient);
 
                 drawcontext.stroke();
             }
@@ -1907,13 +1907,13 @@ export default {
                 if(data){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale + 10* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
 
                 if(pointName){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale - 4* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
             }
         },
@@ -2302,6 +2302,9 @@ export default {
             return item;
         },
         enableType(drawtype,sign,status){
+
+            // console.log(drawtype,sign,status);
+
             // switch(drawtype){
             //     case 1: //  位移
             //         this.drawtype_move = status;
