@@ -36,7 +36,7 @@
                                 <p v-text="initData(item.uploadTime)"></p>
                                 <p class="operation">
                                     <!-- <span v-text="'版本'+item.version"></span> -->
-                                    <i class="icon-goujian icon-search" @click="view(item.fgId,item.fileName)"></i>
+                                    <!-- <i class="icon-goujian icon-search" @click="view(item.fgId,item.fileName)"></i> -->
                                     <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
                                 </p>
                             </span>

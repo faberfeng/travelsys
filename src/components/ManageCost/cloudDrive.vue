@@ -116,7 +116,7 @@
                                         <p v-text="initData(item.uploadTime)"></p>
                                         <p class="operation">
                                             <!-- <span v-text="'版本'+item.fgVersion"></span> -->
-                                            <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
+                                            <!-- <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i> -->
                                             <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
                                         </p>
                                     </span>
@@ -165,7 +165,7 @@
                                     </td>
                                     <td>
                                         <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
-                                        <i class="icon-goujian icon-search" @click="view(item.fileId,item.fileName)"></i>
+                                        <!-- <i class="icon-goujian icon-search" @click="view(item.fileId,item.fileName)"></i> -->
                                     </td>
                                     <!-- <td v-text="item.fgVersion"></td> -->
                                     <td>{{item.fileSize|fileSizeChange()}}</td>
@@ -389,7 +389,7 @@
             <div id="box-right-1" v-show="screenLeft.show"  v-if="screenLeft.item == 3">
                 <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
                     <p class="head" v-if="checkedItem.dirId || checkedRound">
-                        <i class="icon-goujian icon-search" @click="view()"></i>
+                        <!-- <i class="icon-goujian icon-search" @click="view()"></i> -->
                         <i class="icon-goujian icon-download" @click="downLoad()"></i>
                         <i class="icon-goujian icon-deleteVersion" @click="deleteVersion()"></i>
                         <select v-model="posType" class="inp-search">
