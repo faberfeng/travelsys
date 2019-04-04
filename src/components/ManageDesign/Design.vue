@@ -4428,10 +4428,14 @@ export default {
          */
     preview(val){
         var vm = this
+        this.$message({
+            type:'info',
+            message:'该功能正在开发'
+        });
         if(val){
-             window.open(vm.QJFileManageSystemURL+val+"/preview");
+            //  window.open(vm.QJFileManageSystemURL+val+"/preview");
         }else{
-              window.open(vm.QJFileManageSystemURL+vm.checkFileDir.dpath+"/preview");
+            //   window.open(vm.QJFileManageSystemURL+vm.checkFileDir.dpath+"/preview");
         }
     },
     view(filePath,fileName){

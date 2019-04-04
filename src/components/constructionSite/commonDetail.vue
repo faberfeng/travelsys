@@ -715,8 +715,9 @@ export default Vue.component('commonDetail',{
             exportDataEdit:false,
             editAlertEdit:false,
             projAuth:'',
-
-
+            pointNameValue:'',
+            pointNumValue:'',
+            scaleValue:1,
         }
     },
     created(){
@@ -931,6 +932,25 @@ export default Vue.component('commonDetail',{
             var vm=this;
             vm.$emit('baseMapEmit')
         },
+        //获取监测项目最后一个点位名称
+        getMaxPointNameByItemId(){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'detectionInfo/getMaxPointNameByItemId',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    baseMapId:vm.itemSubmitbaseMapId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.pointNameValue=response.data.rt.split('-')[0];
+                    this.pointNumValue=response.data.rt.split('-')[1];
+                }
+            })
+        },
         //单点
         spotClick(){
             this.$refs.pic.setDrawCancel();
@@ -944,7 +964,9 @@ export default Vue.component('commonDetail',{
             this.isClick7=false;
             this.isClick8=false;
             this.saveDrawShow=true;
+             this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
             this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemSubmitSign,this.itemMonitorId,1);
+           
             
         },
         //连续
@@ -1203,6 +1225,7 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.getBaseMapInfoByBaseMapIdInfo=response.data.rt;
                     this.angle=this.getBaseMapInfoByBaseMapIdInfo.rotate;
+                    this.scaleValue=this.getBaseMapInfoByBaseMapIdInfo.zoom;
                     if(this.angle==null){
                         this.angle=0;
                     }
@@ -1308,6 +1331,7 @@ export default Vue.component('commonDetail',{
                      })
                  })
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
+                   this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                   this.displayInspectSpot()
                  console.log(this.monitorPointInfo,'this.monitorPointInfo');  
             })
@@ -2352,7 +2376,7 @@ export default Vue.component('commonDetail',{
     }
 })
 </script>
-<style lang="less">
+<style lang="less" scoped>
     *{
         margin:0;
         padding: 0;
@@ -2366,6 +2390,9 @@ export default Vue.component('commonDetail',{
         font-style:normal
     }
     li{list-style: none}
+    #edit .el-dialog{
+        width: 800px !important;
+    }
     select.autoImport{
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
                 /*很关键：将默认的select选择框样式清除*/  
