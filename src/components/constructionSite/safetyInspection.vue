@@ -782,10 +782,21 @@
                     <button class="editBtnC"  @click="exportReport(selectUgId,consultValue,userValue,monitorCompany,monitorBaseMapId)" >生成</button>
                 </div>
             </el-dialog>
-             <el-dialog title="测点变化曲线"  :visible="moreSpotShow" @close="moreSpotCancle()">
+             <el-dialog title="测点变化曲线" width="900px"  :visible="moreSpotShow" @close="moreSpotCancle()">
+                    <div style="margin-bottom:20px;">
+                        <el-date-picker
+                            v-model="selectValue"
+                            type="datetimerange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd">                         
+                        </el-date-picker>
+                        <span class="searchBtn" @click="makeSureData()">确认</span>
+                    </div>
                     <div v-if="moreSpotShow">
-                        <vue-highcharts v-show="typeSpotShow"  id="spotChangeLine" style="max-height:600px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
-                        <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:600px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
+                        <vue-highcharts v-show="typeSpotShow"  id="spotChangeLine" style="max-height:800px"  :options="optionMoreSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
+                        <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:800px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
                     </div>
             </el-dialog>
         </div>
@@ -1166,6 +1177,7 @@ export default {
             photoId:null,//图片ID
             photoIdList:null,
             spotPicInfoList:'',
+            selectValue:'',
             optionMoreSpotChangeLine:{
                         chart: {
                             type: 'spline',
@@ -2103,7 +2115,11 @@ export default {
                         headers:{
                             'token':vm.token
                         },
-                        data:vm.pointIds
+                        data:vm.pointIds,
+                        params:{
+                            d1:'',
+                            d2:''
+                        }
                     }).then((response)=>{
                         if(response.data.cd=='0'){
                             var chartDataLength=response.data.rt;
@@ -3075,6 +3091,9 @@ export default {
         moreSpotCancle(){
             this.moreSpotShow=false;
         },
+        makeSureData(){
+
+        },
         drawFinish(){
             var vm=this;
             console.log('222');
@@ -3112,7 +3131,7 @@ export default {
         //获取图片列表
          getTagList(){
              var vm=this;
-              var alist=[];
+              var olist=[];
             //   this.monitorPointInfo=[];
             //   this.getAllMonitorPoint();
              axios({
@@ -3128,9 +3147,8 @@ export default {
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
-                     
                     this.spotPicInfoList.forEach((item)=>{
-                        alist.push(
+                        olist.push(
                             {
                                 'data':null,
                                 'id':item.id+'img',
@@ -3148,7 +3166,7 @@ export default {
                         )
                      
                     })
-                    alist.forEach((item)=>{
+                    olist.forEach((item)=>{
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
@@ -6280,8 +6298,9 @@ export default {
             }else{
                 this.setSpotPicShow=true;
                 this.picMark=true;
+                 this.getAllMonitorPoint();
                 this.getTagList();
-                this.$refs.pic.setDrawStatus("none",10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+                this.$refs.pic.setDrawStatus("none",10001,10001,1,null,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
             }
         },
         //获取图片列表
@@ -8172,6 +8191,18 @@ export default {
             }
         }
         #edit{
+            .searchBtn{
+                display: inline-block;
+                width: 54px;
+                height: 26px;
+                border: 1px solid #f2f2f2;
+                background: #fc3439;
+                font-size: 14px;
+                line-height: 26px;
+                color: #f2f2f2;
+                border-radius: 3px;
+                cursor: pointer;
+            }
             .addContent{
                 width: 80px;
                 height:30px;
