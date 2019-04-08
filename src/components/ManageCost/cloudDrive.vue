@@ -1022,6 +1022,8 @@
             .UserList{
                 border-collapse: collapse;
                 border: 1px solid #e6e6e6;
+                height: 600px;
+                overflow: scroll;
                 .checkbox-att{
                     display:none;
                 }
@@ -5325,10 +5327,10 @@ export default {
                 vm.FileTree = data.transformTozTreeFormat(setting,vm.FileTree_original)
                 console.log(vm.FileTree,'vm.FileTree');
                 if(name){
-                     vm.handleNodeClick(vm.FileTree[0]);
-                    vm.$refs.fileTree_cloudDrive.setCurrentKey(vm.FileTree[0].dirId);
+                     vm.handleNodeClick(vm.FileTree[1]);
+                    vm.$refs.fileTree_cloudDrive.setCurrentKey(vm.FileTree[1].dirId);
                     setTimeout(()=>{
-                            var n = 0+1
+                            var n = 1+1
                             $('#cloudDirveFileTree .el-tree-node:nth-child('+n+')').addClass('is-current_fistload')
                         },0)
 
@@ -5858,7 +5860,10 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.customData = response.data.rt;
+                    // this.customData = response.data.rt;
+                    response.data.rt.forEach((item)=>{
+                        this.customData.unshift(item)
+                    })
                     this.customPageDetial.total=1;
                     this.customData.forEach((item)=>{
                         Object.assign(item,{
