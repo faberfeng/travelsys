@@ -48,7 +48,7 @@
               <div class="taskHeadRight">
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="projectWork()">工程任务</span>
-                <span class="btn-operate" v-show="batchVerificationShow" >开始核实</span>
+                <span class="btn-operate" v-show="batchVerificationShow">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
                 
                 <span class="btn-operate" v-show="projectWorkShow" @click="userGroupTask()">群组权限</span>

@@ -1655,17 +1655,17 @@ export default Vue.component('commonDetail',{
             if(this.currentPointId){
                 data={
                     itemId:this.itemMonitorId,
-                    variationAlertTotal:this.variationAlertTotal,
-                    variationAlertDay:this.variationAlertDay,
-                    variationAlertHour:this.variationAlertHour,
+                    variationAlertTotal:this.variationAlertTotal/1000,
+                    variationAlertDay:this.variationAlertDay/1000,
+                    variationAlertHour:this.variationAlertHour/1000,
                     pointId:this.currentPointId
                 }
             }else{
                 data={
                     itemId:this.itemMonitorId,
-                    variationAlertTotal:this.variationAlertTotal,
-                    variationAlertDay:this.variationAlertDay,
-                    variationAlertHour:this.variationAlertHour
+                    variationAlertTotal:this.variationAlertTotal/1000,
+                    variationAlertDay:this.variationAlertDay/1000,
+                    variationAlertHour:this.variationAlertHour/1000
                 }
             }
             axios({
