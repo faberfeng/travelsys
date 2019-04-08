@@ -12,8 +12,7 @@
                         <span class="demonstration">图例缩放比例</span>
                         <el-slider v-model="scaleValue" :max="100" :min="1" :step="1" @change="updateBaseMapZoom()"></el-slider>
                 </div>
-                <div class="headLeft" v-show="manageEdit">
-                    <!-- <span :class="[{'isClickStyle':isClick},'headLeftBtn']" @click="baseMapEmit()">底图</span> -->
+                <!-- <div class="headLeft" v-show="manageEdit">
                     <span :class="[{'isClickStyle':isClick1},'headLeftBtn']" @click="spotClick()">单点</span>
                     <span :class="[{'isClickStyle':isClick2},'headLeftBtn']" @click="spotAllClick()">连续</span>
                     <span :class="[{'isClickStyle':isClick3},'headLeftBtn']" @click="drawingTxtClick()">文字</span>
@@ -22,7 +21,7 @@
                     <span :class="[{'isClickStyle':isClick6},'headLeftBtn']" @click="deleteDrawCommon()">删除</span>
                     <span :class="[{'isClickStyle':isClick7},'headLeftBtn']" style="margin-left:20px;" @click="saveDraw()">保存</span>
                     <span :class="[{'isClickStyle':isClick8},'headLeftBtn']" style="background:#fff !important;" @click="cancleAll()">取消</span>
-                </div>
+                </div> -->
                 <div class="headMiddle">
                     <label>测试总数：{{itemSubmitCount}} </label>
                     <label>报警：{{isAlertNum}}</label>
@@ -141,9 +140,9 @@
                 <div class="bottomTabelPagination">
                     <div class="paginationLeft">
                         <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">报警值：</label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm/天</label><label v-show="itemMonitorType==2||itemMonitorType==3">m/天</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <!-- <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertDay">单次{{changeAlertDay}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm/天</label><label v-show="itemMonitorType==2||itemMonitorType==3">m/天</label><label v-show="itemMonitorType==4">KN</label></label>
                         <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertHour">{{changeAlertHour}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm/时</label><label v-show="itemMonitorType==2||itemMonitorType==3">m/时</label><label v-show="itemMonitorType==4">KN</label></label>
-                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2||itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label>
+                        <label style="color:#333;font-size:14px;line-height:62px;display:inlin-block;margin-left:10px;" v-show="changeAlertTotal">累计{{changeAlertTotal}}<label v-show="itemMonitorType!=4&&itemMonitorType!=2&&itemMonitorType!=3">mm</label><label v-show="itemMonitorType==2||itemMonitorType==3">m</label><label v-show="itemMonitorType==4">KN</label></label> -->
                         </span>
                         <span class="leftBtnOne" v-show="editAlertEdit" @click="editAlertValueBtn()">修改</span>
                         <span class="leftTxtTwo">
@@ -252,7 +251,8 @@
                             type="datetimerange"
                             range-separator="至"
                             start-placeholder="开始日期"
-                            end-placeholder="结束日期">                         
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd">                         
                         </el-date-picker>
                         <span class="searchBtn" @click="makeSureData()">确认</span>
 
@@ -268,7 +268,9 @@
                             placeholder="选择日期时间">
                         </el-date-picker> -->
                     </div>
-                    
+                    <!-- <div v-if="searchSpotChangeLineShow">
+                        <vue-highcharts  id="searchSpotChangeLine" style="max-height:900px"  :options="searchOptionSpotChangeLine" ref="searchSpotChangeLine"></vue-highcharts>
+                    </div> -->
                     <div v-if="spotChangeLineShow">
                         <vue-highcharts  id="spotChangeLine" style="max-height:900px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
@@ -891,24 +893,33 @@ export default Vue.component('commonDetail',{
         // },
         makeSureData(){
             var vm=this;
-            console.log(this.selectValue,'this.startValue');
-            this.startValue=this.selectValue[0];
-            this.endValue=this.selectValue[1];
-            axios({
-                url:this.BDMSUrl+'detectionInfo/getPointChartData',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    startDate:this.startValue,
-                    endDate:this.endValue,
-                    pointId:this.pointId,
-                }
-            }).then((response)=>{
-                if(response.data.cd==0){
-                    console.log(response.data.rt);
-                }
-            })
+            // console.log(this.selectValue,'this.startValue');
+            // this.startValue=this.selectValue[0];
+            // this.endValue=this.selectValue[1];
+            // axios({
+            //     url:this.BDMSUrl+'detectionInfo/getPointChartData',
+            //     headers:{
+            //         'token':vm.token
+            //     },
+            //     params:{
+            //         startDate:this.startValue,
+            //         endDate:this.endValue,
+            //         pointId:this.pointId
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd==0){
+            //         console.log(response.data.rt);
+            //     }
+            // })
+            if(this.itemMonitorType==1){
+                this.getPointHorizontalShiftChartData()
+            }else if(this.itemMonitorType==2){
+                this.getPointVerticalShiftChartData()
+            }else if(this.itemMonitorType==3){
+                this.getPointGaugeChartData()
+            }else if(this.itemMonitorType==4){
+                this.getPointForceChartData()
+            }
         },
         getUserInfo(){
                 var vm = this
@@ -1035,9 +1046,7 @@ export default Vue.component('commonDetail',{
             this.isClick8=false;
             this.saveDrawShow=true;
              this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue)
-            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemSubmitSign,this.itemMonitorId,1);
-           
-            
+            this.$refs.pic.setDrawStatus("onePoint",this.itemMonitorType,this.itemSubmitSign,this.itemMonitorId,1); 
         },
         //连续
         spotAllClick(){
@@ -1177,8 +1186,6 @@ export default Vue.component('commonDetail',{
                     message:'请选择导出的条目'
                 })
             }
-           
-
         },
         //修复故障
         changeBrokenCommon(){
@@ -1845,7 +1852,9 @@ export default Vue.component('commonDetail',{
         getPointForceChartData(){
             var vm=this;
             this.acquisitionTimeXlist=[];
-             this.elevationYlist=[];
+            this.elevationYlist=[];
+            this.startValue=this.selectValue[0];
+            this.endValue=this.selectValue[1];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointForceChartData',
@@ -1853,7 +1862,9 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    pointId:this.pointId
+                    pointId:this.pointId,
+                    startDate:this.startValue,
+                    endDate:this.endValue
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1876,7 +1887,8 @@ export default Vue.component('commonDetail',{
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
                     },200)
-                    
+                    this.startValue='';
+                    this.endValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1890,6 +1902,8 @@ export default Vue.component('commonDetail',{
             var vm=this;
             this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
+             this.startValue=this.selectValue[0];
+            this.endValue=this.selectValue[1];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointGaugeChartData',
@@ -1897,7 +1911,9 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    pointId:this.pointId
+                    pointId:this.pointId,
+                    startDate:this.startValue,
+                    endDate:this.endValue
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1920,7 +1936,8 @@ export default Vue.component('commonDetail',{
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
                     },200)
-                    
+                    this.startValue='';
+                    this.endValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1934,6 +1951,8 @@ export default Vue.component('commonDetail',{
              var vm=this;
              this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
+             this.startValue=this.selectValue[0];
+            this.endValue=this.selectValue[1];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointHorizontalShiftChartData',
@@ -1941,7 +1960,9 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    pointId:this.pointId
+                    pointId:this.pointId,
+                    startDate:this.startValue,
+                    endDate:this.endValue
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1950,6 +1971,7 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.shiftDistance)
                     })
+                    
                     // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
                     // console.log(this.elevationYlist,'this.elevationYlist');
                      var min=this.getMinValue(this.elevationYlist);
@@ -1968,7 +1990,8 @@ export default Vue.component('commonDetail',{
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
                     },200)
-                    
+                    this.startValue='';
+                    this.endValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1984,6 +2007,8 @@ export default Vue.component('commonDetail',{
              this.elevationYlist=[];
              this.optionSpotChangeLine.yAxis.min='';
              this.optionSpotChangeLine.yAxis.max='';
+             this.startValue=this.selectValue[0];
+            this.endValue=this.selectValue[1];
             //  console.log(this.optionSpotChangeLine.yAxis.min);
             axios({
                 method:'post',
@@ -1992,7 +2017,9 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    pointId:this.pointId
+                    pointId:this.pointId,
+                    endDate:this.endValue,
+                    startDate:this.startValue
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2016,6 +2043,8 @@ export default Vue.component('commonDetail',{
                         spotChangeLineChart.hideLoading();
                         spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
                     },200)
+                    this.startValue='';
+                    this.endValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',

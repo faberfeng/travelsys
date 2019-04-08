@@ -60,8 +60,10 @@
                                 <!-- <td v-show="isEditShow">{{item.todayResult}}</td>
                                 <td v-show="isEditShow">{{item.todayRemark}}</td> -->
                                 <td>
-                                    <button title="修改" v-show="editWorkThroughtEdit" @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
-                                    <button title="删除" v-show="editWorkThroughtEdit" class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
+                                    <!-- v-show="editWorkThroughtEdit" -->
+                                    <button title="修改"  @click="renamePatrolBtn(item.id,item.patrolTypeId,item.patrolName)" class="editBtn actionBtn"></button>
+                                    <button title="删除"  class="deleteBtn actionBtn" @click="deletePatrol(item.id)"></button>
+                                    <!-- v-show="editWorkThroughtEdit" -->
                                 </td>
                             </tr>
                         </tbody>
@@ -203,7 +205,7 @@ export default Vue.component('walkThrough',{
         vm.curTime();
         vm.initPatrolPresupposition();
         vm.getAllPatrolSummary();
-        vm.getUserInfo();
+        // vm.getUserInfo();
     },
     filters:{
          timeChange(val) {

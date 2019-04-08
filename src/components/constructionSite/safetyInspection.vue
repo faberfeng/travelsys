@@ -353,7 +353,7 @@
 
             <el-dialog title="新增监测内容" :visible="addInspectContentShow" @close="addInspectContentCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="directoryType" ><option v-for="(item,index) in getDetectionDirectoryLists" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                    <div class="editBodyone"><label class="editInpText">监测目录:</label><select class="editSelect" v-model="directoryType" ><option v-for="(item,index) in getDetectionDirectoryLists" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoA"></i></div>
                     <div class="editBodytwo"><label class="editInpText">名称:</label><input class="inp" style="height:32px !important" v-model="monitorName" placeholder="请输入" /></div>
                     <div class="editBodytwo"><label class="editInpText">类型:</label><select class="editSelect" v-model="monitorType" @change="typeChange(monitorType)" ><option v-for="(item,index) in monitorTypeList" :value="item.value" :key="index" v-text="item.label"></option></select><i class="icon-sanjiao"></i></div>
                     <div class="editBodytwo"><label class="editInpText">类型标记:</label><select class="editSelect" v-model="typeTagValue" ><option v-for="(item,index) in selectTypeTagList" :value="item.value" :key="index" v-text="item.name"></option></select><i class="icon-sanjiao"></i></div>
@@ -384,7 +384,7 @@
 
              <el-dialog title="编辑编号" :visible="bindSpotNumShow" @close="bindSpotNumCancle()">
                 <div class="editBody">
-                    <div class="editBodyone"><label class="editInpText">修改的测点:</label><select class="editSelect" v-model="editSpotNum" @change="changeSpot()" ><option v-for="(item,index) in editSpotNumList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoT"></i></div>
+                    <div class="editBodyone"><label class="editInpText">修改的测点:</label><select class="editSelect" v-model="editSpotNum" @change="changeSpot()" ><option v-for="(item,index) in editSpotNumList" :value="item.id" :key="index" v-text="item.name"></option></select><i class="icon-sanjiaoB"></i></div>
                 </div>
                 <div class="editBodytwo"><label class="editInpText">新测点编号:</label><input class="inpSmall" style="height:32px !important" v-model="newSpotNum" /></div>
                 <div slot="footer" class="dialog-footer">
@@ -1030,6 +1030,7 @@ export default {
             isClick2:false,
             isClick3:false,
             isClick4:false,
+            moveClick:false,
             isClick5:false,
             isClick6:false,
             isClick7:false,
@@ -3076,6 +3077,7 @@ export default {
         },
         drawFinish(){
             var vm=this;
+            console.log('222');
         
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
@@ -3150,6 +3152,7 @@ export default {
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
+                    console.log(this.monitorPointInfo,'图片标记');
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                 }
             })
@@ -3541,126 +3544,126 @@ export default {
             var blist=[];
             var clist=[];
             var dlist=[];
+            var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
             console.log(list,'list1111');
             // var list1=this.
-            list.forEach((item)=>{
-                 vm.$set(item,'pointGroupIds',null);
-            })
-            list.forEach((item,index,array)=>{
-                 if(item.id.length==undefined){
-                    alist.push(item)
-                    if(item.drawMaxCount==1){
-                        blist.push({
-                            'itemId':item.itemId,
-                            'plotInfos':[item.plotInfo],
-                            'pointGroupIds':[item.pointGroupIds],
-                            'prefix':item.prefix,
-                            'startNo':item.startNo
-                        });
-                    }else if(item.drawMaxCount==2){
-                         clist.push(item)
+            if(this.moveClick==false){
+                     list.forEach((item)=>{
+                        vm.$set(item,'pointGroupIds',null);
+                    })
+                    list.forEach((item,index,array)=>{
+                        if(item.id.length==undefined){
+                            alist.push(item)
+                            if(item.drawMaxCount==1){
+                                blist.push({
+                                    'itemId':item.itemId,
+                                    'plotInfos':[item.plotInfo],
+                                    'pointGroupIds':[item.pointGroupIds],
+                                    'prefix':item.prefix,
+                                    'startNo':item.startNo
+                                });
+                            }else if(item.drawMaxCount==2){
+                                clist.push(item)
+                            }
+
+                        }
+                    })
+                    for(var i=0;i < clist.length;i++){
+                        var itemId=clist[i].itemId;
+                        if(!map.has(itemId)){
+                            var array=new Array();
+                            array.push(clist[i]);
+                            map.set(itemId,array)
+                        }else{
+                            var array= map.get(itemId);
+                            array.push(clist[i]);
+                            map.set(itemId,array);
+                        }
                     }
-
-                }
-            })
-            for(var i=0;i < clist.length;i++){
-                var itemId=clist[i].itemId;
-                if(!map.has(itemId)){
-                    var array=new Array();
-                    array.push(clist[i]);
-                    map.set(itemId,array)
-                }else{
-                    var array= map.get(itemId);
-                    array.push(clist[i]);
-                    map.set(itemId,array);
-                }
-            }
-            //  console.log(map,'map000');
-             var a='';
-             var b=[];
-             map.forEach((value, key, mapObject)=>{
-                a=this.returnData(value);
-                b.push(a);
-             })
-             console.log(b,'bbbb');
-             dlist=blist.concat(b);
-            console.log(dlist,'添加点位数据');
-            if(this.alist==[]){
-                this.editSpotShow=false;
-            }else if(this.alist!=[]){
-                // axios({
-                //         method:'POST',
-                //         url:vm.BDMSUrl+'detectionInfo/editAllMonitorPoint',
-                //         headers:{
-                //             'token':vm.token
-                //         },
-                //         params:{
-                //             userGroupId:vm.selectUgId
-                //         },
-                //         data:alist
-                //     }).then((response)=>{
-                //         if(response.data.cd=='0'){
-                //             this.$message({
-                //                 type:'success',
-                //                 message:'保存监测点成功'
-                //             })
-                //              this.$refs.pic.setDrawCancel();
-                //             this.getMonitorMainTable();
-                //             this.getAllMonitorPoint();
-                //             if(this.picMark==true){
-                //                 setTimeout(()=>{
-                //                         this.getTagList();
-                //                     },400)
-                //                 }
-                //                 this.startpointShow=false;
-                //         }else if(response.data.cd=='-1'){
-                        
-                //             // this.$message({
-                //             //     type:'error',
-                //             //     message:response.data.msg
-                //             // })
-                //         }
-                //     })
-                // }
-
+                    //  console.log(map,'map000');
+                    var a='';
+                    var b=[];
+                    map.forEach((value, key, mapObject)=>{
+                        a=this.returnData(value);
+                        b.push(a);
+                    })
+                    console.log(b,'bbbb');
+                    dlist=blist.concat(b);
+                    console.log(dlist,'添加点位数据');
+                    if(this.alist==[]){
+                        this.editSpotShow=false;
+                    }else if(this.alist!=[]){
+                        axios({
+                            url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
+                            method:'POST',
+                            headers:{
+                                'token':vm.token
+                            },
+                            params:{
+                                baseMapId:vm.monitorBaseMapId,
+                            },
+                            data:dlist
+                            // infos:blist,
+                        }).then((response)=>{
+                        if(response.data.cd=='0'){
+                                    this.$message({
+                                        type:'success',
+                                        message:'保存监测点成功'
+                                    })
+                                    this.$refs.pic.setDrawCancel();
+                                    this.getMonitorMainTable();
+                                    this.getAllMonitorPoint();
+                                    if(this.picMark==true){
+                                        setTimeout(()=>{
+                                                this.getTagList();
+                                            },400)
+                                        }
+                                        this.startpointShow=false;
+                                        this.isBindPoint=false;
+                                }else if(response.data.cd=='-1'){
+                                
+                                    this.$message({
+                                        type:'error',
+                                        message:response.data.msg
+                                    })
+                                }
+                        })
+                    }
+            }else if(this.moveClick==true){
+                this.pointIds.forEach((item)=>{
+                    list.forEach((item1)=>{
+                         if(item==item1.id){
+                             elist.push({
+                                 'id':item1.id,
+                                 'plotInfo':item1.plotInfo
+                             })
+                         }
+                    })
+                })
+                console.log(elist,'elist');
                 axios({
-                    url:this.BDMSUrl+'detectionInfo/addOrBindMonitorPoint',
-                    method:'POST',
+                    url:this.BDMSUrl+'detectionInfo/updatePointGroupPosition',
+                    method:'post',
                     headers:{
                         'token':vm.token
                     },
-                    params:{
-                        baseMapId:vm.monitorBaseMapId,
-                    },
-                    data:dlist
-                    // infos:blist,
+                    data:elist
                 }).then((response)=>{
-                   if(response.data.cd=='0'){
-                            this.$message({
-                                type:'success',
-                                message:'保存监测点成功'
-                            })
-                             this.$refs.pic.setDrawCancel();
-                            this.getMonitorMainTable();
-                            this.getAllMonitorPoint();
-                            if(this.picMark==true){
-                                setTimeout(()=>{
-                                        this.getTagList();
-                                    },400)
-                                }
-                                this.startpointShow=false;
-                                this.isBindPoint=false;
-                        }else if(response.data.cd=='-1'){
-                        
-                            this.$message({
-                                type:'error',
-                                message:response.data.msg
-                            })
-                        }
+                    if(response.data.cd==0){
+                        this.$refs.pic.setDrawCancel();
+                        this.getMonitorMainTable();
+                        this.getAllMonitorPoint();
+                        if(this.picMark==true){
+                            setTimeout(()=>{
+                                    this.getTagList();
+                                },400)
+                            }
+                    }
                 })
             }
+           
 
 
         },
@@ -3676,6 +3679,7 @@ export default {
             this.isClick6=false;
             this.isClick7=false;
             this.isClick8=false;
+            this.moveClick=false;
             this.pointNameValue='';
             this.pointNumValue='';
               this.$refs.pic.Max_Select = 8;
@@ -3794,6 +3798,7 @@ export default {
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
+            this.moveClick=false;
             this.getBaseMapList();
         },
         //获取底图列表
@@ -6214,6 +6219,7 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.moveClick=false;
             }
         },
         //多点触发绘图
@@ -6240,6 +6246,7 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.moveClick=false;
             }
         },
         //添加文本
@@ -6260,6 +6267,7 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.moveClick=false;
             }
         },
         //上传图片编辑
@@ -6448,6 +6456,7 @@ export default {
             this.isClick2=false;
             this.isClick3=false;
             this.isClick4=true;
+            this.moveClick=true;
             this.isClick5=false;
             this.isClick6=false;
             this.isClick7=false;
@@ -6480,6 +6489,7 @@ export default {
                 this.isClick6=true;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.moveClick=false;
                 if(this.picMarkName!="Select_img_Mark"){
                     // this.$refs.pic.deleteDraw();
                     axios({
@@ -6585,6 +6595,7 @@ export default {
                 this.isClick6=false;
                 this.isClick7=false;
                 this.isClick8=false;
+                this.moveClick=false;
                 this.$refs.pic.setDrawCancel();
                  this.getAllMonitorPoint();
                 
@@ -8403,6 +8414,29 @@ export default {
                 content: '';
                 top: 118px;
                 right: 204px;
+            }
+            .icon-sanjiaoB {
+                 display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 120px;
+                right: 290px;
+
+            }
+            .icon-sanjiaoA{
+                display: block;
+                position: absolute;
+                width: 12px;
+                height: 7px;
+                background-image: url('../Settings/images/sanjiao.png');
+                background-size: 100% 100%;
+                content: '';
+                top: 118px;
+                right: 295px;
             }
             .inpSmall{
                 width: 120px;
