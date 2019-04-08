@@ -1922,7 +1922,8 @@ export default {
                                     message:'该点位不存在图片,请删除重新上传'
                                 })
                             }else{
-                                window.open(vm.QJFileManageSystemURL+item.filePath+'/preview',"_blank")
+                                window.open(vm.BDMSUrl+'/doc/download/'+item.fileGroupId,"_blank")
+                                // window.open(vm.BDMSUrl+item.filePath,"_blank")
                             }
                         }
                     })
@@ -3150,15 +3151,8 @@ export default {
                     this.spotPicInfoList.forEach((item)=>{
                         olist.push(
                             {
-                                'data':null,
                                 'id':item.id+'img',
-                                'isAlert':null,
-                                'isBroken':null,
-                                'itemId':null,
-                                'itemName':null,
                                 'plotInfo':JSON.parse(item.coordinateInfo).plotInfo,
-                                'pointName':null,
-                                'type':null,
                                 'filePath':item.filePath,
                                 'baseMapId':item.baseMapId,
                                 'photoId':item.id,
@@ -3172,6 +3166,7 @@ export default {
                     })
                     console.log(this.monitorPointInfo,'图片标记');
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
+                    this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 }
             })
         },
@@ -6300,7 +6295,7 @@ export default {
                 this.picMark=true;
                  this.getAllMonitorPoint();
                 this.getTagList();
-                this.$refs.pic.setDrawStatus("none",10001,10001,1,null,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
+                this.$refs.pic.setDrawStatus("none",10001,10001,10001,1,{r:0,g:170,b:0},{SelectImg:"fz_img_for_site",DrawImg:"fz_img_for_site1"});
             }
         },
         //获取图片列表

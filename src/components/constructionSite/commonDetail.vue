@@ -2887,6 +2887,9 @@ export default Vue.component('commonDetail',{
                                             cursor: pointer;
                                             margin-left: 10px;
                                         }
+                                        .el-icon-warning{
+                                            font-size: 17px;
+                                        }
                                         .location{
                                             background: url('../planCost/images/location.png') no-repeat 0 0;
                                         }
