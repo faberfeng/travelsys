@@ -470,8 +470,8 @@ export default {
                             if(SID > 0){
                                 for(let i = 0; i < this.drawList.length;i++){
                                     if(this.drawList[i].SID == SID){
-                                        // this.drawList[i].isBroken = !this.drawList[i].isBroken;
-                                        // this.Refresh();
+                                        this.drawList[i].isBroken = !this.drawList[i].isBroken;
+                                        this.Refresh();
                                         this.$emit('Broken_changed',this.drawList[i]);
                                         break;
                                     }
@@ -1139,6 +1139,7 @@ export default {
                 }
 
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
+                
 
                 switch(this.drawList[i].type){
                     case "move":
@@ -1158,6 +1159,10 @@ export default {
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
+
+                                if(this.drawList[i].isBroken){this.drawBroken(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
+                                if(this.drawList[i].Selected){this.drawSelected(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
+
                                 this.drawMove(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                                 
@@ -1181,6 +1186,8 @@ export default {
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
+                                if(this.drawList[i].isBroken){this.drawBroken(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
+                                if(this.drawList[i].Selected){this.drawSelected(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
                                 this.drawLevel(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
@@ -1203,6 +1210,8 @@ export default {
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
+                                if(this.drawList[i].isBroken){this.drawBroken(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
+                                if(this.drawList[i].Selected){this.drawSelected(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
                                 this.drawForce(this.drawcontext,this.drawList[i].position[j],this.pointScale,10,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,10,colorId);
                             }
@@ -1225,6 +1234,8 @@ export default {
                                     data = this.drawList[i].pointGroupData[0].data;
                                     name = this.drawList[i].pointGroupData[0].name;
                                 }
+                                if(this.drawList[i].isBroken){this.drawBroken(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
+                                if(this.drawList[i].Selected){this.drawSelected(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5);}
                                 this.drawSlanting(this.drawcontext,this.drawList[i].position[j],this.pointScale,7.5,color,this.drawList[i].Selected,data,name,drawItemTagType);
                                 this.drawMove(this.drawcontextSelect,this.drawList[i].position[j],this.pointScale,7.5,colorId);
                             }
@@ -1660,11 +1671,11 @@ export default {
             if(type == "SS"){color.r = 255;color.g = 127;color.b = 127;}
             if(type == undefined){}
 
-            if(!isSelected){
+            // if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            }else{
-                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
-            }
+            // }else{
+            //     color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
+            // }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
@@ -1749,11 +1760,11 @@ export default {
             if(type == "SW" ){color.r =   0;color.g =   0;color.b = 255;}
             if(type == "CYS"){color.r =   0;color.g =   0;color.b = 255;}
 
-            if(!isSelected){
+            // if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            }else{
-                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
-            }
+            // }else{
+            //     color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
+            // }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
@@ -1859,11 +1870,11 @@ export default {
             if(type == "TY"){color.r =   0;color.g = 255;color.b = 0;}
             if(type == "SY"){color.r =   0;color.g = 255;color.b = 0;}
 
-            if(!isSelected){
+            // if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            }else{
-                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
-            }
+            // }else{
+            //     color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
+            // }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
@@ -1957,11 +1968,11 @@ export default {
             if(type == "TX"){color.r = 0;color.g = 0;color.b = 0;}
             if(type == "QX"){color.r = 0;color.g = 255;color.b = 0;}
 
-            if(!isSelected){
+            // if(!isSelected){
                 color_ = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-            }else{
-                color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
-            }
+            // }else{
+            //     color_ = 'rgb(' + (color.r + 100) / 2 + ',' + (color.g + 100) / 2 + ',' + (color.b + 255) / 2 + ')';
+            // }
             drawcontext.lineWidth=1;
             drawcontext.fillStyle=color_;
             drawcontext.strokeStyle=color_;
@@ -2131,6 +2142,51 @@ export default {
                 }
             }
 
+            
+        },
+        drawBroken(drawcontext,position_,scale,radius){
+
+            var position = this.rotate_XY_display(position_);
+
+            drawcontext.lineWidth=2;
+            drawcontext.strokeStyle="rgba(0,0,0,1)";
+            drawcontext.fillStyle="rgba(255,0,0,1)";
+            drawcontext.setLineDash([3]);
+
+            drawcontext.fillRect(
+                position.x * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient + (radius + 10) * scale * this.scale * this.ResolutionScale * this.Koeffzient,
+                position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale* this.scale * this.ResolutionScale * this.Koeffzient - (radius + 5) * scale * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * scale * 2.5 * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * 0.75 * scale * 2 * this.scale * this.ResolutionScale * this.Koeffzient);
+
+            drawcontext.fillRect(
+                position.x * this.ResolutionScale * this.scale - radius * scale* this.scale * this.ResolutionScale * this.Koeffzient + (radius + 10) * scale * this.scale * this.ResolutionScale * this.Koeffzient,
+                position.y * this.ResolutionScale * this.scale - radius * 0.75 * scale* this.scale * this.ResolutionScale * this.Koeffzient - (radius + 5) * scale * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * scale * 0.2 * this.scale * this.ResolutionScale * this.Koeffzient,
+                radius * 0.75 * scale * 3.5 * this.scale * this.ResolutionScale * this.Koeffzient);
+
+            drawcontext.setLineDash([]);
+            
+        },
+        drawSelected(drawcontext,position_,scale,radius){
+
+            var position = this.rotate_XY_display(position_);
+
+            drawcontext.lineWidth=2;
+            drawcontext.strokeStyle="rgba(0,0,0,1)";
+            
+            drawcontext.setLineDash([3]);
+
+            drawcontext.beginPath();
+            drawcontext.arc(
+                position.x * this.ResolutionScale * this.scale,
+                position.y * this.ResolutionScale * this.scale,
+                radius * scale * this.scale * this.ResolutionScale * this.Koeffzient  * 1.5,
+                0,
+                2*Math.PI);
+            drawcontext.stroke();
+
+            drawcontext.setLineDash([]);
             
         },
         create_Multiple_points(){
