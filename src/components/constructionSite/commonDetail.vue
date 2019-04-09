@@ -1825,6 +1825,9 @@ export default Vue.component('commonDetail',{
         },
         //点击获得曲线
         getCurve(pointId,name,type){
+            this.selectValue='';
+            this.startValue='';
+            this.endValue='';
             if(type){
                 this.itemMonitorType=type
             }
