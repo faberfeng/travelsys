@@ -2596,6 +2596,11 @@ export default {
                             userData:plotInfo.userData,
                             pointGroupData:list[i].pointGroupData
                         };
+
+                if(list[i].pointGroupData){
+                    item.isBroken = list[i].pointGroupData[0].isBroken;
+                }
+                
                 this.drawList.push(item);
 
                 this.drawID++;
