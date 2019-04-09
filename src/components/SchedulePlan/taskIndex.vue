@@ -53,7 +53,7 @@
                 
                 <span class="btn-operate" v-show="projectWorkShow" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="exportProject()">导入MPP文件</span>
-                <span class="btn-operate" @click="cancleSelect()">取消选择</span>
+                <span class="btn-operate" v-show="projectWorkShow"  @click="cancleSelect()">取消选择</span>
                 <!-- <span class="btn-operate" @click="showColumnConfig()">显示列</span> -->
               </div>
             </div>

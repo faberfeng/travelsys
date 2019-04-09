@@ -866,6 +866,7 @@ export default {
             alert:'',
             listLength:'',//判断选择了几条点位
             plotGroup:"",//选中当前数组
+            plotGroupOne:'',//第一次集合绑定的监测点
             picMarkName:'',
             baseMapShow:false,
             baseMapMonitor:false,
@@ -2072,6 +2073,8 @@ export default {
             }
             if(status==true){
                 this.plotGroup=list[0].pointGroupData;
+                console.log(this.plotGroup,'this.plotGroup');
+                this.plotGroupOne=list[0].pointGroupData[0].id;
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
                 this.broken=list[0].isBroken;
@@ -6573,12 +6576,13 @@ export default {
 
         },
         brokenChanged(val){
+            console.log(val,'val000');
          
-            var pointId=val.ID_out;
+            var pointId=val.pointGroupData[0].id;
             var status="";
-            if(val.isBroken==0){
+            if(val.pointGroupData[0].isBroken==0){
                 status=1
-            }else if(val.isBroken==1){
+            }else if(val.pointGroupData[0].isBroken==1){
                 status=0
             }
             var vm=this;
