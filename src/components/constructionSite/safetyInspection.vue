@@ -188,9 +188,11 @@
                             <label class="inspectTableHeadLeftTxt"></label>
                         </div>
                         <div class="inspectTableHeadRight">
-                            <div class="addData" v-show="importDataEdit" @click="batchExport()">数据导入</div>
+                            <!-- v-show="importDataEdit" -->
+                            <div class="addData"  @click="batchExport()">数据导入</div>
                             <div class="addInspectContent"  @click="configureMonitorItemBtn()">配置监测目录</div>
-                            <div class="addInspectContent" v-show="editInspectWordEdit" @click="addMonitorItemBtn()">新增监测内容</div>
+                            <div class="addInspectContent"  @click="addMonitorItemBtn()">新增监测内容</div>
+                            <!-- v-show="editInspectWordEdit" -->
                         </div>
                     </div>
                     <div class="inspectTableBody">
@@ -234,11 +236,17 @@
                                     <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     <td>
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
-                                        <button title="编辑" v-show="editInspectWordEdit" @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
-                                        <button title="上移" v-show="editInspectWordEdit" class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
-                                        <button title="下移" v-show="editInspectWordEdit" class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
-                                        <button title="详情" v-show="searchInspectDetailEdit" class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count,item.sign)"></button>
-                                        <button title="导入" v-show="importDataEdit" class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
+                                        <!-- v-show="editInspectWordEdit" -->
+                                        <button title="编辑"  @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
+                                        <!-- v-show="editInspectWordEdit" -->
+                                        <button title="上移"  class="upmoveBtn actionBtn" @click="moveUp(item.id)"></button>
+                                        <!-- v-show="editInspectWordEdit" -->
+                                        <button title="下移"  class="downmoveBtn actionBtn" @click="moveDown(item.id)"></button>
+                                        <!-- v-show="searchInspectDetailEdit" -->
+                                        
+                                        <button title="详情"  class="detailBtn actionBtn" @click="detail(item.keyword,item.id,item.type,item.name,item.baseMapId,item.count,item.sign)"></button>
+                                        <!-- v-show="importDataEdit" -->
+                                        <button title="导入"  class="exportBtn actionBtn" @click="importData(item.keyword,item.name,item.type,item.id)"></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -3201,6 +3209,8 @@ export default {
             vm.pitchDetailShow=false;
             vm.walkThroughShow=false;
             vm.commonDetailShow=false;
+            vm.displaySpotNum=false;
+            this.picMark=false;
             // vm.pageSize=10;
             // vm.pageNum1=2;
             vm.currentPage1=1;

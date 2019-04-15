@@ -975,9 +975,9 @@ export default Vue.component('commonDetail',{
         displayInspectSpot(){
             // console.log(this.commonMonitorMainItemList);
              for(let i = 0; i < this.commonMonitorMainItemList.length;i++){
-                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].sign,this.commonMonitorMainItemList[i].spotNum);
+                this.$refs.pic.enableType(this.commonMonitorMainItemList[i].type,this.commonMonitorMainItemList[i].sign,this.commonMonitorMainItemList[i].spotNum,this.commonMonitorMainItemList[i].id);
             }
-            this.$refs.pic.enableType(this.itemMonitorType,this.itemSubmitSign,true);
+            this.$refs.pic.enableType(this.itemMonitorType,this.itemSubmitSign,true,this.itemMonitorId);
             // console.log('触发')
         },
         baseMapCancle(){
