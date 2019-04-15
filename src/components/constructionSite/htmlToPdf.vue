@@ -33,10 +33,10 @@
                 </div>
                 <!-- 概述 -->
                 <div class="pdfSummary">
-                    <div class="qrcodeBody" v-show="generateQrcode==1">
+                    <!-- <div class="qrcodeBody" v-show="generateQrcode==1">
                             <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                             <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
-                    </div>
+                    </div> -->
                     <label class="pdfSummaryHead">概述</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                     <div class="txt"><label class="label1">观测时间：{{beforeDate|timeChange()}}</label></div>
@@ -86,10 +86,10 @@
                 </div>
                 <!-- 现场巡检 -->
                 <div class="pdfInspection">
-                     <div class="qrcodeBody" v-show="generateQrcode==1">
+                     <!-- <div class="qrcodeBody" v-show="generateQrcode==1">
                             <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                             <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
-                    </div>
+                    </div> -->
                      <label class="pdfSummaryHead">现场巡检报表</label>
                     <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                     <div class="txt"><label class="label1">观测者：</label><span class="span1"><label>观测时间：</label></span></div>
@@ -136,14 +136,14 @@
                     <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
                        
                         <div class="verticalLength" v-show="item.type!=5">
-                             <div class="qrcodeBody" v-show="generateQrcode==1">
+                             <!-- <div class="qrcodeBody" v-show="generateQrcode==1">
                                 <img style="margin-right:-150px;width:60px;height:60px;" :src="BDMSUrl+'/QRCode2/getQRimage/'+'{'+onlyNum+'}'" />
                                 <label class="onlyNumStyle">报告编码：{{onlyNum}}</label>
-                            </div>
+                            </div> -->
                             <label class="pdfSummaryHead1">{{company}}</label>
                             <label class="pdfSummaryHead">监测报表</label>
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">观测：{{item.getItemDutyUserList.observerName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">计算：{{item.getItemDutyUserList.calculatorName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">检核：{{item.getItemDutyUserList.inspectorName}}</label></span></div>
+                            <!-- <div class="txt"><label class="label1">测量日期</label><span class="span1"><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">观测：{{item.getItemDutyUserList.observerName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">计算：{{item.getItemDutyUserList.calculatorName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">检核：{{item.getItemDutyUserList.inspectorName}}</label></span></div> -->
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
                             <!-- <div class="bottomTabel2" v-show="baseMapPosition==1">
                                 <div class="bottomTabelDiv"  style="padding: 0px; overflow: hidden;">
@@ -153,7 +153,7 @@
                                 </div>
                              </div> -->
                             <div class="bottomTabel" >
-                                <table class="bottomTableList" border="1" cellspacing="0" width="100%">
+                                <table :id="'bottomTableList'+item.id" class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
                                             <th rowspan="2">测点编号</th>
@@ -284,6 +284,7 @@
         </div>
         <div>
             <button class="downbtn" @click="getPdf()">下载到本地</button>
+             <button class="downbtn" @click="getExcel()">导出excel表</button>
         </div>
     </div>
 </template>
@@ -294,6 +295,7 @@ import moment from 'moment'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import picView from './picView.vue'
+import {method5} from './js/method.js'
 // var dpiWidth;
 // var dpiHeight;
 export default {
@@ -504,6 +506,7 @@ export default {
                              this.$set(item,'getItemDutyUserList',this.getItemDutyUserList1)
                          }
                      })
+                     console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -1003,6 +1006,11 @@ export default {
                     // console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
                 }
             }) 
+        },
+        getExcel(){
+            this.getAllMonitorItemList.forEach((item)=>{
+                    method5('bottomTableList'+item.id);
+            })
         },
          //html转PDF
         getPdf(){

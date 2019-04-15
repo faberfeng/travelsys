@@ -38,6 +38,7 @@
                         <span v-show="importMethod==1&&importDataEdit" class="import" @click="handExportExcel()">导入</span>
                         <span v-show="importMethod==2&&importDataEdit" @click="autoAcquisitionBtn()" class="import">配置</span>
                         <span class="import1" v-show="exportDataEdit" @click="getImportHistory">导出</span>
+                         <span class="import2" @click="downExcel()" v-show="exportDataEdit" >导出Excel</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
@@ -62,8 +63,9 @@
                 
             </div>
             <div class="projectBodyBottom">
+                <!-- <div><button id >导出excel表</button></div> -->
                 <div class="bottomTabel">
-                    <table class="bottomTableList" border="1" cellspacing="0" width="100%">
+                    <table id="bottomTableList" border="1" cellspacing="0" width="100%">
                         <thead>
                             <tr>
                                 <th rowspan="2">测点编号</th>
@@ -463,6 +465,7 @@ import moment from 'moment'
 import Vue from 'vue'
 import picView from './picView.vue'
 import pdf from 'vue-pdf'
+import {method5} from './js/method.js'
 import data from '../Settings/js/date';
 import VueHighcharts from 'vue2-highcharts'
 export default Vue.component('commonDetail',{
@@ -855,6 +858,9 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+        downExcel(){
+            method5('bottomTableList')   
+        },
         // callback(e){
         //     console.log(e.data,'e.data.command');
         //     switch(e.data.command){
@@ -2654,7 +2660,19 @@ export default Vue.component('commonDetail',{
                         color:#666;
                         border-radius: 3px;
                         cursor: pointer;
-
+                    }
+                     .import2{
+                        display: inline-block;
+                        width:124px;
+                        height: 26px;
+                        border:1px solid #f2f2f2;
+                        background: #f2f2f2;
+                        font-size: 14px;
+                        line-height: 26px;
+                        // vertical-align: middle;
+                        color:#666;
+                        border-radius: 3px;
+                        cursor: pointer;
                     }
                 }
             }
@@ -2855,7 +2873,7 @@ export default Vue.component('commonDetail',{
             .projectBodyBottom{
                 margin-top:30px;
                 .bottomTabel{
-                    .bottomTableList{
+                    #bottomTableList{
                         border-collapse: collapse;
                         border: 1px solid #e6e6e6;
                             thead{
