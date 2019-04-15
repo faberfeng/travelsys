@@ -1125,9 +1125,11 @@ export default {
 
             for(let i = 0;i < this.drawList.length;i++){
 
-                if(this.drawList[i].display==false){
-                    continue;
-                }
+                // if(this.drawList[i].display==false){
+                //     continue;
+                // }
+
+                var needContinue = false;
 
                 let color = this.baseColor;
                
@@ -1140,6 +1142,28 @@ export default {
 
                 let colorId = {r:this.drawList[i].SID % 256,g:parseInt(this.drawList[i].SID / 256) % 256,b:parseInt(this.drawList[i].SID / 256 / 256) % 25};
                 
+                var data = "";
+                var name = "";
+
+                var drawItemTagType_ = null;
+
+                if(this.drawList[i].pointGroupData){
+                    needContinue = true;
+                    for(let k = 0; k < this.drawList[i].pointGroupData.length;k++){
+                        if(this.drawList[i].pointGroupData[k].display == true){
+                            this.drawList[i].type = this.drawList[i].pointGroupData[k].itemTypeToDisplay;
+                            drawItemTagType_ = this.drawList[i].pointGroupData[k].sign;
+                            data = this.drawList[i].pointGroupData[k].data;
+                            name = this.drawList[i].pointGroupData[k].name;
+                            needContinue = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(needContinue){
+                    continue;
+                }
 
                 switch(this.drawList[i].type){
                     case "move":
@@ -1152,13 +1176,18 @@ export default {
 
                             for(let j = 0;j<this.drawList[i].position.length;j++){
                                 var drawItemTagType = this.drawItemTagType;
-                                var data = "";
-                                var name = "";
-                                if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
-                                    data = this.drawList[i].pointGroupData[0].data;
-                                    name = this.drawList[i].pointGroupData[0].name;
+
+                                if(drawItemTagType_){
+                                    drawItemTagType = drawItemTagType_;
                                 }
+
+                                // var data = "";
+                                // var name = "";
+                                // if(this.drawList[i].pointGroupData){
+                                //     drawItemTagType = this.drawList[i].pointGroupData[0].sign;
+                                //     data = this.drawList[i].pointGroupData[0].data;
+                                //     name = this.drawList[i].pointGroupData[0].name;
+                                // }
 
                                 var need_Alert = false;
 
@@ -1193,13 +1222,16 @@ export default {
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
                                 var drawItemTagType = this.drawItemTagType;
-                                var data = "";
-                                var name = "";
-                                if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
-                                    data = this.drawList[i].pointGroupData[0].data;
-                                    name = this.drawList[i].pointGroupData[0].name;
+                                if(drawItemTagType_){
+                                    drawItemTagType = drawItemTagType_;
                                 }
+                                // var data = "";
+                                // var name = "";
+                                // if(this.drawList[i].pointGroupData){
+                                //     drawItemTagType = this.drawList[i].pointGroupData[0].sign;
+                                //     data = this.drawList[i].pointGroupData[0].data;
+                                //     name = this.drawList[i].pointGroupData[0].name;
+                                // }
 
                                 var need_Alert = false;
 
@@ -1232,13 +1264,16 @@ export default {
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
                                 var drawItemTagType = this.drawItemTagType;
-                                var data = "";
-                                var name = "";
-                                if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
-                                    data = this.drawList[i].pointGroupData[0].data;
-                                    name = this.drawList[i].pointGroupData[0].name;
+                                if(drawItemTagType_){
+                                    drawItemTagType = drawItemTagType_;
                                 }
+                                // var data = "";
+                                // var name = "";
+                                // if(this.drawList[i].pointGroupData){
+                                //     drawItemTagType = this.drawList[i].pointGroupData[0].sign;
+                                //     data = this.drawList[i].pointGroupData[0].data;
+                                //     name = this.drawList[i].pointGroupData[0].name;
+                                // }
 
                                 var need_Alert = false;
 
@@ -1270,13 +1305,16 @@ export default {
                             }
                             for(let j = 0;j<this.drawList[i].position.length;j++){
                                 var drawItemTagType = this.drawItemTagType;
-                                var data = "";
-                                var name = "";
-                                if(this.drawList[i].pointGroupData){
-                                    drawItemTagType = this.drawList[i].pointGroupData[0].sign;
-                                    data = this.drawList[i].pointGroupData[0].data;
-                                    name = this.drawList[i].pointGroupData[0].name;
+                                if(drawItemTagType_){
+                                    drawItemTagType = drawItemTagType_;
                                 }
+                                // var data = "";
+                                // var name = "";
+                                // if(this.drawList[i].pointGroupData){
+                                //     drawItemTagType = this.drawList[i].pointGroupData[0].sign;
+                                //     data = this.drawList[i].pointGroupData[0].data;
+                                //     name = this.drawList[i].pointGroupData[0].name;
+                                // }
                                  var need_Alert = false;
 
                                 if(this.drawList[i].pointGroupData){
@@ -2468,40 +2506,18 @@ export default {
             // console.log(item);
             return item;
         },
-        enableType(drawtype,sign,status){
-
-            // console.log(drawtype,sign,status);
-
-            // switch(drawtype){
-            //     case 1: //  位移
-            //         this.drawtype_move = status;
-            //         break;
-            //     case 2: //  位移
-            //         this.drawtype_move = status;
-            //         break;
-            //     case 3: //  水位
-            //         this.drawtype_level = status;
-            //         break;
-            //     case 4: //  力
-            //         this.drawtype_force = status;
-            //         break;
-            //     case 5: //  倾斜
-            //         this.drawtype_slanting = status;
-            //         break;
-            // }
-
-
-            // for(let i = 0; i < this.drawList.length;i++){
-            //     if(this.drawList[i].typeNum == drawtype && this.drawList[i].ItemId == drawItemId){
-            //         this.drawList[i].display = status;
-            //     }
-            // }
+        enableType(drawtype,sign,status,contentType){
 
             for(let i = 0; i < this.drawList.length;i++){
 
                 if(this.drawList[i].pointGroupData){
-                    if(this.drawList[i].pointGroupData[0].itemType == drawtype && this.drawList[i].pointGroupData[0].sign == sign){
-                        this.drawList[i].display = status;
+                    for(let j = 0; j < this.drawList[i].pointGroupData.length;j++)
+                    if(this.drawList[i].pointGroupData[j].itemType == drawtype && this.drawList[i].pointGroupData[j].sign == sign ){
+
+                        if(this.drawList[i].pointGroupData[j].itemId == contentType){
+                            // this.drawList[i].display = status;
+                            this.drawList[i].pointGroupData[j].display = status;
+                        }
                     }
                 }
             }
@@ -2564,6 +2580,50 @@ export default {
 
             return output;
         },
+        getType(itemType){
+            var drawtype = "";
+            switch(itemType){
+                case 1: //  位移
+                    drawtype = "move";
+                    break;
+                case 2: //  位移
+                    drawtype = "move";
+                    break;
+                case 3: //  水位
+                    drawtype = "level";
+                    break;
+                case 4: //  力
+                    drawtype = "force";
+                    break;
+                case 5: //  倾斜
+                    drawtype = "slanting";
+                    break;
+                case 101: // 线段
+                    drawtype = "line";
+                    break;
+                case 102: // 椭圆
+                    drawtype = "circular";
+                    break;
+                case 103: // 方块
+                    drawtype = "rectangle";
+                    break;
+                case 104: // 云线
+                    drawtype = "cloud";
+                    break;
+                case 105: // 标记
+                    drawtype = "Mark";
+                    break;
+                case 10001: // 图标
+                    drawtype = "Select_img_Mark";
+                    break;
+                case 10000: // 文字
+                    drawtype = "text";
+                    break;
+            }
+
+            return drawtype;
+        }
+        ,
         loadPoints(list){
             this.drawList = [];
             this.SelectedList = [];
@@ -2575,47 +2635,13 @@ export default {
                 let plotInfo = JSON.parse(list[i].plotInfo);
                 // console.log(plotInfo,'plotInfo')
 
+                
                 if(list[i].pointGroupData){
 
-                    var drawtype = "";
+                    for(let j = 0; j < list[i].pointGroupData.length;j++){
 
-                     switch(list[i].pointGroupData[0].itemType){
-                        case 1: //  位移
-                            drawtype = "move";
-                            break;
-                        case 2: //  位移
-                            drawtype = "move";
-                            break;
-                        case 3: //  水位
-                            drawtype = "level";
-                            break;
-                        case 4: //  力
-                            drawtype = "force";
-                            break;
-                        case 5: //  倾斜
-                            drawtype = "slanting";
-                            break;
-                        case 101: // 线段
-                            drawtype = "line";
-                            break;
-                        case 102: // 椭圆
-                            drawtype = "circular";
-                            break;
-                        case 103: // 方块
-                            drawtype = "rectangle";
-                            break;
-                        case 104: // 云线
-                            drawtype = "cloud";
-                            break;
-                        case 105: // 标记
-                            drawtype = "Mark";
-                            break;
-                        case 10001: // 图标
-                            drawtype = "Select_img_Mark";
-                            break;
-                        case 10000: // 文字
-                            drawtype = "text";
-                            break;
+                        list[i].pointGroupData[j].itemTypeToDisplay = this.getType(list[i].pointGroupData[j].itemType);
+                        list[i].pointGroupData[j].display = true;
                     }
 
                     let item = {
@@ -2635,7 +2661,7 @@ export default {
                                 TempPostion:plotInfo.TempPostion,
                                 text:plotInfo.text,
                                 display:true,
-                                typeNum:drawtype,                               //  type
+                                typeNum:null,                               //  type
                                 userData:plotInfo.userData,
                                 pointGroupData:list[i].pointGroupData
                             };
