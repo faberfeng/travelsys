@@ -2575,35 +2575,79 @@ export default {
                 let plotInfo = JSON.parse(list[i].plotInfo);
                 // console.log(plotInfo,'plotInfo')
 
-                let item = {
-                            data:list[i].data,                                  //  data
-                            ItemId:list[i].itemId,                              //  itemId
-                            ID_out:list[i].id,                                  //  id
-                            isAlert:list[i].isAlert,                            //  isAlert
-                            isBroken:list[i].isBroken,                          //  isBroken
-                            itemName:list[i].itemName,                          //  itemName
-                            pointName:list[i].pointName,                        //  pointName
-                            status:"normal",
-                            Selected:false,
-                            SID:this.drawID,
-                            type:plotInfo.type,
-                            position:plotInfo.position,
-                            count:1,
-                            TempPostion:plotInfo.TempPostion,
-                            text:plotInfo.text,
-                            display:true,
-                            typeNum:list[i].type,                               //  type
-                            userData:plotInfo.userData,
-                            pointGroupData:list[i].pointGroupData
-                        };
-
                 if(list[i].pointGroupData){
-                    item.isBroken = list[i].pointGroupData[0].isBroken;
-                }
-                
-                this.drawList.push(item);
 
-                this.drawID++;
+                    var drawtype = "";
+
+                     switch(list[i].pointGroupData[0].itemType){
+                        case 1: //  位移
+                            drawtype = "move";
+                            break;
+                        case 2: //  位移
+                            drawtype = "move";
+                            break;
+                        case 3: //  水位
+                            drawtype = "level";
+                            break;
+                        case 4: //  力
+                            drawtype = "force";
+                            break;
+                        case 5: //  倾斜
+                            drawtype = "slanting";
+                            break;
+                        case 101: // 线段
+                            drawtype = "line";
+                            break;
+                        case 102: // 椭圆
+                            drawtype = "circular";
+                            break;
+                        case 103: // 方块
+                            drawtype = "rectangle";
+                            break;
+                        case 104: // 云线
+                            drawtype = "cloud";
+                            break;
+                        case 105: // 标记
+                            drawtype = "Mark";
+                            break;
+                        case 10001: // 图标
+                            drawtype = "Select_img_Mark";
+                            break;
+                        case 10000: // 文字
+                            drawtype = "text";
+                            break;
+                    }
+
+                    let item = {
+                                data:list[i].data,                                  //  data
+                                ItemId:list[i].itemId,                              //  itemId
+                                ID_out:list[i].id,                                  //  id
+                                isAlert:list[i].isAlert,                            //  isAlert
+                                isBroken:list[i].isBroken,                          //  isBroken
+                                itemName:list[i].itemName,                          //  itemName
+                                pointName:list[i].pointName,                        //  pointName
+                                status:"normal",
+                                Selected:false,
+                                SID:this.drawID,
+                                type:plotInfo.type,
+                                position:plotInfo.position,
+                                count:1,
+                                TempPostion:plotInfo.TempPostion,
+                                text:plotInfo.text,
+                                display:true,
+                                typeNum:drawtype,                               //  type
+                                userData:plotInfo.userData,
+                                pointGroupData:list[i].pointGroupData
+                            };
+
+                    if(list[i].pointGroupData>0){
+                        item.isBroken = list[i].pointGroupData[0].isBroken;
+                    }
+                    
+                    this.drawList.push(item);
+
+                    this.drawID++;
+                }
 
             }
             this.Refresh();

@@ -7,6 +7,9 @@
                     <el-checkbox id="name" @change="clickCheck(item1)"  v-model="item1.spotNum" ></el-checkbox><label for="name">{{item1.name}}</label>
                 </li>
             </ul>
+            <div class="treeOne_check" v-if="item.disabled1">
+                <el-checkbox id="name" @change="clickCheck(item)"  v-model="item.spotNum" ></el-checkbox><label for="name">{{item.name}}</label>
+            </div>
         </li>
     </ul>
     
@@ -81,6 +84,12 @@ export default Vue.component('fileTree', {
                     #name{
                         margin-right: 5px;
                     }
+                }
+            }
+            .treeOne_check{
+                margin-left:10px;
+                #name{
+                    margin-right: 5px;
                 }
             }
 

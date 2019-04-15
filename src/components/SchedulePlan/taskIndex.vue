@@ -48,7 +48,7 @@
               <div class="taskHeadRight">
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="projectWork()">工程任务</span>
-                <span class="btn-operate" v-show="batchVerificationShow">开始核实</span>
+                <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
                 
                 <span class="btn-operate" v-show="projectWorkShow" @click="userGroupTask()">群组权限</span>
@@ -95,13 +95,19 @@
                       index-text="序号"
                       :data="taskIndexDataList" :columns="columnsBatich" :max-height="props.height" :tree-type="props.treeType"
                       :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                      :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
+                      :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick1"
                       @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                       <template slot="action" slot-scope="scope">
-                        <button class="el-icon-circle-plus actionBtn" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
-                        <button class="el-icon-upload actionBtn" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
-                        <button class="el-icon-picture-outline actionBtn" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
+                        <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
+                        <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
+                        <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
                         <!-- <el-slider v-model="value9" ></el-slider> -->
+                      </template>
+                      <template slot="verifyTime" slot-scope="scope">
+                         <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
+                      </template>
+                      <template slot="verifyNum" slot-scope="scope">
+                          <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="scope.row.realTaskStart==null?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider>
                       </template>
                       <template slot="milepost" slot-scope="scope">
                           {{scope.row.taskType==1?'是':'否'}}
@@ -163,8 +169,8 @@
       <div class="__template__" type="RESOURCE_EDITOR"></div>
       <div class="__template__" type="RESOURCE_ROW"></div>
     </div>
-
-    <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']" v-show="hiddenGanttList" v-if="!showCommonList">
+<!-- v-show="projectWorkShow" -->
+    <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']"  v-if="!showCommonList">
       <div id="center-selection">
         <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
           <i class="icon-right"></i>
@@ -873,7 +879,7 @@
           </div>
           <div class="verifyTime">
             <label class="verifySilderText">核实日期:</label>
-            <el-date-picker v-model="verifyStartTime" type="date" placeholder="选择日期">
+            <el-date-picker  v-model="verifyStartTime" type="date" placeholder="选择日期">
             </el-date-picker>
           </div>
         </div>
@@ -1188,6 +1194,10 @@
     data() {
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+        changeVerifyList:{},
+        batchVerifyList:[],
+        value1:'',
+        value2:0,
         value9:[],
         elementTraceIds:[],
         returnLabelUrl:'',
@@ -1703,6 +1713,20 @@
             //   show: true,
             // },
             {
+              label: '核实时间',
+              prop: 'operator',
+              type: 'template',
+              template: 'verifyTime',
+              width: '140px'
+            },
+             {
+              label: '核实比例',
+              prop: 'operator',
+              type: 'template',
+              template: 'verifyNum',
+              width: '140px'
+            },
+            {
               label: '操作',
               prop: 'operator',
               type: 'template',
@@ -1823,6 +1847,7 @@
 
     },
     methods: {
+
        callback(e){
             switch(e.data.command){
               case "EngineReady":
@@ -2170,10 +2195,13 @@
       //获取工程列表
       getTaskList() {
         this.loading=true;
+        // this.taskIndexData=[];
+        // this.taskIndexDataList=[];
+        // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         var list=[];
         //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         // this.taskIndexData=[];
-        // this.taskIndexDataList=[];
+        this.taskIndexDataList=[];
         axios({
           method: 'post',
           url: this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
@@ -2193,7 +2221,11 @@
              
             // })
             this.dataDigui(response.data.rt);
-            // console.log(this.taskIndexDataList,'this.taskIndexDataList');
+            this.taskIndexDataList.forEach((item)=>{
+              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+              this.$set(item,'currentDate',Date.parse(new Date()))
+            })
+            console.log(this.taskIndexDataList,'this.taskIndexDataList');
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
@@ -2207,6 +2239,7 @@
         })
       },
       dataDigui(root){
+        // this.taskIndexDataList=[];
         for(let i = 0;i < root.length;i++){
             if(root[i].children){
               this.dataDigui(root[i].children);
@@ -2273,6 +2306,45 @@
           }
         })
       },
+      rowClick1(row, rowIndex,$event){
+
+        // {
+        //   if(row.target._prevClass=="zk-table__cell-inner"){
+        //     row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        //   if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
+        //     row.target.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        //   if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+        //     row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       item.style.backgroundColor='white'
+        //     })
+        //     row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //   }
+        // }
+
+        this.selectRowList = rowIndex;
+          this.selectRowList.forEach((item, index) => {
+            if (item._isHover == true) {
+              this.selectChildren=item.children
+              this.taskId = item.taskId
+              this.taskParId = item.taskParId
+            }
+          })
+        setTimeout(()=>{
+            
+        },200)
+        this.getTask();
+        this.getVerifyList();
+        this.getEntityRelation();
+
+      },
       //点击zk-tree获取id
       rowClick(row, rowIndex,$event) {
         // var userAgent = navigator.userAgent;//取得浏览器的userAgent字符串
@@ -2321,6 +2393,7 @@
         //    console.log('是谷歌浏览器')
         // }
         console.log(row);
+        
         {
           if(row.target._prevClass=="zk-table__cell-inner"){
             row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
@@ -3560,6 +3633,62 @@
         this.selectType = this.TypeList[0].value;
         this.radio = '1';
       },
+      //开始核实
+      startVerify(){
+        var vm=this;
+        // console.log(this.taskIndexDataList,'当前数据改变');
+        // console.log(this.$refs.slider);
+        // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+        // console.log(document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0],'0000');
+         
+        if(this.changeVerifyList){
+          this.batchVerifyList=[];
+          for(var id in this.changeVerifyList){
+            this.batchVerifyList.push(this.changeVerifyList[id]);
+          }
+          console.log(this.batchVerifyList,'this.batchVerifyList');
+          axios({
+            url:this.BDMSUrl+'schedule/'+this.projId+'/task/batchVerify',
+            method:'post',
+            headers:{
+              'token':vm.token 
+            },
+            data:this.batchVerifyList
+          }).then((response)=>{
+            if(response.data.cd=='0'){
+               this.taskIndexDataList=[];
+                this.taskIndexData=[];
+              // document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
+                this.getTaskList();
+                this.$message({
+                  type:'success',
+                  message:'批量核实成功'
+                })
+                this.batchVerifyList=[];
+                //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
+                this.changeVerifyList={};
+            }else{
+                this.$message({
+                  type:'error',
+                  message:response.data.msg
+                })
+            }
+          })
+
+        }else{
+          this.$message({
+            type:'info',
+            message:'请选择需要核实的任务'
+          })
+        }
+        
+
+
+        // this.taskIndexDataList.forEach((item)=>{
+        //   console.log(this.$refs.$('slider'+item.taskId));
+        // })
+
+      },
       //批量核实
       batchVerification(){
         this.batchVerificationShow=true;
@@ -3568,6 +3697,8 @@
       projectWork(){
         this.projectWorkShow=true;
         this.batchVerificationShow=false;
+        this.batchVerifyList=[];
+        this.changeVerifyList={};
       },
       selectChange() {
         this.compCount1 = 0;
@@ -4281,6 +4412,18 @@
       bindPic() {
         this.uploadPicDialog = true;
       },
+      changeSlider(id,num,time){
+        // console.log('111');
+        console.log(id,num,time);
+        // console.log(this.taskIndexDataList,'DATACHANGE');
+        this.changeVerifyList[id]={"taskId":id,"tvRate":num,"tvDate":moment(time).format("YYYY-MM-DD")}
+        console.log(this.changeVerifyList,'滑动条')
+      },
+      changeDatePicker(id,num,time){
+        console.log(id,num,time);
+        this.changeVerifyList[id]={"taskId":id,"tvRate":num,"tvDate":moment(time).format("YYYY-MM-DD")}
+        console.log(this.changeVerifyList,'时间条')
+      },
       //上传图片取消
       uploadPicCancle() {
         this.uploadPicDialog = false;
@@ -4569,6 +4712,11 @@
     height: 100%;
     #print-qrcode{
           display: none;
+      }
+      .input-class{
+        .el-input__inner{
+            width: 130px; 
+          } 
       }
     .dialog {
       top: 15vh;
@@ -6487,6 +6635,13 @@
         border: none;
         cursor: pointer;
         margin-right: 16px;
+      }
+      .actionBtnA {
+        width: 16px;
+        height: 16px;
+        border: none;
+        cursor: pointer;
+        margin-right: 24px;
       }
       .el-icon-circle-plus{
           // width: 18px;

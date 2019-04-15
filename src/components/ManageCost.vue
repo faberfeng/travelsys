@@ -867,7 +867,7 @@ export default {
                             path:'/setting/initalsettings'//配置中心
                         })
                     }
-                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00104')
+                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00105')
             }
         },
         getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4){
@@ -954,21 +954,31 @@ export default {
                             {
                                 title:'/setting/usermanage',
                                 linkUrl:'用户管理'
-                            }
+                            },
+                           
+                           
                         )
                         vm.$set(item,'routerLink',routerLink3);
                     }
                     if(item.moduleCode==Code4){
-                        vm.$set(item,'isShowUrl','/setting/projectstationmanage');
+                        vm.$set(item,'isShowUrl','/setting/safeManageClassify');
                         let routerLink4=[];
                         routerLink4.push(
+                            // {
+                            //     title:'/setting/projectstationmanage',
+                            //     linkUrl:'工程动态管理'
+                            // },
+                            // {
+                            //     title:'/setting/projectloggermanage',
+                            //     linkUrl:'工程日志管理'
+                            // }
                             {
-                                title:'/setting/projectstationmanage',
-                                linkUrl:'工程动态管理'
+                                title:'/setting/safeManageClassify',
+                                linkUrl:'安全检查分类'
                             },
                             {
-                                title:'/setting/projectloggermanage',
-                                linkUrl:'工程日志管理'
+                                title:'/setting/qualityManageClassify',
+                                linkUrl:'质量检查分类'
                             }
                         )
                         vm.$set(item,'routerLink',routerLink4);
@@ -1105,6 +1115,13 @@ export default {
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '017'){
+                 this.$router.push({
+                    path:this.firstGetSecondGradeList(this.moduleLists,'017','01701','/qualityManage/qualityManage')
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+
             }else if(tab.name === '015'){
                 this.navigationPath = tab.name;
                 // sessionStorage.setItem('navigationPath',this.navigationPath)

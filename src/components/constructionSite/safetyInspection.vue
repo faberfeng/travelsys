@@ -2072,6 +2072,7 @@ export default {
                 this.isBindPoint=false;
             }
             if(status==true){
+
                 this.plotGroup=list[0].pointGroupData;
                 console.log(this.plotGroup,'this.plotGroup');
                 this.plotGroupOne=list[0].pointGroupData[0].id;
@@ -3705,9 +3706,10 @@ export default {
         },
         checkboxChange(data){
             console.log(data,'data');
+            console.log(this.monitorMainItemList,'this.monitorMainItemList000');
 
             for(let i = 0; i < this.monitorMainItemList.length;i++){
-                this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].sign,this.monitorMainItemList[i].spotNum);
+                this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].sign,this.monitorMainItemList[i].spotNum,this.monitorMainItemList[i].id);
             }
         },
         checkChange(){
@@ -4018,10 +4020,15 @@ export default {
                          val.forEach((item1)=>{
                              if(item.id==item1.directoryId){
                                     a.push(item1);
+                                }else if(item1.directoryId==null){
+                                    this.$set(item1,'children',[]);
+                                    vm.$set(item1,'disabled1',true);
+                                    this.getDetectionDirectoryListLeft.push(item1);
                                 }
                                 vm.$set(item,'children',a)
                              })
                     })
+                    this.getDetectionDirectoryListLeft=Array.from(new Set(this.getDetectionDirectoryListLeft))
                     console.log(this.getDetectionDirectoryListLeft,'树形结构');
                 }else{
                     this.$message({
@@ -4355,6 +4362,9 @@ export default {
                              a.push(item1);
                             vm.$set(item,'pointGroupData',a);
                          }
+                        //  else{
+                        //      vm.$set(item,'pointGroupData',[]);
+                        //  }
                      })
                  })
                   this.$refs.pic.loadPoints(this.monitorPointInfo);

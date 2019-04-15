@@ -1,4 +1,5 @@
-var response={
+var response=
+{
     "cd":"0",
     "rt":{
         "onlineInfo":{

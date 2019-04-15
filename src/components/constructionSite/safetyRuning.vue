@@ -54,16 +54,22 @@
                         </div>
                         <div class="checkSite">
                             <h5 class="checkSite_header"><img class=imgIcon src="./images/checksite.png">检查点位列表</h5>
+                            <a :class="['right_header','right-expend',bottomExpend2.isExpend?'':'right-pack-up']" href="javascript:void(0)" @click="changeBottomExpend2()" v-text="bottomExpend2.title"></a>
                             <div class="checkLabelBtn">
+
                                 <div class="btn" @click="printAllLabel" >打印全部标签</div>
                                 <div class="btn1" @click="editSite">编辑点位</div>
+                                <div class="btn2"  @click="downCheckPoint">导出检查点位</div>
+                                
                             </div>
-                            <div class="checkSite_table">
+                            <div class="checkSite_table" v-show="bottomExpend2.isExpend">
                                 <table>
                                     <thead>
                                         <tr>
                                             <th></th>
+                                            <th></th>
                                             <th>位置</th>
+                                            <th>检查类型</th>
                                             <th>安全状态</th>
                                             <th>检查时间</th>
                                             <th>检查人</th>
@@ -72,9 +78,11 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr :class="{'check':index==isshow}" v-for="(item,index) in checkPointsByItemIdList" :key="index" @click="checkItem(index)">
+                                        <tr :class="{'check':index==isshow}" v-for="(item,index) in checkPointsByItemIdList" :key="index" @click.stop="checkItem(index,item.checkPoint.id)">
                                             <td>{{index+1}}</td>
+                                            <td><el-checkbox v-model="item.checkNum"  v-on:click.native.stop></el-checkbox></td>
                                             <td>{{item.checkPoint.name}}</td>
+                                            <td>{{getClassifyName(item.checkPoint.classificationId)}}</td>
                                             <td>{{item.checkRecord.currCheckStatus|securityStatusChange()}}</td>
                                             <td>{{item.checkRecord.checkTime | changeTime()}}</td>
                                             <td>{{item.checkUserName | nameChange()}}</td>
@@ -83,7 +91,9 @@
                                                 <button class="printLabelBtn actionBtn" @click.stop="printLabel(item.checkRecord.id)" title="打印标签"></button>
                                                 <!-- @click.stop="printLabel(item.checkRecord.id)" -->
                                                 <button class="checkBtn actionBtn" @click.stop="srCheck(item.checkPoint.id)" title="检查"></button>
+                                                <button class="supplyBtn actionBtn" @click.stop="supplyCheck(item.checkPoint.id)" title="补充检查"></button>
                                                 <button class="deleteBtn actionBtn" @click.stop="deleteCheckPoint(item.checkPoint.id)" title="删除"></button>
+                                                
                                             </td>
                                         </tr>
                                     </tbody>
@@ -94,7 +104,7 @@
                                 </span>
                             </div>
                              <!--以下是page-navigitation-->
-                            <div class="datagrid-pager pagination">
+                            <div class="datagrid-pager pagination" v-show="bottomExpend2.isExpend">
                                 <table cellspacing="0" cellpadding="0" border="0" >
                                     <tbody>
                                         <tr>
@@ -148,24 +158,49 @@
                                 <div style="clear:both;"></div>
                             </div>
                         </div>
-                        <div class="bottom">
+                        <div class="bottom" style="margin-top:0px;">
                             <div class="bottom_table">
                                 <div class="header_text">
                                     <span class="text">点位【{{checkPointName}}】检查记录</span>
                                     <div class="selectBtn">
-                                        <span class="pre_btn" @click="getPreviousCheckRecord()">上一条</span>
-                                        <span class="next_btn" @click="getNextCheckRecord()">下一条</span>
+                                        <span v-if="checkPointId" class="pre_btn" @click="downLoadCheckRecord()">导出检查记录</span>
+                                        <!-- <span class="next_btn" @click="getNextCheckRecord()">下一条</span> -->
                                     </div>
                                 </div>
-                                <div class="header_body">
+                                <div class="header_body1">
+                                    <table class="bodyTable" border="1" cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th width="100px">检查序号</th>
+                                                <th width="100px">安全状态</th>
+                                                <th width="100px">待查状态</th>
+                                                <th width="100px">检查人</th>
+                                                <th width="100px">检查时间</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                                     
-                                        <span class="text">检查序号：</span><span class="value">{{checkId}}</span>
+                                <div class="header_body" style="width:100%;height:150px;overflow:auto; border-bottom:1px solid #dddddd;border-top:1px solid #dddddd">
+                                    <table class="bodyTable" border="1" cellspacing="0" width="100%">
+                                        <tbody style="overflow:auto">
+                                            <tr v-for="(item,index) in listData" :key="index">
+                                                <td width="100px">{{item.id}}</td>
+                                                <td width="100px">{{item.currCheckStatus|securityStatusChange()}}</td>
+                                                <td width="100px">{{item.expectCheckStatus|expectCheckStatusChange()}}</td>
+                                                <td width="100px">{{item.checkUserName|nameChange()}}</td>
+                                                <td width="100px">{{item.checkTime| changeTime()}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                        <!-- <span class="text">检查序号：</span><span class="value">{{checkId}}</span>
                                         <span class="text">状态：</span><span class="value">{{currCheckStatus|securityStatusChange()}}</span>
                                         <span class="text">检查人：</span><span class="value">{{checkUserName|nameChange()}}</span>
-                                        <span class="text">检查时间：</span><span class="value">{{checkTime | changeTime()}}</span>
+                                        <span class="text">检查时间：</span><span class="value">{{checkTime | changeTime()}}</span> -->
                                 
-                                    <ul id="checkPics" style="overflow: auto;"></ul>
-                                </div>
+                                    <!-- <ul id="checkPics" style="overflow: auto;"></ul> -->
+                                
                             </div>
                         </div>
                     </div>
@@ -331,6 +366,97 @@
                     </div>
                 </el-dialog>
 
+                <el-dialog width="400px" title="补充安全状态修改" :visible="supplySecurityStatusShow" @close="srSupplyStatusCancle">
+                    <div class="editBody">
+                        <div class="editBodytwo" style="margin-left:1px;">
+                            <el-radio v-model="securityStatus" label="1">确认安全</el-radio>
+                        </div>
+                        <div class="editBodytwo" style="margin-left: 1px;">
+                            <el-radio v-model="securityStatus"  label="2">需要整改</el-radio>
+                        </div>
+                        <div class="editBodytwo" style="margin-left: 1px;">
+                            <el-radio v-model="securityStatus"  label="3">急需整改</el-radio>
+                        </div>
+                         <div class="editBodytwo" style="margin-left:1px;">
+                            <el-date-picker 
+                                v-model="valueDate"
+                                type="datetime"
+                                placeholder="选择日期"
+                                value-format="yyyy-MM-dd HH:mm:ss">
+                            </el-date-picker>
+                        </div>
+                        
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="srSupplyStatusConfirm">确定</button>
+                        <button class="editBtnC" @click="srSupplyStatusCancle">取消</button>
+                    </div>
+                </el-dialog>
+
+                <el-dialog  title="临时点位" :visible="timePointShow" @close="timePointCancle">
+                    <div class="editBody">
+                        <div class="editBodytwo">
+                            <el-date-picker
+                                v-model="selectTime"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                value-format="yyyy-MM-dd HH:mm:ss">
+                            </el-date-picker>
+                        </div>
+                        <div class="editBodytwo">
+                            <el-input style="width:402px;" v-model="checkPointTdName" placeholder="请输入临时点位名称" ></el-input>
+                        </div>
+                        <div class="editBodytwo">
+                                <el-select style="width:402px" v-model="classifyValue" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in getClassificationsList"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="timePointConfirm">确定</button>
+                        <button class="editBtnC" @click="timePointCancle">取消</button>
+                    </div>
+                </el-dialog>
+
+                <el-dialog  title="正常点位" :visible="time1PointShow" @close="time1PointCancle">
+                    <div class="editBody">
+                        <!-- <div class="editBodytwo">
+                            <el-date-picker
+                                v-model="selectTime"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                value-format="yyyy-MM-dd HH:mm:ss">
+                            </el-date-picker>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <el-input style="width:402px;" v-model="checkPointTdName" placeholder="请输入临时点位名称" ></el-input>
+                        </div>
+                        <div class="editBodytwo">
+                                <el-select style="width:402px" v-model="classifyValue" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in getClassificationsList"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="time1PointConfirm">确定</button>
+                        <button class="editBtnC" @click="time1PointCancle">取消</button>
+                    </div>
+                </el-dialog>
+
                 <el-dialog title="重命名目录" :visible.sync="fileNameShow" @close="addfileCancle">
                     <div class="editBody">
                         <div class="editBodytwo imageBody">
@@ -363,25 +489,25 @@
                         <div class="editBodytwo">
                             <label>负责单位:</label>
                             <el-select v-model="respDept" @change="respDeptChange">
-                                <el-option v-for="item in manageUserList" :key="item.ugId" :value="item.ugId" :label="item.ugName"></el-option>
+                                <el-option v-for="item in manageUserList" :key="item.groupId" :value="item.groupId" :label="item.groupName"></el-option>
                             </el-select>
                         </div>
                         <div class="editBodytwo">
                             <label>负责人:</label>
                             <el-select v-model="respUser">
-                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.userName" ></el-option>
+                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.name" ></el-option>
                             </el-select>
                         </div>
                         <div class="editBodytwo">
                             <label>检查单位:</label>
                             <el-select v-model="checkDept" @change="checkDeptChange" >
-                                <el-option v-for="item in manageUserList" :key="item.ugId" :value="item.ugId" :label="item.ugName"></el-option>
+                                <el-option v-for="item in manageUserList" :key="item.groupId" :value="item.groupId" :label="item.groupName"></el-option>
                             </el-select>
                         </div>
                         <div class="editBodytwo">
                             <label>检查人:</label>
                             <el-select v-model="checkUser">
-                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.userName"></el-option>
+                                <el-option v-for="item in personInChargeByDeptList" :key="item.userId" :value="item.userId" :label="item.name"></el-option>
                             </el-select>
                         </div> 
                     </div>
@@ -411,7 +537,8 @@
                         </div>
                         <div class="editBody_right">
                             <div class="editBody_right1">
-                                <span class="newFile actionBtn" @click="newTabFile">新建</span>
+                                <span class="newFile actionBtn" title="正常新建" @click="newTabFile">正常新建</span>
+                                <span class="newTimeFile actionBtn"  title="临时新建" @click="timeTabFile">临时新建</span>
                                 <span class="deleteFile actionBtn" @click="deleteTabCheckPoint">删除</span>
                                 <span class="editFile actionBtn" @click="rwrite()">重命名</span>
                             </div>
@@ -463,18 +590,30 @@ export default {
     name:'safetyChecking',
     data(){
         return{
+            bottomExpend2:{
+                title:'收起',
+                isExpend:true
+            },
+            listData:[],
+            valueDate:'',
             routerList:'',
             moduleList:'',
             dataShow:true,
             entType:'',
             ugId:'',
             checkItemDataList:'',
-            checkPointsByItemIdList:'',
+            checkPointsByItemIdList:[],
             pointTotal:'',
             checkPointsForPageList:'',
             checkPointsForPageSingleList:[],//单个二维码
             checkPointsList:'',
             checkPointsListLength:'',
+            pointType:'',
+            startTime:'',
+            endTime:'',
+            selectTime:'',
+            timePointShow:false,
+            time1PointShow:false,
             checkPointTdName:'',
             pointsForPagePager:'',
             loadzTreeDataList_original:'',//原始树形图
@@ -505,6 +644,7 @@ export default {
             singleLable:false,
             securityStatus:'',
             securityStatusShow:false,
+            supplySecurityStatusShow:false,
             fileNameShow:false,//重命名显示
             newFileName:'',//重命名数据
             addCheckItemNodeShow:false,
@@ -574,6 +714,9 @@ export default {
             UPID:'',
             returnLabelUrl:'',
             qrShareUrl:'',
+            getClassificationsList:'',
+            classifyValue:'',
+            checkPointIdsData:'',
 
         }
     },
@@ -593,6 +736,7 @@ export default {
         vm.getSecurityCheck();
         vm.loadzTreeData();
         vm.getCheckPointsByItemId();
+        vm.getClassifications();
         // vm.getCheckItemData();
     },
     mount(){
@@ -674,6 +818,8 @@ export default {
                 } else if(val == 2) {
                     return "不安全";
                 } else if(val == 3) {
+                    return "整改中";
+                }else if(val==4){
                     return "未知";
                 }
         },
@@ -684,12 +830,28 @@ export default {
                         return "待检查";
                     } else if(status == 3) {
                         return "整改中";
+                    }else if(status == 4){
+                        return "待验证";
                     }
-    
         }
 
     },
     methods:{
+        changeBottomExpend2(){
+             var vm = this
+            vm.bottomExpend2.isExpend = !vm.bottomExpend2.isExpend
+            vm.bottomExpend2.title = vm.bottomExpend2.isExpend?'收起':'展开'
+            console.log(document.getElementsByClassName('bottom')[0]);
+            if(!vm.bottomExpend2.isExpend){
+                
+                 document.getElementsByClassName('bottom')[0].style.marginTop='130px';
+                 document.getElementsByClassName('header_body')[0].style.height='600px'
+            }else{
+                document.getElementsByClassName('bottom')[0].style.marginTop='0px';
+                document.getElementsByClassName('header_body')[0].style.height='150px'
+            }
+           
+        },
         //打印当前标签
         printCurrentLabel(){
             var vm = this
@@ -816,7 +978,7 @@ export default {
     getSecurityCheck(){
         axios({
             method:'get',
-            url:this.BDMSUrl+'/project2/security/securityCheck',
+            url:this.BDMSUrl+'security/securityCheck',
             headers:{
                 'token':this.token
             },
@@ -827,7 +989,7 @@ export default {
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.entType=response.data.rt.entType;
-                this.ugId=response.data.rt.ugId;
+                this.ugId=response.data.rt.groupId;
                 // this.validateAuth();
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
@@ -845,7 +1007,7 @@ export default {
                 projId:this.projId,
                 type:5,
             },
-            url:this.BDMSUrl+'/project2/buildSite/validateAuth'
+            url:this.BDMSUrl+'buildSite/validateAuth'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.showSafetyCheck=true;
@@ -855,6 +1017,33 @@ export default {
             }
         })
     },
+    getClassifyName(val){
+        var a='';
+        this.getClassificationsList.forEach((item)=>{
+            if(item.id==val){
+                a=item.name
+            }
+        })
+        return a;
+    },
+    getClassifications(){
+        var vm=this;
+        axios({
+            url:vm.BDMSUrl+'security/getClassifications',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projId:vm.projId,
+                type: 1
+            }
+        }).then((response)=>{
+            if(response.data.cd==0){
+                this.getClassificationsList=response.data.rt;
+            }
+        })
+    },
+
     //获取检查项目目录
     loadzTreeData(){
         var vm = this
@@ -880,7 +1069,7 @@ export default {
             params:{
                 projId:this.projId
             },
-            url:this.BDMSUrl+'/project2/security/loadzTreeData'
+            url:this.BDMSUrl+'security/loadTreeData'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.loadzTreeDataList_original=response.data.rt;
@@ -901,7 +1090,7 @@ export default {
             params:{
                 itemId:this.itemId
             },
-            url:this.BDMSUrl+'/project2/security/getCheckItemData'
+            url:this.BDMSUrl+'security/getCheckItemData'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.checkItemDataList=response.data.rt;
@@ -913,6 +1102,7 @@ export default {
     },
     //获取检查点位列表及对应点位最新的检查记录
     getCheckPointsByItemId(){
+        this.checkPointsByItemIdList=[];
         axios({
             method:'get',
             headers:{
@@ -924,15 +1114,24 @@ export default {
                 page:this.pageDetial.currentPage,
                 rows:this.pageDetial.pagePerNum
             },
-            url:this.BDMSUrl+'/project2/security/getCheckPointsByItemId'
+            url:this.BDMSUrl+'security/getCheckPointsByItemId'
         }).then(response=>{
-            if(response.data.cd=='0'){
+            if(response.data.rt.rows){
                 this.checkPointsByItemIdList=response.data.rt.rows;
+                if(this.checkPointsByItemIdList==null){
+                        this.dataShow=true;
+                }else if(this.checkPointsByItemIdList){
+                        this.dataShow=false;
+                }
+                this.checkPointsByItemIdList.forEach((item)=>{
+                    this.$set(item,'checkNum',false);
+                })
                 this.pointTotal=response.data.rt.total;
                 this.pageDetial.total=response.data.rt.total;
                 console.log(this.checkPointsByItemIdList);
                 if(this.checkPointsByItemIdList){
-                    this.dataShow=false;
+                    // this.dataShow=false;
+                    // this.dataShow=true;
                 }
             }else if(response.data.cd=='-1'){
                 alert(response.data.msg);
@@ -952,7 +1151,8 @@ export default {
         this.getCheckPointsByItemId();
         
     },
-    checkItem(num){
+    checkItem(num,id){
+        var vm=this;
         this.isshow=num;
         console.log('dhsjdhj');
         this.checkPointId=this.checkPointsByItemIdList[this.isshow].checkPoint.id;
@@ -961,6 +1161,25 @@ export default {
         this.currCheckStatus=this.checkPointsByItemIdList[this.isshow].checkRecord.currCheckStatus;
         this.checkUserName=this.checkPointsByItemIdList[this.isshow].checkUserName;
         this.checkTime=this.checkPointsByItemIdList[this.isshow].checkRecord.checkTime;
+        axios({
+            url:this.BDMSUrl+'security/getCheckRecord',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                checkPointId:id
+            },
+            method:'get'
+        }).then((response)=>{
+            if(response.data.cd==0){
+                this.listData=response.data.rt;
+            }else{
+                this.$message({
+                    type:'success',
+                    message:response.data.msg
+                })
+            }
+        })
     },
     //打印全部标签
     printAllLabel(){
@@ -968,6 +1187,61 @@ export default {
             this.labelListShow=true;
             this.getCheckPointsForPage();
         }
+    },
+    downCheckPoint(){
+        if(this.addNodeparentItemId){
+            var data=[];
+            this.checkPointsByItemIdList.forEach((item)=>{
+                if(item.checkNum==true){
+                    data.push(item.checkPoint.id);
+                }
+            })
+            if(data.length>0){
+                var str=data[0]
+                data=data.slice(1,data.length+1);
+                console.log(data,'data1');
+                data.forEach((item)=>{
+                    str=str+'&checkPointId='+item
+                })
+                console.log(str)
+
+            }
+            
+            
+            // this.checkPointIdsData=data;
+            if(str){
+                axios({
+                    url:this.BDMSUrl+'security/exportCheckPoint?checkPointId='+str,
+                    // url:'http://10.252.26.48:8080/bdms_war_exploded/security/exportCheckPoint?checkPointId='+str,
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+                    this.checkPointsByItemIdList.forEach((item)=>{
+                        item.checkNum=false;
+                    })
+
+                })
+            }else{
+                this.$message({
+                    type:'info',
+                    message:"请选择你需要导出的检查点位"
+                })
+            }
+
+        }else{
+            this.$message({
+                type:'error',
+                message:'请先选择检查项目'
+            })
+        }
+
     },
     labelListSingleCancle(){
         this.labelListSingleShow=false;
@@ -996,7 +1270,7 @@ export default {
                 page:this.pageLabelList.currentPage,
                 rows:this.pageLabelList.pagePerNum
             },
-            url:this.BDMSUrl+'/project2/security/getCheckPointsForPage'
+            url:this.BDMSUrl+'security/getCheckPointsForPage'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.checkPointsForPageList=response.data.rt.rows;
@@ -1017,7 +1291,7 @@ export default {
             params:{
                 itemId:this.itemId,
             },
-            url:this.BDMSUrl+'/project2/security/getCheckPoints'
+            url:this.BDMSUrl+'security/getCheckPoints'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.checkPointsList=response.data.rt;
@@ -1066,7 +1340,7 @@ export default {
             params:{
                id:num
             },
-            url:this.BDMSUrl+'/project2/security/getRelaFilesByCrId'
+            url:this.BDMSUrl+'security/getRelaFilesByCrId'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.getRelaFilesByCrIdList=response.data.rt;
@@ -1078,7 +1352,11 @@ export default {
     },
     srCheck(num){
         this.checkPointId=num;
-         this.securityStatusShow=true;
+        this.securityStatusShow=true;
+    },
+    supplyCheck(num){
+        this.checkPointId=num;
+        this.supplySecurityStatusShow=true;
     },
     srStatusCancle(){
         this.securityStatusShow=false;
@@ -1095,7 +1373,7 @@ export default {
                projId:this.projId,
                checkPointId:this.checkPointId
             },
-            url:this.BDMSUrl+'/project2/security/updateCheckPointSecurityStatus'
+            url:this.BDMSUrl+'security/updateCheckPointSecurityStatus'
         }).then(response=>{
             if(response.data.cd=='0'){
                 vm.securityStatusShow=false;
@@ -1109,6 +1387,38 @@ export default {
                 alert(response.data.msg);
             }
         })
+    },
+    srSupplyStatusConfirm(){
+        var vm=this;
+        axios({
+            url:this.BDMSUrl+'security/addCheckPointSecurityStatus',
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                currCheckStatus:this.securityStatus,
+                checkPointId:this.checkPointId,
+                projId:this.projId,
+                date:this.valueDate
+            }
+        }).then((response)=>{
+            if(response.data.cd=='0'){
+                this.supplySecurityStatusShow=false;
+                vm.securityStatus='',
+                this.valueDate='';
+                vm.$message({type:'success',
+                    message:'安全状态修改成功'})
+                vm.getCheckPointsByItemId();
+            }
+        })
+        
+    },
+    srSupplyStatusCancle(){
+        this.supplySecurityStatusShow=false;
+        this.supplySecurityStatusShow=false;
+        this.securityStatus='',
+        this.valueDate='';
     },
     //重命名
     rwrite(){
@@ -1150,11 +1460,11 @@ export default {
                     'token':this.token
                 },
                 params:{
-                name:this.checkPointTdName,
-                itemId:this.itemId,
-                id:this.rwriteShowId,
+                    name:this.checkPointTdName,
+                    itemId:this.itemId,
+                    id:this.rwriteShowId,
                 },
-                url:this.BDMSUrl+'/project2/security/renameCheckPoint'
+                url:this.BDMSUrl+'security/renameCheckPoint'
             }).then(response=>{
                 if(response.data.cd=='0'){
                     // this.checkPointTdName='';
@@ -1175,11 +1485,15 @@ export default {
                     'token':this.token
                 },
                 params:{
-                name:this.checkPointTdName,
-                itemId:this.itemId,
-                projId:this.projId
+                    name:this.checkPointTdName,
+                    itemId:this.itemId,
+                    projId:this.projId,
+                    type:this.pointType,
+                    classificationId:this.classifyValue,
+                    // startTime:'',
+                    // endTime:''
                 },
-                url:this.BDMSUrl+'/project2/security/addCheckPoint'
+                url:this.BDMSUrl+'security/addCheckPoint'
             }).then(response=>{
                 if(response.data.cd=='0'){
                         this.checkPointTdName='';
@@ -1187,9 +1501,9 @@ export default {
                         this.getCheckPoints();
 
                 }else if(response.data.cd=='-1'){
-                    alert(response.data.msg);
-                }
-            })
+                        alert(response.data.msg);
+                    }
+                })
             }
         }
     },
@@ -1215,7 +1529,7 @@ export default {
             params:{
                id:this.checkPointId
             },
-            url:this.BDMSUrl+'/project2/security/deleteCheckPoint'
+            url:this.BDMSUrl+'security/deleteCheckPoint'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.deleteCheckPointDialog=false;
@@ -1235,15 +1549,28 @@ export default {
     //获取当前项目的用户群组
     getManageDept(){
         var vm=this;
+         var vm = this;
+                // axios({
+                //     method:'get',
+                //     url:vm.BDMSUrl+'/userGroup/getAllGroup',
+                //     headers:{
+                //         'token':vm.token
+                //     },
+                //     params:{
+                //         projectId:vm.projId
+                //     }
+                // }).then((response)=>{
+                //     if(response.data.cd == '0'){}
         axios({
             method:'get',
             headers:{
                 'token':this.token
             },
             params:{
-               projId:this.projId
+               projectId:vm.projId
             },
-            url:this.BDMSUrl+'/project2/security/getManageDept'
+            // url:this.BDMSUrl+'security/getManageDept'
+            url:vm.BDMSUrl+'/userGroup/getAllGroup',
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.manageUserList=response.data.rt;
@@ -1256,16 +1583,16 @@ export default {
     //
     respDeptChange(){
         this.manageUserList.forEach((item)=>{
-            if(item.ugId==this.respDept){
-                this.byDeptId=item.ugId;
+            if(item.groupId==this.respDept){
+                this.byDeptId=item.groupId;
             }
         })
         this.getPersonInChargeByDept();
     },
     checkDeptChange(){
         this.manageUserList.forEach((item)=>{
-            if(item.ugId==this.checkDept){
-                this.byDeptId=item.ugId;
+            if(item.groupId==this.checkDept){
+                this.byDeptId=item.groupId;
             }
         })
         this.getPersonInChargeByDept();
@@ -1281,13 +1608,14 @@ export default {
             params:{
                itemId:this.itemId
             },
-            url:this.BDMSUrl+'/project2/security/validateAddNode'
+            url:this.BDMSUrl+'security/validateAddNode'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.addCheckItemNodeShow=true;
                 // this.addCheckItemNodeShow=true;
                 
             }else if(response.data.cd=='-1'){
+                this.addCheckItemNodeShow=false;
                 vm.$message({
                     type:'error',
                     message:response.data.msg
@@ -1304,9 +1632,10 @@ export default {
                 'token':this.token
             },
             params:{
-                ugId:this.byDeptId
+                groupId:this.byDeptId
             },
-            url:this.BDMSUrl+'/project2/security/getPersonInChargeByDept'
+            // url:this.BDMSUrl+'security/getPersonInChargeByDept'
+            url:this.BDMSUrl+'userGroup/getGroupUser',
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.personInChargeByDeptList=response.data.rt;
@@ -1324,7 +1653,7 @@ export default {
     addfileConfirm(){
         axios({
             method:'post',
-            url:this.BDMSUrl+'project2/security/reNameNodeName',
+            url:this.BDMSUrl+'security/reNameNodeName',
             headers:{
                 'token':this.token,
             },
@@ -1377,7 +1706,7 @@ export default {
                 checkUser:this.checkUser,//检查人
                 ugId:this.ugId //安全检查的ugid
             },
-            url:this.BDMSUrl+'/project2/security/addCheckItemNode'
+            url:this.BDMSUrl+'security/addCheckItemNode'
         }).then(response=>{
             if(response.data.cd=='0'){
                 this.addCheckItemNodeShow=false;
@@ -1433,7 +1762,7 @@ export default {
             params:{
                itemId:this.itemId
             },
-            url:this.BDMSUrl+'/project2/security/deleteItemNode'
+            url:this.BDMSUrl+'security/deleteItemNode'
         }).then(response=>{
             if(response.data.cd=='0'){
                 vm.$message(
@@ -1479,17 +1808,111 @@ export default {
         var name='';
         // this.checkPointsList=[];
         // this.getCheckPoints();
-        this.checkPointsList.unshift({'name':name,'name1':1});
-        console.log(this.checkPointsList);
-        this.checkPointsList.forEach((item)=>{
-            if(item.name==""){
-                this.showTd=true;
-            }
-        })
+        this.pointType=0;
+        this.time1PointShow=true;
+        this.getClassifications();
+        // this.checkPointsList.unshift({'name':name,'name1':1});
+        // console.log(this.checkPointsList);
+        // this.checkPointsList.forEach((item)=>{
+        //     if(item.name==""){
+        //         this.showTd=true;
+        //     }
+        // })
+
         // let str =document.getElementById("checkPointId");
         // var td = document.createElement('td');
         // tr.appendChild(td);
         // console.log(str);
+    },
+    timeTabFile(){
+        this.pointType=1;
+        this.timePointShow=true;
+        this.selectTime='';
+        this.startTime='';
+        this.endTime='';
+        this.getClassifications();
+    },
+    timePointCancle(){
+        this.timePointShow=false;
+        this.pointType='';
+        this.startTime='';
+        this.endTime='';
+        this.checkPointTdName='';
+    },
+    timePointConfirm(){
+        this.timePointShow=true;
+        this.startTime=this.selectTime[0];
+        this.endTime=this.selectTime[1];
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                name:this.checkPointTdName,
+                itemId:this.itemId,
+                projId:this.projId,
+                type:this.pointType,
+                startTime:this.startTime,
+                endTime:this.endTime,
+                classificationId:this.classifyValue,
+            },
+            url:this.BDMSUrl+'security/addCheckPoint'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                    this.checkPointTdName='';
+                    this.timePointShow=false;
+                    this.selectTime='';
+                    this.startTime='';
+                    this.endTime='';
+                    this.getCheckPointsByItemId();
+                    this.getCheckPoints();
+            }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+        })
+
+    },
+    time1PointCancle(){
+        this.time1PointShow=false;
+        this.pointType='';
+        this.startTime='';
+        this.endTime='';
+        this.checkPointTdName='';
+    },
+    time1PointConfirm(){
+        // this.timePointShow=true;
+        // this.startTime=this.selectTime[0];
+        // this.endTime=this.selectTime[1];
+        axios({
+            method:'get',
+            headers:{
+                'token':this.token
+            },
+            params:{
+                name:this.checkPointTdName,
+                itemId:this.itemId,
+                projId:this.projId,
+                type:this.pointType,
+                classificationId:this.classifyValue,
+                // startTime:this.startTime,
+                // endTime:this.endTime
+            },
+            url:this.BDMSUrl+'security/addCheckPoint'
+        }).then(response=>{
+            if(response.data.cd=='0'){
+                    this.checkPointTdName='';
+                    this.time1PointShow=false;
+                    this.selectTime='';
+                    this.startTime='';
+                    this.endTime='';
+                    this.getCheckPointsByItemId();
+                    this.getCheckPoints();
+            }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+        })
+
     },
     deleteTabCheckPoint(){
         var vm=this;
@@ -1501,6 +1924,28 @@ export default {
                 message:'请选择要删除的检查点位'
             })
         } 
+    },
+    //导出检查记录
+    downLoadCheckRecord(){
+        var vm=this;
+        axios({
+            url:this.BDMSUrl+'security/exportCheckRecord',
+            method:'GET',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                checkPointId:this.checkPointId
+            },
+            responseType:'blob' 
+        }).then((response)=>{
+            let blob = new Blob([response.data],{
+               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+             });
+             let objectUrl = URL.createObjectURL(blob);  //生成一个url
+             window.location.href = objectUrl;   //浏览器打开这个url
+                // window.open(response.data)
+        })
     },
     //获取下一条检查记录
     getNextCheckRecord(){
@@ -1514,7 +1959,7 @@ export default {
                id:this.checkId,
                checkPointId:this.checkPointId
             },
-            url:this.BDMSUrl+'/project2/security/getNextCheckRecord'
+            url:this.BDMSUrl+'security/getNextCheckRecord'
         }).then(response=>{
             if(response.data.cd=='0'){
                     this.list=response.data.rt;
@@ -1546,7 +1991,7 @@ export default {
                 id:this.checkId,
                 checkPointId:this.checkPointId
                 },
-                url:this.BDMSUrl+'/project2/security/getPreviousCheckRecord'
+                url:this.BDMSUrl+'security/getPreviousCheckRecord'
             }).then(response=>{
                 if(response.data.cd=='0'){
                         this.list1=response.data.rt;
@@ -1711,7 +2156,7 @@ export default {
             float: left;
             width: 100%;
             // height:800px;
-            overflow: auto;
+            // overflow: auto;
         }
         ::-webkit-scrollbar{width:0px}
         #item-box-file{
@@ -1748,14 +2193,15 @@ export default {
             width: 100%;
             height: 90%;
             padding:0px 20px 20px 20px;
+            position: relative;
             ::-webkit-scrollbar{width:0px}
             .project_left{
                 // width: 80%;
                 // height: 800px;
                 // float: left;
-                display: inline-block;
-                width: 84%;
-                position: relative;
+                // display: inline-block;
+                width: 85%;
+                // position: relative;
                 transition: all ease 0.5s;
                 ::-webkit-scrollbar{width:0px}
                 .information{
@@ -1833,6 +2279,35 @@ export default {
                     // overflow-x: auto;
                     margin-bottom:25px;
                     position: relative;
+                    .right_header{
+                            text-decoration: none;
+                            float: right;
+                            font-size: 14px;
+                            color: #336699;
+                            line-height: 14px;
+                            margin-top:4px; 
+                            margin-bottom: 4px;
+                    }
+                    .right-expend{
+                        position: relative;
+                        transition: all ease .5s;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            top: 1px;
+                            left: -20px;
+                            width: 12px;
+                            height: 12px;
+                            background: url('../planCost/images/expand.png') no-repeat 0 0;
+                            content: '';
+                        }
+                    }
+                    .right-pack-up{
+                        transition: all ease .5s;
+                        &::after{
+                            transform: rotateZ(180deg);
+                        }
+                    }
                     .checkSite_header{
                         float: left;
                         margin-left:22px;
@@ -1849,15 +2324,16 @@ export default {
                         .imgIcon{
                             margin-right:11px;
                         }
+                        
                     }
                     .checkLabelBtn{
-                            width: 200px;
+                            width: 300px;
                             float:right;
                             position: absolute;
                             top:-1px;
                             right: 13px;
                         .btn{
-                            margin-right:10px;
+                            margin-right:5px;
                             line-height: 23px;
                             padding:2px 12px;
                             font-size:14px;
@@ -1867,20 +2343,35 @@ export default {
                             cursor: pointer;
                             background-color:#f2f2f2;
                             border:1px solid #f3f3f3;
+                            float: left;
                             }
                         .btn1{
-                        margin-right:-4px;
-                        line-height: 23px;
-                        padding:2px 12px;
-                        font-size:14px;
-                        float: right;
-                        display:inline-block;
-                        height: 26px;
-                        border: none;
-                        cursor: pointer;
-                        background-color:#f2f2f2;
-                        border:1px solid #f3f3f3;
+                            margin-right:-12px;
+                            line-height: 23px;
+                            padding:2px 12px;
+                            font-size:14px;
+                            float: right;
+                            display:inline-block;
+                            height: 26px;
+                            border: none;
+                            cursor: pointer;
+                            background-color:#f2f2f2;
+                            border:1px solid #f3f3f3;
                         }
+                        .btn2{
+                            margin-right:-9px;
+                            line-height: 23px;
+                            padding:2px 12px;
+                            font-size:14px;
+                            float: left;
+                            display:inline-block;
+                            height: 26px;
+                            border: none;
+                            cursor: pointer;
+                            background-color:#f2f2f2;
+                            border:1px solid #f3f3f3;
+                        }
+                        
                     }
                     .checkSite_table{
                             width: 100%;
@@ -1931,8 +2422,8 @@ export default {
                                         white-space: nowrap;
                                         overflow: hidden;
                                         .actionBtn{
-                                                width: 16px;
-                                                height: 17px;
+                                                width: 18px;
+                                                height: 18px;
                                                 border: none;
                                                 cursor: pointer;
                                                 margin-right: 16px;
@@ -1942,6 +2433,10 @@ export default {
                                         }
                                         .checkBtn{
                                             background: url('./images/check.png') no-repeat;
+                                        }
+                                        .supplyBtn{
+                                             background: url('./images/time1.png') no-repeat;
+
                                         }
                                             .deleteBtn{
                                             background: url('../../assets/delete.png') no-repeat;
@@ -2096,11 +2591,135 @@ export default {
                                 }
                             }
                         }
-                        .header_body{
-                            width: 100%;
+                         .header_body1{
+                                width: 100%;
                                 text-align: left;
                                 margin-top:10px;
                                 float: left;
+                                .bodyTable{
+                                    border-collapse: collapse;
+                                    border: 1px solid #e6e6e6;
+                                    overflow: auto;
+                                    thead{
+                                        background: #f2f2f2;
+                                        tr{
+                                            th{
+                                                padding-left: 6px;
+                                                padding-right: 15px;
+                                                height: 32px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 1px solid #e6e6e6;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                font-weight: normal;
+
+                                            }
+                                        }
+                                    }
+                                    tbody{
+                                        tr{
+                                            td{
+                                                padding-left: 6px;
+                                                padding-right: 15px;
+                                                height: 32px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 1px solid #e6e6e6;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                font-weight: normal;
+                                                // /*
+                                                // 溢出隐藏
+                                                // */
+                                                // overflow: hidden;
+                                                // /*
+                                                // 显示省略号
+                                                // */
+                                                // text-overflow: ellipsis;
+                                                // /*
+                                                // 不换行
+                                                // */
+                                                // white-space: nowrap;
+                                            }
+                                        }
+                                    }
+
+                                }
+                                .text{
+                                    // margin-right: 0px;
+                                    width: 80px;
+                                    display: inline-block;
+                                    font-size:14px;
+                                    line-height: 14px;
+                                    color:#333333;
+                                }
+                                .value{
+                                    margin-right: 5px;
+                                    width: 150px;
+                                    display: inline-block;
+                                    font-size:14px;
+                                    line-height: 14px;
+                                    color:#333333;
+
+                                }
+
+                        }
+                        .header_body{
+                                width: 100%;
+                                text-align: left;
+                                margin-top:10px;
+                                float: left;
+                                .bodyTable{
+                                    border-collapse: collapse;
+                                    border: 1px solid #e6e6e6;
+                                    overflow: auto;
+                                    thead{
+                                        background: #f2f2f2;
+                                        tr{
+                                            th{
+                                                padding-left: 6px;
+                                                padding-right: 15px;
+                                                height: 32px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 1px solid #e6e6e6;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                font-weight: normal;
+
+                                            }
+                                        }
+                                    }
+                                    tbody{
+                                        tr{
+                                            td{
+                                                padding-left: 6px;
+                                                padding-right: 15px;
+                                                height: 32px;
+                                                text-align: center;
+                                                box-sizing: border-box;
+                                                border-right: 1px solid #e6e6e6;
+                                                font-size: 12px;
+                                                color: #333333;
+                                                font-weight: normal;
+                                                // /*
+                                                // 溢出隐藏
+                                                // */
+                                                // overflow: hidden;
+                                                // /*
+                                                // 显示省略号
+                                                // */
+                                                // text-overflow: ellipsis;
+                                                // /*
+                                                // 不换行
+                                                // */
+                                                // white-space: nowrap;
+                                            }
+                                        }
+                                    }
+
+                                }
                                 .text{
                                     // margin-right: 0px;
                                     width: 80px;
@@ -2133,8 +2752,10 @@ export default {
                 // right: 0px;
                 // height: 800px;
                 display:inline-block;
-                position:relative;
-                float: right;
+                position: absolute;
+                top:-10px;
+                right:0px;
+                // float: right;
                 width: 15%;
                 transition: all ease 0.5s;
                 background: #ffffff;
@@ -2315,6 +2936,9 @@ export default {
             background: #000;
         }
         #edit{
+            .el-date-editor.el-input {
+                    width: 335px !important;
+                }
             .el-dialog__body {
             .editBody {
                 .editBodytwo{
@@ -2454,6 +3078,16 @@ export default {
                                 &:hover{
                                     background: url('../ManageCost/images/add1.png')no-repeat 0 0;
                             }
+                        }
+                        .newTimeFile{
+                            background: url('../ManageCost/images/add1.png')no-repeat 0 0;
+                                margin-right: 10px;
+                                &:hover{
+                                    background: url('../ManageCost/images/add.png')no-repeat 0 0;
+                            }
+                        }
+                        .el-icon-circle-plus-outline{
+                            font-size: 16px;
                         }
                         
                         .newFile1{

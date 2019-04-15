@@ -145,13 +145,13 @@
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
                             <div class="txt"><label class="label1">测量日期</label><span class="span1"><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">观测：{{item.getItemDutyUserList.observerName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">计算：{{item.getItemDutyUserList.calculatorName}}</label><label style="font-size:3.70mm;display:inline-block;margin-right:5px;">检核：{{item.getItemDutyUserList.inspectorName}}</label></span></div>
                             <div class="txt1"><label>监测内容：{{item.name}}</label></div>
-                            <div class="bottomTabel2" v-show="baseMapPosition==1">
+                            <!-- <div class="bottomTabel2" v-show="baseMapPosition==1">
                                 <div class="bottomTabelDiv"  style="padding: 0px; overflow: hidden;">
                                         <div class="bottomTabelDiv1">
                                             <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                         </div>
                                 </div>
-                             </div>
+                             </div> -->
                             <div class="bottomTabel" >
                                 <table class="bottomTableList" border="1" cellspacing="0" width="100%">
                                     <thead>
@@ -197,11 +197,11 @@
                                 </table>
                             </div>
                             <div class="bottomTabel1" v-show="baseMapPosition==2">
-                                <div  class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
+                                <!-- <div  class="bottomTabelDiv" style="padding: 0px; overflow: hidden;">
                                     <div class="bottomTabelDiv1">
                                         <picView  @load_points="allLoad(item.monitorPointInfo,item.id,item.type)" :id="'pic'+item.id" :ref="'pic'+item.id" :para="item.paramsLists" ></picView>
                                      </div>
-                                </div>
+                                </div> -->
                                  <table class="bottomTableList1" border="1" cellspacing="0" width="100%">
                                     <tbody>
                                         <!-- <tr>

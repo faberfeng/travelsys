@@ -28,19 +28,7 @@
                  </div>
                  <div class="fileitem">   
                      <ul class="clearfix"  style="padding: 0px 0px 2px 2px;">
-                         <!-- <li v-if="noCommentShow" class="item-file"  v-for="(val,key) in uploadViewPointList" :key="key+'_attach'" style="padding:0;overflow: hidden;">
-                            <img  style="object-fit: cover;" :src="QJFileManageSystemURL+val.filePath" :title="val.fileName" class="item-file-attach"/>
-                            <div class="actionbox clearfix">
-                                <i class="button-relocation" title="定位" @click="relocation()"></i>
-                                <i class="line"></i>
-                                <i class="button-search"  @click="preview(val.filePath)"></i>
-                                 <i class="line"></i>
-                                 <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
-                            </div>
-                        </li> -->
-                        <!-- v-if="CommentShow" -->
                         <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="val+'_attach'" style="padding:0;overflow: hidden;">
-                            <!-- :title="val.fileName" -->
                             <img  style="object-fit: cover;" :src="BDMSUrl+val"  class="item-file-attach"/>
                             <div class="actionbox clearfix">
                                 <i class="button-relocation" title="定位" @click="relocation()"></i>
@@ -57,10 +45,7 @@
                                 </span>
                                 <span  class="item-file-detial">
                                     <h3 v-text="val.name"></h3>
-                                    <!-- <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="'浏览器'"></span>上传</p> -->
-                                    <!-- <p v-text="initData(val.name)"></p> -->
                                     <p class="operation">
-                                        <!-- <span v-text="'版本'+val.version"></span> -->
                                         <i class="icon-goujian icon-delete" @click="deleteFile(key,2)"></i>
                                         <i class="icon-goujian icon-search" @click="preview(val.uri)"></i>
                                         <i class="icon-goujian icon-download" @click="downLoad(val.uri)"></i>
@@ -519,8 +504,8 @@ export default Vue.component('common-upload',{
             vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
                         elementFilter:this.elementFilter,
-                        // extension:item.fileExtension,
                         relativePath:item,
+                        // extension:item.fileExtension,
                         // uuid:item.fileUuid,
                         // name:item.fileName,
                         // projId:this.projId,
@@ -625,11 +610,16 @@ export default Vue.component('common-upload',{
                     vm.uploadViewPointList=[]                     
                    vm.$refs.message.value = ''
                     vm.newStmt = false
+                }else if(!vm.valuemonomer){
+                    vm.$message({
+                        type:'info',
+                        message:'请新建目录上传模型'
+                    })
                 }else{
-                    // vm.$message({
-                    //     type:'error',
-                    //     message:response.data.msg
-                    // })
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
                 }
                 vm.fullscreenLoading = false
             }).catch((err)=>{

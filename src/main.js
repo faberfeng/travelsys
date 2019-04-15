@@ -11,6 +11,15 @@ import ZkTable from 'vue-table-with-tree-grid'
 import vuescroll from 'vue-scroll'
 import FullCalendar from 'vue-full-calendar'
 
+import 'jquery'
+import 'uikit'
+// import "uikit-css"
+// import 'uikit/dist/css/uikit.almost-flat.css'
+
+// import UIkit from './uikit'
+
+// Vue.use(UIkit)
+
 // import htmlToPdf from '@/components/utils/htmlToPdf.js'  
 // Vue.use(htmlToPdf) 
 import '../node_modules/fullcalendar/dist/fullcalendar.css';
@@ -23,6 +32,11 @@ import '../node_modules/fullcalendar/dist/fullcalendar.css';
 
 // require('videojs-contrib-hls/dist/videojs-contrib-hls');
 // import { lazyAMapApiLoaderInstance } from 'vue-amap';
+import 'v2-datepicker/lib/index.css';
+
+import V2Datepicker from 'v2-datepicker';
+Vue.use(V2Datepicker)
+
 Vue.use(VueAMap);
 // console.log(Vue);
 // console.log(VueAMap);

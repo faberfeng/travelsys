@@ -95,15 +95,11 @@
                                             <li :class="['item-file']" v-for="(val,key) in item.fileList" :key="key+'file'">
                                                 <div class="item-file-box clearfix">
                                                     <span  class="item-file-image">
-                                                        <!-- <img :src="checkIcon(val.fileExtension.toUpperCase())?require('../ManageCost/images/icon/'+checkIcon1(val.fileExtension.toUpperCase())+'.png'):''" /> -->
                                                         <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(val.name).toUpperCase())+'.png')" />
                                                     </span>
                                                     <span  class="item-file-detial">
                                                         <h3 v-text="val.name"></h3>
-                                                        <!-- <p>由<span class="text-name" v-text="val.uploadUser"></span><span v-text="item.from"></span>上传</p>
-                                                        <p v-text="initData(val.uploadTime)"></p> -->
                                                         <p class="operation">
-                                                            <!-- <span v-text="'版本'+val.version"></span> -->
                                                             <i class="icon-goujian icon-search" @click="preview(val.path)"></i>
                                                             <i class="icon-goujian icon-download" @click="downLoad(val.path)"></i>
                                                         </p>
@@ -161,28 +157,16 @@
                                                         <!--下面是文件图片的代码-->
                                                             <div>
                                                                 <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
-                                                                    <!-- <li :class="['item-file']" v-for="(val,key) in item.vpList" :key="key+'attach'" style="padding:0;overflow: hidden;">
-                                                                        <img style="object-fit: contain" :src="QJFileManageSystemURL+val.relativePath" :title="val.fileName" class="item-file-attach"/>
-                                                                        <div class="actionbox clearfix">
-                                                                            <i class="button-relocation" title="定位" @click="relocation(val.locationInfo)"></i>
-                                                                            <i class="line"></i>
-                                                                            <i class="button-search"  @click="preview(val.relativePath)"></i>
-                                                                            <i class="line"></i>
-                                                                            <i class="button-download" @click="downLoad(val.relativePath)"></i>
-                                                                        </div>
-                                                                    </li> -->
                                                                     <li :class="['item-file']" v-for="(left,right) in val.fileList" :key="right+'file'">
                                                                         <div class="item-file-box clearfix">
                                                                             <span  class="item-file-image">
-                                                                                <!-- checkIcon(left.fileExtension.toUpperCase())? -->
+                                                                              
                                                                                 <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(left.name).toUpperCase())+'.png')" />
                                                                             </span>
                                                                             <span  class="item-file-detial">
                                                                                 <h3 v-text="left.name"></h3>
-                                                                                <!-- <p>由<span class="text-name" v-text="left.uploadUser"></span><span v-text="val.fromIn"></span>上传</p>
-                                                                                <p v-text="initData(left.uploadTime)"></p> -->
+                                                                               
                                                                                 <p class="operation">
-                                                                                    <!-- <span v-text="'版本'+left.version"></span> -->
                                                                                     <i class="icon-goujian icon-search" @click="preview(left.path)"></i>
                                                                                     <i class="icon-goujian icon-download" @click="downLoad(left.path)"></i>
                                                                                 </p>
@@ -4463,7 +4447,12 @@ export default {
             }
         }).then((response)=>{
             if(Math.ceil(response.data.cd) == 0){
-                vm.ugList = response.data.rt
+                // vm.ugList = response.data.rt
+                response.data.rt.forEach((item)=>{
+                    if(item.groupName.indexOf('质量检查')==-1){
+                            vm.ugList.push(item);
+                    }
+                })
                 vm.selectUgId = response.data.rt[0].groupId;
                 vm.getCatalog();
             }

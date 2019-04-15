@@ -342,6 +342,24 @@ const router = new Router({
         }
       ]
     },
+
+    //质量管理路由配置
+    {
+      path:'/qualityManage',
+      name:'qualityManage',
+      meta:{
+        requireAuth:true
+      },
+      component:resolve=>require(['@/components/ManageCost'],resolve),
+      children:[
+        {
+          path:'/qualityManage/qualityManage',
+          name:'qualityManage',
+          component:resolve=>require(['@/components/qualityManage/qualityManage'],resolve)
+        }
+      ]
+    },
+    
     //现场连线路由配置
     {
       path:'/liveConnect',
@@ -595,6 +613,22 @@ const router = new Router({
             settingsCenter:true
           },
           component:resolve=>require(['@/components/Settings/hierarchicalManagement'],resolve)
+        },
+        {
+          path:'/setting/safeManageClassify',
+          name:'safeManageClassify',
+          meta:{
+            settingsCenter:true
+          },
+          component:resolve=>require(['@/components/Settings/safeManageClassify'],resolve)
+        },
+        {
+          path:'/setting/qualityManageClassify',
+          name:'qualityManageClassify',
+          meta:{
+            settingsCenter:true
+          },
+          component:resolve=>require(['@/components/Settings/qualityManageClassify'],resolve)
         },
       ]
     }

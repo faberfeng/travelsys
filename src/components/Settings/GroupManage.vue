@@ -552,13 +552,13 @@ export default {
             },
             deleteQR(ugId,name){//删除群组
                 var vm = this   
-                if(name == "默认群组"|| name == '质量验收' || name == '质量检查' || name == '安全验收' || name == '安全检查'){
-                    vm.$message({
-                        type:'warning',
-                        message: name+'不能删除！'
-                    })
-                    return false
-                }
+                // if(name == "默认群组"|| name == '质量验收' || name == '质量检查' || name == '安全验收' || name == '安全检查'){
+                //     vm.$message({
+                //         type:'warning',
+                //         message: name+'不能删除！'
+                //     })
+                //     return false
+                // }
                 vm.$confirm('您要删除所选群组['+ name +']吗？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
