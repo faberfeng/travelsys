@@ -4696,7 +4696,23 @@ export default {
      * **/
     downLoad(index){
         var vm = this
-        window.open(vm.BDMSUrl+'doc/download/'+index);
+        // axios({
+        //     url:vm.BDMSUrl+'doc/download/'+index,
+        //     method:'get',
+        //     params:{
+        //         groupId:vm.selectUgId,
+        //         token:vm.token
+        //     },
+        //     responseType:'blob'
+        // }).then((response)=>{
+        //     // let blob=new Blob([response.data],{
+        //     //             type:'image/jpeg'      //将会被放入到blob中的数组内容的MIME类型 
+        //     //         });
+        //     // let objectUrl = URL.createObjectURL(blob);  //生成一个url
+        //     // window.location.href = objectUrl;   //浏览器打开这个url
+        // })
+        window.open(vm.BDMSUrl+'/doc/download/'+index+'?token='+vm.token+'&groupId='+vm.selectUgId);
+        // window.open(vm.BDMSUrl+'doc/download/'+index);
         // var filePath = ''
         // var fileId = []
         // var fileName = ''
@@ -4805,7 +4821,23 @@ export default {
         //     arr.push(fileId)
         //     fileId = arr
         // }
-        window.open(vm.BDMSUrl+'/doc/download/'+fileId);
+
+        // axios({
+        //     url:vm.BDMSUrl+'doc/download/'+index,
+        //     method:'get',
+        //     params:{
+        //         groupId:vm.selectUgId,
+        //         token:vm.token
+        //     },
+        //     responseType:'blob'
+        // }).then((response)=>{
+        //     // let blob=new Blob([response.data],{
+        //     //             type:'image/jpeg'      //将会被放入到blob中的数组内容的MIME类型 
+        //     //         });
+        //     // let objectUrl = URL.createObjectURL(blob);  //生成一个url
+        //     // window.location.href = objectUrl;   //浏览器打开这个url
+        // })
+        window.open(vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId);
         // axios({
         //     // method:'POST',
         //     method:'get',
@@ -4884,27 +4916,13 @@ export default {
             data:{
                 fgIds:fgIds,
                 dirIds:dirIds
-            }
-            // params:{
-            //     fileId:'',//文件id
-            //     projId:vm.projId
-            // },
+            },
+            params:{
+                token:vm.token,//文件id
+                groupId:vm.selectUgId
+            },
         }).then((response)=>{
-            // window.open(response.data);
-            // if(Math.ceil(response.data.cd) == 0){
-                
-            // //    if(response.data.rt.length>0){
-            // //        for(var i= 0;i<response.data.rt.length;i++){
-            // //             url += 'urls='+response.data.rt[i]+'&'
-            // //        }
-            // //    }else{
-            // //        empty = true
-            // //        vm.$message({
-            // //            type:'info',
-            // //            message:"您所选择的文件夹为空，里面一无所有"
-            // //        })
-            // //    }
-            // }
+            
         }).catch((err)=>{
             console.log(err)
         })

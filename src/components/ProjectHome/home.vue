@@ -23,7 +23,7 @@
         <div class="projectTab">
             <div id="item-box">
                 <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
-                <!-- <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span> -->
+                <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
             </div>
             <ul class="projectList" v-show="tabShow == 1">
                 <span v-show="tabdataShow1">
@@ -111,7 +111,7 @@ export default {
         vm.getBasicSituation();//获取工程概况信息;
         vm.getProjectImageList()//获取工程图片列表
         vm.getProjectStationInfo()//获取用户动态信息列表
-        // vm.getProjectNoticeList();//获取通知列表
+        vm.getProjectNoticeList();//获取通知列表
 
     },
     methods:{
@@ -219,7 +219,7 @@ export default {
             var vm = this
             axios({
                 method:'get',
-                url:vm.BDMSUrl+'project2/main/noticeList',
+                url:vm.BDMSUrl+'api/v1/main/noticeList',
                 headers:{
                     'token':this.token,
                 },
@@ -234,23 +234,33 @@ export default {
                         this.projectNoticeListInfo = response.data.rt.rows;
                         this.tabdataShow2=false;
                          this.projectNoticeListInfo.forEach((item,index,arr)=>{
-                            if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){
-                                arr[index].noticeName = '进度计划';
-                            }else if(item.type=='5'||item.type=='6'||item.type=='7'){
+                            // if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){
+                            //     arr[index].noticeName = '进度计划';
+                            // }else if(item.type=='5'||item.type=='6'||item.type=='7'){
+                            //     arr[index].noticeName = '设计协调';
+                            // }else if(item.type=='8'||item.type=='9'||item.type=='10'||item.type=='11'){
+                            //     arr[index].noticeName = '施工现场';
+                            // }else if(item.type=='12'){
+                            //     arr[index].noticeName = '空间管理';
+                            // }else if(item.type=='13'||item.type=='14'||item.type=='15'||item.type=='23'||item.type=='24'||item.type=='25'){
+                            //     arr[index].noticeName = '质量验收';
+                            // }else if(item.type=='16'||item.type=='17'||item.type=='18'){
+                            //     arr[index].noticeName = '质量检查';
+                            // }else if(item.type=='19'||item.type=='20'||item.type=='21'){
+                            //     arr[index].noticeName = '安全验收';
+                            // }else if(item.type=='26'||item.type=='27'){
+                            //     arr[index].noticeName = '安全检查';
+                            // };
+
+                            if(item.type=='1'){
                                 arr[index].noticeName = '设计协调';
-                            }else if(item.type=='8'||item.type=='9'||item.type=='10'||item.type=='11'){
-                                arr[index].noticeName = '施工现场';
-                            }else if(item.type=='12'){
-                                arr[index].noticeName = '空间管理';
-                            }else if(item.type=='13'||item.type=='14'||item.type=='15'||item.type=='23'||item.type=='24'||item.type=='25'){
-                                arr[index].noticeName = '质量验收';
-                            }else if(item.type=='16'||item.type=='17'||item.type=='18'){
-                                arr[index].noticeName = '质量检查';
-                            }else if(item.type=='19'||item.type=='20'||item.type=='21'){
-                                arr[index].noticeName = '安全验收';
-                            }else if(item.type=='26'||item.type=='27'){
-                                arr[index].noticeName = '安全检查';
-                            };
+                            }else if(item.type=='2'){
+                                arr[index].noticeName = '文档管理下载';
+                            }else if(item.type=='3'){
+                                arr[index].noticeName = '工程任务';
+                            }else if(item.type=='4'){
+                                arr[index].noticeName = '进入页面';
+                            }
                             
                             var ImagePath = this.updateNoticeImage(item.type);//判断图片地址
                             var subTitle = this.updateNoticeTitle(item.type);//判断副标题

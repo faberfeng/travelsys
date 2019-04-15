@@ -24,10 +24,13 @@
                 </router-link>
                 
             </div>
-            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow">
+            <!-- v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" -->
+            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" >
                 <div class="textBtnLeft">
-                    <label class="recordTxt" v-show="exportReportEdit" @click="exportrEportsBtn()">导出报告</label>
-                    <label class="exportTxt" v-show="searchCheckEdit" @click="walkThroughBtn()">巡视记录</label>
+                    <!-- v-show="exportReportEdit" -->
+                    <label class="recordTxt"  @click="exportrEportsBtn()">导出报告</label>
+                    <!-- v-show="searchCheckEdit" -->
+                    <label class="exportTxt"  @click="walkThroughBtn()">巡视记录</label>
                 </div>
                 <!-- <div class="overviewBody">
                     <div class="overviewHead">
@@ -256,10 +259,10 @@
                     <div class="tableBodyPagination">
                         <div class="tableBodyPaginationLeft">
                             <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">最新数据：</label><label style="color:#333;font-size:14px;line-height:62px">{{nowDate}}</label></span>
-                            <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
+                            <!-- <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
                                 <el-select v-model="positionValue" @change="positionChange()"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
                             </span>
-                            <span class="leftTxtOne"><label class="leftTxtOneBtn"  @click="previewAlert()">发送报警短信</label></span>
+                            <span class="leftTxtOne"><label class="leftTxtOneBtn"  @click="previewAlert()">发送报警短信</label></span> -->
                             <!-- style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" -->
                         </div>
                         <div class="tableBodyPaginationRight">

@@ -867,10 +867,10 @@ export default {
                             path:'/setting/initalsettings'//配置中心
                         })
                     }
-                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00105')
+                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00105','00104')
             }
         },
-        getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4){
+        getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4,Code5){
             var vm=this;
             //   console.log(vm.moduleList,'获取的东西');
             var secondList=[];
@@ -980,6 +980,29 @@ export default {
                                 title:'/setting/qualityManageClassify',
                                 linkUrl:'质量检查分类'
                             }
+                        )
+                        vm.$set(item,'routerLink',routerLink4);
+                    }
+                     if(item.moduleCode==Code5){
+                        vm.$set(item,'isShowUrl','/setting/projectstationmanage');
+                        let routerLink4=[];
+                        routerLink4.push(
+                            {
+                                title:'/setting/projectstationmanage',
+                                linkUrl:'工程动态管理'
+                            }
+                            // {
+                            //     title:'/setting/projectloggermanage',
+                            //     linkUrl:'工程日志管理'
+                            // }
+                            // {
+                            //     title:'/setting/safeManageClassify',
+                            //     linkUrl:'安全检查分类'
+                            // },
+                            // {
+                            //     title:'/setting/qualityManageClassify',
+                            //     linkUrl:'质量检查分类'
+                            // }
                         )
                         vm.$set(item,'routerLink',routerLink4);
                     }

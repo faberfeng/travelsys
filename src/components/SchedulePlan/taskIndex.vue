@@ -1799,6 +1799,7 @@
       vm.loadingTitle();
       vm.getTaskIndex();
       vm.getProjectGroup();
+      vm.addBroseNotice();
       // vm.changeUrl();
      
       // this.getTaskList();
@@ -2124,6 +2125,22 @@
         ]
 
       },
+      addBroseNotice(){
+        var vm=this;
+        axios({
+          url:this.BDMSUrl+'notice/addBroseNotice',
+          method:'POST',
+          headers:{
+            'token':vm.token
+          },
+          params:{
+            type:1,//进度计划
+            projectId:this.projId
+          }
+        }).then((response)=>{
+
+        })
+      },
       
       //获取工程群组
       getProjectGroup(){
@@ -2393,6 +2410,7 @@
         //    console.log('是谷歌浏览器')
         // }
         console.log(row);
+        var a=''
         
         {
           if(row.target._prevClass=="zk-table__cell-inner"){
@@ -2400,18 +2418,22 @@
               item.style.backgroundColor='white'
             })
             row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+            console.log(row.target.parentElement.parentElement.style.color,'000');
+            // row.target.parentElement.parentElement.style.color='white'
           }
           if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
             row.target.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
             })
             row.target.parentElement.style.backgroundColor='#0081c2'
+          //  row.target.parentElement.parentElement.style.color='white'
           }
           if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
             row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
             })
             row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+            // row.target.parentElement.parentElement.style.color='white'
           }
         }
        

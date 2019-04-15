@@ -23,18 +23,19 @@
                     <li v-for="(item,index) in projectStationList" :key="index">
                         <div class="projectListInfo">
                             <div class="projectListImg">
-                                <img :src="item.userImg?QJFileManageSystemURL+item.userImg:require('../../assets/people.png')">
+                                <img :src="item.userId?BDMSUrl+'user/avater?userId='+item.userId:require('../../assets/people.png')">
                             </div> 
                             <div class="projectListText">
-                                <p class="title"><label class="projectListTextName">{{item.userName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>
-                                <p class="font-color1">{{item.title}}</p>
-                                <p class="projectBottom">{{item.date | toLocalD}}<label>{{item.fromIn}}</label></p>
+                                <p class="title"><label class="projectListTextName">{{item.noticeName}}</label><span :title="item.subTitle"  class="projectList-detial">{{item.content}}</span></p>
+                                <p class="font-color1">{{item.message}}</p>
+                                <p class="projectBottom">{{item.createDate | toLocalD}}</p>  
+                                <!-- <label>{{item.fromIn}}</label> -->
                             </div>
                         </div>
                     </li>
                 </ul>
         </div>
-        <div class="pagenation">   
+        <!-- <div class="pagenation">   
             <div class="pagination">
                 <el-pagination
                     :page-sizes="[10,20,30,40,50]"
@@ -44,7 +45,7 @@
                     @current-change="currentPageChange">
                 </el-pagination>
             </div>
-        </div>
+        </div> -->
       </div>
   </div>
 </template>
@@ -88,13 +89,29 @@ export default {
         getAuthorization(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'project2/dynamic/'+this.projId+'/index',
+                // url:this.BDMSUrl+'project2/dynamic/'+this.projId+'/index',
+                url:this.BDMSUrl+'notice/getNotice',
                 headers:{
                     'token':this.token
+                },
+                params:{
+                    projectId:this.projId
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.isAuthorization = true;
+                    this.projectStationList=response.data.rt;
+                    this.projectStationList.forEach((item,index,arr)=>{
+                        if(item.type=='1'){
+                                arr[index].noticeName = '设计协调';
+                        }else if(item.type=='2'){
+                            arr[index].noticeName = '文档管理下载';
+                        }else if(item.type=='3'){
+                            arr[index].noticeName = '工程任务';
+                        }else if(item.type=='4'){
+                            arr[index].noticeName = '进入页面';
+                        } 
+                    })
+                   
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -103,31 +120,45 @@ export default {
                     })
                 }
             }).then(()=>{
-                this.getUserInfoList(this.pageNo,this.pageSize);
+                
+                // this.getUserInfoList(this.pageNo,this.pageSize);
             })
         },
         //获取用户动态信息列表
         getUserInfoList(index,number,start,end){
+            var vm=this;
+            this.projectStationList=[];
             axios({
                 method:'post',
-                url:this.BDMSUrl+'project2/dynamic/project/'+this.projId+'/list',
+                // url:this.BDMSUrl+'project2/dynamic/project/'+this.projId+'/list',
+                url:this.BDMSUrl+'notice/getNoticeByDate',
                 headers:{
                     token:this.token
                 },
-                data:{
-                    pageNo:index,
-                    pageSize:number,
-                    start:start,
-                    end:end
+                params:{
+                    projectId:vm.projId,
+                    startDate:start,
+                    endDate:end
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    if(response.data.rt.rows != null){
-                        this.projectStationList = response.data.rt.rows;
-                        this.totalInfoNumber =  response.data.rt.pager.totalSize;
+                    if(response.data.rt != null){
+                        this.projectStationList = response.data.rt;
+                         this.projectStationList.forEach((item,index,arr)=>{
+                            if(item.type=='1'){
+                                    arr[index].noticeName = '设计协调';
+                            }else if(item.type=='2'){
+                                arr[index].noticeName = '文档管理下载';
+                            }else if(item.type=='3'){
+                                arr[index].noticeName = '工程任务';
+                            }else if(item.type=='4'){
+                                arr[index].noticeName = '进入页面';
+                            } 
+                        })
+                        // this.totalInfoNumber =  response.data.rt.pager.totalSize;
                     }
                 }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
+                    // alert(response.data.msg)
                 }else{
                     this.$router.push({
                         path:'/login'
@@ -136,16 +167,16 @@ export default {
                 
             })
         },
-        //每页条数改变时
-        pageSizeChange(val){
-            this.pageSize = val;
-            this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-        },
-        //当前页改变时
-        currentPageChange(val){
-            this.pageNo=val;
-            this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
-        },
+        // //每页条数改变时
+        // pageSizeChange(val){
+        //     this.pageSize = val;
+        //     this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+        // },
+        // //当前页改变时
+        // currentPageChange(val){
+        //     this.pageNo=val;
+        //     this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
+        // },
         //按日期查询
         queryProjectStation(){
             this.getUserInfoList(this.pageNo,this.pageSize,this.startDay,this.endDay);
@@ -238,6 +269,7 @@ export default {
                 overflow: auto;
                 padding-left: 0;
                 margin-top: 0px;
+                height: 700px;
                 
         }
         .projectList li{

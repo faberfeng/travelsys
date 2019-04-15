@@ -132,7 +132,7 @@
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
-                                    <button title="定位" class="location actionBtn"></button>
+                                    <!-- <button title="定位" class="location actionBtn"></button> -->
                                     <button title="曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
                                 </td>
                             </tr>
@@ -1642,9 +1642,9 @@ export default Vue.component('commonDetail',{
                     this.changeAlertDay=this.getAlertArgumentsList.changeAlertDay;
                     this.changeAlertHour=this.getAlertArgumentsList.changeAlertHour;
                     this.changeAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
-                    this.variationAlertTotal=this.getAlertArgumentsList.changeAlertTotal;
-                    this.variationAlertDay=this.getAlertArgumentsList.changeAlertDay;
-                    this.variationAlertHour=this.getAlertArgumentsList.changeAlertHour;
+                    this.variationAlertTotal=this.getAlertArgumentsList.changeAlertTotal*1000;
+                    this.variationAlertDay=this.getAlertArgumentsList.changeAlertDay*1000;
+                    this.variationAlertHour=this.getAlertArgumentsList.changeAlertHour*1000;
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -2038,9 +2038,12 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
+                    console.log(this.elevationYlist,'this.elevationYlist');
                     var min=this.getMinValue(this.elevationYlist);
                      var max=this.getMaxValue(this.elevationYlist)
                     var middle=(min+max)/2;
+                    console.log(3*min-2*max,'min');
+                    console.log(3*max-2*min,'max')
                     this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
                      this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
                      this.spotChangeLineShow=true;

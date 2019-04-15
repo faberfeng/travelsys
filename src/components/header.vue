@@ -11,7 +11,8 @@
                 <img class="headerInfoImg" :src="userimg?userimg:require('../assets/people.png')" />
                 <div class="infoHover">
                     <p class="p1 p-hover" v-text="username"></p>
-                    <p class="p2 p-hover" @click="logout">退出</p>
+                    <p class="p2 p-hover" @click="returnProject">返回工程页</p>
+                    <p class="p3 p-hover" @click="logout">退出</p>
                 </div>
             </div>
         </el-col>
@@ -26,12 +27,14 @@ export default Vue.component('common-header', {
             BDMSUrl:'',
             QJFileManageSystemURL:'',
             commomHeadPictureFile:'',
+            entId:'',
         }
     },
     props: ['username','userid','proname','proimg','userimg'],
     created(){
         var vm = this
         vm.token  = localStorage.getItem('token')
+        vm.entId = localStorage.getItem('entId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
         vm.commomHeadPictureFile= vm.$store.state.commomHeadPictureFile;
@@ -51,6 +54,12 @@ export default Vue.component('common-header', {
     methods:{
         app(){
             var app1 =this.$refs.iframe1.contentWindow;
+        },
+        returnProject(){
+            this.$router.push({
+                path:'/projectlist',
+                query:{entId:this.entId}
+            })
         },
         logout(){
             var vm = this
@@ -144,7 +153,7 @@ export default Vue.component('common-header', {
     }
     .infoHover{
         width: 180px;
-        height: 112px;
+        height: 162px;
         position: absolute;
         top: 68px;
         right: 5px;
@@ -167,6 +176,17 @@ export default Vue.component('common-header', {
         margin: 0;
     }
     .infoHover .p2{
+        border-bottom: 1px solid #e6e6e6;
+        height: 51px;
+        line-height: 50px;
+        margin: 0;
+        color: #666666;
+        font-size:14px;
+        font-weight: normal;
+        text-align: left;
+        padding-left: 28px;
+    }
+    .infoHover .p3{
         height: 51px;
         line-height: 50px;
         margin: 0;
