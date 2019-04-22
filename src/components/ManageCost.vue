@@ -574,6 +574,7 @@ export default {
                                   this.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
                                         // type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        type:'pdf',
                                         source:this.BDMSUrl+'doc/download/'+item.fgId,
                                         page:1,
                                         angle:0

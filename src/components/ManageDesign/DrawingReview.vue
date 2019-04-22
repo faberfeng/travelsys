@@ -217,9 +217,11 @@
                                     <i class="icon-sanjiao"></i>
                                 </td>
                                 <td>
-                                    <select v-model="holderId" class="inp-search">
+                                    <!-- <select v-model="holderId" class="inp-search">
                                         <option v-for="(val,index) in getHoldersList" :key="index" :value="val.dirId" v-html="val.dirName"></option>
-                                    </select>
+                                    </select> -->
+
+                                    <treeselect v-model="holderId" :multiple="true" :options="getHoldersList" />
                                     <i class="icon-sanjiao"></i>
                                 </td>
                                 <td style="max-width:100px;" v-text="item.fileName"></td>
@@ -301,6 +303,10 @@ import data from '../Settings/js/date.js'
 import moment from 'moment';
 import pdf from 'vue-pdf'
 import picView from '../constructionSite/picView.vue'
+import Treeselect from '@riophae/vue-treeselect'
+  // import the styles
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+
 var THREE = require('three');
 var isUserInteracting = false;
 export default {
@@ -686,14 +692,14 @@ export default {
             var setting = {
                 data: {
                     key:{
-                        name: "dirName",
+                        name: "label",
                         children:'children',
-                        title:"dirName",
+                        title:"label",
                     },
                     simpleData: {
                         enable: true,
-                        idKey: "dirId",
-                        pIdKey: "dirParId",
+                        idKey: "id",
+                        pIdKey: "parentId",
                         rootPId: 0
                     }
                 }
@@ -714,8 +720,16 @@ export default {
                     var getHolder=[]
                     getHolder=response.data.rt;
                     // console.log(vm.checkFileDir.buildId,'vm.checkFileDir.buildId');
+                    // response.data.rt.forEach((item)=>{
+                    //     getHolder.push({
+                    //         "id": item.dirId?item.dirId:null,
+                    //         "label": item.dirName?item.dirName:'',
+                    //         "parentId":item.dirParId?item.dirParId:null
+                    //     })  
+                    // })
 
                     // getHolder = data.transformTozTreeFormat(setting,getHolder);
+                   
                     console.log(getHolder,'getHolder');
                     this.getHoldersList =getHolder
                     // getHolder.forEach((item)=>{
@@ -755,7 +769,7 @@ export default {
                     //     "holderType": "",
                     //     "parentHolderId":null
                     // })
-                    console.log(this.getHoldersList,'this.getHoldersList');
+                   
 
 
 
