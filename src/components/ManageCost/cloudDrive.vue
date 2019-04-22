@@ -2695,6 +2695,7 @@ export default {
     data() {
          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
+            elementTracId:'',
             routerList:'',
             moduleList:'',
             spanShow:true,
@@ -4262,8 +4263,26 @@ export default {
               }
           })
       },
+      //获得元素
+    getElement(level,id){
+            var vm=this;
+            axios({
+                url:vm.BDMSUrl+'api/v1/getElement',
+                params:{
+                    fileId:level,
+                    selectId:id,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    if(response.data.rt[response.data.rt.length-1].para2=='structure'){
+                        this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
+                    }
+                }
+            })
+        },
       //构件绑定文件
       goujianBindByWord(){
+          var vm=this;
            if(document.getElementById('webgl').style.display=='none'){
             this.$message({
                 type:'info',
@@ -4274,8 +4293,14 @@ export default {
                   message:'先在图形上面选择构件'
               })
             }else{
+                var mb={};
                 var fgIdList = []
-            var msg = ''
+                this.elementTracId=[];
+                console.log(CurrentSelectedEntList,'CurrentSelectedEntList000');
+                CurrentSelectedEntList.ID.forEach((item)=>{
+                    vm.getElement(item.level,item.id)
+                })
+                var msg = ''
                 if(vm.showQuanJing){
                     if(vm.checkedRound.ID !=''){
                         fgIdList.push(vm.checkedRound.ID)
@@ -4296,6 +4321,46 @@ export default {
                     }
                     msg = '文件'
                 }
+                mb={
+                    "businessIds":fgIdList,
+                    "elementTraceIds":this.elementTracId
+                }
+                console.log(mb,'mb00000');
+
+                vm.$confirm('当前所选的构件是否绑定勾选的文件？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        url:this.BDMSUrl+'manifest/bindElement',
+                        method:'POST',
+                        headers:{
+                            'token':vm.token
+                        },
+                        params:{
+                            businessName:'构件',
+                            projectId:this.projId,
+                            type:1
+                        },
+                        data:mb
+                    }).then((response)=>{
+                        if(response.data.cd==0){
+                            this.$message({
+                                type:'success',
+                                message:'构件绑定文件成功'
+                            })
+                        }else{
+
+                        }
+                    })
+                }).catch(() => {
+                    // vm.$message({
+                    //     type: 'info',
+                    //     message: '已取消删除'
+                    // });          
+                });
+                
 
             }
       },

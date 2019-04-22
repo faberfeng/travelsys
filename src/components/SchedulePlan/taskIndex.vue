@@ -52,7 +52,7 @@
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
               </div>
               <div class="taskHeadRight">
-                <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span> -->
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
                 <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">工程任务</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
@@ -63,9 +63,6 @@
                 <span class="btn-operate" v-show="projectWorkShow"  @click="cancleSelect()">取消选择</span>
 
                 <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showColumnConfig()">显示列</span> -->
-
-                
-
                 <span class="btn-operate" v-show="projectWorkShow" @click="exportExcel()">导出excel</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span>
               </div>
