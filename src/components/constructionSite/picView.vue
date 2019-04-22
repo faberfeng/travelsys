@@ -2077,7 +2077,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius  * scale * this.scale * this.ResolutionScale * this.Koeffzient ,
                     Math.PI / 2,
                     Math.PI);
                 drawcontext.lineTo(
@@ -2090,7 +2090,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius  * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     Math.PI / 2 * 3,
                     2 * Math.PI);
                 drawcontext.lineTo(
@@ -2103,7 +2103,7 @@ export default {
                 drawcontext.arc(
                     position.x * this.ResolutionScale * this.scale ,
                     position.y * this.ResolutionScale * this.scale,
-                    radius * scale,
+                    radius  * scale * this.scale * this.ResolutionScale * this.Koeffzient,
                     0,
                     2 * Math.PI);
                 drawcontext.stroke();
