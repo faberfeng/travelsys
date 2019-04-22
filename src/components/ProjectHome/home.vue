@@ -231,7 +231,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd === '0'){
                     if(response.data.rt.rows){
-                        this.projectNoticeListInfo = response.data.rt.rows;
+                        // this.projectNoticeListInfo = response.data.rt.rows;
+                        response.data.rt.rows.forEach((item)=>{
+                            this.projectNoticeListInfo.unshift(item);
+                        })
                         this.tabdataShow2=false;
                          this.projectNoticeListInfo.forEach((item,index,arr)=>{
                             // if(item.type=='1'||item.type=='2'||item.type=='3'||item.type=='4'){

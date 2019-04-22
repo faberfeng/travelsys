@@ -631,6 +631,12 @@ const router = new Router({
           component:resolve=>require(['@/components/Settings/qualityManageClassify'],resolve)
         },
       ]
+    },
+    //图片预览
+    {
+      path:'/filePreview',
+      name:'picView',
+      component:resolve=>require(['@/components/filePreview'],resolve)
     }
   ]
 })

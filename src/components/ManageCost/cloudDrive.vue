@@ -69,6 +69,7 @@
                             <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow "  @click="copyfile(true)">剪切</li>
                             <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder&&wordDownload" @click="downloadFile" >下载</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
+                            <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="goujianBindByWord()">构件绑定文件</li>
                             <!-- <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li> -->
                             <!-- (showQuanJing && checkedRound.checked) || -->
                             <li class="item"  v-if="(( (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="rename">更名</li>
@@ -4261,6 +4262,43 @@ export default {
               }
           })
       },
+      //构件绑定文件
+      goujianBindByWord(){
+           if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else if(CurrentSelectedEntList==''){
+              this.$message({
+                  type:'info',
+                  message:'先在图形上面选择构件'
+              })
+            }else{
+                var fgIdList = []
+            var msg = ''
+                if(vm.showQuanJing){
+                    if(vm.checkedRound.ID !=''){
+                        fgIdList.push(vm.checkedRound.ID)
+                    }
+                    msg = '点位'
+                }else{
+                    for(var i=0;i<vm.fileList.length;i++){
+                        if(vm.fileList[i].checked){
+                            if (vm.fileList[i].isAutoCreated == 1||vm.fileList[i].isDrawing==1) {
+                                vm.$message({
+                                    type:'error',
+                                    message:'系统文件，不能操作！'
+                                })
+                                return false
+                            }
+                            fgIdList.push(vm.fileList[i].fgId)
+                        }
+                    }
+                    msg = '文件'
+                }
+
+            }
+      },
       deletePoint(){//删除点位
         var vm = this
        
@@ -5874,7 +5912,8 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    name:this.newList.detailName
+                    name:this.newList.detailName,
+                    projectId:this.projId
                 }
             }).then((response)=>{
                 if(response.data.cd==0){

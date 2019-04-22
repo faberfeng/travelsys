@@ -13,7 +13,7 @@
             </div>
             <div class="dot-line"></div>
             <div class="activeBox">
-                <p v-if="activeShow">请点击<a href="http://42.159.153.210:8080/bdms/#/login">BDMS管理系统</a>登入使用</p>
+                <p v-if="activeShow">请点击<a :href="BDMSLoginUrl">BDMS管理系统</a>登入使用</p>
                 <p v-if="!activeShow">请重新验证激活</p>
             </div>
         </div>
@@ -33,7 +33,8 @@ export default {
             email:'',
             activeCode:'',
             activeShow:false,
-            activeTxt:''
+            activeTxt:'',
+            BDMSLoginUrl:'',
         }
     },
     created(){
@@ -41,6 +42,7 @@ export default {
         vm.BDMSUrl=vm.$store.state.BDMSUrl;
         vm.email=vm.$route.query.email;
         vm.activeCode=vm.$route.query.activeCode;
+        vm.BDMSLoginUrl=vm.$store.state.BDMSLoginUrl;
     },
     mounted(){
         this.userActive();

@@ -205,7 +205,7 @@ export default Vue.component('walkThrough',{
         vm.curTime();
         vm.initPatrolPresupposition();
         vm.getAllPatrolSummary();
-        // vm.getUserInfo();
+        vm.getUserInfo();
     },
     filters:{
          timeChange(val) {
@@ -219,27 +219,27 @@ export default Vue.component('walkThrough',{
     methods:{
         getUserInfo(){
                 var vm = this;
-                axios({
-                    method:'GET',
-                    url:vm.BDMSUrl+'project2/getOnlineInfo',
-                    params:{
-                        refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
-                    },
-                    headers:{
-                        'accept':'application/json;charset=UTF-8',
-                        'token':vm.token,
-                    },
-                }).then((response)=>{
-                    var id = localStorage.getItem('projId');
-                    vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
-                    
+                // axios({
+                //     method:'GET',
+                //     url:vm.BDMSUrl+'project2/getOnlineInfo',
+                //     params:{
+                //         refresh:Math.random()/*IE11浏览器会默认从缓存里取数据*/
+                //     },
+                //     headers:{
+                //         'accept':'application/json;charset=UTF-8',
+                //         'token':vm.token,
+                //     },
+                // }).then((response)=>{
+                //     var id = localStorage.getItem('projId');
+                //     vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
+                //      })
                     if(vm.projAuth1.indexOf("00600902") > 0){
                     vm.editWorkThroughtEdit = true
                     }
                     if(vm.projAuth1.indexOf("00600903") > 0){
                         vm.inputRemarkEdit = true
                     }
-                })
+               
         },
         checkAuth(){
             var vm=this;

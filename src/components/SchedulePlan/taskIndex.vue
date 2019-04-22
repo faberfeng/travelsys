@@ -30,9 +30,15 @@
           </router-link>
           <div v-if="!showCommonList" class="item-search">
                 <span class="title-right">
-                    <input type="text" placeholder="请输入文件名称" v-model="searchTaskName"
+                    <input type="text" placeholder="请输入任务名称" v-model="searchTaskName"
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
+                </span>
+
+                <span class="title-right">
+                    <input type="text" placeholder="请输入任务标签" v-model="searchTaskTag"
+                            class="title-right-icon" @keyup.enter="searchByTag()">
+                    <span class="title-right-edit-icon el-icon-search" @click="searchByTag()"></span>
                 </span>
             <!-- <span class="icon-type"  @click="getGanttList"></span> -->
             <!-- 以上是甘特图按钮 -->
@@ -46,15 +52,22 @@
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
               </div>
               <div class="taskHeadRight">
+                <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
-                <span class="btn-operate" v-show="batchVerificationShow" @click="projectWork()">工程任务</span>
+                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">工程任务</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
                 
                 <span class="btn-operate" v-show="projectWorkShow" @click="userGroupTask()">群组权限</span>
-                <span class="btn-operate" v-show="projectWorkShow" @click="exportProject()">导入MPP文件</span>
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="exportProject()">导入MPP文件</span> -->
                 <span class="btn-operate" v-show="projectWorkShow"  @click="cancleSelect()">取消选择</span>
-                <!-- <span class="btn-operate" @click="showColumnConfig()">显示列</span> -->
+
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showColumnConfig()">显示列</span> -->
+
+                
+
+                <span class="btn-operate" v-show="projectWorkShow" @click="exportExcel()">导出excel</span>
+                <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span>
               </div>
             </div>
             <div>
@@ -67,8 +80,33 @@
                   @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                   <template slot="action" slot-scope="scope">
                     <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                    <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                    <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button>
+                    <!-- <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button> -->
+                    <!-- <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button> -->
+                    <!-- <button class="remarkBtn actionBtn" title="备注" @click="mark(scope)"></button> -->
+                    <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
+                    <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
+                    <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
+                  </template>
+                  
+                  <template slot="remark"  slot-scope="scope">
+                    <el-tooltip :content="scope.row.remark" placement="top">
+                          <span style="cursor:pointer" >{{scope.row.remark | splitRemark()}}</span>
+                    </el-tooltip>
+                    <!-- <el-popover
+                        ref="popover1"
+                        placement="bottom"
+                        title="标题"
+                        width="200"
+                        trigger="hover"
+                        :content="scope.row.remark">
+                       
+                    </el-popover> -->
+                    <!-- <el-tooltip class="item" effect="dark" :content="scope.row.remark" placement="bottom">
+                        <el-button>右下</el-button>
+                    </el-tooltip> -->
+                  </template>
+                   <template slot="taskPriority" slot-scope="scope">
+                      {{scope.row.taskPriority | status()}}
                   </template>
                   <template slot="milepost" slot-scope="scope">
                       {{scope.row.taskType==1?'是':'否'}}
@@ -128,6 +166,51 @@
                         {{scope.row.taskDuration + '天'}}
                       </template>
                     </zk-table>
+              </div>
+
+              <div v-show="projectGanntShow" style="overflow: auto;" class="taskBody">
+                <div id='ganttLeft' style="float:left;width:49.8%;border:1px solid #ccc;height:660px;overflow:auto;cursion:w-resize">
+                     <zk-table
+                        index-text="序号"
+                        :data="taskIndexData" :columns="columnsSetting" :max-height="props.height" :tree-type="props.treeType"
+                        :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
+                        :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick1"
+                        @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
+                        <template slot="action" slot-scope="scope">
+                          <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
+                          <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
+                          <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
+                         
+                        </template>
+                        <template slot="verifyTime" slot-scope="scope">
+                          <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
+                        </template>
+                        <template slot="verifyNum" slot-scope="scope">
+                            <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="scope.row.realTaskStart==null?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider>
+                        </template>
+                        <template slot="milepost" slot-scope="scope">
+                            {{scope.row.taskType==1?'是':'否'}}
+                        </template>
+                        <template slot="taskStart" slot-scope="scope">
+                          {{scope.row.taskStart | timeChange()}}
+                        </template>
+                        <template slot="taskEnd" slot-scope="scope">
+                          {{scope.row.taskEnd | timeChange()}}
+                        </template>
+                        <template slot="realTaskStart" slot-scope="scope">
+                          {{scope.row.realTaskStart | timeChange()}}
+                        </template>
+                        <template slot="realTaskEnd" slot-scope="scope">
+                          {{scope.row.realTaskEnd | timeChange()}}
+                        </template>
+                        <template slot="taskDuration" slot-scope="scope">
+                          {{scope.row.taskDuration + '天'}}
+                        </template>
+                    </zk-table>
+                </div>
+                <!-- <div style="float:right;width:0.04%;height:680px;color:#000"></div> -->
+                <div id='ganttRight' style="float:right;width:49.8%;border:1px solid #ccc;height:660px;overflow:auto;position:relative;cursion:w-resize">
+                </div>
               </div>
             </div>
           </div>
@@ -320,7 +403,7 @@
             <li class="uploadFileLi" v-for="(item,index) in fileList" :key="index">
               <span class="uploadFileText">{{item.name}}</span>
               <span class="icon">
-                  <i class="icon-goujian icon-search" @click="searchsPic(item.path)"></i>
+                  <!-- <i class="icon-goujian icon-search" @click="searchsPic(item.path)"></i> -->
                   <i class="icon-goujian icon-download" @click="downLoadPic(item.path)"></i>
                   <i class="icon-goujian icon-delete" @click="deleteFile(item.id)"></i>
               </span>
@@ -431,34 +514,34 @@
       </div>
     </div>
     <div v-if="ListHeaderShow" id="edit" class="dialog">
-      <div class="el-dialog__header">
-        <span class="el-dialog__title">显示列</span>
-        <button type="button" aria-label="Close" class="el-dialog__headerbtn" @click="headerListCancle">
-          <i class="el-dialog__close el-icon el-icon-close"></i>
-        </button>
-      </div>
-      <div class="el-dialog__body">
-        <div class="clearfix">
-                    <span class="item-attibuteAuth" v-for="(item,index) in detailsHead_model" :key="index"
-                          v-if="index >=2">
-                          <label :class="[item.showModel?'active':'','checkbox-fileItem']" :for="item.prop+'_header'"
-                                 v-text="item.label"></label>
-                          <input type="checkbox" :id="item.prop+'_header'" class="checkbox-arr"
-                                 v-model="item.showModel">
-                    </span>
+        <div class="el-dialog__header">
+          <span class="el-dialog__title">显示列</span>
+          <button type="button" aria-label="Close" class="el-dialog__headerbtn" @click="headerListCancle">
+            <i class="el-dialog__close el-icon el-icon-close"></i>
+          </button>
         </div>
-      </div>
-      <div class="el-dialog__footer">
-        <div slot="footer" class="dialog-footer">
-          <button class="editBtnS">确定</button>
-          <button class="editBtnC">取消</button>
+        <div class="el-dialog__body">
+          <div class="clearfix">
+                      <span class="item-attibuteAuth" v-for="(item,index) in detailsHead_model" :key="index"
+                            >
+                            <label :class="[item.show?'active':'','checkbox-fileItem']" :for="item.prop+'_header'"
+                                  v-text="item.label"></label>
+                            <input type="checkbox" :id="item.prop+'_header'" class="checkbox-arr"
+                                  v-model="item.show">
+                      </span>
+          </div>
         </div>
-      </div>
+        <div class="el-dialog__footer">
+          <div slot="footer" class="dialog-footer">
+            <button class="editBtnS" @click="makeSureHead()">确定</button>
+            <button class="editBtnC" @click="headerListCancle()">取消</button>
+          </div>
+        </div>
     </div>
     <div id="mask" v-if="labelListShow||ListHeaderShow"></div>
     <div id="edit">
-      <el-dialog title="编辑工程任务"  :visible.sync="addTaskDialog" @close="addTaskCancle">
-          <div class="editBody" v-loading="loading" >
+      <el-dialog title="编辑工程任务"   :visible.sync="addTaskDialog" @close="addTaskCancle">
+          <div class="editBody" v-loading="loading"  >
             <div class="editBodyone">
               <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
             </div>
@@ -509,19 +592,28 @@
               </div>
             </div>
             <div class="editBodytwo1">
+              <label class="text1">标签:</label>
+              <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div>
+            </div>
+            <div class="editBodytwo1">
+              <label class="text1">备注:</label>
+              <div><input class="input1" v-model="taskMark" placeholder="请输入任务备注"></div>
+            </div>
+            <div class="editBodytwo1">
                 <div class="startTime">
                     <label>计划开始:</label>
                     <el-date-picker v-model="taskStart" type="date"
                                     placeholder="选择日期">
                     </el-date-picker>
                 </div>
-                <div class="endTime">
+                <div class="endTime" >
                     <label>计划结束:</label>
                     <el-date-picker v-model="taskEnd" type="date"
                                     placeholder="选择日期">
                     </el-date-picker>
                 </div>
             </div>
+            
           </div>
           <div slot="footer" class="dialog-footer">
             <button class="editBtnS" @click="addTaskMakeSure">确定</button>
@@ -578,6 +670,14 @@
                         v-text="item.label"></option>
               </select>
             </div>
+          </div>
+           <div class="editBodytwo1">
+              <label class="text1">标签:</label>
+              <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div>
+          </div>
+          <div class="editBodytwo1">
+              <label class="text1">备注:</label>
+              <div><input class="input1" v-model="taskMark" placeholder="请输入任务备注"></div>
           </div>
           <div class="editBodytwo1">
             <div class="startTime">
@@ -841,7 +941,7 @@
                             <span @click="selectFile">
                                 <button class="upImgBtn">选择文件</button>
                             </span>
-                            <input class="upInput" type="file" ref="file" @change="imgChanged($event)"
+                            <input class="upInput" type="file" accept="image/*" ref="file"  @change="imgChanged($event)"
                                    multiple="multiple">
                         </span>
             <span class="upImgText" style="width:200px !important">{{imageName}}</span>
@@ -1075,6 +1175,28 @@
           <button class="editBtnC" @click="removeTaskCancle">取消</button>
         </div>
       </el-dialog>
+
+      <el-dialog title="任务排序" width="500px" :visible.sync="taskSortDialog" @close="taskSortCancle" >
+        <div class="editBody" >
+          <div class="editBodytwo2">
+            <div style="margin-bottom:20px;text-align:left;margin-left:85px;">
+              <el-radio v-model="sortRadio" label="1">升序</el-radio>
+              <el-radio v-model="sortRadio" label="2">降序</el-radio>
+            </div>
+            <label class="labelText">排序条件</label>
+            <select v-model="labelTypeValue" class="linkSelect">
+              <option v-for="(item,index) in labelTypeList" :key="index" :value="item.value" v-text="item.label">
+              </option>
+            </select>
+           
+          </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <button class="editBtnS" @click="taskSortMakeSure">确定</button>
+          <button class="editBtnC" @click="taskSortCancle">取消</button>
+        </div>
+      </el-dialog>
+      
     </div>
     <div id="edit1">
       <el-dialog title="群组权限" :visible.sync="userGroupTaskDialog" @close="userGroupTaskCancle">
@@ -1186,6 +1308,7 @@
   import commonList from '../planCost/qingDan.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
+  import {method5} from '../constructionSite/js/method.js'
   var app
   var CurrentSelectPara='';
   var CurrentSelectedEntList='';
@@ -1194,6 +1317,8 @@
     data() {
       window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
+        taskMark:"",//任务备注
+        taskTag:'',//任务标签
         changeVerifyList:{},
         batchVerifyList:[],
         value1:'',
@@ -1259,6 +1384,21 @@
         patternValue: '',
         amount: '',
         resourceTypeList: [],//获取资源类别
+        labelTypeList:[{
+          value:1,
+          label:'名称'
+          },
+          {
+            value:2,
+            label:'编号'
+          },
+          {
+            value:3,
+            label:'优先级'
+          }
+        ],
+        labelTypeValue:1,
+        sortRadio:'1',
         resourceTypeValue: '',//资源类别值
         pageDetial_1: {
           pagePerNum: 10,//一页几份数据
@@ -1273,6 +1413,7 @@
         linkId: '',//前置任务ID
         groupIds: [],
         searchTaskName: '',//查询任务名称列表
+        searchTaskTag:'',//查询任务标签
         tableCollapse: '',//是否折叠
         screenLeft: {
           show: true,
@@ -1292,6 +1433,8 @@
         editTaskDialog: false,
         progressSearchDialog: false,//进度查询
         batchVerificationShow:false,//批量核实
+        projectGanntShow:false,
+        SettingVerificationShow:false,//上海院
         projectWorkShow:true,//工程任务
         valueSearchDialog: false,//产值查询
         userGroupTaskDialog: false,//群组权限
@@ -1303,6 +1446,7 @@
         addAssociationListDialog: false,//选择关联清单
         addResourceTaskDialog: false,//添加资源类别
         removeTaskDialog: false,//移动任务
+        taskSortDialog:false,//任务排序
         detailName: '',//清单名关键字
         startDate: '',//查询开始时间
         endDate: '',//查询结束时间
@@ -1447,15 +1591,15 @@
           },
           {
             value: 1,
-            label: '1'
+            label: '高'
           },
           {
             value: 2,
-            label: '2'
+            label: '中'
           },
           {
             value: 3,
-            label: '3'
+            label: '低'
           }
         ],
         taskTypeList: [
@@ -1529,7 +1673,6 @@
             type: 'template',
             template: 'action',
             minWidth: '240px'
-
           },
           // {
           //   label: '序号',
@@ -1546,8 +1689,9 @@
           {
             label: '优先级',
             prop: 'taskPriority',
-            width: '65px'
-
+            width: '100px',
+            type: 'template',
+            template: 'taskPriority',
           },
           {
             label: '里程碑',
@@ -1618,11 +1762,18 @@
             prop: 'dutyUserName',
             width: '80px'
           },
-          // {
-          //   label: '计划人',
-          //   prop: 'createUserName',
-          //   show: true,
-          // },
+          {
+            label: '标签',
+            prop: 'tag',
+            width: '80px'
+          },
+          {
+            label: '备注',
+            prop: 'remark',
+            width: '100px',
+            type: 'template',
+            template:'remark'
+          },
           {
             label: '操作',
             prop: 'operator',
@@ -1631,6 +1782,140 @@
             width: '130px'
           }
         ],
+
+        detailsHead_model: [
+            {
+              label: '名称',
+              prop: 'taskName',
+              type: 'template',
+              template: 'action',
+              minWidth: '240px',
+              show:true
+            },
+            // {
+            //   label: '序号',
+            //   prop: 'taskId',
+            //   show: true,
+            //   minWidth: '60px'
+            // },
+            {
+              label: '编号',
+              prop: 'completeTaskCode',
+              width: '80px',
+              show:true
+
+            },
+            {
+              label: '优先级',
+              prop: 'taskPriority',
+              width: '100px',
+              type: 'template',
+              template: 'taskPriority',
+              show:true
+            },
+            {
+              label: '里程碑',
+              prop: 'taskType',
+              width: '65px',
+              type: 'template',
+              template: 'milepost',
+              show:true
+            },
+            {
+              label: '计划开始',
+              prop: 'taskStart',
+              type: 'template',
+              template: 'taskStart',
+              width: '90px',
+              show:true
+
+            },
+            {
+              label: '计划结束',
+              prop: 'taskEnd',
+              type: 'template',
+              template: 'taskEnd',
+              width: '90px',
+              show:true
+            },
+            {
+              label: '实际开始',
+              prop: 'realTaskStart',
+              type: 'template',
+              template: 'realTaskStart',
+              width: '90px',
+              show:true
+            },
+            {
+              label: '实际结束',
+              prop: 'realTaskEnd',
+              type: 'template',
+              template: 'realTaskEnd',
+              width: '90px',
+              show:true
+            },
+            {
+              label: '工作日',
+              prop: 'taskDuration',
+              type: 'template',
+              template: 'taskDuration',
+              width: '65px',
+              show:true
+            },
+            {
+              label: '计划状态',
+              prop: 'taskStatusStr',
+              width: '80px',
+              show:true
+
+            },
+            {
+              label: '实际状态',
+              prop: 'actualStatusStr',
+              width: '80px',
+              show:true
+            },
+            {
+              label: '比对状态',
+              prop: 'verifyStatusStr',
+              width: '80px',
+              show:true
+            },
+            {
+              label: '负责群组',
+              prop: 'taskUserGroupName',
+              width: '80px',
+              show:true
+            },
+            {
+              label: '负责人',
+              prop: 'dutyUserName',
+              width: '80px',
+              show:true
+            },
+            {
+              label: '备注',
+              prop: 'remark',
+              width: '100px',
+              type: 'template',
+              template:'remark',
+              show:true
+            },
+            {
+              label: '标签',
+              prop: 'tag',
+              width: '80px'
+            },
+            {
+              label: '操作',
+              prop: 'operator',
+              type: 'template',
+              template: 'action',
+              width: '130px',
+              show:true
+            }
+        ],
+
         columnsBatich:[
             {
               label: '名称',
@@ -1735,6 +2020,111 @@
             }
 
         ],
+
+        columnsSetting:[
+            {
+              label: '名称',
+              prop: 'taskName',
+              type: 'template',
+              template: 'action',
+              width: '140px'
+
+            },
+            // {
+            //   label: '序号',
+            //   prop: 'taskId',
+            //   show: true,
+            //   minWidth: '60px'
+            // },
+            // {
+            //   label: '编号',
+            //   prop: 'completeTaskCode',
+            //   width: '80px'
+
+            // },
+            {
+              label: '计划开始',
+              prop: 'taskStart',
+              type: 'template',
+              template: 'taskStart',
+              width: '90px'
+
+            },
+            {
+              label: '计划结束',
+              prop: 'taskEnd',
+              type: 'template',
+              template: 'taskEnd',
+              width: '90px'
+            },
+            // {
+            //   label: '实际开始',
+            //   prop: 'realTaskStart',
+            //   type: 'template',
+            //   template: 'realTaskStart',
+            // width: '90px'
+            // },
+            // {
+            //   label: '实际结束',
+            //   prop: 'realTaskEnd',
+            //   type: 'template',
+            //   template: 'realTaskEnd',
+            // width: '90px'
+            // },
+            // {
+            //   label: '计划状态',
+            //   prop: 'taskStatusStr',
+            //   width: '80px'
+
+            // },
+            // {
+            //   label: '实际状态',
+            //   prop: 'actualStatusStr',
+            //   width: '80px'
+            // },
+            // {
+            //   label: '比对状态',
+            //   prop: 'verifyStatusStr',
+            //   width: '80px'
+            // },
+            // {
+            //   label: '负责群组',
+            //   prop: 'taskUserGroupName',
+            //   width: '80px'
+            // },
+            // {
+            //   label: '负责人',
+            //   prop: 'dutyUserName',
+            //   width: '80px'
+            // },
+            // {
+            //   label: '计划人',
+            //   prop: 'createUserName',
+            //   show: true,
+            // },
+            // {
+            //   label: '核实时间',
+            //   prop: 'operator',
+            //   type: 'template',
+            //   template: 'verifyTime',
+            //   width: '140px'
+            // },
+            //  {
+            //   label: '核实比例',
+            //   prop: 'operator',
+            //   type: 'template',
+            //   template: 'verifyNum',
+            //   width: '140px'
+            // },
+            // {
+            //   label: '操作',
+            //   prop: 'operator',
+            //   type: 'template',
+            //   template: 'action',
+            //   width: '140px'
+            // }
+
+        ],
         //以下为甘特图数据
         hiddenGanttList: true,
         xmlDoc: '',
@@ -1797,9 +2187,15 @@
       vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
-      vm.getTaskIndex();
+      // vm.getTaskIndex();
       vm.getProjectGroup();
       vm.addBroseNotice();
+      vm.getProjectTaskAuthority();
+      // $('body').not($(".zk-table")).bind('click', function() {
+         
+      //   });
+        // console.log($('body')[0],'abc')
+        // console.log($(".zk-table"),'$(".zk-table")');
       // vm.changeUrl();
      
       // this.getTaskList();
@@ -1832,6 +2228,20 @@
           return;
         } else {
           return moment(val).format("YYYY-MM-DD");
+        }
+      },
+      splitRemark(val){
+        if(val){
+          return val.substring(0,5);
+        }
+      },
+      status(val){
+        if(val==1){
+          return '高'
+        }else if(val==2){
+          return '中'
+        }else if(val==3){
+          return '低'
         }
       },
       linkType(val) {
@@ -1915,6 +2325,26 @@
 
                 
             }
+      },
+
+      //按标签刷选
+      searchByTag(){
+        var vm=this;
+        axios({
+          url:this.BDMSUrl+'schedule/taskQueryByTag',
+          headers:{
+            'token':vm.token
+          },
+          params:{
+            projId:vm.projId,
+            ugId:vm.selectUgId,
+            tag:this.searchTaskTag
+          }
+        }).then((response)=>{
+          if(response.data.cd=='0'){
+            this.taskIndexData = response.data.rt;
+          }
+        })
       },
       loadingTitle(){
           var vn=this;
@@ -2234,7 +2664,54 @@
             var vm=this
             // vm.$emit('refresh')
             this.taskIndexData = response.data.rt;
+
+            {
+
+              var min_Day_count = 100000000000;
+              var parent=document.getElementById('ganttRight');
+              console.log(parent,'parent');
+
+              for(let i = 0;i < this.taskIndexData.length;i++){ // 取最小时间
+                // taskStart
+                  let Day_count = this.taskIndexData[i].taskEnd - this.taskIndexData[i].taskStart;
+                  Day_count /= (1000 * 3600 * 24);
+                  Day_count = parseInt(Day_count);
+
+                  if(min_Day_count > Day_count){
+                    min_Day_count = Day_count;
+                  }
+                  console.log(min_Day_count,'min_Day_count');
+
+              }
+
+               for(let i = 0;i < this.taskIndexData.length;i++){
+                // taskStart
+                  let Day_count = this.taskIndexData[i].taskEnd - this.taskIndexData[i].taskStart;
+                  Day_count /= (1000 * 3600 * 24);
+                  Day_count = parseInt(Day_count);
+
+                  for(let j = 0;j < Day_count;j++){
+
+                    var item = document.createElement("div");
+                    item.style.background = "#ccc";
+                    item.style.position = "absolute";
+                    item.style.top = i * 50 +37+ "px";
+                    item.style.left = (j * 10 - min_Day_count) +10+ "px";
+                    console.log(item.style.left,'item.style.left');
+                    item.style.height = 37 + "px";
+                    item.style.width = 100 + "px";
+                    
+                   
+                    parent.appendChild(item);
+                  }
+
+
+
+              }
+            }
+
             // this.taskIndexData.forEach((item)=>{
+              
              
             // })
             this.dataDigui(response.data.rt);
@@ -2416,24 +2893,34 @@
           if(row.target._prevClass=="zk-table__cell-inner"){
             row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
+              // item.style.border='1px solid #e9eaec'
             })
             row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+            // row.target.parentElement.parentElement.style.border='2px solid black'
+            
             console.log(row.target.parentElement.parentElement.style.color,'000');
             // row.target.parentElement.parentElement.style.color='white'
           }
           if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
             row.target.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
+              // item.style.border='1px solid #e9eaec'
             })
             row.target.parentElement.style.backgroundColor='#0081c2'
+            //  row.target.parentElement.style.border='2px solid black'
           //  row.target.parentElement.parentElement.style.color='white'
+        
           }
           if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
             row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
               item.style.backgroundColor='white'
+              // item.style.border='1px solid #e9eaec'
             })
             row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
             // row.target.parentElement.parentElement.style.color='white'
+
+            //  row.target.parentElement.parentElement.parentElement.style.border='2px solid black'
+            
           }
         }
        
@@ -2998,7 +3485,8 @@
             // page: this.pageDetial_1.currentPage,
             // rows: this.pageDetial_1.pagePerNum,
             // type: 4,
-            name:this.detailName
+            name:this.detailName,
+            projectId:this.projId
           }
         }).then(response => {
           if (response.data.cd == '0') {
@@ -3044,7 +3532,8 @@
             // page: this.pageDetial_1.currentPage,
             // rows: this.pageDetial_1.pagePerNum,
             // type: 4
-            name:''
+            name:'',
+            projectId:this.projId
           }
         }).then(response => {
           if (response.data.cd == '0') {
@@ -3183,6 +3672,37 @@
         })
         return vm.returnLabelUrl;
       },
+      //
+      getProjectTaskAuthority(){
+        var vm=this;
+          axios({
+            url:this.BDMSUrl+'schedule/getProjectTaskAuthority',
+            headers:{
+              'token':vm.token
+            },
+            params:{
+              projectId:vm.projId
+            }
+          }).then((response)=>{
+            if(response.data.rt){
+                this.detailsHead_model=JSON.parse(response.data.rt);
+                console.log(this.detailsHead_model,'11111');
+                this.columns=[];
+                this.detailsHead_model.forEach((item)=>{
+                    if(item.show==true){
+                      this.columns.push(item);
+                    }
+                })
+                console.log(this.columns,'this.columns0000')
+                this.taskIndexData=[];
+                if(document.getElementsByClassName('zk-table__body')){
+                      document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+                }
+                this.getTaskList();
+            }
+            
+          })
+      },
       addTaskMakeSure() {
         
         if(this.taskName==''){
@@ -3240,6 +3760,8 @@
               taskEnd: moment(this.taskEnd).format("YYYY-MM-DD"),//任务结束时间
               taskParId:this.taskParId,
               id: '',
+              remark:this.taskMark,
+              tag:this.taskTag
             }
           }).then(response => {
             if (response.data.cd == "0") {
@@ -3254,6 +3776,8 @@
               this.taskName = '';
               this.taskStart = '';
               this.taskEnd = '';
+              this.taskMark = '';
+              this.taskTag='';
               this.$message({
                 type:'success',
                 message:'新增任务成功'
@@ -3418,6 +3942,8 @@
         //   console.log(this.editObject);
         this.editTaskDialog = true;
         this.taskName = this.editObject.row.taskName;
+        this.taskMark= this.editObject.row.remark;
+        this.taskTag= this.editObject.row.tag;
         this.dutyUserId = this.editObject.row.dutyUserId;
         this.taskPriority = this.editObject.row.taskPriority;
         this.taskUserGroup = this.editObject.row.taskUserGroup;
@@ -3486,6 +4012,8 @@
             taskPriority: this.taskPriority,//任务优先级
             dutyUserId: this.dutyUserId,//群组成员数据id
             taskGroup: this.taskGroup,//任务组别
+            remark:this.taskMark,
+            tag:this.taskTag
           }
         }).then(response => {
           if (response.data.cd == "0") {
@@ -3598,6 +4126,9 @@
         this.showText = false;
         this.showText1 = false;
       },
+      mark(){
+
+      },
       sort(scope) {
         this.removeTaskDialog = true;
         this.sortObject = scope;
@@ -3610,8 +4141,43 @@
         //     this.showText1=true;
         // }
       },
+      mark(scope){
+        console.log()
+        this.$confirm(scope.row.remark?scope.row.remark:'无任务备注','提示');
+      },
       removeTaskCancle() {
         this.removeTaskDialog = false;
+      },
+      taskSortCancle(){
+          this.taskSortDialog = false;
+      },
+      taskSortMakeSure(){
+        var vm=this;
+        // this.taskIndexData=[];
+        axios({
+          url:this.BDMSUrl+'schedule/taskSort',
+          method:'post',
+          headers:{
+            'token':vm.token
+          },
+          params:{
+            type:this.labelTypeValue,
+            sortMode:parseInt(this.sortRadio)
+          },
+          data:this.taskIndexData
+        }).then((response)=>{
+          if(response.data.cd=='0'){
+            // this.getTaskList();
+            // this.taskIndexData=[];
+            this.taskIndexData = response.data.rt;
+            document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+            //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+            this.taskSortDialog = false;
+            this.labelTypeValue=1;
+            this.sortRadio='1';
+          }
+        })
+
       },
       removeTaskMakeSure() {
         if (this.taskId == this.removeTaskId) {
@@ -3680,6 +4246,7 @@
             if(response.data.cd=='0'){
                this.taskIndexDataList=[];
                 this.taskIndexData=[];
+                document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
               // document.getElementsByClassName("editBodytwo3")[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
                 this.getTaskList();
                 this.$message({
@@ -3687,7 +4254,7 @@
                   message:'批量核实成功'
                 })
                 this.batchVerifyList=[];
-                //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
+               
                 this.changeVerifyList={};
             }else{
                 this.$message({
@@ -3719,6 +4286,8 @@
       projectWork(){
         this.projectWorkShow=true;
         this.batchVerificationShow=false;
+        this.projectGanntShow=false;
+
         this.batchVerifyList=[];
         this.changeVerifyList={};
       },
@@ -3955,23 +4524,55 @@
         this.getTaskList();
       },
       //显示列
-      showColumnConfig() {
-        var vm = this;
-        this.ListHeaderShow = true;
-        var str = [];
-        $.extend(str, vm.columns);
-        this.detailsHead_model = str;
-        this.detailsHead_model.forEach((item, index) => {
-          this.$set(item, 'showModel', item.show)
-        })
-        // this.deleteColumns();
-        },
-        headerListCancle(){
+      showColumnConfig(){
+        var vm=this;
+        vm.ListHeaderShow = true;
+        
+      },
+      showGantt(){
+        var vm=this;
+        vm.projectGanntShow=true;
+        vm.batchVerificationShow=false;
+        vm.projectWorkShow=false;
+      },
+      exportExcel(){
+        document.getElementsByClassName('zk-table')[0].setAttribute('id','newDiv');
+        console.log(document.getElementById('newDiv'));
+          method5('newDiv');
+      },
+      sortLabel(){
+        this.taskSortDialog=true;
+      },
+      headerListCancle(){
             var vm = this
             vm.ListHeaderShow = false
-            vm.detailsHead_model.forEach((item,index)=>{
-                vm.$set(item,'showModel',item.show)
-            })
+            // vm.detailsHead_model.forEach((item,index)=>{
+            //     vm.$set(item,'showModel',item.show)
+            // })
+        },
+        makeSureHead(){
+          var vm=this;
+          console.log(this.detailsHead_model,'this.detailsHead_model');
+          axios({
+            url:this.BDMSUrl+'schedule/setProjectTaskAuthority',
+            headers:{
+              'token':vm.token
+            },
+            method:'post',
+            params:{
+              projectId:this.projId
+            },
+            data:this.detailsHead_model
+          }).then((response)=>{
+            if(response.data.cd==0){
+              this.getProjectTaskAuthority();
+            }
+          })
+          // this.taskIndexData=[];
+          // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+          // this.getTaskList();
+          this.ListHeaderShow=false;
+          
         },
         //删除核实任务
         deleteVerfiy(tvId,num){
@@ -4491,7 +5092,13 @@
       },
       //查看
       searchs(filePath) {
-        window.open(this.BDMSUrl + filePath + "/preview");
+        // top.location.href=this.BDMSUrl+filePath,'_top';
+        console.log(filePath,'filePath');
+        let routeData=this.$router.resolve({
+          path:'/filePreview',
+          query:{filePath:filePath}
+        })
+        window.open(routeData.href,'_blank');
       },
       //下载
       downLoad(filePath) {
@@ -4500,11 +5107,16 @@
       },
       //查看图片
       searchsPic(filePath) {
+         this.$message({
+          type:'info',
+          message:'该功能正在开发'
+        })
         window.open(this.BDMSUrl + filePath + "/preview");
       },
       //下载图片
       downLoadPic(filePath) {
         var vm = this
+       
         window.open(vm.BDMSUrl + filePath + '');
       },
 
@@ -4570,14 +5182,16 @@
       //删除任务关联文件(文件/图片)
       deleteFileMakeSure() {
         axios({
-          method: 'post',
-          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/deleteAttach',
+          method: 'get',
+          // url: this.BDMSUrl + 'schedule/' + this.projId + '/task/deleteAttach',
+          url:this.BDMSUrl +'schedule/deleteRelaFile',
           headers: {
             'token': this.token
           },
           params: {
-            taskId: this.taskId,
-            fileId: this.fileId
+            // taskId: this.taskId,
+            // fileId: this.fileId
+            relaFileId:this.fileId
           }
         }).then(response => {
           if (response.data.cd == '0') {
@@ -4731,6 +5345,28 @@
   }
 
   #taskIndex {
+     /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+        width:15px;
+        height: 15px;
+    }
+    /* 滚动槽 */
+    ::-webkit-scrollbar-track {
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
+    -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+        border-radius:10px;
+    }
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+        border-radius:10px;
+        background:rgba(0,0,0,0.1);
+        box-shadow:inset 006px rgba(0, 0, 0, .5);
+    -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+    }
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background:rgba(255,0,0,0.4);
+    }
+    /*********************/
     height: 100%;
     #print-qrcode{
           display: none;
@@ -6656,7 +7292,7 @@
         height: 16px;
         border: none;
         cursor: pointer;
-        margin-right: 16px;
+        margin-right: 0px;
       }
       .actionBtnA {
         width: 16px;
@@ -6700,6 +7336,9 @@
 
       .sortBtn {
         background: url('./images/sort.png') no-repeat 0 0;
+      }
+      .remarkBtn{
+          background: url('./images/detial1.png') no-repeat 0 0;
       }
   }
 </style>
