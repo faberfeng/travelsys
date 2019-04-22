@@ -25,10 +25,10 @@
                                 <input class="tdInput" v-model="phone" @focus="focusPhone()" @blur="blurPhone(1,phone)" placeholder="手机"/>
                             </td>
                             <td width="330px">
-                                <el-alert v-show="inputPhoneShow" title="输入手机号" type="info" show-icon>
+                                <el-alert v-show="inputPhoneShow" title="输入手机号(*非必填项)" type="info" show-icon>
                                 </el-alert>
-                                <el-alert v-show="inputPhoneNoShow" title="请输入有效的手机号" type="error" show-icon>
-                                </el-alert>
+                                <!-- <el-alert v-show="inputPhoneNoShow" title="请输入有效的手机号" type="error" show-icon>
+                                </el-alert> -->
                                 <el-alert v-show="inputPhoneVfShow" title="手机号已被使用" type="error" show-icon>
                                 </el-alert>
                             </td>
@@ -119,7 +119,7 @@
                                 <button>发送验证码</button>
                             </td> -->
                             <td width="330px">
-                                <el-alert v-show="inputCodeShow" title="输入手机验证码" type="info" show-icon>
+                                <el-alert v-show="inputCodeShow" title="输入手机验证码(*非必填项)" type="info" show-icon>
                                 </el-alert>
                                 <!-- <el-alert title="请输入手机验证码" type="error" show-icon>
                                 </el-alert> -->

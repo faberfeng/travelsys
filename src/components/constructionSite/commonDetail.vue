@@ -27,7 +27,8 @@
                     <label>报警：{{isAlertNum}}</label>
                     <label>故障：{{isBrokenNum}}</label>
                 </div>
-                <div class="headRight" v-show="editInspectMethodEdit">
+                <!-- v-show="editInspectMethodEdit" -->
+                <div class="headRight" >
                     <span class="autoImportTxt">采集方式:</span>
                     <div class="import2">
                         <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
@@ -35,10 +36,14 @@
                         </select>                        
                         <i class="icon-sanjiao"></i>
                     </div>
-                        <span v-show="importMethod==1&&importDataEdit" class="import" @click="handExportExcel()">导入</span>
-                        <span v-show="importMethod==2&&importDataEdit" @click="autoAcquisitionBtn()" class="import">配置</span>
-                        <span class="import1" v-show="exportDataEdit" @click="getImportHistory">导出</span>
-                         <span class="import2" @click="downExcel()" v-show="exportDataEdit" >导出Excel</span>
+                    <!-- &&importDataEdit -->
+                        <span v-show="importMethod==1" class="import" @click="handExportExcel()">导入</span>
+                        <!-- &&importDataEdit -->
+                        <span v-show="importMethod==2" @click="autoAcquisitionBtn()" class="import">配置</span>
+                        <!-- v-show="exportDataEdit" -->
+                        <span class="import1"  @click="getImportHistory">导出</span>
+                        <!-- v-show="exportDataEdit" -->
+                         <span class="import2" @click="downExcel()"  >导出Excel</span>
                 </div>
             </div>
             <div class="projectBodyCenter">
@@ -134,6 +139,7 @@
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <!-- <button title="定位" class="location actionBtn"></button> -->
                                     <button title="曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
+                                    <i class="el-icon-date" style="color:red;width:18px;height:18px;cursor:pointer;margin-left:12px;" @click="getAllCurve(item.pointId)"></i>
                                 </td>
                             </tr>
                         </tbody>
@@ -277,6 +283,40 @@
                         <vue-highcharts  id="spotChangeLine" style="max-height:900px"  :options="optionSpotChangeLine" ref="spotChangeLine"></vue-highcharts>
                     </div>
             </el-dialog>
+
+            <el-dialog width="1000px" title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
+                    <div style="margin-bottom:20px;">
+                        <el-date-picker
+                            v-model="selectValue1"
+                            type="datetimerange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd">                         
+                        </el-date-picker>
+                        <span class="searchBtn" @click="makeSureData1()">确认</span>
+
+                        <!-- <el-date-picker
+                            v-model="startValue"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+
+                         <el-date-picker
+                            v-model="endValue"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker> -->
+                    </div>
+                    <!-- <div v-if="searchSpotChangeLineShow">
+                        <vue-highcharts  id="searchSpotChangeLine" style="max-height:900px"  :options="searchOptionSpotChangeLine" ref="searchSpotChangeLine"></vue-highcharts>
+                    </div> -->
+                    <div v-if="spotChangeLineShow1">
+                        <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
+                    </div>
+            </el-dialog>
+
+
             <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
@@ -481,6 +521,9 @@ export default Vue.component('commonDetail',{
         return{
             startValue:'',
             endValue:'',
+            startValue1:'',
+            endValue1:'',
+            selectValue1:'',
             selectValue:'',
             broken:0,
             alert:'',
@@ -520,6 +563,9 @@ export default Vue.component('commonDetail',{
             editPersonShow:false,
             editAlertValueShow:false,//编辑报警值
             spotChangeLineShow:false,//取消点位改变曲线
+            spotChangeLineShow1:false,//取消点位改变曲线
+            getAllCurveList:[],
+            getAllCurveName:'',
             autoAcquisitionShow:false,//自动采集配置
             textShow:false,
             uploadshow:false,
@@ -532,8 +578,11 @@ export default Vue.component('commonDetail',{
             getSingleSheetTitleInfoList:'',
             imageName:"未选择任何文件",
             acquisitionTimeXlist:[],
+            acquisitionTimeXlist1:[],
+            getAllCurveId:'',
             acquisitionTimeYlist:'',
             elevationYlist:[],
+            elevationYlist1:[],
             userGroupList:'',//监测人员列表
             observerId:"",
             calculatorId:'',
@@ -578,6 +627,62 @@ export default Vue.component('commonDetail',{
             measureName:'',
             measureId:'',
             optionSpotChangeLine:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                            min:4268.5,
+                            max:43403.3542,
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                                // tickPixelInterval:1000
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            },
+            optionSpotChangeLine1:{
                         chart: {
                             type: 'spline',
                             inverted: false
@@ -926,6 +1031,9 @@ export default Vue.component('commonDetail',{
             }else if(this.itemMonitorType==4){
                 this.getPointForceChartData()
             }
+        },
+        makeSureData1(){
+            this.getAllCurve(this.getAllCurveId)
         },
         getUserInfo(){
                 var vm = this
@@ -1372,8 +1480,8 @@ export default Vue.component('commonDetail',{
                     'token':vm.token
                 },
                 params:{
-                    // userGroupId:vm.userGroupId,
-                    baseMapId:vm.itemSubmitbaseMapId
+                    userGroupId:vm.userGroupId
+                    // baseMapId:vm.itemSubmitbaseMapId
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -1419,7 +1527,7 @@ export default Vue.component('commonDetail',{
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
                    this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                   this.displayInspectSpot()
-                 console.log(this.monitorPointInfo,'this.monitorPointInfo');  
+                
             })
         },
         drawFinish(){
@@ -1790,6 +1898,13 @@ export default Vue.component('commonDetail',{
             this.spotChangeLineShow=false;
              this.optionSpotChangeLine.yAxis.min='';
              this.optionSpotChangeLine.yAxis.max='';
+             this.selectValue='';
+        },
+         spotChangeLineCancle1(){
+            this.spotChangeLineShow1=false;
+             this.optionSpotChangeLine1.yAxis.min='';
+             this.optionSpotChangeLine1.yAxis.max='';
+             this.selectValue1='';
         },
         // 获取监测点采集数据（表格）
         getPointDatas(){
@@ -1862,8 +1977,12 @@ export default Vue.component('commonDetail',{
             var vm=this;
             this.acquisitionTimeXlist=[];
             this.elevationYlist=[];
-            this.startValue=this.selectValue[0];
-            this.endValue=this.selectValue[1];
+            // this.startValue=this.selectValue[0];
+            // this.endValue=this.selectValue[1];
+            if(this.selectValue){
+                this.startValue=this.selectValue[0];
+                this.endValue=this.selectValue[1];
+             }
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointForceChartData',
@@ -1882,20 +2001,28 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.force)
                     })
-                    var min=this.getMinValue(this.elevationYlist);
-                     var max=this.getMaxValue(this.elevationYlist)
-                    var middle=(min+max)/2;
-                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                     this.spotChangeLineShow=true;
-                    setTimeout(()=>{
-                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                        spotChangeLineChart.removeSeries();
-                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
-                        spotChangeLineChart.hideLoading();
-                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },200)
+                    // console.log(this.elevationYlist,'受力')
+                    if(this.elevationYlist.length>0){
+                    }
+                        // var min=this.getMinValue(this.elevationYlist);
+                        // var max=this.getMaxValue(this.elevationYlist)
+                        var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
+                        var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
+                        var middle=(min+max)/2;
+                        // console.log(min,max,middle,'min,max,middle');
+                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                        this.spotChangeLineShow=true;
+
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                        },200)
+                    
                     this.startValue='';
                     this.endValue='';
                 }else if(response.data.cd=='-1'){
@@ -1911,8 +2038,12 @@ export default Vue.component('commonDetail',{
             var vm=this;
             this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
-             this.startValue=this.selectValue[0];
-            this.endValue=this.selectValue[1];
+             if(this.selectValue){
+                this.startValue=this.selectValue[0];
+                this.endValue=this.selectValue[1];
+             }
+            //  this.startValue=this.selectValue[0];
+            // this.endValue=this.selectValue[1];
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointGaugeChartData',
@@ -1931,20 +2062,24 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.gaugeHeight)
                     })
-                     var min=this.getMinValue(this.elevationYlist);
-                     var max=this.getMaxValue(this.elevationYlist)
-                    var middle=(min+max)/2;
-                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                     this.spotChangeLineShow=true;
-                    setTimeout(()=>{
-                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                        spotChangeLineChart.removeSeries();
-                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
-                        spotChangeLineChart.hideLoading();
-                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },200)
+                    if(this.elevationYlist.length>0){}
+                        // var min=this.getMinValue(this.elevationYlist);
+                        // var max=this.getMaxValue(this.elevationYlist)
+                        var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
+                        var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
+                        var middle=(min+max)/2;
+                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                        this.spotChangeLineShow=true;
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                        },200)
+                    
                     this.startValue='';
                     this.endValue='';
                 }else if(response.data.cd=='-1'){
@@ -1955,13 +2090,75 @@ export default Vue.component('commonDetail',{
                 }
             })
         },
+        //
+        getAllCurve(id){
+            var vm=this;
+            this.acquisitionTimeXlist1=[];
+            this.elevationYlist1=[];
+            this.startValue1='';
+            this.endValue1='';
+           
+            this.getAllCurveId=id;
+            this.getAllCurveList=[];
+            if(this.selectValue1){
+                 this.startValue1=this.selectValue1[0];
+                this.endValue1=this.selectValue1[1];
+            }
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:id,
+                    startDate:this.startValue1,
+                    endDate:this.endValue1
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getAllCurveList=response.data.rt;
+                    // console.log(this.getAllCurveList,'this.getAllCurveList');
+                    if(this.getAllCurveList.length>0){
+                            this.getAllCurveName=this.getAllCurveList[0].pointName;
+                    }
+                        this.getAllCurveList.forEach((item)=>{
+                            this.acquisitionTimeXlist1.push(this.timeChangeMethod(item.collectTime))
+                            this.elevationYlist1.push(item.data)
+                        })
+                        var min=this.getMinValue(this.elevationYlist1)?this.getMinValue(this.elevationYlist1):0;
+                        var max=this.getMaxValue(this.elevationYlist1)?this.getMaxValue(this.elevationYlist1):0;
+                        //  console.log(min,'min');
+                        //  console.log(max,'max');
+                        var middle=(min+max)/2;
+                        this.optionSpotChangeLine1.yAxis.min=(3*min-2*max);
+                        this.optionSpotChangeLine1.yAxis.max=(3*max-2*min);
+                        this.spotChangeLineShow1=true;
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine1;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.getAllCurveName,data:this.elevationYlist1});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist1});
+                        },200)
+                    
+                    this.startValue='';
+                    this.endValue='';
+                    
+                }
+            })
+
+        },
         //获取30天曲线图（水平位移）
         getPointHorizontalShiftChartData(){
              var vm=this;
              this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
-             this.startValue=this.selectValue[0];
-            this.endValue=this.selectValue[1];
+             if(this.selectValue){
+                    this.startValue=this.selectValue[0];
+                    this.endValue=this.selectValue[1];
+             }
             axios({
                 method:'post',
                 url:this.BDMSUrl+'detectionInfo/getPointHorizontalShiftChartData',
@@ -1980,27 +2177,32 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.shiftDistance)
                     })
+                    if(this.elevationYlist.length>0){
+                    }
+                        // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
+                        // console.log(this.elevationYlist,'this.elevationYlist');
+                        // var min=this.getMinValue(this.elevationYlist);
+                        // var max=this.getMaxValue(this.elevationYlist);
+                        var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
+                        var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
+                        //  console.log(min,'min');
+                        //  console.log(max,'max');
+                        var middle=(min+max)/2;
+                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                        this.spotChangeLineShow=true;
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                        },200)
                     
-                    // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                    // console.log(this.elevationYlist,'this.elevationYlist');
-                     var min=this.getMinValue(this.elevationYlist);
-                     var max=this.getMaxValue(this.elevationYlist);
-                    //  console.log(min,'min');
-                    //  console.log(max,'max');
-                    var middle=(min+max)/2;
-                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                     this.spotChangeLineShow=true;
-                    setTimeout(()=>{
-                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                        spotChangeLineChart.removeSeries();
-                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
-                        spotChangeLineChart.hideLoading();
-                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },200)
                     this.startValue='';
                     this.endValue='';
+                    this.selectValue='';
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -2016,8 +2218,12 @@ export default Vue.component('commonDetail',{
              this.elevationYlist=[];
              this.optionSpotChangeLine.yAxis.min='';
              this.optionSpotChangeLine.yAxis.max='';
-             this.startValue=this.selectValue[0];
-            this.endValue=this.selectValue[1];
+             if(this.selectValue){
+                    this.startValue=this.selectValue[0];
+                    this.endValue=this.selectValue[1];
+             }
+            //  this.startValue=this.selectValue[0];
+            // this.endValue=this.selectValue[1];
             //  console.log(this.optionSpotChangeLine.yAxis.min);
             axios({
                 method:'post',
@@ -2038,23 +2244,28 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    console.log(this.elevationYlist,'this.elevationYlist');
-                    var min=this.getMinValue(this.elevationYlist);
-                     var max=this.getMaxValue(this.elevationYlist)
-                    var middle=(min+max)/2;
-                    console.log(3*min-2*max,'min');
-                    console.log(3*max-2*min,'max')
-                    this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                     this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                     this.spotChangeLineShow=true;
-                    setTimeout(()=>{
-                        let spotChangeLineChart=this.$refs.spotChangeLine;
-                        spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
-                        spotChangeLineChart.removeSeries();
-                        spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
-                        spotChangeLineChart.hideLoading();
-                        spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
-                    },200)
+                    // console.log(this.elevationYlist,'this.elevationYlist');
+                    this.spotChangeLineShow=true;
+                    // if(this.elevationYlist.length==0){
+                    //     this.elevationYlist.push(0);
+                    // }
+                        var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
+                        var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
+                        var middle=(min+max)/2;
+                        // console.log(3*min-2*max,'min');
+                        // console.log(3*max-2*min,'max')
+                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                        
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                        },200)
+                    
                     this.startValue='';
                     this.endValue='';
                 }else if(response.data.cd=='-1'){
@@ -2504,7 +2715,7 @@ export default Vue.component('commonDetail',{
         font-style:normal
     }
     li{list-style: none}
-    #edit 
+    // #edit 
     select.autoImport{
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
                 /*很关键：将默认的select选择框样式清除*/  
@@ -2912,6 +3123,9 @@ export default Vue.component('commonDetail',{
                                             margin-left: 10px;
                                         }
                                         .el-icon-warning{
+                                            font-size: 17px;
+                                        }
+                                        .el-icon-date{
                                             font-size: 17px;
                                         }
                                         .location{

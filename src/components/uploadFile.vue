@@ -151,7 +151,7 @@ export default Vue.component('common-upload',{
                     vm.imageName ='未选择任何文件'
                     vm.filesList = null
                     fileId.push(response.data.rt[0].fileId)
-                    vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
+                    // vm.latestFile(fileId,"更新了点位文件"+response.data.rt[0].fileName);
                     vm.$refs.file.value = ''
                     vm.$emit('refreshqj')
                 

@@ -218,7 +218,7 @@
                                 </td>
                                 <td>
                                     <select v-model="holderId" class="inp-search">
-                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option>
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.dirId" v-html="val.dirName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -257,7 +257,7 @@
                     <div class="editBodytwo imageBody" style="position: relative;">
                         <label class=" imageBodyText">相关空间：</label>
                         <select class="inp-search" v-model="holderId">
-                            <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option> 
+                            <option v-for="(val,index) in getHoldersList" :key="index" :value="val.dirId" v-html="val.dirName"></option> 
                         </select>
                         <i class="icon-sanjiao" style="top: 16px;left: 350px;"></i>
                     </div>
@@ -683,6 +683,22 @@ export default {
         //获取单体分区楼层三个级别的容器信息
         getHolders(){
             var vm=this;
+            var setting = {
+                data: {
+                    key:{
+                        name: "dirName",
+                        children:'children',
+                        title:"dirName",
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "dirId",
+                        pIdKey: "dirParId",
+                        rootPId: 0
+                    }
+                }
+            }
+
             this.getHoldersList=[];
              axios({
                 url:vm.BDMSUrl+'dc/drawingReview/getHolders',
@@ -695,26 +711,54 @@ export default {
                 },
             }).then((response)=>{
                 if(response.data.cd=='0'){
-                    var getHolder=''
+                    var getHolder=[]
                     getHolder=response.data.rt;
+                    // console.log(vm.checkFileDir.buildId,'vm.checkFileDir.buildId');
 
-                    getHolder.forEach((item)=>{
-                         if(vm.checkFileDir.buildId==item.dirParId){
-                             this.getHoldersList.push({
-                                "holderId": item.dirId?item.dirId:null,
-                                "holderName": item.dirName?item.dirName:'',
-                                "holderType": "",
-                                "parentHolderId":item.dirParId?item.dirParId:null
-                             })
-                         }
-                     })
-                    this.getHoldersList.unshift({ 
-                        "holderId": null,
-                        "holderName": "无",
-                        "holderType": "",
-                        "parentHolderId":null
-                    })
+                    // getHolder = data.transformTozTreeFormat(setting,getHolder);
+                    console.log(getHolder,'getHolder');
+                    this.getHoldersList =getHolder
+                    // getHolder.forEach((item)=>{
+                    //     if(item.children){
+                    //         item.children.forEach((val)=>{
+                    //             console.log(val,'val');
+                    //             val.dirName='&nbsp&nbsp&nbsp&nbsp'+val.dirName
+                    //         })
+                    //     }
+                    //     this.getHoldersList.push(item);
+                            
+                    // })
+
                     console.log(this.getHoldersList,'this.getHoldersList');
+                    //  getHolder.forEach((item)=>{
+                    //      if(item.children){
+                    //          this.getHoldersList.push({
+                    //             "holderId": item.dirId?item.dirId:null,
+                    //             "holderName": item.dirName?item.dirName:'',
+                    //             "holderType": "",
+                    //             "parentHolderId":item.dirParId?item.dirParId:null
+                    //          })
+                    //          item.children.forEach((val)=>{
+                    //               this.getHoldersList.push({
+                    //                 "holderId": val.dirId?item.dirId:null,
+                    //                 "holderName": val.dirName?item.dirName:'',
+                    //                 "holderType": "",
+                    //                 "parentHolderId":val.dirParId?item.dirParId:null
+                    //             })
+                    //         })
+                    //      }
+                         
+                    //  })
+                    // this.getHoldersList.unshift({ 
+                    //     "holderId": null,
+                    //     "holderName": "无",
+                    //     "holderType": "",
+                    //     "parentHolderId":null
+                    // })
+                    console.log(this.getHoldersList,'this.getHoldersList');
+
+
+
                      
                 }else{
                     this.$message({

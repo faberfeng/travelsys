@@ -724,7 +724,7 @@ export default {
                 if(response.data.cd=='0'){
                     this.ugList=response.data.rt;
                     this.ugList.forEach((item)=>{
-                        if(item.groupName.indexOf('质量检查')>-1&&item.isDefault==1){
+                        if(item.groupName.indexOf('质量管理')>-1&&item.isDefault==1){
                             this.getGroupUser(item.groupId)
                             this.groupId=item.groupId;
                         }
@@ -763,7 +763,7 @@ export default {
                     }else{
                         this.$message({
                                     type:'error',
-                                    message:'您不是质量检查群组成员，不能访问质量检查页面内容'
+                                    message:'您不是质量管理群组成员，不能访问质量管理页面内容'
                                 })
 
                     }

@@ -121,7 +121,7 @@ var app
 // var responseStr=require('./json/response');
 // var responseStr=require('./json/response1');
 
-var isOpen=0;
+// var isOpen=0;
 var CurrentSelectedEntLists='';
 export default {
     name:'Home',
@@ -135,7 +135,7 @@ export default {
         );
         return{
             url:'http://10.252.26.240:8080/genDist/',
-
+            isOpen:0,
             BDMSUrl:'',
             settingsCenter:true,//是否是两边铺满
             header:{
@@ -296,8 +296,9 @@ export default {
         webGlbtn(){
             var vm=this;
             this.webGlShow=!this.webGlShow;
-            isOpen++
-            if(isOpen==1){
+            this.isOpen++;
+            console.log(this.isOpen,'isOpen00');
+            if(this.isOpen==1){
                     setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
                     // app = document.getElementById("webIframe").contentWindow;
@@ -334,7 +335,7 @@ export default {
                 this.GetDrawingBackList='',
                 this.drawList=[];
                 this.GetDrawingBackList=e.data.parameter;
-                // console.log(this.GetDrawingBackList,'图纸')
+                console.log(this.GetDrawingBackList,'图纸')
                 this.getDrawingList();
                 break;
 		    }
@@ -364,6 +365,7 @@ export default {
                 vm.getElement(item.level,item.id)
             })
             vm.midShow=true;
+           
             // vm.$confirm('此操作将你选择构件生成清单, 是否继续?', '提示', {
             //     confirmButtonText: '确定',
             //     cancelButtonText: '取消',
@@ -385,7 +387,8 @@ export default {
                 },
                 data:this.elementTracId,
                 params:{
-                    manifestName:this.manifestName
+                    manifestName:this.manifestName,
+                    projectId:this.projId
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
@@ -512,19 +515,23 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
+                    console.log(this.getWebGlDrawingList,'this.getWebGlDrawingList');
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
+
+                            this.drawingWebGlId=item.id;
+                            this.drawingWebGlIdList.push(this.drawingWebGlId);
                             if(this.GetDrawingBackList.GCodeList.length!=0){
                                 
-                                for(var i=0;i<this.GetDrawingBackList.GCodeList.length;i++){
-                                    if((this.GetDrawingBackList.GCodeList)[i]==item.directory){
-                                        this.drawingWebGlId=item.id;
-                                        this.drawingWebGlIdList.push(this.drawingWebGlId);
-                                    }
-                                }
+                                // for(var i=0;i<this.GetDrawingBackList.GCodeList.length;i++){
+                                //     if((this.GetDrawingBackList.GCodeList)[i]==item.directory){
+                                //         this.drawingWebGlId=item.id;
+                                //         this.drawingWebGlIdList.push(this.drawingWebGlId);
+                                //     }
+                                // }
                             }else{
-                                this.drawingWebGlId=item.id;
-                                this.drawingWebGlIdList.push(this.drawingWebGlId);
+                                // this.drawingWebGlId=item.id;
+                                // this.drawingWebGlIdList.push(this.drawingWebGlId);
                             }
                             // console.log(this.drawingWebGlIdList,'drawingWebGlIdList');
                         }
@@ -555,23 +562,26 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.drawingWebGlList=response.data.rt;
-                    // console.log(this.drawingWebGlList,'图纸地址');
+                    console.log(this.drawingWebGlList,'图纸地址');
                     this.drawingWebGlList.forEach((item)=>{
                         this.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
+
+                                //  vm.versionPath=(response.data.rt)[0].fgId;
+                                //  vm.drawingFileUrl=vm.BDMSUrl+'doc/download/'+vm.versionPath
                                
                                 this.getDrawingRotateInfo(item.drawingId);
                                   this.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
-                                        type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
-                                        source:this.QJFileManageSystemURL+item.fileUri,
+                                        // type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
+                                        source:this.BDMSUrl+'doc/download/'+item.fgId,
                                         page:1,
                                         angle:0
                                 })
                             }
                         })
                     })
-                    // console.log(this.drawList,'最后的东西');
+                    console.log(this.drawList,'最后的东西');
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
@@ -1338,7 +1348,7 @@ export default {
     }
     .creatMid{
         position: absolute;
-        top:10px;
+        top:9px;
         color:black;
         font-size: 14px;
         right: 188px;

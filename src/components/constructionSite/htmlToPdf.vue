@@ -132,8 +132,8 @@
                     <div class="baseWord"><div class="baseWord1">工程负责人：</div><div class="baseWord2">监测单位：{{projectName}}</div></div>
                 </div>
                 <!-- 公共面积 -->
-                <ul class="inspectUl">
-                    <li class="inspectLi" v-for="(item,index) in getAllMonitorItemList" :key="index">
+                <ul class="inspectUl" id="inspectUlId">
+                    <li class="inspectLi"  v-for="(item,index) in getAllMonitorItemList" :key="index">
                        
                         <div class="verticalLength" v-show="item.type!=5">
                              <!-- <div class="qrcodeBody" v-show="generateQrcode==1">
@@ -1008,9 +1008,11 @@ export default {
             }) 
         },
         getExcel(){
-            this.getAllMonitorItemList.forEach((item)=>{
-                    method5('bottomTableList'+item.id);
-            })
+            method5('inspectUlId');
+            // this.getAllMonitorItemList.forEach((item)=>{
+            //     console.log('bottomTableList'+item.id);
+            //         method5('bottomTableList'+item.id);
+            // })
         },
          //html转PDF
         getPdf(){

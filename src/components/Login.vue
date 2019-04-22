@@ -69,6 +69,7 @@ export default {
         if(defaultSubProjId != 'undefined'){
             localStorage.removeItem('defaultSubProjId')
         }
+        localStorage.clear();
         //  this.validateInstance()
         // if(token != 'undefined'){
         //     vm.token = token
@@ -123,6 +124,7 @@ export default {
             // formData.append('isRemember',this.isAuto);
             formData.append('password',this.login.Password);
             this.loadingShow=true;
+            localStorage.clear();
             axios({
                 method: 'Post',
                 // url: this.BDMSUrl + 'project2/login',
