@@ -188,6 +188,7 @@ export default {
             drawingWebGlUrl:'',//图纸路径
             drawingWebGlId:'',//图纸ID
             drawingWebGlIdList:[],//图纸数组ID
+            fileType:'',
             drawingWebGlType:'',//图纸类型
             drawingWebGlList:'',
             ListJSON:'',
@@ -498,6 +499,30 @@ export default {
             var ifm= document.getElementById("webIframe"); 
             ifm.height=document.documentElement.clientHeight;
         },
+        getFileInfoById(fgId){
+            var vm=this;
+            var fgids=[];
+            fgids.push(fgId);
+            console.log(fgids,'fgids00');
+            $.ajax({
+                url:this.BDMSUrl+'doc/getFileInfoById',
+                type:"post",
+                dataType:"json",
+                data:JSON.stringify({fgIds:fgids}),
+                // 'Content-Type':'application/x-www-form-urlencoded',
+                
+                headers:{
+                    token:vm.token
+                },
+                success:function(response){
+                    if(response.cd){
+                        vm.fileType=response.rt;
+                    }
+                }
+            })
+            return vm.fileType;
+        },
+        
         //获取图纸列表
         getDrawingList(){
             // console.log(this.GetDrawingBackList,'图纸')
@@ -566,18 +591,15 @@ export default {
                     this.drawingWebGlList.forEach((item)=>{
                         this.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
-
-                                //  vm.versionPath=(response.data.rt)[0].fgId;
-                                //  vm.drawingFileUrl=vm.BDMSUrl+'doc/download/'+vm.versionPath
-                               
-                                this.getDrawingRotateInfo(item.drawingId);
+                                // this.getDrawingRotateInfo(item.drawingId);
                                   this.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
                                         // type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
                                         type:'pdf',
+                                        // type:this.getFileInfoById(item.fgId),
                                         source:this.BDMSUrl+'doc/download/'+item.fgId,
                                         page:1,
-                                        angle:0
+                                        angle:this.getDrawingRotateInfo(item.drawingId)
                                 })
                             }
                         })
@@ -605,24 +627,42 @@ export default {
         },
         getDrawingRotateInfo(val){
             var vm=this;
-             axios({
-                url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
-                method:'post',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                   drawingId:val,
-                },
-            }).then((response)=>{
-                if(response.data.cd=='0'){
-                    if(response.data.rt){
-                        this.rotate=response.data.rt.rotateInfo;
-                    }
-                }else{
+            //  axios({
+            //     url:vm.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
+            //     method:'post',
+            //     headers:{
+            //         'token':vm.token
+            //     },
+            //     params:{
+            //        drawingId:val,
+            //     },
+            // }).then((response)=>{
+            //     if(response.data.cd=='0'){
+            //         if(response.data.rt){
+            //             this.rotate=response.data.rt.rotateInfo;
+            //         }
+            //     }else{
                     
-                } 
+            //     } 
+            // })
+            var vm=this;
+            $.ajax({
+                url:this.BDMSUrl+'dc/drawingReview/getDrawingRotateInfo',
+                type:"post",
+                data:{
+                    drawingId:val
+                },
+                headers:{
+                    token:vm.token
+                },
+                async:false, //同步
+                success:function(response){
+                    if(response.cd==0){
+                        this.rotate=response.rt;
+                    }
+                }
             })
+            return this.rotate;
 
         },
         //获取项目模型展示初始化数据
