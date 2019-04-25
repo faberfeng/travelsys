@@ -326,7 +326,8 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">结束深度:</label>
-                        <input @change="numChange1()" placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
+                        <!-- @change="numChange1()" -->
+                        <input  placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">

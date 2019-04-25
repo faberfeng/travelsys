@@ -4305,51 +4305,67 @@
       },
       fdPlayMakeSure(){
         // this.fdPlayDialog=false;
-        var date='';
-       date=(this.taskFdEnd-this.taskFdStart)%this.fdNum
+        var date=1;
+        var datas=[];
+
+        console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
+       date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
        console.log(date,'date00');
-        this.fdPlayData=[];
-        this.fdIndex();
-      },
-      fdIndex(){
-        var vm=this;
-         if(document.getElementById('webgl').style.display=='none'){
+       for(let i=0;i<this.fdNum;i++){
+         console.log(this.taskFdStart+date*i,this.taskFdStart+date*(i+1));
+          datas.push({
+            'id':i+1,
+            'taskFdStart':moment(this.taskFdStart.getTime()+date*i).format('YYYY-MM-DD'),
+            'taskFdEnd':moment(this.taskFdStart.getTime()+date*(i+1)).format('YYYY-MM-DD')
+          })
+       }
+        if(document.getElementById('webgl').style.display=='none'){
             this.$message({
                 type:'info',
                 message:'请打开顶部的虚拟场景'
             })
             // this.fdPlayDialog=false;
-            }else{
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-                const app = document.getElementById('webIframe').contentWindow;
-                axios({
-                    url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId',
-                    headers:{
-                      'token':this.token
-                    },
-                    method:"post",
-                    params:{
-                      startDate:moment(vm.taskFdStart).format("YYYY-MM-DD"),
-                      endDate:moment(vm.taskFdEnd).format("YYYY-MM-DD")
-                    },
-                    data:this.fdPlayDataId
-                  }).then((response)=>{
-                    if(response.data.cd==0){
-                        // console.log('00');
-                        this.returnTraceIds=response.data.rt;
-                        this.fdPlayDialog=false;
-                        this.taskFdStart='';
-                        this.taskFdEnd='';
-                        this.returnTraceIdsData.push({
-                            'id':1,
-                            'data':this.returnTraceIds
-                        })
-                        console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
-                        app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*");
-                    }
+          }else{
+
+              document.body.scrollTop = 0;
+              document.documentElement.scrollTop = 0;
+              datas.forEach((item)=>{
+                        this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
                   })
-                 }
+                  console.log(datas,'datas00');
+              //  console.log(date,'date00');
+                this.fdPlayData=[];
+                console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
+                app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+          }
+      },
+      fdIndex(taskFdStart,taskFdEnd,i){
+        var vm=this;
+            axios({
+                url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId',
+                headers:{
+                  'token':this.token
+                },
+                method:"post",
+                params:{
+                  startDate:taskFdStart,
+                  endDate:taskFdEnd
+                },
+                data:this.fdPlayDataId
+              }).then((response)=>{
+                if(response.data.cd==0){
+                    // console.log('00');
+                    this.returnTraceIds=response.data.rt;
+                    this.fdPlayDialog=false;
+                    this.taskFdStart='';
+                    this.taskFdEnd='';
+                    this.returnTraceIdsData.push({
+                        'id':i,
+                        'data':this.returnTraceIds
+                    })
+                  // console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
+                }
+              })
         },
 
 

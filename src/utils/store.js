@@ -121,25 +121,25 @@ export default new Vuex.Store({
 
 
         //外网测试（最新BDWork）
-        BIMServerPort:'443',
-        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
-        commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
-        BDMSUrl:'http://42.159.153.210:8080/bdms-rebuild/',//仅供文件上传使用
-        // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
-        WebGlUrl:"https://bim.arctron.cn",
-        GMDUrl:"https://bim.arctron.cn",
-        shareUrl:"http://42.159.153.210:8080/bdms/#",
-        appShareUrl:'http://42.159.153.210:8080/bdms/',
-        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
-        iframeWebGlUrl:'http://42.159.153.210:8080/BDView/',
-        applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
-        messageUrl:'http://42.159.153.210:8079',
-        webSocketUrl:"ws://42.159.153.210:16800/websocket",
-        qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
-        loginUrl:"http://42.159.153.210:8080/bdms/#/registerIndex",
-        userCenterUrl:'http://42.159.153.210:8080/bdms/#/userLogin',
-        BDMSLoginUrl:'http://42.159.153.210:8080/bdms/#/login',
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        // BDMSUrl:'http://42.159.153.210:8080/bdms-rebuild/',//仅供文件上传使用
+        // // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"http://42.159.153.210:8080/bdms/#",
+        // appShareUrl:'http://42.159.153.210:8080/bdms/',
+        // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // iframeWebGlUrl:'http://42.159.153.210:8080/BDView/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+        // loginUrl:"http://42.159.153.210:8080/bdms/#/registerIndex",
+        // userCenterUrl:'http://42.159.153.210:8080/bdms/#/userLogin',
+        // BDMSLoginUrl:'http://42.159.153.210:8080/bdms/#/login',
 
 
         //无锡市政院（最新版本）
@@ -168,28 +168,26 @@ export default new Vuex.Store({
 
         //最新bdms外网地址
 
-        // BIMServerPort:'443',
-        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
-        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
-        // BDMSUrl:'https://bdms.arctron.cn/bdms-rebuild/',//仅供文件上传使用
-        // // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
-        // WebGlUrl:"https://bim.arctron.cn",
-        // GMDUrl:"https://bim.arctron.cn",
-        // shareUrl:"https://bdms.arctron.cn/bdmsRebuild/#",
-        // appShareUrl:'https://bdms.arctron.cn/bdmsRebuild/',
-        // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
-        // iframeWebGlUrl:'https://bdms.arctron.cn/BDView/',
-        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
-        // messageUrl:'http://42.159.153.210:8079',
-        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
-        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
-        // loginUrl:"https://bdms.arctron.cn/bdmsRebuild/#/registerIndex",
-        // userCenterUrl:'https://bdms.arctron.cn/bdmsRebuild/#/userLogin',
-        // BDMSLoginUrl:'https://bdms.arctron.cn/bdmsRebuild/#/login',
+        BIMServerPort:'443',
+        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        BDMSUrl:'https://bdms.arctron.cn/bdms-rebuild/',//仅供文件上传使用
+        // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
+        WebGlUrl:"https://bim.arctron.cn",
+        GMDUrl:"https://bim.arctron.cn",
+        shareUrl:"https://bdms.arctron.cn/bdmsRebuild/#",
+        appShareUrl:'https://bdms.arctron.cn/bdmsRebuild/',
+        // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        iframeWebGlUrl:'https://bdms.arctron.cn/BDView/',
+        applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        messageUrl:'http://42.159.153.210:8079',
+        webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+        loginUrl:"https://bdms.arctron.cn/bdmsRebuild/#/registerIndex",
+        userCenterUrl:'https://bdms.arctron.cn/bdmsRebuild/#/userLogin',
+        BDMSLoginUrl:'https://bdms.arctron.cn/bdmsRebuild/#/login',
 
-
-        
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,
