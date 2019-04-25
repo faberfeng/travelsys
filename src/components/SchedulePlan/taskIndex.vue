@@ -1486,6 +1486,7 @@
         taskFdEnd:'',
         fdPlayDataId:[],
         returnTraceIdsData:[],
+        returnTraceIds:[],
         fdNum:'',
         addLinkDialog: false,
         editTaskDialog: false,
@@ -4306,6 +4307,7 @@
         // this.fdPlayDialog=false;
         var date='';
        date=(this.taskFdEnd-this.taskFdStart)%this.fdNum
+       console.log(date,'date00');
         this.fdPlayData=[];
         this.fdIndex();
       },
@@ -4335,10 +4337,15 @@
                   }).then((response)=>{
                     if(response.data.cd==0){
                         // console.log('00');
-                        this.returnTraceIdsData=response.data.rt;
+                        this.returnTraceIds=response.data.rt;
                         this.fdPlayDialog=false;
                         this.taskFdStart='';
                         this.taskFdEnd='';
+                        this.returnTraceIdsData.push({
+                            'id':1,
+                            'data':this.returnTraceIds
+                        })
+                        console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
                         app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*");
                     }
                   })
