@@ -4329,6 +4329,7 @@
 
               document.body.scrollTop = 0;
               document.documentElement.scrollTop = 0;
+               const app = document.getElementById('webIframe').contentWindow;
               datas.forEach((item)=>{
                         this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
                   })
