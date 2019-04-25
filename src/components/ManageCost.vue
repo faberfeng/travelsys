@@ -780,8 +780,9 @@ export default {
                 // localStorage.setItem('userImg',vm.header.userImg)
                 // localStorage.setItem('entType',response.data.rt.onlineInfo.entType)
                 // localStorage.setItem('userName',vm.header.userName)
-                localStorage.setItem('projAuth',response.data.rt.authIds)
-                // console.log(response.data.rt.authIds,'权限文件');
+                localStorage.setItem('projAuth',response.data.rt.authIds);
+                // console.log()
+                console.log(response.data.rt.authIds,'权限文件');
             })
         },
 

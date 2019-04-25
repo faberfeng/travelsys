@@ -1359,6 +1359,7 @@
   var app
   var CurrentSelectPara='';
   var CurrentSelectedEntList='';
+  var return4DImages='';
   export default {
     name: 'taskIndex',
     data() {
@@ -2313,8 +2314,12 @@
                         break;
               case "GetDrawingList":
               break;
-              case "UsingColorStatus":{
-              }
+              case "UsingColorStatus":
+              break;
+              case "Return_4D_images":
+                return4DImages=e.data.parameter;
+                console.log(return4DImages,'return4DImages');
+              break;
             }
         },
       //着色状态
@@ -2688,7 +2693,15 @@
       },
       //4d播放
       fDplay(){
-        this.fdPlayDialog=true;
+        if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+            // this.fdPlayDialog=false;
+          }else{
+              this.fdPlayDialog=true;
+          }
       },
       //放大
       bigLength(){
@@ -4309,7 +4322,10 @@
         var datas=[];
 
         console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
-       date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
+      if(this.fdNum){
+        date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
+      }
+       
        console.log(date,'date00');
        for(let i=0;i<this.fdNum;i++){
          console.log(this.taskFdStart+date*i,this.taskFdStart+date*(i+1));
@@ -4339,6 +4355,11 @@
                 console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
                 app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
                 this.fdPlayDialog=false;
+                this.fdNum='';
+                this.$message({
+                  type:'success',
+                  message:'4D播放加载中...'
+                })
           }
       },
       fdIndex(taskFdStart,taskFdEnd,i){

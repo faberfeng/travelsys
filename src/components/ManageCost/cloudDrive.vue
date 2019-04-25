@@ -2882,6 +2882,7 @@ export default {
         vm.shareUrl=vm.$store.state.shareUrl;
         this.GMDUrl = this.$store.state.GMDUrl;
         vm.projAuth = localStorage.getItem('projAuth')
+        console.log(vm.projAuth,'vm.projAuth');
         vm.checkFilePaste()
         vm.getIntoCloudD()
 

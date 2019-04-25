@@ -638,8 +638,10 @@ export default Vue.component('commonDetail',{
                             categories:[],
                         },
                         yAxis: {
-                            min:4268.5,
-                            max:43403.3542,
+                            // min:4268.5,
+                            // max:43403.3542,
+                             min:0,
+                            max:0,
                                 title: {
                                     text: '数量'
                                 },
@@ -1022,6 +1024,12 @@ export default Vue.component('commonDetail',{
             //         console.log(response.data.rt);
             //     }
             // })
+            // let spotChangeLineChart=this.$refs.spotChangeLine;
+            // spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+            // spotChangeLineChart.removeSeries();
+            //  this.optionSpotChangeLine.yAxis.min='';
+            //  this.optionSpotChangeLine.yAxis.max='';
+            this.$refs.spotChangeLine.removeSeries();
             if(this.itemMonitorType==1){
                 this.getPointHorizontalShiftChartData()
             }else if(this.itemMonitorType==2){
@@ -1977,6 +1985,8 @@ export default Vue.component('commonDetail',{
             var vm=this;
             this.acquisitionTimeXlist=[];
             this.elevationYlist=[];
+             this.optionSpotChangeLine.yAxis.min=undefined;
+             this.optionSpotChangeLine.yAxis.max=undefined;
             // this.startValue=this.selectValue[0];
             // this.endValue=this.selectValue[1];
             if(this.selectValue){
@@ -2001,6 +2011,7 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.force)
                     })
+                     this.spotChangeLineShow=true;
                     // console.log(this.elevationYlist,'受力')
                     if(this.elevationYlist.length>0){
                     }
@@ -2010,9 +2021,9 @@ export default Vue.component('commonDetail',{
                         var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
                         var middle=(min+max)/2;
                         // console.log(min,max,middle,'min,max,middle');
-                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                        this.spotChangeLineShow=true;
+                        // this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        // this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                       
 
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine;
@@ -2021,6 +2032,9 @@ export default Vue.component('commonDetail',{
                             spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
+
                         },200)
                     
                     this.startValue='';
@@ -2038,6 +2052,8 @@ export default Vue.component('commonDetail',{
             var vm=this;
             this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
+              this.optionSpotChangeLine.yAxis.min=undefined;
+             this.optionSpotChangeLine.yAxis.max=undefined;
              if(this.selectValue){
                 this.startValue=this.selectValue[0];
                 this.endValue=this.selectValue[1];
@@ -2062,15 +2078,16 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.gaugeHeight)
                     })
-                    if(this.elevationYlist.length>0){}
+                     this.spotChangeLineShow=true;
+                    // if(this.elevationYlist.length>0){}
                         // var min=this.getMinValue(this.elevationYlist);
                         // var max=this.getMaxValue(this.elevationYlist)
                         var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
                         var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
                         var middle=(min+max)/2;
-                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                        this.spotChangeLineShow=true;
+                        // this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        // this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                       
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine;
                             spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
@@ -2078,6 +2095,8 @@ export default Vue.component('commonDetail',{
                             spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
                     
                     this.startValue='';
@@ -2097,6 +2116,8 @@ export default Vue.component('commonDetail',{
             this.elevationYlist1=[];
             this.startValue1='';
             this.endValue1='';
+            this.optionSpotChangeLine1.yAxis.min=undefined;
+             this.optionSpotChangeLine1.yAxis.max=undefined;
            
             this.getAllCurveId=id;
             this.getAllCurveList=[];
@@ -2131,8 +2152,8 @@ export default Vue.component('commonDetail',{
                         //  console.log(min,'min');
                         //  console.log(max,'max');
                         var middle=(min+max)/2;
-                        this.optionSpotChangeLine1.yAxis.min=(3*min-2*max);
-                        this.optionSpotChangeLine1.yAxis.max=(3*max-2*min);
+                        // this.optionSpotChangeLine1.yAxis.min=(3*min-2*max);
+                        // this.optionSpotChangeLine1.yAxis.max=(3*max-2*min);
                         this.spotChangeLineShow1=true;
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine1;
@@ -2141,6 +2162,8 @@ export default Vue.component('commonDetail',{
                             spotChangeLineChart.addSeries({name:this.getAllCurveName,data:this.elevationYlist1});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist1});
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
                     
                     this.startValue='';
@@ -2155,6 +2178,8 @@ export default Vue.component('commonDetail',{
              var vm=this;
              this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
+            this.optionSpotChangeLine.yAxis.min=undefined;
+             this.optionSpotChangeLine.yAxis.max=undefined;
              if(this.selectValue){
                     this.startValue=this.selectValue[0];
                     this.endValue=this.selectValue[1];
@@ -2177,8 +2202,9 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.shiftDistance)
                     })
-                    if(this.elevationYlist.length>0){
-                    }
+                     this.spotChangeLineShow=true;
+                    // if(this.elevationYlist.length>0){
+                    // }
                         // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
                         // console.log(this.elevationYlist,'this.elevationYlist');
                         // var min=this.getMinValue(this.elevationYlist);
@@ -2188,9 +2214,9 @@ export default Vue.component('commonDetail',{
                         //  console.log(min,'min');
                         //  console.log(max,'max');
                         var middle=(min+max)/2;
-                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                        this.spotChangeLineShow=true;
+                        // this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        // this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                       
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine;
                             spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
@@ -2198,6 +2224,9 @@ export default Vue.component('commonDetail',{
                             spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
                     
                     this.startValue='';
@@ -2216,8 +2245,8 @@ export default Vue.component('commonDetail',{
              var vm=this;
              this.acquisitionTimeXlist=[];
              this.elevationYlist=[];
-             this.optionSpotChangeLine.yAxis.min='';
-             this.optionSpotChangeLine.yAxis.max='';
+             this.optionSpotChangeLine.yAxis.min=undefined;
+             this.optionSpotChangeLine.yAxis.max=undefined;
              if(this.selectValue){
                     this.startValue=this.selectValue[0];
                     this.endValue=this.selectValue[1];
@@ -2245,19 +2274,18 @@ export default Vue.component('commonDetail',{
                         this.elevationYlist.push(item.elevation)
                     })
                      console.log(this.elevationYlist,'this.elevationYlist');
-                        this.spotChangeLineShow=true;
-                    // if(this.elevationYlist.length==0){
-                    //     this.elevationYlist.push(0);
-                    // }
-                        this.optionSpotChangeLine.yAxis.min='';
-                        this.optionSpotChangeLine.yAxis.max='';
+                    this.spotChangeLineShow=true;
+                    // if(this.elevationYlist.length>0){}
+                        // this.optionSpotChangeLine.yAxis.min=undefined;
+                        // this.optionSpotChangeLine.yAxis.max=undefined;
                         var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
                         var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
                         var middle=(min+max)/2;
+                        //  this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
+                        // this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
                         console.log(3*min-2*max,'min');
                         console.log(3*max-2*min,'max');
-                        this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
-                        this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
+                        
                         
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine;
@@ -2266,6 +2294,8 @@ export default Vue.component('commonDetail',{
                             spotChangeLineChart.addSeries({name:this.pointName,data:this.elevationYlist});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist});
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
                     
                     this.startValue='';
