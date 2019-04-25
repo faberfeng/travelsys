@@ -205,6 +205,7 @@
                                     <input  placeholder="请输入" v-model="item.drawingNo" class="calculateInp">
                                 </td>
                                 <td>
+                                    <!-- item.drawingName -->
                                     <input  placeholder="请输入" v-model="item.drawingName" class="calculateInp">
                                 </td>
                                 <td>
@@ -217,11 +218,11 @@
                                     <i class="icon-sanjiao"></i>
                                 </td>
                                 <td>
-                                    <!-- <select v-model="holderId" class="inp-search">
+                                    <select v-model="holderId" class="inp-search">
                                         <option v-for="(val,index) in getHoldersList" :key="index" :value="val.dirId" v-html="val.dirName"></option>
-                                    </select> -->
+                                    </select>
 
-                                    <treeselect v-model="holderId" :multiple="true" :options="getHoldersList" />
+                                    <!-- <treeselect v-model="holderId" :multiple="true" :options="getHoldersList" /> -->
                                     <i class="icon-sanjiao"></i>
                                 </td>
                                 <td style="max-width:100px;" v-text="item.fileName"></td>

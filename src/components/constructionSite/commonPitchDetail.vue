@@ -9,13 +9,15 @@
                 <div class="containerHead">
                     <div class="containerHeadLeft">
                         <span class="addOrder" @click="addIndexNum()">添加序列</span>
-                        <span class="exportOrder" v-show="exportDataEdit" @click="getImportHistory">导出</span>
+                        <!-- v-show="exportDataEdit" -->
+                        <span class="exportOrder"  @click="getImportHistory">导出</span>
                     </div>
                     <div class="containerHeadMiddle">
                         <label>测试总数：{{itemSubmitCount}}</label>
                         <label>报警：{{itemAlertAmount}}</label>
                     </div>
-                    <div class="containerHeadRight" v-show="editInspectMethodEdit">
+                    <!-- v-show="editInspectMethodEdit" -->
+                    <div class="containerHeadRight" >
                         <span class="autoImportTxt">采集方式:</span>
                         <div class="import2">
                             <select v-model="importMethod" @change="importMethodChange()" class="autoImport">
@@ -23,8 +25,10 @@
                             </select>                        
                             <i class="icon-sanjiao"></i>
                         </div>
-                        <span v-show="importMethod==1&&importDataEdit" @click="importExcelData()" class="import">导入</span>
-                        <span v-show="importMethod==2&&importDataEdit" class="import" @click="autoAcquisitionBtn()">配置</span>
+                        <!-- &&importDataEdit -->
+                        <span v-show="importMethod==1" @click="importExcelData()" class="import">导入</span>
+                        <!-- &&importDataEdit -->
+                        <span v-show="importMethod==2" class="import" @click="autoAcquisitionBtn()">配置</span>
                     </div>
                 </div>
                 <div class="containerTable">
@@ -316,17 +320,19 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">起始深度:</label>
-                        <input placeholder="请输入数值" v-model="initDepth" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
+                        <!-- readonly='readonly' -->
+                        <input placeholder="请输入数值" v-model="initDepth"  class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">结束深度:</label>
-                        <input placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
+                        <input @change="numChange1()" placeholder="请输入数值" v-model="terminalDepth" class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
                         <label class="editTxt">测点间距:</label>
-                        <input placeholder="请输入数值"  v-model="pointDistance" readonly='readonly' class="inp" style="width:140px !important;height:30px !important"/>
+                        <!-- readonly='readonly' -->
+                        <input placeholder="请输入数值"  v-model="pointDistance"  class="inp" style="width:140px !important;height:30px !important"/>
                         <label>m</label>
                     </div>
                     <div class="editBodytwo">
@@ -993,7 +999,7 @@ export default Vue.component('commonPitch-detail',{
             vm.getPitchBaseInfo();
             vm.getDetectionItemCollectWay();
             this.getItemDutyUser();
-            this.getAlertArguments();
+            // this.getAlertArguments();
             this.getUserByUserGroup();
             // this.getUserInfo();
             this.checkAuth();
@@ -1091,7 +1097,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     var id = localStorage.getItem('projId');
                     vm.projAuth1=response.data.rt.onlineInfo.projAuth[id];
-                    this.checkAuth();
+                   
                 })
             
             },
@@ -1115,7 +1121,7 @@ export default Vue.component('commonPitch-detail',{
         },
             editAlertValueBtn(){
                 this.editAlertValueShow=true;
-                this.getAlertArguments();
+                // this.getAlertArguments();
             },
             editPersonBtn(){
                 this.editPersonShow=true;
@@ -1227,7 +1233,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.editAlertValueShow=false;
-                        this.getAlertArguments();
+                        // this.getAlertArguments();
                         this.getPitchBaseInfo();
                         this.$message({
                             type:'success',
@@ -1742,6 +1748,10 @@ export default Vue.component('commonPitch-detail',{
             numChange(){
                 this.allnum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)+1
             },
+            // numChange1(){
+            //     this.spotNum=Math.floor((this.terminalDepth-this.initDepth)/this.pointDistance)+1
+            // },
+
             //点击修改斜度序列
             editPitchSeqBtn(val,valItemId){
                 var vm=this;

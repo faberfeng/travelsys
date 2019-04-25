@@ -519,6 +519,14 @@ const router = new Router({
           component:resolve=>require(['@/components/Settings/ProjectStationManage'],resolve)
         },
         {
+          path:'/setting/projectLableManage',
+          name:'projectLableManage',
+          meta:{
+            settingsCenter:true
+          },
+          component:resolve=>require(['@/components/Settings/projectLableManage'],resolve)
+        },
+        {
           path:'/setting/projectloggermanage',
           name:'ProjectLoggerManage',
           meta:{

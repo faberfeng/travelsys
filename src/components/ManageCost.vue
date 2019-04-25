@@ -503,24 +503,37 @@ export default {
             var vm=this;
             var fgids=[];
             fgids.push(fgId);
-            console.log(fgids,'fgids00');
+            // console.log(fgids,'fgids00');
             $.ajax({
                 url:this.BDMSUrl+'doc/getFileInfoById',
                 type:"post",
                 dataType:"json",
-                data:JSON.stringify({fgIds:fgids}),
-                // 'Content-Type':'application/x-www-form-urlencoded',
-                
+                data:JSON.stringify(fgids),
+                async:false,
+                contentType:'application/json;charset=utf-8',
                 headers:{
                     token:vm.token
                 },
                 success:function(response){
                     if(response.cd){
-                        vm.fileType=response.rt;
+                        vm.fileType=response.rt[0].fgName;
                     }
                 }
             })
             return vm.fileType;
+            // axios({
+            //     url:this.BDMSUrl+'doc/getFileInfoById',
+            //     method:'post',
+            //     headers:{
+            //         'token':this.token
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd==0){
+
+            //     }
+                
+            // })
+
         },
         
         //获取图纸列表
@@ -566,10 +579,10 @@ export default {
                         this.getMaxVersionPath();
                      }
                 }else if(response.data.cd=='-1'){
-                    this.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
+                    // this.$message({
+                    //     type:'error',
+                    //     message:response.data.msg
+                    // })
                 }
             })
         },
@@ -595,8 +608,8 @@ export default {
                                   this.drawList.push({
                                         name:item1.drawingNumber+'('+item1.drawingName+')',
                                         // type:(item.fileUri.substr(item.fileUri.length-3)).toLocaleUpperCase(),
-                                        type:'pdf',
-                                        // type:this.getFileInfoById(item.fgId),
+                                        // type:'pdf',
+                                        type:this.getFileInfoById(item.fgId).substr(this.getFileInfoById(item.fgId).length-3).toLocaleUpperCase(),
                                         source:this.BDMSUrl+'doc/download/'+item.fgId,
                                         page:1,
                                         angle:this.getDrawingRotateInfo(item.drawingId)
@@ -1041,6 +1054,10 @@ export default {
                             {
                                 title:'/setting/projectstationmanage',
                                 linkUrl:'工程动态管理'
+                            },
+                            {
+                                title:'/setting/projectLableManage',
+                                linkUrl:'工程任务标签管理'
                             }
                             // {
                             //     title:'/setting/projectloggermanage',

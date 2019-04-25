@@ -34,12 +34,18 @@
                             class="title-right-icon" @keyup.enter="getTaskList">
                     <span class="title-right-edit-icon el-icon-search" @click="getTaskList"></span>
                 </span>
-
-                <span class="title-right">
+                <div id="GroupSelect">
+                  <select v-model="searchTaskTag"  class="inp-search" @change="searchByTag()">
+                    <option value="0">按标签筛选</option>
+                    <option :value="item.id" v-for="(item,index) in  labelList" :key="index" v-text="item.name"></option>
+                  </select>
+                  <i class="icon-sanjiao"></i>
+                </div>
+                <!-- <span class="title-right">
                     <input type="text" placeholder="请输入任务标签" v-model="searchTaskTag"
                             class="title-right-icon" @keyup.enter="searchByTag()">
                     <span class="title-right-edit-icon el-icon-search" @click="searchByTag()"></span>
-                </span>
+                </span> -->
             <!-- <span class="icon-type"  @click="getGanttList"></span> -->
             <!-- 以上是甘特图按钮 -->
             <!-- @click="getGanttList" -->
@@ -52,9 +58,12 @@
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
               </div>
               <div class="taskHeadRight">
-                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span> -->
+                <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
-                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">工程任务</span>
+                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="fDplay()">4D播放</span>
+                <span class="btn-operate"  v-show="batchVerificationShow||projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
+                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
+
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
                 
@@ -64,20 +73,20 @@
 
                 <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showColumnConfig()">显示列</span> -->
                 <span class="btn-operate" v-show="projectWorkShow" @click="exportExcel()">导出excel</span>
-                <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span>
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span> -->
               </div>
             </div>
-            <div>
+            <div style="height:600px;">
               <div v-show="projectWorkShow" style="overflow: auto;" class="taskBody">
                 <zk-table
                   index-text="序号"
                   :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
                   :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
                   :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
-                  @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
+                  @row-key="rowKey" @cell-click="cellClick" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                   <template slot="action" slot-scope="scope">
                     <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                    <!-- <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button> -->
+                    <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
                     <!-- <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button> -->
                     <!-- <button class="remarkBtn actionBtn" title="备注" @click="mark(scope)"></button> -->
                     <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
@@ -166,12 +175,12 @@
               </div>
 
               <div v-show="projectGanntShow" style="overflow: auto;" class="taskBody">
-                <div id='ganttLeft' style="float:left;width:49.8%;border:1px solid #ccc;height:660px;overflow:auto;cursion:w-resize">
+                <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;height: 650px;overflow: auto">
                      <zk-table
                         index-text="序号"
                         :data="taskIndexData" :columns="columnsSetting" :max-height="props.height" :tree-type="props.treeType"
                         :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                        :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick1"
+                        :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClickGantt"
                         @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
                         <template slot="action" slot-scope="scope">
                           <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
@@ -206,7 +215,10 @@
                     </zk-table>
                 </div>
                 <!-- <div style="float:right;width:0.04%;height:680px;color:#000"></div> -->
-                <div id='ganttRight' style="float:right;width:49.8%;border:1px solid #ccc;height:660px;overflow:auto;position:relative;cursion:w-resize">
+                <div id="ganttRightIndex" style="float:right;width:49.8%;position:relative;height: 650px;overflow: auto;">
+                    <div id="ganttRightHead" style="width:100%;height:40px;border:1px solid #ccc;position:relative;"></div>
+                    <div id='ganttRight' style="width:100%;position:relative;cursion:w-resize;">
+                </div>
                 </div>
               </div>
             </div>
@@ -336,8 +348,8 @@
           </li>
         </ul>
       </div>
-      <div id="box-right" v-show="selectChildren==null&&screenLeft.show" v-if="screenLeft.item == 2">
-        <div class="verify">
+      <div id="box-right" v-show="screenLeft.show" v-if="screenLeft.item == 2">
+        <div class="verify" v-show="selectChildren==null">
           <h3 class="header-attribute" style="margin-top: 0px;">
             <i class="trrangle"></i>
             核实记录
@@ -351,7 +363,7 @@
             </li>
           </ul>
         </div>
-        <div class="association">
+        <div class="association" v-show="selectChildren==null">
           <h3 class="header-attribute">
             <i class="trrangle"></i>
             关联清单
@@ -587,11 +599,16 @@
                           v-text="item.label"></option>
                 </select>
               </div>
+               <div class="editBodytwoRight">
+                <label class="text1">标签:</label>
+                <!-- <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div> -->
+                <select v-model="taskTag" class="selectGroup">
+                    <option v-for="(item,index) in labelList" :key="index" :value="item.id"
+                            v-text="item.name"></option>
+                </select>
+              </div>
             </div>
-            <div class="editBodytwo1">
-              <label class="text1">标签:</label>
-              <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div>
-            </div>
+           
             <div class="editBodytwo1">
               <label class="text1">备注:</label>
               <div><input class="input1" v-model="taskMark" placeholder="请输入任务备注"></div>
@@ -617,6 +634,35 @@
             <button class="editBtnC" @click="addTaskCancle">取消</button>
           </div>
       </el-dialog>
+
+      <el-dialog title="4D播放"  width="600px"  :visible.sync="fdPlayDialog" @close="fdPlayCancle">
+          <div class="editBody" v-loading="loading"  >
+            <div class="editBodytwo1">
+                <div class="startTime">
+                    <label>计划开始:</label>
+                    <el-date-picker style="width:350px;" v-model="taskFdStart" type="date"
+                                    placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+                <div class="endTime" >
+                    <label>计划结束:</label>
+                    <el-date-picker style="width:400px;" v-model="taskFdEnd" type="date"
+                                    placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+            </div>
+            <div class="editBodytwo1">
+              <!-- <label class="text1">帧数:</label> -->
+              <div><input style="margin-left:40px;margin-top:24px;width:390px;" class="input1" v-model="fdNum" placeholder="请输入天/帧数"><label style="margin-left:2px;display:inline-block;">天/帧数</label></div>
+            </div>
+            
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <button class="editBtnS" @click="fdPlayMakeSure">确定</button>
+            <button class="editBtnC" @click="fdPlayCancle">取消</button>
+          </div>
+      </el-dialog>
+
       <el-dialog title="编辑工程任务" :visible.sync="editTaskDialog" @close="editTaskCancle">
         <div class="editBody" v-loading="loading">
           <div class="editBodyone">
@@ -667,10 +713,14 @@
                         v-text="item.label"></option>
               </select>
             </div>
-          </div>
-           <div class="editBodytwo1">
-              <label class="text1">标签:</label>
-              <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div>
+             <div class="editBodytwoRight">
+               <label class="text1">标签:</label>
+              <!-- <div><input class="input1" v-model="taskTag" placeholder="请输入任务标签"></div> -->
+              <select v-model="taskTag" class="selectGroup">
+                  <option v-for="(item,index) in labelList" :key="index" :value="item.id"
+                          v-text="item.name"></option>
+              </select>
+            </div>
           </div>
           <div class="editBodytwo1">
               <label class="text1">备注:</label>
@@ -1352,9 +1402,11 @@
         tgList: '',
         taskIndexData:[],
         taskIndexDataList:[],
+        taskIndexSelectDataList:[],
         TaskList: [],
         lastNodeName: '',//上级节点名称
         userGroupUserList: [],//群组成员数据
+        labelList:[],//标签列表
         TaskUserGroupList: [],//任务页面的负责群组
         editTaskUserGroupList: [],//任务群组权限界面
         taskInformationList: [],//获取工程任务详细信息
@@ -1403,14 +1455,15 @@
           total: '',//所有数据
         },
         linkList: [],
-        selectRowList: [],//获取选择列表信息
+        selectRowList:[],//获取选择列表信息
+        ganttRowList:[],
         taskId: '',
         curUgId: '',//移动任务所选id
         Type: null,
         linkId: '',//前置任务ID
         groupIds: [],
         searchTaskName: '',//查询任务名称列表
-        searchTaskTag:'',//查询任务标签
+        searchTaskTag:'0',//查询任务标签
         tableCollapse: '',//是否折叠
         screenLeft: {
           show: true,
@@ -1426,6 +1479,14 @@
         },
         //新增任务数据
         addTaskDialog: false,
+        fdPlayDialog:false,
+        fdPlayData:[],
+        fdPlayDataId:[],
+        taskFdStart:'',
+        taskFdEnd:'',
+        fdPlayDataId:[],
+        returnTraceIdsData:[],
+        fdNum:'',
         addLinkDialog: false,
         editTaskDialog: false,
         progressSearchDialog: false,//进度查询
@@ -1776,7 +1837,7 @@
             prop: 'operator',
             type: 'template',
             template: 'action',
-            width: '130px'
+            width: '200px'
           }
         ],
 
@@ -2133,6 +2194,7 @@
         screenLeftShow:false,
         UPID:'',
         showBimDataList:'',//着色数量
+        ganttScale:0.5,//甘特缩放
         loadGanttList:{
             tasks: [
               
@@ -2146,28 +2208,6 @@
             canWriteOnParent: true,
             canAdd:true
             },
-            ret:{"tasks":    [
-            {"id": -1, "name": "Gantt editor", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 0, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 20, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-            {"id": -2, "name": "coding", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 1, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 10, "end": 1398203999999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-            {"id": -3, "name": "gantt part", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_ACTIVE", "depends": "", "canWrite": true, "start": 1396994400000, "duration": 2, "end": 1397167199999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-            {"id": -4, "name": "editor part", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "3", "canWrite": true, "start": 1397167200000, "duration": 4, "end": 1397685599999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-            {"id": -5, "name": "testing", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 1, "status": "STATUS_SUSPENDED", "depends": "2:5", "canWrite": true, "start": 1398981600000, "duration": 5, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": true},
-            {"id": -6, "name": "test on safari", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "", "canWrite": true, "start": 1398981600000, "duration": 2, "end": 1399327199999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-            {"id": -7, "name": "test on ie", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "6", "canWrite": true, "start": 1399327200000, "duration": 3, "end": 1399586399999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false},
-            {"id": -8, "name": "test on chrome", "progress": 0, "progressByWorklog": false, "relevance": 0, "type": "", "typeId": "", "description": "", "code": "", "level": 2, "status": "STATUS_SUSPENDED", "depends": "6", "canWrite": true, "start": 1399327200000, "duration": 2, "end": 1399499999999, "startIsMilestone": false, "endIsMilestone": false, "collapsed": false, "assigs": [], "hasChild": false}
-          ], "selectedRow": 2, "deletedTaskIds": [],
-            "resources": [
-            {"id": "tmp_1", "name": "Resource 1"},
-            {"id": "tmp_2", "name": "Resource 2"},
-            {"id": "tmp_3", "name": "Resource 3"},
-            {"id": "tmp_4", "name": "Resource 4"}
-          ],
-            "roles":       [
-            {"id": "tmp_1", "name": "Project Manager"},
-            {"id": "tmp_2", "name": "Worker"},
-            {"id": "tmp_3", "name": "Stakeholder"},
-            {"id": "tmp_4", "name": "Customer"}
-          ], "canWrite":    true, "canDelete":true, "canWriteOnParent": true, canAdd:true}
 
       }
     },
@@ -2188,6 +2228,8 @@
       vm.getProjectGroup();
       vm.addBroseNotice();
       vm.getProjectTaskAuthority();
+      this.getlabelList();
+      
       // $('body').not($(".zk-table")).bind('click', function() {
          
       //   });
@@ -2327,21 +2369,30 @@
       //按标签刷选
       searchByTag(){
         var vm=this;
-        axios({
-          url:this.BDMSUrl+'schedule/taskQueryByTag',
-          headers:{
-            'token':vm.token
-          },
-          params:{
-            projId:vm.projId,
-            ugId:vm.selectUgId,
-            tag:this.searchTaskTag
-          }
-        }).then((response)=>{
-          if(response.data.cd=='0'){
-            this.taskIndexData = response.data.rt;
-          }
-        })
+        if(this.searchTaskTag==0){
+          this.taskIndexData=[];
+          document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+          this.getTaskList();
+        }else{
+          this.taskIndexData=[];
+          document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+          axios({
+            url:this.BDMSUrl+'schedule/taskQueryByTag',
+            headers:{
+              'token':vm.token
+            },
+            params:{
+              projId:vm.projId,
+              ugId:vm.selectUgId,
+              tag:this.searchTaskTag
+            }
+          }).then((response)=>{
+            if(response.data.cd=='0'){
+              this.taskIndexData = response.data.rt;
+            }
+          })
+        }
+        
       },
       loadingTitle(){
           var vn=this;
@@ -2615,7 +2666,6 @@
 
       //获取工程任务页面
       getTaskIndex() {
-       
         axios({
           method: 'get',
           url: this.BDMSUrl + 'schedule/taskIndex',
@@ -2635,7 +2685,44 @@
           }
         })
       },
+      //4d播放
+      fDplay(){
+        this.fdPlayDialog=true;
+      },
+      //放大
+      bigLength(){
+          this.ganttScale *= 2;
+          // this.drawingDateBar();
+          this.drawingDateBar_reset();
+          this.productGanttNode=document.getElementById('ganttRight');
+          this.productGanttNode.innerHTML = "";
 
+          this.Gantt_item_top = 0;
+
+          for(var i = 0; i < this.selectRowList.length;i++){
+            if(this.selectRowList[i]._isHide == false){
+              this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+            }
+          }
+      },
+      //缩小
+      smallLength(){
+          this.ganttScale /= 2;
+        //  this.drawingDateBar();
+        console.log(this.selectRowList,'this.selectRowList');
+          this.drawingDateBar_reset();
+          this.productGanttNode=document.getElementById('ganttRight');
+          this.productGanttNode.innerHTML = "";
+
+          this.Gantt_item_top = 0;
+
+          for(var i = 0; i < this.selectRowList.length;i++){
+            if(this.selectRowList[i]._isHide == false){
+              this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+            }
+          }
+          console.log()
+      },
       //获取工程列表
       getTaskList() {
         this.loading=true;
@@ -2661,62 +2748,92 @@
             var vm=this
             // vm.$emit('refresh')
             this.taskIndexData = response.data.rt;
-
+            console.log(document.getElementsByClassName('zk-table')[2].scrollHeight,'左边00');
+            this.taskIndexData.forEach((item)=>{
+              // item.children.forEach((val)=>{
+              //   this.$set(val,'statusNum',val.actualStatusStr=='未开始'?0:parseInt(val.actualStatusStr.substring(2).split('%')[0]));
+              // })
+              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+              // item=item.children;
+            })
+            console.log(this.taskIndexData,'数组');
+            
+            this.productGantt(this.taskIndexData);
+            
             {
-
-              var min_Day_count = 100000000000;
-              var parent=document.getElementById('ganttRight');
-              console.log(parent,'parent');
-
-              for(let i = 0;i < this.taskIndexData.length;i++){ // 取最小时间
-                // taskStart
-                  let Day_count = this.taskIndexData[i].taskEnd - this.taskIndexData[i].taskStart;
-                  Day_count /= (1000 * 3600 * 24);
-                  Day_count = parseInt(Day_count);
-
-                  if(min_Day_count > Day_count){
-                    min_Day_count = Day_count;
-                  }
-                  console.log(min_Day_count,'min_Day_count');
-
-              }
-
-               for(let i = 0;i < this.taskIndexData.length;i++){
-                // taskStart
-                  let Day_count = this.taskIndexData[i].taskEnd - this.taskIndexData[i].taskStart;
-                  Day_count /= (1000 * 3600 * 24);
-                  Day_count = parseInt(Day_count);
-
-                  for(let j = 0;j < Day_count;j++){
-
-                    var item = document.createElement("div");
-                    item.style.background = "#ccc";
-                    item.style.position = "absolute";
-                    item.style.top = i * 50 +37+ "px";
-                    item.style.left = (j * 10 - min_Day_count) +10+ "px";
-                    console.log(item.style.left,'item.style.left');
-                    item.style.height = 37 + "px";
-                    item.style.width = 100 + "px";
-                    
-                   
-                    parent.appendChild(item);
-                  }
-
-
-
-              }
+                
+                document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.cursor="pointer";
+                let c=0;
+                let name=document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0];
+                name.addEventListener('click',(e)=>{
+                  if(c==0){
+                        this.taskSortMakeSure(1,1)
+                        document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.color="red";
+                        c++;
+                  }else{
+                      this.taskSortMakeSure(1,2)
+                      document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.color="black";
+                      c=0;
+                  }     
+                })  
             }
-
-            // this.taskIndexData.forEach((item)=>{
+            {
               
-             
-            // })
+              document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.cursor="pointer";
+              let num=document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0];
+              let b=0;
+              num.addEventListener('click',(e)=>{
+                    if(b==0){
+                        this.taskSortMakeSure(2,1)
+                        document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.color="red";
+                        b++;
+                    }else{
+                      this.taskSortMakeSure(2,2)
+                      document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.color="black";
+                      b=0;
+                    }
+              })
+            }
+           
+            {
+                
+                document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.cursor="pointer";
+                let priority=document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0];
+                let a=0;
+                priority.addEventListener('click',(e)=>{
+                  if(a==0){
+                      this.taskSortMakeSure(3,1)
+                      document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.color="red";
+                      a++;
+                  }else{
+                    this.taskSortMakeSure(3,2)
+                    document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.color="black";
+                    a=0;
+                  }          
+                        
+                })
+            }
+            
             this.dataDigui(response.data.rt);
+            this.getDataDigui(response.data.rt);
+           
+
             this.taskIndexDataList.forEach((item)=>{
               this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
               this.$set(item,'currentDate',Date.parse(new Date()))
             })
-            console.log(this.taskIndexDataList,'this.taskIndexDataList');
+            this.taskIndexSelectDataList.forEach((item)=>{
+              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+            })
+            this.selectRowList=this.taskIndexSelectDataList;
+
+
+              this.selectRowList.forEach((item)=>{
+                this.$set(item,'_isHide',false);
+                this.fdPlayDataId.push(item.taskId);
+              })
+              console.log(this.fdPlayDataId,'this.fdPlayDataId');
+              //  this.productGantt(this.selectRowList);
             if (response.data.rt == null) {
               this.taskIndexData = [];
             }
@@ -2729,6 +2846,253 @@
           }
         })
       },
+      productGantt(taskIndexData){
+
+        var min_Day_count = 10000000000000000000;
+        var max_Day_count = -1;
+        
+        this.productGanttNode=document.getElementById('ganttRight');
+        this.productGannttHead=document.getElementById('ganttRightHead');
+
+        this.Gantt_item_top = 0;
+
+        for(let i = 0;i < taskIndexData.length;i++){ // 取最小时间
+
+            taskIndexData[i].taskStartDay = taskIndexData[i].taskStart / (1000 * 3600 * 24);
+            taskIndexData[i].taskStartDay = parseInt(taskIndexData[i].taskStartDay + 0.5);
+
+            taskIndexData[i].taskEndDay = taskIndexData[i].taskEnd / (1000 * 3600 * 24);
+            taskIndexData[i].taskEndDay = parseInt(taskIndexData[i].taskEndDay + 0.5);
+
+          // taskStart
+            let Day_count = taskIndexData[i].taskEndDay - taskIndexData[i].taskStartDay;
+
+            if(min_Day_count > taskIndexData[i].taskStartDay){
+              min_Day_count = taskIndexData[i].taskStartDay;
+            }
+
+            if(max_Day_count < taskIndexData[i].taskEndDay){
+              max_Day_count = taskIndexData[i].taskEndDay;
+            }
+
+            console.log(min_Day_count,'min_Day_count');
+
+        }
+
+        this.min_Day_count_g = min_Day_count;
+        this.max_Day_count_g = max_Day_count;
+
+        ////////////////////// 画日 ////////////////////////////
+
+        this.drawingDateBar();
+
+        //////////////////////////////////////////////////////
+
+        //////////////
+
+        min_Day_count = parseInt(min_Day_count + 0.5);
+
+        
+        for(let i = 0;i < taskIndexData.length;i++){
+          this.productGantt_loop(taskIndexData[i],min_Day_count);
+        }
+
+      },
+      productGantt_loop(root,min_Day_count){
+
+          this.ganttItem(root,min_Day_count);
+
+          if(root.children){
+            for(var i = 0; i < root.children.length;i++){
+              this.productGantt_loop(root.children[i],min_Day_count);
+            }
+          }
+        
+      },
+      drawingDateBar_reset(){
+        this.productGannttHead.style.width=(this.max_Day_count_g - this.min_Day_count_g + 1)*10 * this.ganttScale +"px";
+        for(let i = 0;i<this.days_bar.length;i++){
+
+          this.days_bar[i].style.left = (i * 10) * this.ganttScale + "px";
+          this.days_bar[i].style.width = (10) * this.ganttScale + "px";
+
+          if(this.ganttScale < 2){
+            this.days_bar[i].style.border = "";
+            this.days_bar[i].innerHTML = "";
+          }else{
+            this.days_bar[i].style.borderRight = "1px solid #000";
+            this.days_bar[i].innerHTML = this.days_bar[i].date_str.split("-")[2];
+          }
+        }
+
+        for(let i = 0;i<this.months_bar.length;i++){
+
+          this.months_bar[i].style.left = this.months_bar[i].div_left * this.ganttScale + "px";
+          this.months_bar[i].style.width = this.months_bar[i].div_length * this.ganttScale + "px";
+          console.log(this.months_bar[i].offsetWidth);
+          if(this.months_bar[i].offsetWidth < 100){
+            this.months_bar[i].innerHTML = "";
+          }else{
+            this.months_bar[i].innerHTML = this.months_bar[i].date_str.split("-")[0] + "年" + this.months_bar[i].date_str.split("-")[1] + "月";
+          }
+        }
+
+      },
+      drawingDateBar(){
+       
+        this.days_bar = [];
+        this. months_bar = [];
+        this.productGannttHead.innerHTML = "";
+        this.productGannttHead.style.width=(this.max_Day_count_g - this.min_Day_count_g + 1)*10 * this.ganttScale +"px";
+      
+
+        for(let i = 0; i < this.max_Day_count_g - this.min_Day_count_g + 1;i++){
+              var item = document.createElement("div");
+              item.style.background = "#ccc";
+
+              //  item.style.borderTop = "1px solid #000";
+              item.style.position = "absolute";
+              item.style.borderRight = "";
+              item.style.top = "20px";
+              item.style.left = (i * 10) * this.ganttScale + "px";
+              // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+              item.style.height = 20 + "px";
+              item.style.width = 10 * this.ganttScale + "px";
+              item.date_str = moment((this.min_Day_count_g + i) * (3600*24*1000)).format('YYYY-MM-DD');
+              // item.innerHTML=i;
+              item.style.fontSize='12px';
+              item.style.lineHeight='20px';
+              this.days_bar.push(item);
+              
+              this.productGannttHead.appendChild(item);
+        }
+
+        var startMonth = moment((this.min_Day_count_g) * (3600*24*1000)).format('MM');
+        var days_count = 0;
+        var startMonth_position = 0;
+
+        for(let i = 0; i < this.max_Day_count_g - this.min_Day_count_g ;i++){
+          var Month = moment((this.min_Day_count_g + (i + 1)) * (3600*24*1000)).format('MM');
+          days_count++;
+          if(startMonth != Month){
+
+              var item = document.createElement("div");
+              item.style.background = "#ccc";
+              item.style.position = "absolute";
+             
+              item.style.borderRight = "1px solid #000";
+              item.style.top = "0px";
+              item.div_length = days_count * 10;
+              
+
+              item.style.left = (startMonth_position) * this.ganttScale + "px";
+              item.div_left = startMonth_position;
+
+              startMonth_position += days_count * 10;
+              // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+              item.style.height = 20 + "px";
+              
+              item.style.width = item.div_length  * this.ganttScale + "px";
+              
+              item.date_str = moment((this.min_Day_count_g + i) * (3600*24*1000)).format('YYYY-MM-DD');
+
+              if(item.div_length  * this.ganttScale < 100){
+                item.innerHTML = "";
+              }else{
+                item.innerHTML =item.date_str.split("-")[0] + "年" + item.date_str.split("-")[1] + "月";
+              }
+
+              // item.innerHTML=  item.date_str.split("-")[0] + "年" + startMonth + "月";
+              item.style.fontSize='12px';
+              item.style.lineHeight='20px';
+
+              this.months_bar.push(item);
+              this.productGannttHead.appendChild(item);
+              days_count = 0;
+              startMonth = Month;
+          }
+        }
+
+        {
+              days_count++;
+              var item = document.createElement("div");
+              item.style.background = "#ccc";
+              item.style.position = "absolute";
+              
+              item.style.borderBottom = "1px solid #000";
+              item.style.top = "0px";
+              item.div_length = days_count * 10;
+
+              item.style.left = (startMonth_position) * this.ganttScale + "px";
+              item.div_left = startMonth_position;
+
+              startMonth_position += days_count * 10;
+              // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+              item.style.height = 20 + "px";
+              
+              item.style.width = item.div_length  * this.ganttScale + "px";
+              
+              item.date_str = moment((this.max_Day_count_g) * (3600*24*1000)).format('YYYY-MM-DD');
+
+              if(item.div_length  * this.ganttScale < 100){
+                item.innerHTML = "";
+              }else{
+                item.innerHTML =item.date_str.split("-")[0] + "年" + item.date_str.split("-")[1] + "月";
+              }
+
+              // item.innerHTML=item.date_str.split("-")[0] + "年" + startMonth + "月";
+              item.style.fontSize='12px';
+              item.style.lineHeight='20px';
+
+              this.months_bar.push(item);
+              this.productGannttHead.appendChild(item);
+        }
+
+        
+      },
+      ganttItem(root,min_Day_count){
+          root.taskStartDay = root.taskStart / (1000 * 3600 * 24);
+          root.taskStartDay = parseInt(root.taskStartDay + 0.5);
+
+          root.taskEndDay = root.taskEnd / (1000 * 3600 * 24);
+          root.taskEndDay = parseInt(root.taskEndDay + 0.5);
+
+          let Day_count = root.taskEndDay - root.taskStartDay;
+          Day_count++;
+
+          var item = document.createElement("div");
+          item.style.background = "#6eb7ff";
+          item.style.position = "absolute";
+          item.style.border = "1px solid #000";
+          item.style.top = this.Gantt_item_top + "px";
+          item.style.left = ((root.taskStartDay - min_Day_count) * 10) * this.ganttScale + "px";
+          // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+          item.style.height = 37 + "px";
+          item.style.width = 10 * Day_count  * this.ganttScale + "px";
+
+          var line = document.createElement("div");
+          line.style.position = "absolute";
+          line.style.top = (this.Gantt_item_top + 37) + "px";
+          line.style.height = "1px";
+          line.style.width = this.productGannttHead.style.width;
+          line.style.background = "rgba(0,0,0,0.1)";
+          this.productGanttNode.appendChild(line);
+          this.productGanttNode.appendChild(item);
+          this.Gantt_item_top += 37.1;
+
+          var item_sub = document.createElement("div");
+          item_sub.style.background = "#68da68";
+          item_sub.style.position = "absolute";
+          item_sub.style.border = "1px solid #000";
+          item_sub.style.top = "0px";
+          item_sub.style.left ="0px";
+          // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+          item_sub.style.height = "100%";
+          item_sub.style.width = 10 * Day_count  * this.ganttScale * root.statusNum / 100 + "px";
+
+          item.appendChild(item_sub);
+
+      },
       dataDigui(root){
         // this.taskIndexDataList=[];
         for(let i = 0;i < root.length;i++){
@@ -2740,6 +3104,25 @@
             }
         }
       },
+      getDataDigui(root){
+        console.log('000');
+        for(let j = 0;j<root.length;j++){
+
+          this.taskIndexSelectDataList.push(root[j]);
+          if(root[j].children){
+              this.getDataDigui(root[j].children);
+          }
+          
+        
+          // if(root[j].children){
+          //     this.dataDigui(root[j].children);
+          //     this.taskIndexSelectDataList.push(root[j].children);
+          //   }else{
+              
+          //   }
+        }
+      },
+
       search(item){
         item.forEach((val)=>{
           item=val;
@@ -2774,6 +3157,25 @@
           }
         })
       },
+      //获取筛选标签
+       getlabelList(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'schedule/getTaskTag',
+                method:'GET',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    this.labelList=response.data.rt;
+                    this.taskTag=this.labelList[0].id;
+                }
+            })
+        },
       //获取工程任务核实信息列表
       getVerifyList() {
         axios({
@@ -2974,6 +3376,72 @@
         this.getVerifyList();
         this.getEntityRelation();
         // this.getTaskResourceTaskList();
+      },
+      cellClick(row, rowIndex, column, columnIndex, $event){
+        console.log(row, rowIndex, column, columnIndex, $event,'row, rowIndex, column, columnIndex, $event');
+
+      },
+
+      rowClickGantt(row, rowIndex,$event){
+         var a=''
+        
+        {
+          if(row.target._prevClass=="zk-table__cell-inner"){
+            console.log(row.target.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement'); 
+            row.target.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
+            row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+              // item.style.backgroundColor='white'
+              item.style.border='1px solid #e9eaec'
+            })
+            // row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+            row.target.parentElement.parentElement.style.border='2px solid black'
+            
+            // console.log(row.target.parentElement.parentElement.style.color,'000');
+            // row.target.parentElement.parentElement.style.color='white'
+          }
+          if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
+            console.log(row.target.parentElement.parentElement,'row.target.parentElement.parentElement'); 
+            row.target.parentElement.parentElement.style.boder='1px solid #e9eaec';
+            row.target.parentElement.parentElement.childNodes.forEach((item)=>{
+              // item.style.backgroundColor='white'
+              item.style.border='1px solid #e9eaec'
+            })
+            // row.target.parentElement.style.backgroundColor='#0081c2'
+             row.target.parentElement.style.border='2px solid black'
+          //  row.target.parentElement.parentElement.style.color='white'
+        
+          }
+          if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+            
+            console.log(row.target.parentElement.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement.parentElement'); 
+            row.target.parentElement.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
+            row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+              // item.style.backgroundColor='white'
+              item.style.border='1px solid #e9eaec'
+            })
+            // row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+            // row.target.parentElement.parentElement.style.color='white'
+
+             row.target.parentElement.parentElement.parentElement.style.border='2px solid black'
+            
+          }
+        }
+         console.log(row.target.parentElement)
+          this.selectRowList = rowIndex;
+          this.selectRowList.forEach((item, index) => {
+            if (item._isHover == true) {
+              this.selectChildren=item.children
+              this.taskId = item.taskId
+              this.taskParId = item.taskParId
+            }
+          })
+        setTimeout(()=>{
+            
+        },200)
+        this.getTask();
+        this.getVerifyList();
+        this.getEntityRelation();
+
       },
       rowKey(row, rowIndex) {
       
@@ -3255,6 +3723,38 @@
       //鼠标单击树形icon
       treeIconClick(row, rowIndex) {
         this.selectRowList = rowIndex;
+        console.log(this.selectRowList,'this.selectRowList');
+
+        this.productGanttNode=document.getElementById('ganttRight');
+        this.productGanttNode.innerHTML = "";
+
+        this.Gantt_item_top = 0;
+
+        for(var i = 0; i < this.selectRowList.length;i++){
+          if(this.selectRowList[i]._isHide == false){
+            this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+          }
+        }
+
+        var setting = {
+            data: {
+                key:{
+                    name:"dirName",
+                    children:'children'
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "dirId",
+                    pIdKey: "dirParId",
+                    rootPId: 0
+                }
+            }
+        };
+
+        
+        this.ganttRowList=rowIndex;
+
+
         this.selectRowList.forEach((item) => {
           if (item._isHover == true) {
             this.taskId = item.taskId
@@ -3799,6 +4299,53 @@
       addTaskCancle() {
         this.addTaskDialog = false;
       },
+      fdPlayCancle(){
+        this.fdPlayDialog=false;
+      },
+      fdPlayMakeSure(){
+        // this.fdPlayDialog=false;
+        var date='';
+       date=(this.taskFdEnd-this.taskFdStart)%this.fdNum
+        this.fdPlayData=[];
+        this.fdIndex();
+      },
+      fdIndex(){
+        var vm=this;
+         if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })
+            // this.fdPlayDialog=false;
+            }else{
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                const app = document.getElementById('webIframe').contentWindow;
+                axios({
+                    url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId',
+                    headers:{
+                      'token':this.token
+                    },
+                    method:"post",
+                    params:{
+                      startDate:moment(vm.taskFdStart).format("YYYY-MM-DD"),
+                      endDate:moment(vm.taskFdEnd).format("YYYY-MM-DD")
+                    },
+                    data:this.fdPlayDataId
+                  }).then((response)=>{
+                    if(response.data.cd==0){
+                        // console.log('00');
+                        this.returnTraceIdsData=response.data.rt;
+                        this.fdPlayDialog=false;
+                        this.taskFdStart='';
+                        this.taskFdEnd='';
+                        app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*");
+                    }
+                  })
+                 }
+        },
+
+
       //点击添加前置任务
       addLink() {
         if (!this.taskId) {
@@ -4148,7 +4695,7 @@
       taskSortCancle(){
           this.taskSortDialog = false;
       },
-      taskSortMakeSure(){
+      taskSortMakeSure(type,sortMode){
         var vm=this;
         // this.taskIndexData=[];
         axios({
@@ -4158,8 +4705,10 @@
             'token':vm.token
           },
           params:{
-            type:this.labelTypeValue,
-            sortMode:parseInt(this.sortRadio)
+            // type:this.labelTypeValue,
+            // sortMode:parseInt(this.sortRadio)
+            type:type,
+            sortMode:sortMode
           },
           data:this.taskIndexData
         }).then((response)=>{
@@ -5350,7 +5899,7 @@
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
         box-shadow:inset 006px rgba(0, 0, 0, .5);
-    -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+        -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
         border-radius:10px;
     }
     /* 滚动条滑块 */
@@ -5618,6 +6167,46 @@
           }
           &:hover {
             background: #fff6f7;
+          }
+        }
+         #GroupSelect {
+      // display: block;
+      // position: fixed;
+      // top: 77px;
+      // z-index: 1000;
+      // right: 24px;
+            display: inline-block;
+            float: right;
+            margin-top:0px;
+            margin-right:10px;
+            width: 168px;
+            height: 30px;
+          .inp-search {
+            width: 168px;
+            border-radius: 15px;
+            height: 30px;
+            border: 1px solid #cccccc;
+            position: relative;
+            background: #fafafa;
+            padding-left: 10px;
+            padding-right: 20px;
+            box-sizing: border-box;
+            margin-right: 15px;
+            float: left;
+            color: #333333;
+            font-size: 14px;
+            outline: none;
+          }
+          .icon-sanjiao {
+            display: block;
+            position: absolute;
+            width: 12px;
+            height: 7px;
+            background-image: url('../Settings/images/sanjiao.png');
+            background-size: 100% 100%;
+            content: '';
+            top: 13px;
+            right: 18px;
           }
         }
       }

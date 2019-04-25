@@ -3791,7 +3791,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
-            // console.log(list,'list1111');
+            console.log(list,'list1111');
             // var list1=this.
             if(this.moveClick==false){
                      list.forEach((item)=>{
@@ -3806,7 +3806,8 @@ export default {
                                     'plotInfos':[item.plotInfo],
                                     'pointGroupIds':[item.pointGroupIds],
                                     'prefix':item.prefix,
-                                    'startNo':item.startNo
+                                    'startNo':item.startNo,
+                                    'seqId':'',
                                 });
                             }else if(item.drawMaxCount==2){
                                 clist.push(item)
@@ -4242,6 +4243,15 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getDetectionDirectoryListLeft=response.data.rt;
+                    if(this.getDetectionDirectoryListLeft.length==0){
+                        this.getDetectionDirectoryListLeft.push({
+                            'disabled': false,
+                            'id':'',
+                            'name': "",
+                            'userGroupId':'',
+                            'children':[]
+                        })
+                    }
 
                     this.getDetectionDirectoryListLeft.forEach((item)=>{
                         vm.$set(item,'disabled',false);
@@ -4258,7 +4268,7 @@ export default {
                              })
                     })
                     this.getDetectionDirectoryListLeft=Array.from(new Set(this.getDetectionDirectoryListLeft))
-                    // console.log(this.getDetectionDirectoryListLeft,'树形结构');
+                    console.log(this.getDetectionDirectoryListLeft,'树形结构');
                 }else{
                     this.$message({
                         type:'error',
@@ -4407,6 +4417,7 @@ export default {
                     if(response.data.cd=='0'){
                         this.getDetectionDirectory();
                         this.getDetectionDirectorys();
+                        this.getMonitorItem();
                     }
                 })
             })
@@ -4910,26 +4921,30 @@ export default {
         singleBatchImportCancle(){
             var vm=this;
             this.singleBatchImportDataShow=false;
+            this.sheetIndexList='';
+            this.valsheetlist='';
+
+
             // this.singleData
-            // vm.sheetIndex='';//sheet下标*
-            // vm.timeCol='';//采集时间下标*
-            // vm.depthIndexCol='';//深度下标*
-            // vm.distanceCol='';//位移下标*
-            // vm.altitudeCol='';//高程下标*
-            // vm.f0IndexCol='';//初始频率下标*
-            // vm.fnIndexCol='';//本次频率下标*
-            // vm.kIndexCol='';//率定系数下标*
-            // vm.pipeHeightCol='';//管口高度*
-            // vm.gaugeHeightCol='';//水位高度下标（水位）*
-            // vm.forceIndexCol='';//受力下标*
-            // vm.shiftIndexCol='';//位移下标*
-            // vm.useFormulaNum='';//计算公式*
-            // vm.spotNumCol='';//监测点位下标(除斜度外)*
-            // vm.workingConditionList="";
-            // vm.excelMoreFileListName='';
-            // vm.matchedAmount='';
-            // vm.allAmount='';
-            // vm.workingCondition='';
+            vm.sheetIndex='';//sheet下标*
+            vm.timeCol='';//采集时间下标*
+            vm.depthIndexCol='';//深度下标*
+            vm.distanceCol='';//位移下标*
+            vm.altitudeCol='';//高程下标*
+            vm.f0IndexCol='';//初始频率下标*
+            vm.fnIndexCol='';//本次频率下标*
+            vm.kIndexCol='';//率定系数下标*
+            vm.pipeHeightCol='';//管口高度*
+            vm.gaugeHeightCol='';//水位高度下标（水位）*
+            vm.forceIndexCol='';//受力下标*
+            vm.shiftIndexCol='';//位移下标*
+            vm.useFormulaNum='';//计算公式*
+            vm.spotNumCol='';//监测点位下标(除斜度外)*
+            vm.workingConditionList="";
+            vm.excelMoreFileListName='';
+            vm.matchedAmount='';
+            vm.allAmount='';
+            vm.workingCondition='';
         },
         //批量导入数据
         batchImportVerifyMake(){
@@ -5968,11 +5983,15 @@ export default {
         //取消批量数据导入
         batchImportCancle(){
             var vm=this;
+
             this.workingConditionList='';
              vm.excelMoreFileListName='';
             vm.matchedAmount='';
             vm.allAmount='';
             this.sheetList='';
+            this.sheetIndexList='';
+            this.valsheetlist='';
+
              this.excelFileListName='';
             this.monitorImportName='';
             this.excelFileList='';

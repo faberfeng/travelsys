@@ -3243,9 +3243,9 @@ export default {
 				}
 				break;
             case "CurrentSelectedEnt":
-               this.TraceId =e.data.parameter[0].TraceID;
-               console.log(e.data.parameter,'e.data.parameter');
-               console.log(this.TraceId,'this.TraceId');
+            //    this.TraceId =e.data.parameter[0].TraceID;
+            //    console.log(e.data.parameter,'e.data.parameter');
+            //    console.log(this.TraceId,'this.TraceId');
             //    this.getPropertyInfo();
                break;
 			case "ViewpointSubmited":
