@@ -2244,16 +2244,18 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                    // console.log(this.elevationYlist,'this.elevationYlist');
-                    this.spotChangeLineShow=true;
+                     console.log(this.elevationYlist,'this.elevationYlist');
+                        this.spotChangeLineShow=true;
                     // if(this.elevationYlist.length==0){
                     //     this.elevationYlist.push(0);
                     // }
+                        this.optionSpotChangeLine.yAxis.min='';
+                        this.optionSpotChangeLine.yAxis.max='';
                         var min=this.getMinValue(this.elevationYlist)?this.getMinValue(this.elevationYlist):0;
                         var max=this.getMaxValue(this.elevationYlist)?this.getMaxValue(this.elevationYlist):0;
                         var middle=(min+max)/2;
-                        // console.log(3*min-2*max,'min');
-                        // console.log(3*max-2*min,'max')
+                        console.log(3*min-2*max,'min');
+                        console.log(3*max-2*min,'max');
                         this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
                         this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
                         
