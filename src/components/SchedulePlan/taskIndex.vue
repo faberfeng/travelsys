@@ -4338,6 +4338,7 @@
                 this.fdPlayData=[];
                 console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
                 app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+                this.fdPlayDialog=false;
           }
       },
       fdIndex(taskFdStart,taskFdEnd,i){
@@ -4357,7 +4358,7 @@
                 if(response.data.cd==0){
                     // console.log('00');
                     this.returnTraceIds=response.data.rt;
-                    this.fdPlayDialog=false;
+                    // this.fdPlayDialog=false;
                     this.taskFdStart='';
                     this.taskFdEnd='';
                     this.returnTraceIdsData.push({
