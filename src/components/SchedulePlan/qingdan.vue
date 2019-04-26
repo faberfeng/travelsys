@@ -1556,7 +1556,7 @@ import '../ManageCost/js/date.js'
 export default Vue.component('common-list',{
   props:['mId','title','rType','bId','isGongChengLiang','manifestIdOne'],
   data(){
-       window.addEventListener("message", (evt)=>{this.callback(evt)});
+    //    window.addEventListener("message", (evt)=>{this.callback(evt)});
       return {
           returnLabelUrl:'',
           fullscreenLoading:false,//全屏loading

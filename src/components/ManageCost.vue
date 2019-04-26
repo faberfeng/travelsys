@@ -130,9 +130,9 @@ export default {
     },
     data(){
         // window.location.reload();
-         window.addEventListener("message", (evt)=>{
-                       this.callback(evt)},true
-        );
+        //  window.addEventListener("message", (evt)=>{
+        //                this.callback(evt)},false
+        // );
         return{
             url:'http://10.252.26.240:8080/genDist/',
             isOpen:0,
@@ -222,7 +222,12 @@ export default {
     },
     created(){
         var vm = this
-
+        // window.removeEventListener("message", (evt)=>{
+        //         this.callback(evt)}
+        // );
+           window.addEventListener("message", (evt)=>{
+                       this.callback(evt)},false
+        );
         vm.projId = localStorage.getItem('projId');//获取工程编号
         vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.entId=localStorage.getItem('entId');
@@ -272,9 +277,9 @@ export default {
     },
     updated(){
         var vm=this;
-        window.removeEventListener("message", (evt)=>{
-                this.callback(evt)}
-        );
+        // window.removeEventListener("message", (evt)=>{
+        //         this.callback(evt)}
+        // );
         // console.log('updated')
         // vm.getUserInfo();
                   
@@ -282,7 +287,7 @@ export default {
     destoryed(){
         var vm=this;
         window.removeEventListener("message", (evt)=>{
-                this.callback(evt)}
+                this.callback(evt),false}
         );
         console.log('是否销毁');
         // this.IframeClose();
@@ -298,7 +303,7 @@ export default {
             var vm=this;
             this.webGlShow=!this.webGlShow;
             this.isOpen++;
-            console.log(this.isOpen,'isOpen00');
+            // console.log(this.isOpen,'isOpen00');
             if(this.isOpen==1){
                     setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
@@ -320,14 +325,14 @@ export default {
                     //  para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
                     para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
                     this.strJson=para;
-                    console.log(this.strJson,'加载中');
+                    // console.log(this.strJson,'加载中');
                     app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
 				break;
             case "CurrentSelectedEnt":
                 {
                     CurrentSelectedEntLists=e.data.parameter;
-                    console.log(CurrentSelectedEntLists,'选择的构件');
+                    // console.log(CurrentSelectedEntLists,'选择的构件');
                 }
 				break;
 			case "ViewpointSubmited":
@@ -336,7 +341,7 @@ export default {
                 this.GetDrawingBackList='',
                 this.drawList=[];
                 this.GetDrawingBackList=e.data.parameter;
-                console.log(this.GetDrawingBackList,'图纸')
+                // console.log(this.GetDrawingBackList,'图纸')
                 this.getDrawingList();
                 break;
 		    }
@@ -553,7 +558,7 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.getWebGlDrawingList=response.data.rt;
-                    console.log(this.getWebGlDrawingList,'this.getWebGlDrawingList');
+                    // console.log(this.getWebGlDrawingList,'this.getWebGlDrawingList');
                     this.getWebGlDrawingList.forEach((item)=>{
                         if(this.GetDrawingBackList.holderID==item.holderId){
 
@@ -600,7 +605,7 @@ export default {
             }).then(response=>{
                 if(response.data.rt){
                     this.drawingWebGlList=response.data.rt;
-                    console.log(this.drawingWebGlList,'图纸地址');
+                    // console.log(this.drawingWebGlList,'图纸地址');
                     this.drawingWebGlList.forEach((item)=>{
                         this.getWebGlDrawingList.forEach((item1)=>{
                             if(item.drawingId==item1.id){
@@ -617,7 +622,7 @@ export default {
                             }
                         })
                     })
-                    console.log(this.drawList,'最后的东西');
+                    // console.log(this.drawList,'最后的东西');
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
@@ -782,7 +787,7 @@ export default {
                 // localStorage.setItem('userName',vm.header.userName)
                 localStorage.setItem('projAuth',response.data.rt.authIds);
                 // console.log()
-                console.log(response.data.rt.authIds,'权限文件');
+                // console.log(response.data.rt.authIds,'权限文件');
             })
         },
 
@@ -1171,8 +1176,8 @@ export default {
                 // this.$router.push({
                 //     path:'/metarialpurchase/productioncenter'//物资采购
                 // })
-                console.log('pppp');
-                console.log(this.moduleLists,'pppp1')
+                // console.log('pppp');
+                // console.log(this.moduleLists,'pppp1')
                 this.$router.push({
                     path:this.firstGetSecondGradeList(this.moduleLists,'011','01101','/metarialpurchase/productioncenter','01102','/metarialpurchase/wuliaopurchase','01103','/metarialpurchase/dinghuoManage','01104','/metarialpurchase/fahuoManage','01105','/metarialpurchase/checked')
                 })

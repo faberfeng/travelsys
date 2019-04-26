@@ -61,7 +61,7 @@
                 <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
                 <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="fDplay()">4D播放</span>
-                <span class="btn-operate"  v-show="batchVerificationShow||projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
+                <span class="btn-operate"  v-show="projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
                 <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
 
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
@@ -174,8 +174,8 @@
                     </zk-table>
               </div>
 
-              <div v-show="projectGanntShow" style="overflow: auto;" class="taskBody">
-                <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;height: 650px;overflow: auto">
+              <div v-show="projectGanntShow" style="overflow-y: auto;overflow-x:hidden" class="taskBody">
+                <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;">
                      <zk-table
                         index-text="序号"
                         :data="taskIndexData" :columns="columnsSetting" :max-height="props.height" :tree-type="props.treeType"
@@ -215,10 +215,14 @@
                     </zk-table>
                 </div>
                 <!-- <div style="float:right;width:0.04%;height:680px;color:#000"></div> -->
-                <div id="ganttRightIndex" style="float:right;width:49.8%;position:relative;height: 650px;overflow: auto;">
-                    <div id="ganttRightHead" style="width:100%;height:40px;border:1px solid #ccc;position:relative;"></div>
-                    <div id='ganttRight' style="width:100%;position:relative;cursion:w-resize;">
-                </div>
+                <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:auto;">
+                    <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
+                      <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
+                    </div>
+                    <div id='ganttRightBg' style="width:100%;position:relative;">
+                        <div id='ganttRight' style="width:100%;position:relative;position:absolute;top:0px;left:0px;">
+                    </div>
+                    </div>
                 </div>
               </div>
             </div>
@@ -1363,7 +1367,10 @@
   export default {
     name: 'taskIndex',
     data() {
-      window.addEventListener("message", (evt)=>{this.callback(evt)});
+      // window.addEventListener("message", (evt)=>{
+      //   this.callback(evt),
+      //   false
+      //   });
       return {
         taskMark:"",//任务备注
         taskTag:'',//任务标签
@@ -1389,6 +1396,7 @@
         BDMSUrl: '',
         qrShareUrl:'',
         selectUgId: '',//所选择群组id
+        dirIds:'',
         taskNameStr: '',
         ugList: '',//群组列表
         ugList1: [],//群组列表1
@@ -2213,8 +2221,12 @@
 
       }
     },
+   
     created() {
       var vm = this
+      // console.log('进入页面');
+      window.addEventListener("message", this.ls);
+
       vm.projId = localStorage.getItem('projId');
       vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
       vm.token = localStorage.getItem('token');
@@ -2231,6 +2243,12 @@
       vm.addBroseNotice();
       vm.getProjectTaskAuthority();
       this.getlabelList();
+      vm.getDirectoryList();
+     
+
+      
+     
+
       
       // $('body').not($(".zk-table")).bind('click', function() {
          
@@ -2240,6 +2258,11 @@
       // vm.changeUrl();
      
       // this.getTaskList();
+    },
+    destroyed(){ 
+      // console.log('销毁');
+      window.removeEventListener("message", this.ls
+      );
     },
     mounted() {
 
@@ -2251,6 +2274,7 @@
         this.taskIndexDataList=[];
         document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         this.getTaskList();
+        this.getDirectoryList();
       },
       'pageDetial_1.currentPage': function (val, oldval) {
         var vm = this
@@ -2299,16 +2323,21 @@
 
     },
     methods: {
+       ls(evt){
+          
+          this.callback(evt),
+          false
+        },
 
        callback(e){
+         
             switch(e.data.command){
               case "EngineReady":
                 break;
               case "CurrentSelectedEnt":
                   CurrentSelectPara=e.data.parameter[0];
                   CurrentSelectedEntList=e.data.parameter;
-                  console.log(CurrentSelectPara,'CurrentSelectPara');
-                  console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
+               
                 break;
               case "ViewpointSubmited":
                         break;
@@ -2317,8 +2346,23 @@
               case "UsingColorStatus":
               break;
               case "Return_4D_images":
+                var files=[];
                 return4DImages=e.data.parameter;
-                console.log(return4DImages,'return4DImages');
+                
+                return4DImages.forEach((item,index)=>{
+                  files.push({
+                    'fileName':'播放图片-'+(index+1)+'.png',
+                    'base64':item.split(',')[1]
+                  })
+                })
+           
+                if(files){
+                  this.uploadImg(files);
+                  // return false;
+                }
+
+                // this.uploadImg(files);
+              
               break;
             }
         },
@@ -2358,7 +2402,7 @@
                          item.ElementSummaryList = ElementSummaryDataList;
                       })
                       
-                      console.log(this.showBimDataList,'this.showBimDataList');
+                      // console.log(this.showBimDataList,'this.showBimDataList');
                       this.progressSearchDialog=false;
                       app.postMessage({command:"UsingColorStatus",parameter:this.showBimDataList},"*");
                       this.taskProgressStart="";
@@ -2403,7 +2447,7 @@
       loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00503','/SchedulePlan/taskIndex','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00504','/SchedulePlan/calendarConfig');
-          console.log(vn.routerList,'vn.routerList')
+          // console.log(vn.routerList,'vn.routerList')
         },
         //二级标题生成函数
       getSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
@@ -2701,6 +2745,12 @@
             // this.fdPlayDialog=false;
           }else{
               this.fdPlayDialog=true;
+              if(this.dirIds){
+                    // this.createdDetory();
+                    this.deleteDirectory()
+              }else{
+                this.createdDetory();
+              }
           }
       },
       //放大
@@ -2710,32 +2760,40 @@
           this.drawingDateBar_reset();
           this.productGanttNode=document.getElementById('ganttRight');
           this.productGanttNode.innerHTML = "";
-
           this.Gantt_item_top = 0;
-
           for(var i = 0; i < this.selectRowList.length;i++){
             if(this.selectRowList[i]._isHide == false){
               this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
             }
           }
+          // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
       },
       //缩小
       smallLength(){
-          this.ganttScale /= 2;
+        // console.log(this.ganttScale,'this.ganttScale');
+        if(this.ganttScale>0.5){
+           this.ganttScale /= 2;
         //  this.drawingDateBar();
-        console.log(this.selectRowList,'this.selectRowList');
-          this.drawingDateBar_reset();
-          this.productGanttNode=document.getElementById('ganttRight');
-          this.productGanttNode.innerHTML = "";
-
-          this.Gantt_item_top = 0;
-
-          for(var i = 0; i < this.selectRowList.length;i++){
-            if(this.selectRowList[i]._isHide == false){
-              this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+          console.log(this.selectRowList,'this.selectRowList');
+            this.drawingDateBar_reset();
+            this.productGanttNode=document.getElementById('ganttRight');
+            this.productGanttNode.innerHTML = "";
+            this.Gantt_item_top = 0;
+            for(var i = 0; i < this.selectRowList.length;i++){
+              if(this.selectRowList[i]._isHide == false){
+                this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+              }
             }
-          }
-          console.log()
+
+        }else{
+          this.$message({
+            type:'info',
+            message:'最小缩放宽度'
+          })
+        }
+         
+          // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
+        
       },
       //获取工程列表
       getTaskList() {
@@ -2747,6 +2805,7 @@
         //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         // this.taskIndexData=[];
         this.taskIndexDataList=[];
+        // this.selectRowList=[];
         axios({
           method: 'post',
           url: this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
@@ -2762,7 +2821,7 @@
             var vm=this
             // vm.$emit('refresh')
             this.taskIndexData = response.data.rt;
-            console.log(document.getElementsByClassName('zk-table')[2].scrollHeight,'左边00');
+           
             this.taskIndexData.forEach((item)=>{
               // item.children.forEach((val)=>{
               //   this.$set(val,'statusNum',val.actualStatusStr=='未开始'?0:parseInt(val.actualStatusStr.substring(2).split('%')[0]));
@@ -2770,9 +2829,12 @@
               this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
               // item=item.children;
             })
-            console.log(this.taskIndexData,'数组');
-            
+            // this.drawingDateBar_reset();
+            this.productGanttNode=document.getElementById('ganttRight');
+            this.productGanttNode.innerHTML = "";
+            this.Gantt_item_top = 0;
             this.productGantt(this.taskIndexData);
+          
             
             {
                 
@@ -2827,7 +2889,6 @@
                         
                 })
             }
-            
             this.dataDigui(response.data.rt);
             this.getDataDigui(response.data.rt);
            
@@ -2846,7 +2907,8 @@
                 this.$set(item,'_isHide',false);
                 this.fdPlayDataId.push(item.taskId);
               })
-              console.log(this.fdPlayDataId,'this.fdPlayDataId');
+          
+           
               //  this.productGantt(this.selectRowList);
             if (response.data.rt == null) {
               this.taskIndexData = [];
@@ -2866,9 +2928,11 @@
         var max_Day_count = -1;
         
         this.productGanttNode=document.getElementById('ganttRight');
+        this.productGanttNodeBg=document.getElementById('ganttRightBg');
         this.productGannttHead=document.getElementById('ganttRightHead');
+        this.productGannttIndex=document.getElementById('ganttRightIndex');
 
-        this.Gantt_item_top = 0;
+        this.Gantt_item_top = 3;
 
         for(let i = 0;i < taskIndexData.length;i++){ // 取最小时间
 
@@ -2889,7 +2953,7 @@
               max_Day_count = taskIndexData[i].taskEndDay;
             }
 
-            console.log(min_Day_count,'min_Day_count');
+     
 
         }
 
@@ -2910,6 +2974,8 @@
         for(let i = 0;i < taskIndexData.length;i++){
           this.productGantt_loop(taskIndexData[i],min_Day_count);
         }
+
+        // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
 
       },
       productGantt_loop(root,min_Day_count){
@@ -2943,7 +3009,7 @@
 
           this.months_bar[i].style.left = this.months_bar[i].div_left * this.ganttScale + "px";
           this.months_bar[i].style.width = this.months_bar[i].div_length * this.ganttScale + "px";
-          console.log(this.months_bar[i].offsetWidth);
+         
           if(this.months_bar[i].offsetWidth < 100){
             this.months_bar[i].innerHTML = "";
           }else{
@@ -2962,7 +3028,7 @@
 
         for(let i = 0; i < this.max_Day_count_g - this.min_Day_count_g + 1;i++){
               var item = document.createElement("div");
-              item.style.background = "#ccc";
+              item.style.background = "#f8f8f9";
 
               //  item.style.borderTop = "1px solid #000";
               item.style.position = "absolute";
@@ -2991,7 +3057,7 @@
           if(startMonth != Month){
 
               var item = document.createElement("div");
-              item.style.background = "#ccc";
+              item.style.background = "#f8f8f9";
               item.style.position = "absolute";
              
               item.style.borderRight = "1px solid #000";
@@ -3030,10 +3096,10 @@
         {
               days_count++;
               var item = document.createElement("div");
-              item.style.background = "#ccc";
+              item.style.background = "#f8f8f9"
               item.style.position = "absolute";
               
-              item.style.borderBottom = "1px solid #000";
+              // item.style.borderBottom = "1px solid #000";
               item.style.top = "0px";
               item.div_length = days_count * 10;
 
@@ -3073,6 +3139,8 @@
 
           let Day_count = root.taskEndDay - root.taskStartDay;
           Day_count++;
+          this.productGanttNode.style.height = (this.Gantt_item_top+37) + "px";
+          this.productGanttNodeBg.style.height = (this.Gantt_item_top+37) + "px";
 
           var item = document.createElement("div");
           item.style.background = "#6eb7ff";
@@ -3081,21 +3149,32 @@
           item.style.top = this.Gantt_item_top + "px";
           item.style.left = ((root.taskStartDay - min_Day_count) * 10) * this.ganttScale + "px";
           // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
-          item.style.height = 37 + "px";
+          item.style.marginTop=5+'px';
+          item.style.height = 26 + "px";
           item.style.width = 10 * Day_count  * this.ganttScale + "px";
 
           var line = document.createElement("div");
+          var line1 =document.createElement("div");
           line.style.position = "absolute";
           line.style.top = (this.Gantt_item_top + 37) + "px";
           line.style.height = "1px";
-          line.style.width = this.productGannttHead.style.width;
+          // line.style.width = '100%';
+          line.style.width =this.productGannttHead.style.width;
           line.style.background = "rgba(0,0,0,0.1)";
+
+          line1.style.position = "absolute";
+          line1.style.top = (this.Gantt_item_top + 37) + "px";
+          line1.style.height = "1px";
+          line1.style.width = '100%';
+          line1.style.background = "rgba(0,0,0,0.1)";
           this.productGanttNode.appendChild(line);
+          this.productGanttNode.appendChild(line1);
           this.productGanttNode.appendChild(item);
-          this.Gantt_item_top += 37.1;
+          this.Gantt_item_top += 37.16;
 
           var item_sub = document.createElement("div");
           item_sub.style.background = "#68da68";
+
           item_sub.style.position = "absolute";
           item_sub.style.border = "1px solid #000";
           item_sub.style.top = "0px";
@@ -3119,7 +3198,7 @@
         }
       },
       getDataDigui(root){
-        console.log('000');
+   
         for(let j = 0;j<root.length;j++){
 
           this.taskIndexSelectDataList.push(root[j]);
@@ -3299,7 +3378,7 @@
         //     }
         //    console.log('是谷歌浏览器')
         // }
-        console.log(row);
+
         var a=''
         
         {
@@ -3311,7 +3390,7 @@
             row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
             // row.target.parentElement.parentElement.style.border='2px solid black'
             
-            console.log(row.target.parentElement.parentElement.style.color,'000');
+    
             // row.target.parentElement.parentElement.style.color='white'
           }
           if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
@@ -3374,7 +3453,7 @@
             // row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
             //  row.target.parentElement.style.backgroundColor='#0081c2'
        
-        console.log(row.target.parentElement)
+        
           this.selectRowList = rowIndex;
           this.selectRowList.forEach((item, index) => {
             if (item._isHover == true) {
@@ -3392,55 +3471,55 @@
         // this.getTaskResourceTaskList();
       },
       cellClick(row, rowIndex, column, columnIndex, $event){
-        console.log(row, rowIndex, column, columnIndex, $event,'row, rowIndex, column, columnIndex, $event');
+     
 
       },
 
       rowClickGantt(row, rowIndex,$event){
          var a=''
         
-        {
-          if(row.target._prevClass=="zk-table__cell-inner"){
-            console.log(row.target.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement'); 
-            row.target.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
-            row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
-              // item.style.backgroundColor='white'
-              item.style.border='1px solid #e9eaec'
-            })
-            // row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
-            row.target.parentElement.parentElement.style.border='2px solid black'
+        // {
+        //   if(row.target._prevClass=="zk-table__cell-inner"){
+        //     console.log(row.target.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement'); 
+        //     row.target.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
+        //     row.target.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       // item.style.backgroundColor='white'
+        //       item.style.border='1px solid #e9eaec'
+        //     })
+        //     // row.target.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //     row.target.parentElement.parentElement.style.border='2px solid black'
             
-            // console.log(row.target.parentElement.parentElement.style.color,'000');
-            // row.target.parentElement.parentElement.style.color='white'
-          }
-          if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
-            console.log(row.target.parentElement.parentElement,'row.target.parentElement.parentElement'); 
-            row.target.parentElement.parentElement.style.boder='1px solid #e9eaec';
-            row.target.parentElement.parentElement.childNodes.forEach((item)=>{
-              // item.style.backgroundColor='white'
-              item.style.border='1px solid #e9eaec'
-            })
-            // row.target.parentElement.style.backgroundColor='#0081c2'
-             row.target.parentElement.style.border='2px solid black'
-          //  row.target.parentElement.parentElement.style.color='white'
+        //     // console.log(row.target.parentElement.parentElement.style.color,'000');
+        //     // row.target.parentElement.parentElement.style.color='white'
+        //   }
+        //   if(row.target._prevClass=="zk-table__body-cell zk-table--border-cell"){
+        //     console.log(row.target.parentElement.parentElement,'row.target.parentElement.parentElement'); 
+        //     row.target.parentElement.parentElement.style.boder='1px solid #e9eaec';
+        //     row.target.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       // item.style.backgroundColor='white'
+        //       item.style.border='1px solid #e9eaec'
+        //     })
+        //     // row.target.parentElement.style.backgroundColor='#0081c2'
+        //      row.target.parentElement.style.border='2px solid black'
+        //   //  row.target.parentElement.parentElement.style.color='white'
         
-          }
-          if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
+        //   }
+        //   if(row.target._prevClass=="zk-table--level-3-cell"||"zk-table--level-4-cell"){
             
-            console.log(row.target.parentElement.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement.parentElement'); 
-            row.target.parentElement.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
-            row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
-              // item.style.backgroundColor='white'
-              item.style.border='1px solid #e9eaec'
-            })
-            // row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
-            // row.target.parentElement.parentElement.style.color='white'
+        //     console.log(row.target.parentElement.parentElement.parentElement.parentElement,'row.target.parentElement.parentElement.parentElement.parentElement'); 
+        //     row.target.parentElement.parentElement.parentElement.parentElement.style.boder='1px solid #e9eaec';
+        //     row.target.parentElement.parentElement.parentElement.parentElement.childNodes.forEach((item)=>{
+        //       // item.style.backgroundColor='white'
+        //       item.style.border='1px solid #e9eaec'
+        //     })
+        //     // row.target.parentElement.parentElement.parentElement.style.backgroundColor='#0081c2'
+        //     // row.target.parentElement.parentElement.style.color='white'
 
-             row.target.parentElement.parentElement.parentElement.style.border='2px solid black'
+        //      row.target.parentElement.parentElement.parentElement.style.border='2px solid black'
             
-          }
-        }
-         console.log(row.target.parentElement)
+        //   }
+        // }
+        //  console.log(row.target.parentElement)
           this.selectRowList = rowIndex;
           this.selectRowList.forEach((item, index) => {
             if (item._isHover == true) {
@@ -3737,11 +3816,10 @@
       //鼠标单击树形icon
       treeIconClick(row, rowIndex) {
         this.selectRowList = rowIndex;
-        console.log(this.selectRowList,'this.selectRowList');
+    
 
         this.productGanttNode=document.getElementById('ganttRight');
         this.productGanttNode.innerHTML = "";
-
         this.Gantt_item_top = 0;
 
         for(var i = 0; i < this.selectRowList.length;i++){
@@ -3749,21 +3827,6 @@
             this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
           }
         }
-
-        var setting = {
-            data: {
-                key:{
-                    name:"dirName",
-                    children:'children'
-                },
-                simpleData: {
-                    enable: true,
-                    idKey: "dirId",
-                    pIdKey: "dirParId",
-                    rootPId: 0
-                }
-            }
-        };
 
         
         this.ganttRowList=rowIndex;
@@ -4108,7 +4171,7 @@
       //点击新增甘特图
       addGanttTask(){
         var tableInfo = $(".gdfTable");
-        console.log(tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value);
+    
         // $('#workSpace').trigger('moveUpCurrentTask.gantt');return false;//上移
         // $('#workSpace').trigger('moveDownCurrentTask.gantt');return false;//下移
         // $('#workSpace').trigger('deleteFocused.gantt');return false;
@@ -4197,14 +4260,14 @@
           }).then((response)=>{
             if(response.data.rt){
                 this.detailsHead_model=JSON.parse(response.data.rt);
-                console.log(this.detailsHead_model,'11111');
+              
                 this.columns=[];
                 this.detailsHead_model.forEach((item)=>{
                     if(item.show==true){
                       this.columns.push(item);
                     }
                 })
-                console.log(this.columns,'this.columns0000')
+               
                 this.taskIndexData=[];
                 if(document.getElementsByClassName('zk-table__body')){
                       document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
@@ -4316,23 +4379,117 @@
       fdPlayCancle(){
         this.fdPlayDialog=false;
       },
+      //创建目录
+      createdDetory(){
+        var vm=this;
+           axios({
+                method:'get',
+                // url:vm.BDMSUrl+'project2/doc/directory/add',
+                url:vm.BDMSUrl+'/doc/createDirectory',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    parDirId:0,//当前文件夹ID
+                    name:'4D播放截图',
+                    groupId:vm.selectUgId,
+                    projId:vm.projId
+                },
+            }).then((response)=>{
+              this.getDirectoryList();
+            })
+      },
+      //
+      deleteDirectory(){
+          var vm=this;
+          var dirIds=[];
+          dirIds.push(this.dirIds);
+          axios({
+              method:'post',
+              // url:vm.BDMSUrl+'project2/doc/directory/'+vm.checkFileDir.nodeId+'/'+vm.projId+'/delete',
+              url:vm.BDMSUrl+'doc/deleteDirectory',
+              headers:{
+                  'token':vm.token
+              },
+              data:dirIds
+              }).then((response)=>{
+              if(response.data.cd==0){
+                this.createdDetory();
+              }
+            })
+      },
+      //获取目录列表
+      getDirectoryList(){
+        var vm=this;
+        axios({
+            method:'GET',
+            url:vm.BDMSUrl+'/doc/getDirectoryWithAll',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                projectId:vm.projId,
+                groupId:vm.selectUgId
+            }
+        }).then((response)=>{
+            if(response.data.cd=='0'){
+              response.data.rt.forEach((item)=>{
+                if(item.dirName.indexOf('4D播放截图')>-1){
+                    this.dirIds=item.dirId
+                    
+                  } 
+                })
+                console.log(this.dirIds,'this.dirIds');
+                // if(!this.dirIds){
+                //     this.createdDetory();
+                // }
+          }})
+            // $.ajax({
+            //   url:vm.BDMSUrl+'/doc/getDirectoryWithAll?projectId='+this.projId+'&groupId='+this.selectUgId,
+            //   async:false,
+            //   type:'GET',
+            //   headers:{
+            //         token:vm.token
+            //   },
+            //   // data:{
+            //   //   projectId:vm.projId,
+            //   //   groupId:vm.selectUgId
+            //   // },
+            //   success:(response)=>{
+            //     if(response.cd==0){
+            //       response.rt.forEach((item)=>{
+            //       if(item.dirName=='4D播放截图'){
+            //           this.dirIds=item.dirId
+            //         } 
+            //     })
+            //     console.log(this.dirIds,'this.dirIds');
+            //     if(!this.dirIds){
+            //         this.createdDetory();
+            //     }
+            //   }
+
+              // }
+            // })
+      },
+
       fdPlayMakeSure(){
         // this.fdPlayDialog=false;
         var date=1;
         var datas=[];
-
         console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
-      if(this.fdNum){
-        date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
-      }
+        if(this.fdNum){
+          date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
+          date/=(1000 * 3600 * 24)
+          date=parseInt(date+ 0.5)
+        }
        
        console.log(date,'date00');
-       for(let i=0;i<this.fdNum;i++){
-         console.log(this.taskFdStart+date*i,this.taskFdStart+date*(i+1));
+       for(let i=0;i<date;i++){
+         console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
           datas.push({
             'id':i+1,
-            'taskFdStart':moment(this.taskFdStart.getTime()+date*i).format('YYYY-MM-DD'),
-            'taskFdEnd':moment(this.taskFdStart.getTime()+date*(i+1)).format('YYYY-MM-DD')
+            'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
+            'taskFdEnd':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)).format('YYYY-MM-DD')
           })
        }
         if(document.getElementById('webgl').style.display=='none'){
@@ -4342,25 +4499,53 @@
             })
             // this.fdPlayDialog=false;
           }else{
+              this.returnTraceIdsData=[];
 
               document.body.scrollTop = 0;
               document.documentElement.scrollTop = 0;
                const app = document.getElementById('webIframe').contentWindow;
               datas.forEach((item)=>{
                         this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
-                  })
-                  console.log(datas,'datas00');
-              //  console.log(date,'date00');
+                })
+             
+               console.log(date,'date00');
                 this.fdPlayData=[];
-                console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
-                app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+              
+                
+               
                 this.fdPlayDialog=false;
                 this.fdNum='';
+                console.log(this.returnTraceIdsData,'返回的数据');
+                 setTimeout(()=>{
+                     app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+                },200);
                 this.$message({
                   type:'success',
                   message:'4D播放加载中...'
                 })
           }
+      },
+      uploadImg(file){
+        var vm=this;
+          axios({
+            url:vm.BDMSUrl+'doc/uploadBase64',
+            method:'POST',
+            params:{
+              projectId:vm.projId,
+              dirId:vm.dirIds
+            },
+            headers:{
+              'token':vm.token
+            },
+            data:file
+          }).then((response)=>{
+            if(response.data.cd==0){
+                  this.$message({
+                    type:'success',
+                    message:'加载图片已保存文档管理-4D播放截图文件夹'
+                  })
+            }
+          })
       },
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
@@ -4660,7 +4845,7 @@
       deleteGanttTab(){
         this.deleteTaskDialog = true;
         var tableInfo = $(".gdfTable");
-        console.log(tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value);
+     
         // console.log(this.deleteTabObject);
         this.taskId = tableInfo[1].getElementsByClassName("rowSelected")[0].attributes.taskid.value;
         // if (this.deleteTabObject.row.children) {
@@ -4826,7 +5011,7 @@
           for(var id in this.changeVerifyList){
             this.batchVerifyList.push(this.changeVerifyList[id]);
           }
-          console.log(this.batchVerifyList,'this.batchVerifyList');
+    
           axios({
             url:this.BDMSUrl+'schedule/'+this.projId+'/task/batchVerify',
             method:'post',
@@ -5126,10 +5311,15 @@
         vm.projectGanntShow=true;
         vm.batchVerificationShow=false;
         vm.projectWorkShow=false;
+        this.selectRowList=[];
+        this.taskIndexData=[];
+        this.taskIndexSelectDataList=[];
+        document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
+        this.getTaskList();
       },
       exportExcel(){
         document.getElementsByClassName('zk-table')[0].setAttribute('id','newDiv');
-        console.log(document.getElementById('newDiv'));
+    
           method5('newDiv');
       },
       sortLabel(){
@@ -5144,7 +5334,7 @@
         },
         makeSureHead(){
           var vm=this;
-          console.log(this.detailsHead_model,'this.detailsHead_model');
+     
           axios({
             url:this.BDMSUrl+'schedule/setProjectTaskAuthority',
             headers:{
@@ -5223,6 +5413,8 @@
                   }
               }).then(response=>{
                   if(response.data.cd=='0'){
+                  // this.taskIndexData=[];
+                  // document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
                   this.getTaskList();
                   this.getVerifyList();
                   // this.TaskList();
@@ -5288,7 +5480,7 @@
                           "TraceID":String(item.traceId)
                         });
                     })
-                     console.log(para,'多点定位数据');
+                   
                      const app = document.getElementById('webIframe').contentWindow;
                     app.postMessage({command:"LookAtEntities",parameter:para},"*");
                     document.body.scrollTop = 0;
@@ -5404,12 +5596,12 @@
       qrcode(val) {
         this.labelListShow = true;
         this.labelPkId=val;
-        console.log(this.relaList,'this.relaList');
+       
         this.relaList.forEach((item) => {
           if (item.id == val.id) {
             this.relaList1 = [];
             this.relaList1.push(item);
-            console.log(this.relaList1,'relaList1');
+        
           }
         })
       },
@@ -5629,15 +5821,15 @@
       },
       changeSlider(id,num,time){
         // console.log('111');
-        console.log(id,num,time);
+  
         // console.log(this.taskIndexDataList,'DATACHANGE');
         this.changeVerifyList[id]={"taskId":id,"tvRate":num,"tvDate":moment(time).format("YYYY-MM-DD")}
-        console.log(this.changeVerifyList,'滑动条')
+        // console.log(this.changeVerifyList,'滑动条')
       },
       changeDatePicker(id,num,time){
-        console.log(id,num,time);
+    
         this.changeVerifyList[id]={"taskId":id,"tvRate":num,"tvDate":moment(time).format("YYYY-MM-DD")}
-        console.log(this.changeVerifyList,'时间条')
+        // console.log(this.changeVerifyList,'时间条')
       },
       //上传图片取消
       uploadPicCancle() {
@@ -5685,7 +5877,7 @@
       //查看
       searchs(filePath) {
         // top.location.href=this.BDMSUrl+filePath,'_top';
-        console.log(filePath,'filePath');
+    
         let routeData=this.$router.resolve({
           path:'/filePreview',
           query:{filePath:filePath}
@@ -6292,6 +6484,13 @@
             border-radius: 2px;
             height: 28px;
             cursor: pointer;
+            .el-icon-plus{
+              font-size:14px;
+            }
+            .el-icon-minus{
+              font-size:14px;
+            }
+
           }
         }
 

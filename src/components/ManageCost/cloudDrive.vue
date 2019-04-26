@@ -214,10 +214,13 @@
             <!-- <div id="verticalBar"></div> -->
             <div v-show="screenLeft.show"  v-if="screenLeft.item == 1" class="screenRight_1">
                  <p class="clearfix">
-                    <i class="icon-goujian icon-add" v-if="fileNewAndrename" title="添加" @click="addFile"></i>
+                     <!-- v-if="fileNewAndrename" -->
+                    <i class="icon-goujian icon-add"  title="添加" @click="addFile"></i>
                     <!-- <i class="icon-goujian icon-authrity" v-if="editCatalogAuth"  title="权限" @click="authrityFile"></i> -->
-                    <i class="icon-goujian icon-delete" v-if="fileCopyAndCutAndDelete" title="删除" @click="deleteFile"></i>
-                    <i class="icon-goujian icon-edit" v-if="fileNewAndrename"  title="重命名" @click="renameFile"></i>
+                    <!-- v-if="fileCopyAndCutAndDelete"  -->
+                    <i class="icon-goujian icon-delete" title="删除" @click="deleteFile"></i>
+                    <!-- v-if="fileNewAndrename" -->
+                    <i class="icon-goujian icon-edit"   title="重命名" @click="renameFile"></i>
                 </p>
                 <!-- @click.stop="initTreeFolder()" -->
                 <div   @click.stop="initTreeFolder()">
@@ -2693,7 +2696,7 @@ export default {
         upload,commonList,uploadPanorama,uploadBasic
     },
     data() {
-         window.addEventListener("message", (evt)=>{this.callback(evt)});
+        //  window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             elementTracId:'',
             routerList:'',
@@ -3414,16 +3417,6 @@ export default {
                     groupId:vm.selectUgId,
                     projId:vm.projId
                 },
-                // data:{
-                //     // dirName: vm.fileName.newFileName,
-                //     // dirParId: vm.firstTime > 0?vm.checkFileDir.nodeId:null,//当前文件夹ID
-                //     // ugId:vm.selectUgId,
-                //     // projId: vm.projId,
-                //     parDirId:vm.firstTime > 0?vm.checkFileDir.dirId:null,//当前文件夹ID
-                //     name:vm.fileName.newFileName,
-                //     groupId:1,
-                //     projId:vm.projId
-                // },
             }).then((response)=>{
                 if(Math.ceil(response.data.cd) == 0){
                     vm.$message({
