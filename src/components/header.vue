@@ -3,7 +3,8 @@
         <el-col :span="24" class="header">
             <div class="headerImg">
                 <img v-if="!newLogo" :src="require('../assets/defaultlogo.png')"/>
-                <img v-else :src="isUseDefaultLogo?newLogo:require('../assets/defaultlogo.png')"/>
+                <!-- isUseDefaultLogo -->
+                <img v-else :src="newLogo?newLogo:require('../assets/defaultlogo.png')"/>
             </div>
             <div class="headerText" v-text="proname"></div>
             <div class="headerInfo">

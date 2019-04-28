@@ -111,6 +111,9 @@
                         <el-button>右下</el-button>
                     </el-tooltip> -->
                   </template>
+                    <!-- <template slot="taskName" slot-scope="scope">
+                            {{scope.row.taskName | splitRemark()}}
+                    </template> -->
                    <template slot="taskPriority" slot-scope="scope">
                       {{scope.row.taskPriority | status()}}
                   </template>
@@ -182,12 +185,14 @@
                         :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
                         :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClickGantt"
                         @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
+                        
                         <template slot="action" slot-scope="scope">
                           <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
                           <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
                           <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
                          
                         </template>
+                        
                         <template slot="verifyTime" slot-scope="scope">
                           <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
                         </template>
@@ -196,6 +201,9 @@
                         </template>
                         <template slot="milepost" slot-scope="scope">
                             {{scope.row.taskType==1?'是':'否'}}
+                        </template>
+                        <template slot="taskName" slot-scope="scope">
+                            {{scope.row.taskName}}
                         </template>
                         <template slot="taskStart" slot-scope="scope">
                           {{scope.row.taskStart | timeChange()}}
@@ -1735,12 +1743,20 @@
           }
         ],
         columns: [
+          // {
+          //   label: '名称',
+          //   prop: 'taskName',
+          //   type: 'template',
+          //   template: 'action',
+          //   minWidth: '240px'
+          // },
           {
-            label: '名称',
-            prop: 'taskName',
-            type: 'template',
-            template: 'action',
-            minWidth: '240px'
+              label: '名称',
+              prop: 'taskName',
+              type: 'template',
+              template: 'taskName',
+              // width: '140px'
+              minWidth: '240px'
           },
           // {
           //   label: '序号',
@@ -2094,9 +2110,8 @@
               label: '名称',
               prop: 'taskName',
               type: 'template',
-              template: 'action',
+              template: 'taskName',
               width: '140px'
-
             },
             // {
             //   label: '序号',
@@ -2295,6 +2310,12 @@
           return moment(val).format("YYYY-MM-DD");
         }
       },
+      splitName(val){
+        if(val){
+          return val.substring(0,10);
+        }
+
+      },
       splitRemark(val){
         if(val){
           return val.substring(0,5);
@@ -2348,13 +2369,15 @@
               case "Return_4D_images":
                 var files=[];
                 return4DImages=e.data.parameter;
-                
+                console.log(return4DImages,'return4DImages');
                 return4DImages.forEach((item,index)=>{
                   files.push({
                     'fileName':'播放图片-'+(index+1)+'.png',
                     'base64':item.split(',')[1]
                   })
                 })
+                
+                console.log(files,'返回文件');
            
                 if(files){
                   this.uploadImg(files);
@@ -2822,17 +2845,14 @@
             // vm.$emit('refresh')
             this.taskIndexData = response.data.rt;
            
-            this.taskIndexData.forEach((item)=>{
-              // item.children.forEach((val)=>{
-              //   this.$set(val,'statusNum',val.actualStatusStr=='未开始'?0:parseInt(val.actualStatusStr.substring(2).split('%')[0]));
-              // })
-              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
-              // item=item.children;
-            })
+            // this.taskIndexData.forEach((item)=>{
+            //   this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+            // })
             // this.drawingDateBar_reset();
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 0;
+            this.setValueDiGui(response.data.rt);
             this.productGantt(this.taskIndexData);
           
             
@@ -2889,6 +2909,7 @@
                         
                 })
             }
+            
             this.dataDigui(response.data.rt);
             this.getDataDigui(response.data.rt);
            
@@ -3197,6 +3218,15 @@
             }
         }
       },
+      setValueDiGui(root){
+        for(let i =0;i<root.length;i++){
+            this.$set(root[i],'statusNum',root[i].actualStatusStr=='未开始'?0:parseInt(root[i].actualStatusStr.substring(2).split('%')[0]));
+            if(root[i].children){
+              this.setValueDiGui(root[i].children)
+            }
+        }
+
+      },
       getDataDigui(root){
    
         for(let j = 0;j<root.length;j++){
@@ -3265,7 +3295,9 @@
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.labelList=response.data.rt;
-                    this.taskTag=this.labelList[0].id;
+                    if(this.labelList.length>0){
+                        this.taskTag=this.labelList[0].id;
+                    }
                 }
             })
         },
@@ -4518,7 +4550,7 @@
                 console.log(this.returnTraceIdsData,'返回的数据');
                  setTimeout(()=>{
                      app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
-                },200);
+                },0);
                 this.$message({
                   type:'success',
                   message:'4D播放加载中...'
@@ -4549,31 +4581,52 @@
       },
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
-            axios({
-                url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId',
-                headers:{
-                  'token':this.token
-                },
-                method:"post",
-                params:{
-                  startDate:taskFdStart,
-                  endDate:taskFdEnd
-                },
-                data:this.fdPlayDataId
-              }).then((response)=>{
-                if(response.data.cd==0){
-                    // console.log('00');
-                    this.returnTraceIds=response.data.rt;
+        $.ajax({
+          url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId?startDate='+taskFdStart+'&endDate='+taskFdEnd,
+          headers:{
+              'token':this.token
+          },
+          type:'post',
+          // data:'',
+          dataType:"json",
+          data:JSON.stringify(this.fdPlayDataId),
+          async:false,
+          contentType:'application/json;charset=utf-8',
+          success:(response)=>{
+            if(response.cd==0){
+               this.returnTraceIds=response.rt;
                     // this.fdPlayDialog=false;
-                    this.taskFdStart='';
-                    this.taskFdEnd='';
-                    this.returnTraceIdsData.push({
-                        'id':i,
-                        'data':this.returnTraceIds
-                    })
-                  // console.log(this.returnTraceIdsData,'this.returnTraceIdsData');
-                }
-              })
+                this.taskFdStart='';
+                this.taskFdEnd='';
+                this.returnTraceIdsData.push({
+                    'id':i,
+                    'data':this.returnTraceIds
+                })
+            }
+          }
+        })
+            // axios({
+            //     url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId',
+            //     headers:{
+            //       'token':this.token
+            //     },
+            //     method:"post",
+            //     params:{
+            //       startDate:taskFdStart,
+            //       endDate:taskFdEnd
+            //     },
+            //     data:this.fdPlayDataId
+            //   }).then((response)=>{
+            //     if(response.data.cd==0){
+            //         this.returnTraceIds=response.data.rt;
+            //         this.taskFdStart='';
+            //         this.taskFdEnd='';
+            //         this.returnTraceIdsData.push({
+            //             'id':i,
+            //             'data':this.returnTraceIds
+            //         })
+            //     }
+            //   })
         },
 
 

@@ -12,7 +12,8 @@
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                     :border="props.border" empty-text="正在加载...">
                         <template slot="action" slot-scope="scope">
-                            <div v-if="scope.row.level == 4">
+                            <!-- <div v-if="scope.row.level == 4"> -->
+                            <div v-if="scope.row.children.length==0">
                                 <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>
                                 <button class="actionBtn expandProperty" title="编辑特性"  @click="editProperty(scope)"></button>
                             </div>
@@ -466,31 +467,31 @@ export default {
             columns: [
                 {
                     label: '编码',
-                    prop: 'number',
+                    prop: 'classifyCode',
                     width: '200px',
                 },
                 {
                     label: '标题',
-                    prop: 'title',
+                    prop: 'classifyName',
                     minWidth: '150px',
                 },
-                {
-                    label: '计量单位',
-                    minWidth:'150px',
-                    prop:'unit'
-                },
-                {
-                    label: '规则注释',
-                    prop: 'regular',
-                },
-                {
-                    label: '来源',
-                    prop: 'source_',
-                },
-                {
-                    label: '状态',
-                    prop: 'status_',
-                },
+                // {
+                //     label: '计量单位',
+                //     minWidth:'150px',
+                //     prop:'unit'
+                // },
+                // {
+                //     label: '规则注释',
+                //     prop: 'regular',
+                // },
+                // {
+                //     label: '来源',
+                //     prop: 'source_',
+                // },
+                // {
+                //     label: '状态',
+                //     prop: 'status_',
+                // },
                 {
                     label:'操作',
                     prop:'operator',
@@ -645,34 +646,57 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
+        this.getProjectGenieClassByProject();
         this.getProjectGenieClass();
     },
     methods:{
         //获得构件属性语意编码树
         getProjectGenieClass(){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'config2/component/getProjectGenieClass',
+            $.ajax({
+                 url:this.BDMSUrl+'projectInfo/getBiddingCode',
                 headers:{
                     token:this.token
                 },
-                params:{
-                    projId:this.projId,
-                    tableName:'t32',
-                    type:2
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.projectSubmitData = response.data.rt;
-                    this.reJudgeValueType(this.projectSubmitData);
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
+                type:'get',
+                data:{
+                    projectId:this.projId
+                },
+                success:(response)=>{
+                    if(response.cd==0){
+                            this.projectSubmitData = response.rt;
+                    }
                 }
             })
+            // axios({
+            //     method:'get',
+            //     // url:this.BDMSUrl+'config2/component/getProjectGenieClass',
+            //     url:this.BDMSUrl+'projectInfo/getBiddingCode',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     // params:{
+            //     //     projId:this.projId,
+            //     //     tableName:'t32',
+            //     //     type:2
+            //     // },
+            //     params:{
+            //         projectId:this.projId
+            //     }
+
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         alert('随便')
+            //         this.projectSubmitData = response.data.rt;
+            //         // console.log(this.projectSubmitData,'this.projectSubmitData');
+            //         // this.reJudgeValueType(this.projectSubmitData);
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg)
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // })
         },
         //递归解析值类型
         reJudgeValueType(obj){
@@ -747,12 +771,60 @@ export default {
         setMeterial(scope){
             this.gouJianMapShow = true;
             this.setMaterialObject = scope;
-            this.getEntityMapping();
+            // this.getEntityMapping();
         },
         //添加构件映射信息
         projectMappedSure(){
             this.addProjectMappedShow = true;
             this.loadFirstSelectData();
+        },
+        //筛选名称
+        getProjectGenieClassByProject(){
+             var vm = this
+            axios({
+                method:'post',
+                // url:vm.BDMSUrl+'project2/Config/getProjectGenieClassByProjId',
+                url:vm.BDMSUrl+'/projectInfo/getComponentCode',
+                headers:{
+                    token:this.token
+                },
+                params:{
+                    // projId:this.projId
+                    // tableName:'t31'
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd == '0'){
+                    if( response.data.rt){
+                        this.constructorData = response.data.rt;
+                    }
+                }else if(response.data.cd == '-1'){
+                    alert(response.data.msg)
+                }
+            })
+
+        },
+        //筛选第一个下拉框
+        returnFirst(){
+            this.constructorData.forEach((item)=>{
+                if(item.classifyCode.substr(2,4)=='0000'){
+                    this.firstSelectData=item.children
+                }
+            })
+        },
+        returnSecond(data,oCode){
+            data.forEach((item)=>{
+                if(item.classifyCode.substr(2,2)==oCode){
+                    this.secondSelectData=item.children
+                }
+            })
+        },
+        returnThird(data,oCode){
+            data.forEach((item)=>{
+                if(item.classifyCode.substr(4,2)==oCode){
+                    this.thirdSelectData=item.children
+                }
+            })
         },
          //加载第一个下拉框
         loadFirstSelectData(){

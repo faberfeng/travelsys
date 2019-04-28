@@ -78,7 +78,7 @@
                     <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
                         <span class="item-property "  @click="drawingClick()">图<br>纸</span>
                         <!-- <span class="item-version " @click="versionClick()">版<br>本</span> -->
-                        <span class="item-version-3 " @click="annotationClick()">批<br>注</span>
+                        <span class="item-version-3 "  @click="annotationClick()">批<br>注</span>
                     </div>
             </div>
             <div v-show="screenLeft.item == 1"  class="screenRight_1">
@@ -186,7 +186,7 @@
                     <div class="yingsheProject">
                         <label class="yingsheProjectText">图纸列表 : </label>
                         <label class="editBtnS yingsheProjectBtn" for="drawingsInfo">选择文件</label>
-                        <input class="upInput"  type="file"  @change="fileChanged($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                        <input class="upInput"  type="file" accept="image/*,application/pdf"  @change="fileChanged($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
                     </div>
                     <table class="fileContainer" border="1">
                         <thead>
@@ -770,6 +770,11 @@ export default {
                     //     "holderType": "",
                     //     "parentHolderId":null
                     // })
+                    this.getHoldersList.push({ 
+                        "dirId": null,
+                        "dirName": "无",
+                        "dirParId":null
+                    })
                    
 
 
@@ -1057,25 +1062,34 @@ export default {
         },
         annotationClick(){
             var vm=this;
-             this.screenLeft.item = 3
-            //  this.isSelect='';
-            //  this.biaozhushow=true;
-            // this.loadeds()
-            //  this.isSelect=this.drawingVersionId;
-            var fileUri=''
-             this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
-            fileUri=this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
-            vm.drawingFileUrl=this.BDMSUrl+'doc/download/'+this.fileGroupId;
-            this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
-            console.log(this.version,'this.version12')
-            var type=(fileUri.substr(fileUri.length-3)).toString();
-            console.log(type);
-            this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
-            console.log(this.drawingVersionId);
-            console.log(this.drawingVersionList);
-             setTimeout(()=>{
-                this.queryAnnotation();
-            },500)
+            if(vm.drawingName){
+                  this.screenLeft.item = 3
+                //  this.isSelect='';
+                //  this.biaozhushow=true;
+                // this.loadeds()
+                //  this.isSelect=this.drawingVersionId;
+                var fileUri=''
+                this.drawingVersionId=this.drawingVersionList[this.drawingVersionList.length-1].id;
+                fileUri=this.drawingVersionList[this.drawingVersionList.length-1].fileUri;
+                vm.drawingFileUrl=this.BDMSUrl+'doc/download/'+this.fileGroupId;
+                this.version=this.drawingVersionList[this.drawingVersionList.length-1].versionId;
+                console.log(this.version,'this.version12')
+                var type=(fileUri.substr(fileUri.length-3)).toString();
+                console.log(type);
+                this.paraList={type:type,source:vm.drawingFileUrl,angle:this.rotate};
+                console.log(this.drawingVersionId);
+                console.log(this.drawingVersionList);
+                setTimeout(()=>{
+                    this.queryAnnotation();
+                },500)
+
+            }else{
+                this.$message({
+                    type:'info',
+                    message:'请选择需要批注的图纸'
+                })
+            }
+           
             // this.queryAnnotation();
         },
         //更新图纸旋转信息
@@ -2000,11 +2014,16 @@ export default {
                     vm.drawingsUploadShow = true;
                     // vm.getHolders()
                     this.getHoldersList=[];
-                    this.getHoldersList.push({ 
-                        "holderId": null,
-                        "holderName": "无",
-                        "holderType": "",
-                        "parentHolderId":null
+                    // this.getHoldersList.push({ 
+                    //     "holderId": null,
+                    //     "holderName": "无",
+                    //     "holderType": "",
+                    //     "parentHolderId":null
+                    // })
+                    this.getHoldersList.unshift({ 
+                        "dirId": null,
+                        "dirName": "无",
+                        "dirParId":null
                     })
                 }
             }
@@ -2251,21 +2270,11 @@ export default {
                 // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing',
+                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.directoryId+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+(vm.holderId==null?'':'&holderId='+vm.holderId)+(vm.buildId==null?'':'&buildId='+vm.buildId),
                         // url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',
                         headers:{
                             'token':vm.token,
                             'Content-Type': 'multipart/form-data'
-                        },
-                        params:{
-                            directory:vm.directoryId,
-                            drawingName:item.drawingName,
-                            drawingNumber:item.drawingNo,
-                            projectId:vm.projId,
-                            ratio:item.proportion,
-                            pageNo:'',
-                            holderId:vm.holderId,
-                            buildId:vm.buildId==null?'':vm.buildId,
                         },
                         data:formData,
                     }).then((response)=>{

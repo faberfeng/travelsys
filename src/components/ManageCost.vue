@@ -349,19 +349,29 @@ export default {
         //获得元素
         getElement(level,id){
             var vm=this;
-            axios({
-                url:vm.BDMSUrl+'api/v1/getElement',
-                params:{
-                    fileId:level,
-                    selectId:id,
-                }
-            }).then((response)=>{
-                if(response.data.cd==0){
-                    if(response.data.rt[response.data.rt.length-1].para2=='structure'){
-                        this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
+            $.ajax({
+                url:vm.BDMSUrl+'api/v1/getElement?fileId='+level+'&selectId='+id,
+                type:'get',
+                async:false,
+                success:(response)=>{
+                    if(response.cd==0){
+                        this.elementTracId.push(response.rt[response.rt.length-1].traceId)
                     }
                 }
             })
+            // axios({
+            //     url:vm.BDMSUrl+'api/v1/getElement',
+            //     params:{
+            //         fileId:level,
+            //         selectId:id,
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd==0){
+            //         if(response.data.rt[response.data.rt.length-1].para2=='structure'){
+            //             this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
+            //         }
+            //     }
+            // })
         },
         //生成清单
         createdMid(){
@@ -622,7 +632,7 @@ export default {
                             }
                         })
                     })
-                    // console.log(this.drawList,'最后的东西');
+                    console.log(this.drawList,'最后的东西');
                     app.postMessage({command:"DrawingList", parameter:this.drawList},"*")
                     // this.drawingWebGlType=(response.data.rt.substr(response.data.rt.length-3)).toLocaleUpperCase();
                     // this.drawingWebGlUrl=this.QJFileManageSystemURL+response.data.rt;
@@ -674,9 +684,9 @@ export default {
                     token:vm.token
                 },
                 async:false, //同步
-                success:function(response){
+                success:(response)=>{
                     if(response.cd==0){
-                        this.rotate=response.rt;
+                        this.rotate=(response.rt==null?0:response.rt.rotateInfo);
                     }
                 }
             })
@@ -732,9 +742,10 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projectName:'';
                     localStorage.setItem('projectName',vm.header.projectName);
                     
-                    vm.header.projectImg = response.data.rt[0].image?response.data.rt[0].image.filePath:'';
+                    vm.header.projectImg = response.data.rt.image[0]?response.data.rt.image[0].path:'';
+                    console.log(vm.header.projectImg,'vm.header.projectImg');
                     this.$store.commit('changeProjectLogo',{
-                        projectImg:vm.header.projectImg
+                        projectImg:vm.BDMSUrl+vm.header.projectImg
                     })
                     if(vm.header.projectImg){
                         this.$store.commit('switchLogo',{
@@ -994,10 +1005,10 @@ export default {
                                 title:'/setting/constructordesigncode',
                                 linkUrl:'设计构件分类编码'
                             },
-                            // {
-                            //     title:'/setting/projectsubmit',
-                            //     linkUrl:'工程招标分类编码'
-                            // },
+                            {
+                                title:'/setting/projectsubmit',
+                                linkUrl:'工程招标分类编码'
+                            },
                             // {
                             //     title:'/setting/materialpurchase',
                             //     linkUrl:'物资采购分类编码'

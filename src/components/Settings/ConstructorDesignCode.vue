@@ -842,7 +842,7 @@ export default {
                         this.constructorData = response.data.rt;
                         this.diGuiStatus(this.constructorData);
                         this.diGuiSource(this.constructorData);
-                        this.diGuiColor(this.constructorData);
+                        // this.diGuiColor(this.constructorData);
                     }
                 }else if(response.data.cd == '-1'){
                     alert(response.data.msg)

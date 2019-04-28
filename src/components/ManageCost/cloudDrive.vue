@@ -691,7 +691,7 @@
                     <div class="yingsheProject">
                         <label class="yingsheProjectText">图纸列表 : </label>
                         <label class="editBtnS yingsheProjectBtn" for="drawingsInfo">选择文件</label>
-                        <input class="upInput"  type="file"  @change="fileChanged($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
+                        <input class="upInput"  type="file" accept="image/*,application/pdf"  @change="fileChanged($event)" ref="drawingsInfo"  id="drawingsInfo" multiple="multiple">
                     </div>
                     <table class="fileContainer" border="1">
                         <thead>
@@ -723,7 +723,7 @@
                                 </td>
                                 <td>
                                     <select v-model="getHolderId" class="inp-search">
-                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.holderId" v-html="val.holderName"></option>
+                                        <option v-for="(val,index) in getHoldersList" :key="index" :value="val.dirId" v-html="val.dirName"></option>
                                     </select>
                                     <i class="icon-sanjiao"></i>
                                 </td>
@@ -3133,6 +3133,7 @@ export default {
             var vm=this;
             this.getHoldersList=[];
              axios({
+                // url:vm.BDMSUrl+'dc/drawingReview/getHolders',
                 url:vm.BDMSUrl+'dc/drawingReview/getHolders',
                 method:'get',
                 headers:{
@@ -3162,24 +3163,23 @@ export default {
                 //      })
 
 
-                        var getHolder=''
+                        var getHolder=[]
                         getHolder=response.data.rt;
-
-                        getHolder.forEach((item)=>{
-                            if(vm.checkFileDir.buildId==item.dirParId){
-                                this.getHoldersList.push({
-                                    "holderId": item.dirId?item.dirId:null,
-                                    "holderName": item.dirName?item.dirName:'',
-                                    "holderType": "",
-                                    "parentHolderId":item.dirParId?item.dirParId:null
-                                })
-                            }
-                        })
+                        this.getHoldersList=getHolder;
+                        // getHolder.forEach((item)=>{
+                        //     if(vm.checkFileDir.buildId==item.dirParId){
+                        //         this.getHoldersList.push({
+                        //             "holderId": item.dirId?item.dirId:null,
+                        //             "holderName": item.dirName?item.dirName:'',
+                        //             "holderType": "",
+                        //             "parentHolderId":item.dirParId?item.dirParId:null
+                        //         })
+                        //     }
+                        // })
                         this.getHoldersList.unshift({ 
-                            "holderId": null,
-                            "holderName": "无",
-                            "holderType": "",
-                            "parentHolderId":null
+                            "dirId": null,
+                            "dirName": "无",
+                            "dirParId":null
                         })
                         console.log(this.getHoldersList,'this.getHoldersList');
                 }else{
@@ -3295,22 +3295,23 @@ export default {
                 // console.log(this.$refs.pdfDocument_upload);
                 axios({
                         method:'POST',
-                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing',
+                        
+                        url:vm.BDMSUrl+'dc/drawingReview/addDrawing?projectId='+vm.projId+'&drawingNumber='+item.drawingNo+'&directory='+vm.checkFileDir.t31code+'&drawingName='+encodeURIComponent(item.drawingName)+'&ratio='+item.proportion+'&pageNo=1'+(vm.getHolderId==null?'':'&holderId='+vm.getHolderId)+(vm.checkFileDir.buildId==null?'':'&buildId='+vm.checkFileDir.buildId),
                         // url:vm.QJFileManageSystemURL+ 'uploading/uploadFileInfo',
                         headers:{
                             'Content-Type': 'multipart/form-data',
                             'token':vm.token
                         },
-                        params:{
-                            directory:vm.checkFileDir.t31code,
-                            drawingName:item.drawingName,
-                            drawingNumber:item.drawingNo,
-                            projectId:vm.projId,
-                            ratio:item.proportion,
-                            pageNo:'',
-                            holderId:vm.getHolderId,
-                            buildId:vm.checkFileDir.buildId==null?'':vm.checkFileDir.buildId,
-                        },
+                        // params:{
+                        //     directory:vm.checkFileDir.t31code,
+                        //     drawingName:item.drawingName,
+                        //     drawingNumber:item.drawingNo,
+                        //     projectId:vm.projId,
+                        //     ratio:item.proportion,
+                        //     pageNo:'',
+                        //     holderId:vm.getHolderId,
+                        //     buildId:vm.checkFileDir.buildId==null?'':vm.checkFileDir.buildId,
+                        // },
                         data:formData,
                     }).then((response)=>{
                         if(response.data.cd=='0'){
@@ -3691,10 +3692,9 @@ export default {
                     // vm.getHolders()
                     this.getHoldersList=[];
                     this.getHoldersList.push({ 
-                        "holderId": null,
-                        "holderName": "无",
-                        "holderType": "",
-                        "parentHolderId":null
+                        "dirId": null,
+                        "dirName": "无",
+                        "dirParId":null
                     })
                 }
         }
@@ -5076,6 +5076,7 @@ export default {
             vm.getDrawingIdByFgId()
             if(file){
                 console.log(this.fgIdListById,'fgIdList000');
+                // vm.getDrawingIdByFgId()
                 vm.PointFigure.oldname = vm.fileList[val].fgName
                 vm.PointFigure.fgID = vm.fileList[val].fgId
                 vm.checkedItem = {}

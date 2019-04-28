@@ -2491,20 +2491,20 @@ export default Vue.component('common-list',{
                     prop:'id',
                 },
                 {
-                    name:'单体Id',
+                    name:'所在层级',
                     show:true,
-                    prop:'traceId',
+                    prop:'directoryName',
                 },
-                {
-                    name:'所在分区',
-                    show:true,
-                    prop:'dDistrict',
-                },
-                {
-                    name:'所在楼层',
-                    show:true,
-                    prop:'dStorey',
-                },
+                // {
+                //     name:'所在分区',
+                //     show:true,
+                //     prop:'dDistrict',
+                // },
+                // {
+                //     name:'所在楼层',
+                //     show:true,
+                //     prop:'dStorey',
+                // },
                 {
                     name:'类型名称',
                     show:true,
