@@ -225,9 +225,9 @@ export default {
         // window.removeEventListener("message", (evt)=>{
         //         this.callback(evt)}
         // );
-           window.addEventListener("message", (evt)=>{
-                       this.callback(evt)},false
-        );
+        // window.addEventListener("message", (evt)=>{
+        //                this.callback(evt)},false
+        // );
         vm.projId = localStorage.getItem('projId');//获取工程编号
         vm.subProjId=localStorage.getItem('defaultSubProjId');
         vm.entId=localStorage.getItem('entId');
@@ -282,13 +282,26 @@ export default {
         // );
         // console.log('updated')
         // vm.getUserInfo();
+        // console.log('是否更新')
+        // if(document.getElementById('webgl').style.display=='none'){
+        //     window.removeEventListener("message", (evt)=>{
+        //             this.callback(evt),false}
+        //          );
+        //          console.log('图形销毁')
+
+        // }else{
+        //      window.addEventListener("message", (evt)=>{
+        //                this.callback(evt)},false
+        //             );
+
+        // }
                   
     },
     destoryed(){
         var vm=this;
-        window.removeEventListener("message", (evt)=>{
-                this.callback(evt),false}
-        );
+        // window.removeEventListener("message", (evt)=>{
+        //         this.callback(evt),false}
+        // );
         console.log('是否销毁');
         // this.IframeClose();
     },
@@ -312,6 +325,17 @@ export default {
                         // window.removeEventListener("message", (evt)=>{
                         //     this.callback(evt)},true);
                 },1000)
+            }
+            if(this.webGlShow){
+                 window.addEventListener("message", (evt)=>{
+                       this.callback(evt)},false
+                    );
+                    console.log('图形生成')
+            }else{
+                window.removeEventListener("message", (evt)=>{
+                    this.callback(evt),false}
+                 );
+                 console.log('图形销毁')
             }
         },
 
@@ -690,7 +714,7 @@ export default {
                     }
                 }
             })
-            return this.rotate;
+            return parseInt(this.rotate);
 
         },
         //获取项目模型展示初始化数据
@@ -742,10 +766,10 @@ export default {
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projectName:'';
                     localStorage.setItem('projectName',vm.header.projectName);
                     
-                    vm.header.projectImg = response.data.rt.image[0]?response.data.rt.image[0].path:'';
+                    vm.header.projectImg = response.data.rt.image.length!=0?vm.BDMSUrl+response.data.rt.image[0].path:null;
                     console.log(vm.header.projectImg,'vm.header.projectImg');
                     this.$store.commit('changeProjectLogo',{
-                        projectImg:vm.BDMSUrl+vm.header.projectImg
+                        projectImg:vm.header.projectImg
                     })
                     if(vm.header.projectImg){
                         this.$store.commit('switchLogo',{
@@ -903,9 +927,19 @@ export default {
                         //     path:'/Cost/management'//成本管理
                         // })
                         this.$router.push({
-                            path:this.firstGetSecondGradeList(this.moduleLists,'012','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory')
+                            path:this.firstGetSecondGradeList(this.moduleLists,'012','01205','/Cost/wuliaoList','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities' )
+                            // ,'01204','/Cost/inventory'
                         })
-                    }else if(vm.navigationPath==='016'){
+                    }
+                    // else if(vm.navigationPath==='021'){
+                    //     // vm.$router.push({
+                    //     //     path:'/Cost/management'//成本管理//无锡市政院
+                    //     // })
+                    //     this.$router.push({
+                    //         path:this.firstGetSecondGradeList(this.moduleLists,'021','02105','/Cost/wuliaoList')
+                    //     })
+                    // }
+                    else if(vm.navigationPath==='016'){
                         // vm.$router.push({
                         //     path:'/liveConnect/fieldConnection'//现场连线
                         // })
@@ -1008,7 +1042,11 @@ export default {
                             {
                                 title:'/setting/projectsubmit',
                                 linkUrl:'工程招标分类编码'
-                            },
+                            }
+                            // {
+                            //     title:'/setting/wuliaoList',
+                            //     linkUrl:'楼层物料量清单'
+                            // }
                             // {
                             //     title:'/setting/materialpurchase',
                             //     linkUrl:'物资采购分类编码'
@@ -1179,7 +1217,7 @@ export default {
                 //     path:'/Cost/management'
                 // })
                 this.$router.push({
-                    path:this.firstGetSecondGradeList(this.moduleLists,'012','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory')
+                    path:this.firstGetSecondGradeList(this.moduleLists,'012','01205','/Cost/wuliaoList','01201','/Cost/management','01202','/Cost/goujianList','01203','/Cost/quantities','01204','/Cost/inventory')
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

@@ -2696,7 +2696,7 @@ export default {
         upload,commonList,uploadPanorama,uploadBasic
     },
     data() {
-        //  window.addEventListener("message", (evt)=>{this.callback(evt)});
+         window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             elementTracId:'',
             routerList:'',
@@ -3022,7 +3022,7 @@ export default {
                   CurrentSelectPara=e.data.parameter[0];
                   CurrentSelectedEntList=e.data.parameter;
                 //   console.log(CurrentSelectPara,'CurrentSelectPara');
-                //   console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
+                  console.log(CurrentSelectedEntList,'CurrentSelectedEntList');
                 break;
               case "ViewpointSubmited":
                         break;

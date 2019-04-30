@@ -60,7 +60,7 @@
               <div class="taskHeadRight">
                 <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
-                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="fDplay()">4D播放</span>
+                <span class="btn-operate" v-show="projectGanntShow" @click="fDplay()">4D播放</span>
                 <span class="btn-operate"  v-show="projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
                 <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
 
@@ -154,7 +154,7 @@
                          <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
                       </template>
                       <template slot="verifyNum" slot-scope="scope">
-                          <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="scope.row.realTaskStart==null?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider>
+                          <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="(scope.row.realTaskStart==null||scope.row.actualStatusStr=='全部完成')?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider>
                       </template>
                       <template slot="milepost" slot-scope="scope">
                           {{scope.row.taskType==1?'是':'否'}}
@@ -192,8 +192,10 @@
                           <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
                          
                         </template>
-                        
-                        <template slot="verifyTime" slot-scope="scope">
+                        <!-- <template slot="taskName" slot-scope="scope">
+                          {{splitName(scope.row.taskName)}}
+                        </template> -->
+                        <!-- <template slot="verifyTime" slot-scope="scope">
                           <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
                         </template>
                         <template slot="verifyNum" slot-scope="scope">
@@ -201,9 +203,11 @@
                         </template>
                         <template slot="milepost" slot-scope="scope">
                             {{scope.row.taskType==1?'是':'否'}}
-                        </template>
-                        <template slot="taskName" slot-scope="scope">
-                            {{scope.row.taskName}}
+                        </template> -->
+                        <template slot="task" slot-scope="scope">
+                            <el-tooltip :content="scope.row.taskName" placement="top">
+                              <span style="cursor:pointer" >{{scope.row.taskName | splitRemark()}}</span>
+                            </el-tooltip>
                         </template>
                         <template slot="taskStart" slot-scope="scope">
                           {{scope.row.taskStart | timeChange()}}
@@ -211,7 +215,7 @@
                         <template slot="taskEnd" slot-scope="scope">
                           {{scope.row.taskEnd | timeChange()}}
                         </template>
-                        <template slot="realTaskStart" slot-scope="scope">
+                        <!-- <template slot="realTaskStart" slot-scope="scope">
                           {{scope.row.realTaskStart | timeChange()}}
                         </template>
                         <template slot="realTaskEnd" slot-scope="scope">
@@ -219,7 +223,7 @@
                         </template>
                         <template slot="taskDuration" slot-scope="scope">
                           {{scope.row.taskDuration + '天'}}
-                        </template>
+                        </template> -->
                     </zk-table>
                 </div>
                 <!-- <div style="float:right;width:0.04%;height:680px;color:#000"></div> -->
@@ -561,7 +565,7 @@
     </div>
     <div id="mask" v-if="labelListShow||ListHeaderShow"></div>
     <div id="edit">
-      <el-dialog title="编辑工程任务"   :visible.sync="addTaskDialog" @close="addTaskCancle">
+      <el-dialog title="编辑工程任务" v-dialogDrag   :visible.sync="addTaskDialog" @close="addTaskCancle">
           <div class="editBody" v-loading="loading"  >
             <div class="editBodyone">
               <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
@@ -647,7 +651,7 @@
           </div>
       </el-dialog>
 
-      <el-dialog title="4D播放"  width="600px"  :visible.sync="fdPlayDialog" @close="fdPlayCancle">
+      <el-dialog title="4D播放"  v-dialogDrag  width="600px"  :visible.sync="fdPlayDialog" @close="fdPlayCancle">
           <div class="editBody" v-loading="loading"  >
             <div class="editBodytwo1">
                 <div class="startTime">
@@ -675,7 +679,7 @@
           </div>
       </el-dialog>
 
-      <el-dialog title="编辑工程任务" :visible.sync="editTaskDialog" @close="editTaskCancle">
+      <el-dialog title="编辑工程任务" v-dialogDrag :visible.sync="editTaskDialog" @close="editTaskCancle">
         <div class="editBody" v-loading="loading">
           <div class="editBodyone">
             <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
@@ -758,7 +762,7 @@
           <button class="editBtnC" @click="editTaskCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="添加前置任务" :visible.sync="addLinkDialog" @close="addLinkCancle">
+      <el-dialog title="添加前置任务" v-dialogDrag :visible.sync="addLinkDialog" @close="addLinkCancle">
         <div class="editBody" v-loading="loading">
           <div class="editBodytwo3">
             <zk-table :data="taskIndexData" :columns="columns1" :tree-type="props.treeType"
@@ -780,7 +784,7 @@
           <button class="editBtnC" @click="addLinkCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="进度查询" width="560px" :visible.sync="progressSearchDialog" @close="progressSearchCancle">
+      <el-dialog title="进度查询" width="560px" v-dialogDrag :visible.sync="progressSearchDialog" @close="progressSearchCancle">
         <div class="editBody">
           <div class="progressSearchBody">
             <label class="searchWayText">查询方式:</label>
@@ -915,7 +919,7 @@
           <button class="editBtnC" @click="progressSearchCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="产值查询" width="560px" :visible.sync="valueSearchDialog" @close="valueSearchCancle">
+      <el-dialog title="产值查询" width="560px" v-dialogDrag :visible.sync="valueSearchDialog" @close="valueSearchCancle">
         <div class="editBody">
           <div class="progressSearchBody">
             <label class="searchWayText">查询方式:</label>
@@ -973,7 +977,7 @@
           <button class="editBtnC" @click="valueSearchCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="上传文件" width="586px" :visible.sync="uploadFileDialog" @close="uploadFileCancle">
+      <el-dialog title="上传文件" width="586px" v-dialogDrag :visible.sync="uploadFileDialog" @close="uploadFileCancle">
         <div class="editBody">
           <div class="editBodytwo imageBody">
             <label class="imageBodyText">上传文件 :</label>
@@ -992,7 +996,7 @@
           <button class="editBtnC" @click="uploadFileCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="上传图片" width="580px" :visible.sync="uploadPicDialog" @close="uploadPicCancle">
+      <el-dialog title="上传图片" width="580px" v-dialogDrag :visible.sync="uploadPicDialog" @close="uploadPicCancle">
         <div class="editBody">
           <div class="editBodytwo imageBody">
             <label class="imageBodyText">上传文件 :</label>
@@ -1011,7 +1015,7 @@
           <button class="editBtnC" @click="uploadPicCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="导入project文件" width="580px" :visible.sync="exportProjectDialog" @close="exportProjectCancle">
+      <el-dialog title="导入project文件" width="580px" v-dialogDrag :visible.sync="exportProjectDialog" @close="exportProjectCancle">
         <div class="editBody">
           <div class="editBodytwo imageBody">
             <label class="imageBodyText">上传文件 :</label>
@@ -1030,7 +1034,7 @@
           <button class="editBtnC" @click="exportProjectCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="添加核实任务" :visible.sync="addVerifyTaskDialog" @close="addVerifyTaskCancle">
+      <el-dialog title="添加核实任务" v-dialogDrag :visible.sync="addVerifyTaskDialog" @close="addVerifyTaskCancle">
         <div class="editBody">
           <div class="verifySilder">
             <label class="verifySilderText">核实比例:</label>
@@ -1047,7 +1051,7 @@
           <button class="editBtnC" @click="addVerifyTaskCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="选择关联清单"  :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
+      <el-dialog title="选择关联清单"  v-dialogDrag  :visible.sync="addAssociationListDialog" @close="addAssociationListCancle">
         <div class="editBody" v-loading="loading">
           <div class="bindListHead">
             <div class="bindListHeadLeft">
@@ -1187,7 +1191,7 @@
           <button class="editBtnC" @click="addAssociationListCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="添加资源类别" width="580px" :visible.sync="addResourceTaskDialog" @close="addResourceTaskCancle">
+      <el-dialog title="添加资源类别" v-dialogDrag width="580px" :visible.sync="addResourceTaskDialog" @close="addResourceTaskCancle">
         <div class="editBody">
           <div class="resourceText1">
             <label>资源类别名称：</label>
@@ -1219,7 +1223,7 @@
           <button class="editBtnC" @click="addResourceTaskCancle">取消</button>
         </div>
       </el-dialog>
-      <el-dialog title="移动任务" :visible.sync="removeTaskDialog" @close="removeTaskCancle">
+      <el-dialog title="移动任务" v-dialogDrag :visible.sync="removeTaskDialog" @close="removeTaskCancle">
         <div class="editBody">
           <div class="editBodytwo3">
             <zk-table :data="taskIndexData" :columns="columns1" :tree-type="props.treeType"
@@ -1258,7 +1262,7 @@
       
     </div>
     <div id="edit1">
-      <el-dialog title="群组权限" :visible.sync="userGroupTaskDialog" @close="userGroupTaskCancle">
+      <el-dialog title="群组权限" v-dialogDrag :visible.sync="userGroupTaskDialog" @close="userGroupTaskCancle">
         <div class="editBody">
           <div class="userGroupHead">
             <label class="userGroupText">下列勾选的群组可以访问任务：</label>
@@ -1285,7 +1289,7 @@
 
     </div>
     <div id="inital">
-      <el-dialog :visible.sync="deleteTaskDialog" width="398px" @close="deleteTaskClose">
+      <el-dialog v-dialogDrag :visible.sync="deleteTaskDialog" width="398px" @close="deleteTaskClose">
         <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
         <p class="deleteDialogWarning" v-show="showText1">你要删除当前所选的任务及所有子任务？</p>
         <p class="deleteDialogWarning" v-show="showText">你要删除当前所选的任务？</p>
@@ -1295,7 +1299,7 @@
           <button class="cancelBtn" @click="deleteTaskClose">取消</button>
         </div>
       </el-dialog>
-      <el-dialog :visible.sync="deleteLinkTaskDialog" width="398px" @close="deleteLinkTaskClose">
+      <el-dialog v-dialogDrag :visible.sync="deleteLinkTaskDialog" width="398px" @close="deleteLinkTaskClose">
         <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
         <p class="deleteDialogWarning">你要删除当前所选的前置任务？</p>
         <p class="deleteDialogText">确定删除吗?</p>
@@ -1304,7 +1308,7 @@
           <button class="cancelBtn" @click="deleteLinkTaskClose">取消</button>
         </div>
       </el-dialog>
-      <el-dialog :visible.sync="deleteFileDialog" width="398px" @close="deleteFileClose">
+      <el-dialog v-dialogDrag :visible.sync="deleteFileDialog" width="398px" @close="deleteFileClose">
         <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
         <!-- <p class="deleteDialogWarning"></p> -->
         <p class="deleteDialogText">你要删除该任务关联文件？</p>
@@ -1313,7 +1317,7 @@
           <button class="cancelBtn" @click="deleteFileClose">取消</button>
         </div>
       </el-dialog>
-      <el-dialog :visible.sync="deleteTaskResourceDialog" width="398px" @close="deleteTaskResourceClose">
+      <el-dialog v-dialogDrag :visible.sync="deleteTaskResourceDialog" width="398px" @close="deleteTaskResourceClose">
         <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
         <!-- <p class="deleteDialogWarning"></p> -->
         <p class="deleteDialogText">确定要删除该任务下的资源分配？</p>
@@ -1322,7 +1326,7 @@
           <button class="cancelBtn" @click="deleteTaskResourceClose">取消</button>
         </div>
       </el-dialog>
-      <el-dialog :visible.sync="deleteAssociationListDialog" width="398px" @close="deleteAssociationListClose">
+      <el-dialog v-dialogDrag :visible.sync="deleteAssociationListDialog" width="398px" @close="deleteAssociationListClose">
         <div class="deleteDialogImg"><img src="../../assets/warning.png"/></div>
         <!-- <p class="deleteDialogWarning"></p> -->
         <p class="deleteDialogText">确定要将清单与当前任务解除关联关系吗？</p>
@@ -2110,7 +2114,7 @@
               label: '名称',
               prop: 'taskName',
               type: 'template',
-              template: 'taskName',
+              template: 'task',
               width: '140px'
             },
             // {
@@ -2310,12 +2314,7 @@
           return moment(val).format("YYYY-MM-DD");
         }
       },
-      splitName(val){
-        if(val){
-          return val.substring(0,10);
-        }
-
-      },
+      
       splitRemark(val){
         if(val){
           return val.substring(0,5);
@@ -2344,6 +2343,11 @@
 
     },
     methods: {
+      splitName(val){
+        if(val){
+          return val.substring(0,10);
+        }
+      },
        ls(evt){
           
           this.callback(evt),
@@ -2917,7 +2921,11 @@
             this.taskIndexDataList.forEach((item)=>{
               this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
               this.$set(item,'currentDate',Date.parse(new Date()))
+              // if(item.statusNum==NaN){
+              //   item.statusNum=100
+              // }
             })
+            console.log(this.taskIndexDataList,'this.taskIndexDataList00');
             this.taskIndexSelectDataList.forEach((item)=>{
               this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
             })

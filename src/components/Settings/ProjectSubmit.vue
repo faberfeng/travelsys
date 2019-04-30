@@ -4,24 +4,29 @@
             <h4 class="title"><span>工程招标分类编码</span></h4>
             <div class="manageWorktool" >
                 <span class="worktooltitle">分类编码</span>
-                <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button>
+                <!-- <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button> -->
                 <div class="worktable">
                     <zk-table 
                     index-text="序号"
                     :data="projectSubmitData" :columns="columns" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                     :border="props.border" empty-text="正在加载...">
+                        <template slot="other" slot-scope="scope">
+                            <div v-if="scope.row.children.length==0">
+                                {{splitOther(scope.row.other)}}
+                            </div>
+                        </template>
                         <template slot="action" slot-scope="scope">
-                            <!-- <div v-if="scope.row.level == 4"> -->
+                            
                             <div v-if="scope.row.children.length==0">
                                 <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>
-                                <button class="actionBtn expandProperty" title="编辑特性"  @click="editProperty(scope)"></button>
+                                <!-- <button class="actionBtn expandProperty" title="编辑特性"  @click="editProperty(scope)"></button> -->
                             </div>
-                            <button class="actionBtn tiqingBtn" title="提请"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
+                            <!-- <button class="actionBtn tiqingBtn" title="提请"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
                             <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
                             <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
                             <button class="editBtn actionBtn" title="编辑" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
-                            <button class="deleteBtn actionBtn" title="删除" @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
+                            <button class="deleteBtn actionBtn" title="删除" @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button> -->
                         </template> 
                     </zk-table>
                 </div>
@@ -175,7 +180,7 @@
                         <button class="editBtnC" @click="editListCancelBtn">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="构件量映射信息" :visible.sync="gouJianMapShow" :before-close="projectMappedCancel">
+                <el-dialog title="构件量映射信息" v-dialogDrag :visible.sync="gouJianMapShow" :before-close="projectMappedCancel">
                     <div class="editBody" style="margin:0 30px">
                         <div class="yingsheProject">
                             <label class="yingsheProjectText">已添加的映射信息 : </label>
@@ -197,7 +202,7 @@
             </el-dialog>
             </div>
              <div id="ProjectTotalNumber">
-                <el-dialog  title="构件映射" :visible.sync="addProjectMappedShow" :before-close="addProjectMappedCancel">
+                <el-dialog  title="构件映射" v-dialogDrag :visible.sync="addProjectMappedShow" :before-close="addProjectMappedCancel">
                     <div class="editBody">
                         <div class="projectTitle">
                             <label  class="TitleText">构件分类 : </label>
@@ -224,22 +229,22 @@
                             </span>
                         </div>
                         <div class="calculate" >
-                            <div class="calculateLeft" style="overflow:hidden">
+                            <!-- <div class="calculateLeft" style="overflow:hidden">
                                 <span class="calculateResult">计量条件 : 结果为 <label>是/否</label></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangCondition"/>
                                     <button class="calculateBtn" @click="showConvenience(10000)">...</button>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="calculateRight" style="overflow:hidden">
-                                <span class="calculateResult">计量公式 : 结果为 <label>m2</label></span>
+                                <span class="calculateResult">计量公式 : 结果为 <label>{{inputGouJianFunctionValue}}</label></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
                                     <button class="calculateBtn" @click="showConvenience(20000)">...</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="symbolYingshe">特征映射 : </div>
+                        <!-- <div class="symbolYingshe">特征映射 : </div>
                         <div class="tableInputClass">
                             <table>
                                 <thead>
@@ -264,7 +269,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> -->
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addProjectMappedSure">确定</button>
@@ -280,35 +285,35 @@
                         </div>
                         <div class="projectSelect">
                             <span class="projectSpan">
-                                <input v-model="firstSelectTitle" class="editSelect" disabled style="background:none;"/>
+                                <input v-model="firstSelectName" class="editSelect" disabled style="background:none;"/>
                                 <i class="icon-down icon-downOne"></i>
                             </span>
                             <span class="projectSpan">
-                                <input v-model="secondSelectTitle" class="editSelect" disabled style="background:none;"/>
+                                <input v-model="secondSelectName" class="editSelect" disabled style="background:none;"/>
                                 <i class="icon-down icon-downTwo"></i>
                             </span>
                             <span class="projectSpan projectSpanLast">
-                                <input v-model="thirdSelectTitle" class="editSelect" disabled style="background:none;"/>
+                                <input v-model="thirdSelectName" class="editSelect" disabled style="background:none;"/>
                                 <i class="icon-down icon-downThree"></i>
                             </span>
                         </div>
                         <div class="calculate" >
-                            <div class="calculateLeft" style="overflow:hidden">
+                            <!-- <div class="calculateLeft" style="overflow:hidden">
                                 <span class="calculateResult">计量条件 : 结果为 <label>是/否</label></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangCondition"/>
                                     <button class="calculateBtn" @click="showConvenience(10000)">...</button>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="calculateRight" style="overflow:hidden">
-                                <span class="calculateResult">计量公式 : 结果为 <label>m2</label></span>
+                                <span class="calculateResult">计量公式 : 结果为 <label>{{inputGouJianFunctionValue}}</label></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
                                     <button class="calculateBtn" @click="showConvenience(20000)">...</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="symbolYingshe">特征映射 : </div>
+                        <!-- <div class="symbolYingshe">特征映射 : </div>
                         <div class="tableInputClass">
                             <table>
                                 <thead>
@@ -333,7 +338,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> -->
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="editProjectMappedSure">确定</button>
@@ -342,7 +347,7 @@
                 </el-dialog>
             </div>
             <div id="CInput" ref="convenienceInp">
-                <el-dialog  title="表达式快捷输入面板" :visible.sync="convenientInput" :before-close="cancelConveient"  :key="0">
+                <el-dialog  title="表达式快捷输入面板" v-dialogDrag :visible.sync="convenientInput" :before-close="cancelConveient"  :key="0">
                     <div class="editBody">
                         <div class="InputBody">
                             <div class="InputBodyLeft">
@@ -350,7 +355,7 @@
                                     <span>构件属性</span>
                                 </div>
                                 <select class="multipleSelectA" multiple="multiple" v-model="inputGouJianType">
-                                    <option v-for="(item,index) in goujianProperty" :key="index">{{item.code}}({{item.classifyName}})</option>
+                                    <option v-for="(item,index) in goujianProperty" :key="index">{{item.propertyName}}</option>
                                 </select>
                             </div>
                             <div class="InputBodyMiddle">
@@ -362,7 +367,7 @@
                                     <option>-(减)</option>
                                     <option>*(乘)</option>
                                     <option>/(除)</option>
-                                    <option>==(等于)</option>
+                                    <!-- <option>==(等于)</option>
                                     <option>！=(不等于)</option>
                                     <option>&lt;(小于)</option>
                                     <option>&le;(小于等于)</option>
@@ -370,24 +375,26 @@
                                     <option>&ge;(大于等于)</option>
                                     <option>&&(且)</option>
                                     <option>||(或)</option>
-                                    <option>!(非)</option>
+                                    <option>!(非)</option> -->
                                 </select>
                             </div>
                             <div class="InputBodyRight">
                                 <div class="InputBodyTitle">
-                                    <span>函数</span>
+                                    <span>单位</span>
                                 </div>
-                                <select class="multipleSelectC" multiple="multiple" v-model="inputGouJianFunction">
-                                    <option>()</option>
+                                <input class="multipleSelectC" v-model="inputGouJianFunctionValue"/>
+                                <!-- <select class="multipleSelectC" multiple="multiple" v-model="inputGouJianFunction">
+                                    <option>mm</option>
                                     <option>IF(A,B,C)</option>
                                     <option>SUB(A,B)</option>
-                                </select>
+                                </select> -->
                             </div>
                             <div class="InputBodyLast">
                                 <div class="InputBodyTitle">
                                     <span>可取值</span>
                                 </div>
                                 <select multiple="multiple" class="multipleSelectD" v-model="inputGouJianValue">
+                                    <!-- <option v-for="(item,index) in goujianProperty" :key="index">{{item.propertyName}}</option> -->
                                     <option>true</option>
                                     <option>false</option>
                                     <option>1</option>
@@ -405,6 +412,7 @@
                                     <option>10000</option>
                                 </select>
                             </div>
+
                         </div>
                     </div>   
                     <div slot="footer" class="dialog-footer">
@@ -475,11 +483,13 @@ export default {
                     prop: 'classifyName',
                     minWidth: '150px',
                 },
-                // {
-                //     label: '计量单位',
-                //     minWidth:'150px',
-                //     prop:'unit'
-                // },
+                {
+                    label: '计量单位',
+                    minWidth:'150px',
+                    prop:'other',
+                    type:'template',
+                    template:'other',
+                },
                 // {
                 //     label: '规则注释',
                 //     prop: 'regular',
@@ -527,14 +537,14 @@ export default {
             columnsProject:[
                 {
                     label: '项目名称',
-                    prop: 'classifyName',
+                    prop: 'biddingName',
                     width:'80px'
                 },
-                {
-                    label: '计量条件',
-                    prop: 'calCondition',
-                    width:'80px'
-                },
+                // {
+                //     label: '计量条件',
+                //     prop: 'calCondition',
+                //     width:'80px'
+                // },
                 {
                     label: '计量公式 ',
                     prop: 'formula',
@@ -619,10 +629,13 @@ export default {
             setMaterialObject:{},
             projectNumber:'',
             firstSelectTitle:'',
+            firstSelectName:'',
             firstSelectData:[],
             secondSelectTitle:'',
+            secondSelectName:'',
             secondSelectData:[],
             thirdSelectTitle:'',
+            thirdSelectName:'',
             thirdSelectData:[],
             jiLiangCondition:'',
             jiLiangResult:'',
@@ -631,7 +644,8 @@ export default {
             editProjectMappedShow:false,
             inputGouJianType:[],
             inputGouJianCalculate:[],
-            inputGouJianFunction:[],
+            inputGouJianFunction:'',
+            inputGouJianFunctionValue:'',
             inputGouJianValue:[],
             showConvenienceType:'',
             showConvenienceObject:{},
@@ -640,6 +654,9 @@ export default {
             localType:'',
             localStatus:''
         }
+    },
+    filters:{
+       
     },
     created(){
         var vm = this
@@ -650,6 +667,13 @@ export default {
         this.getProjectGenieClass();
     },
     methods:{
+         splitOther(val){
+            if(val==null){
+                return '未知'
+            }else{
+                return val
+            }
+        },
         //获得构件属性语意编码树
         getProjectGenieClass(){
             $.ajax({
@@ -744,20 +768,23 @@ export default {
                 return "工程标准";
             }
         },
+        //获取工程表达式
         getEntityMapping(){
+            this.projectMappingData=[];
             axios({
                 method:'post',
-                url:this.BDMSUrl+'project2/Config/getEntityMapping',
+                // url:this.BDMSUrl+'project2/Config/getEntityMapping',
+                url:this.BDMSUrl+'projectInfo/getCodeFormula',
                 headers:{
                     token:this.token
                 },
                 params:{
-                    genieclassId:this.setMaterialObject.row.id,
+                    code:this.setMaterialObject.row.classifyCode,
                     projectId:this.projId
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
-                    this.projectMappingData = response.data.rt.rows;
+                    this.projectMappingData = response.data.rt;
                 }else if(response.data.cd =='-1'){
                     alert(response.data.msg)
                 }else{
@@ -771,7 +798,7 @@ export default {
         setMeterial(scope){
             this.gouJianMapShow = true;
             this.setMaterialObject = scope;
-            // this.getEntityMapping();
+            this.getEntityMapping();
         },
         //添加构件映射信息
         projectMappedSure(){
@@ -805,134 +832,145 @@ export default {
 
         },
         //筛选第一个下拉框
-        returnFirst(){
-            this.constructorData.forEach((item)=>{
-                if(item.classifyCode.substr(2,4)=='0000'){
-                    this.firstSelectData=item.children
-                }
-            })
-        },
-        returnSecond(data,oCode){
-            data.forEach((item)=>{
-                if(item.classifyCode.substr(2,2)==oCode){
-                    this.secondSelectData=item.children
-                }
-            })
-        },
-        returnThird(data,oCode){
-            data.forEach((item)=>{
-                if(item.classifyCode.substr(4,2)==oCode){
-                    this.thirdSelectData=item.children
-                }
-            })
-        },
+      
          //加载第一个下拉框
         loadFirstSelectData(){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    obscureCode:'__0000',
-                    codeLength:6,
-                    tableNo:'t31',
-                    projId:this.projId,
-                    type:1
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         obscureCode:'__0000',
+            //         codeLength:6,
+            //         tableNo:'t31',
+            //         projId:this.projId,
+            //         type:1
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         this.firstSelectData = response.data.rt;
+            //         this.firstSelectTitle = this.firstSelectData[0].classifyCode;
+            //         this.loadSecondSelectData(this.firstSelectTitle.substr(0,2));
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // }) 
+             this.constructorData.forEach((item)=>{
+                if(item.classifyCode.substr(2,4)=='0000'){
+                    this.firstSelectData.push(item)
                 }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.firstSelectData = response.data.rt;
-                    this.firstSelectTitle = this.firstSelectData[0].classifyCode;
-                    this.loadSecondSelectData(this.firstSelectTitle.substr(0,2));
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            }) 
+            })
+            console.log(this.firstSelectData,'this.firstSelectData');
+            this.firstSelectTitle = this.firstSelectData[0].classifyCode;
+             this.firstSelectName = this.firstSelectData[0].classifyName;
+            this.loadSecondSelectData(this.firstSelectTitle)
         },
         //加载第二个下拉框
         loadSecondSelectData(oCode){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    obscureCode:oCode+'__00',
-                    codeLength:6,
-                    tableNo:'t31',
-                    projId:this.projId,
-                    type:1
+             this.constructorData.forEach((item)=>{
+                if(item.classifyCode==oCode){
+                    this.secondSelectData=item.children
                 }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.secondSelectData = response.data.rt;
-                    this.secondSelectData.splice(0,1);
-                    this.secondSelectTitle = this.secondSelectData[0].classifyCode;
-                    this.loadThirdSelectData(this.secondSelectTitle.substr(0,4));
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            }) 
+            })
+            this.secondSelectTitle = this.secondSelectData[0].classifyCode;
+            this.secondSelectName = this.secondSelectData[0].classifyName;
+            this.loadThirdSelectData(this.secondSelectData,this.secondSelectTitle)
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         obscureCode:oCode+'__00',
+            //         codeLength:6,
+            //         tableNo:'t31',
+            //         projId:this.projId,
+            //         type:1
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         this.secondSelectData = response.data.rt;
+            //         this.secondSelectData.splice(0,1);
+            //         this.secondSelectTitle = this.secondSelectData[0].classifyCode;
+            //         this.loadThirdSelectData(this.secondSelectTitle.substr(0,4));
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // }) 
+
+
         },
         //加载第三个下拉框
-        loadThirdSelectData(oCode){
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    obscureCode:oCode+'__',
-                    codeLength:6,
-                    tableNo:'t31',
-                    projId:this.projId,
-                    type:1
+        loadThirdSelectData(data,oCode){
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         obscureCode:oCode+'__',
+            //         codeLength:6,
+            //         tableNo:'t31',
+            //         projId:this.projId,
+            //         type:1
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         this.thirdSelectData = response.data.rt;
+            //         this.thirdSelectData.splice(0,1);
+            //         this.thirdSelectTitle = this.thirdSelectData[0].classifyCode;
+            //         this.projectNumber = this.thirdSelectTitle;
+            //         this.getEngineeringInfo();
+            //         this.getEntityPropertiesForEngineering();
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // }) 
+            data.forEach((item)=>{
+                if(item.classifyCode==oCode){
+                    this.thirdSelectData=item.children
                 }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.thirdSelectData = response.data.rt;
-                    this.thirdSelectData.splice(0,1);
-                    this.thirdSelectTitle = this.thirdSelectData[0].classifyCode;
-                    this.projectNumber = this.thirdSelectTitle;
-                    this.getEngineeringInfo();
-                    this.getEntityPropertiesForEngineering();
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            }) 
+            })
+            this.thirdSelectTitle = this.thirdSelectData[0].classifyCode;
+            this.thirdSelectName = this.thirdSelectData[0].classifyName;
+            this.projectNumber = this.thirdSelectTitle;
+            this.getEntityPropertiesForEngineering();
         },
          //第一个下拉框改变
         firstSelectTitleChange(){
-            var code = this.firstSelectTitle.substr(0,2);
+            // var code = this.firstSelectTitle.substr(0,2);
+            // this.loadSecondSelectData(code);
+            var code = this.firstSelectTitle;
             this.loadSecondSelectData(code);
         },
         //第二个下拉框改变
         secondSelectTitleChange(){
-            var code = this.secondSelectTitle.substr(0,4);
-            this.loadThirdSelectData(code);
+            var code = this.secondSelectTitle;
+            this.loadThirdSelectData(this.secondSelectData,code);
         },
         //第三个下拉框改变
         thirdSelectTitleChange(){
             // console.log(this.thirdSelectTitle)
             // var code = this.thirdSelectTitle.substr(0,6);
             this.projectNumber = this.thirdSelectTitle;
-            this.getEngineeringInfo();
+            // this.getEngineeringInfo();
+            this.getEntityPropertiesForEngineering();
         },
         //判断值类型
         judgeValueType(value){
@@ -982,13 +1020,14 @@ export default {
         getEntityPropertiesForEngineering(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
+                // url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
+                url:this.BDMSUrl+'projectInfo/getComponentBandProperty',
                 headers:{
                     token:this.token
                 },
                 params:{
-                    entityNumber:this.projectNumber,
-                    projId:this.projId
+                    componentCode:this.projectNumber,
+                    projectId:this.projId
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
@@ -1009,35 +1048,36 @@ export default {
         //确认添加
         addProjectMappedSure(){
             var arr = [];
-            this.addProjectMappingData.forEach((item,index)=>{
-                arr.push({
-                    id:item.id,
-                    formula:$('.TextInput')[index].value
-                })
-            })
-            if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
+            // this.addProjectMappingData.forEach((item,index)=>{
+            //     arr.push({
+            //         id:item.id,
+            //         formula:$('.TextInput')[index].value
+            //     })
+            // })
+            // this.jiLiangCondition == '' ||
+            if( this.jiLiangResult == ''){
                 alert('请输入完整表单');
             }else{
                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'project2/Config/addDesignMapping',
+                    // url:this.BDMSUrl+'project2/Config/addDesignMapping',
+                    url:this.BDMSUrl+'projectInfo/setCodeFormula',//设置工程表达式
                     headers:{
                         token:this.token
                     },
-                    data:{
-                        projId:this.projId,
-                        condition:this.jiLiangCondition,
-                        entityNumber:this.projectNumber,
-                        engineeringNumber:this.setMaterialObject.row.number,
+                    params:{
+                        projectId:this.projId,
+                        componentCode:this.projectNumber,
                         formula:this.jiLiangResult,
-                        mappings:arr,
-                        type:1
+                        biddingCode:this.setMaterialObject.row.classifyCode,
+                        unit:this.inputGouJianFunctionValue
                     }
                 }).then(response=>{
                     if(response.data.cd == '0'){
                         this.addProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
+                        this.inputGouJianFunctionValue='';
                         this.getEntityMapping();
                     }else if(response.data.cd == '-1'){
                         alert(response.data.msg)
@@ -1064,149 +1104,154 @@ export default {
             this.editProjectMappedShow = true;
             this.jiLiangCondition = scope.row.calCondition;
             this.jiLiangResult = scope.row.formula;
-            this.projectNumber = scope.row.entityNumber;
-            this.thirdSelectTitle = this.projectNumber.substr(4,4)+'-'+scope.row.classifyName;
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    obscureCode:'__0000',
-                    codeLength:6,
-                    tableNo:'t31',
-                    projId:this.projId,
-                    type:1
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    if(response.data.rt){
-                        response.data.rt.forEach(item=>{
-                            if(item.classifyCode.substr(0,2) == scope.row.entityNumber.substr(0,2)){
-                                this.firstSelectTitle = item.classifyCode.substr(0,2)+'-'+item.classifyName;
-                            }
-                        })
-                    }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            }) 
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    obscureCode:scope.row.entityNumber.substr(0,2)+'__00',
-                    codeLength:6,
-                    tableNo:'t31',
-                    projId:this.projId,
-                    type:1
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    if(response.data.rt){
-                        response.data.rt.forEach(item=>{
-                            if(item.classifyCode.substr(2,2) == scope.row.entityNumber.substr(2,2)){
-                                this.secondSelectTitle = item.classifyCode.substr(2,2)+'-'+item.classifyName;
-                            }
-                        })
-                    }
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            }) 
-            axios({
-                method:'post',
-                url:this.BDMSUrl+'project2/Config/getEngineeringInfo',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    projectId:this.projId,
-                    entityNumber:scope.row.entityNumber,
-                    tableNo:'t32',
-                    classifyCode:this.setMaterialObject.row.number
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.addProjectMappingData = response.data.rt.rows;
-                        this.addProjectMappingData.forEach(item=>{
-                            item = Object.assign(item,{
-                                valueType_:this.judgeValueType(item.valueType),
-                                formula_:item.formula===null? '@':item.formula
-                            })
-                        })
-                }else if(response.data.cd  == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
-            axios({
-                method:'get',
-                url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
-                headers:{
-                    token:this.token
-                },
-                params:{
-                    entityNumber:scope.row.entityNumber,
-                    projId:this.projId
-                }
-            }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.goujianProperty = response.data.rt;
-                }else if(response.data.cd  == '-1'){
-                    alert(response.data.msg)
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-            })
+            this.projectNumber = scope.row.code;
+            
+            // this.loadFirstSelectData()
+            this.thirdSelectName=scope.row.biddingName
+            this.inputGouJianFunctionValue=scope.row.unit
+            // this.thirdSelectTitle = this.projectNumber
+            this.getEntityPropertiesForEngineering();
+            
+            // .substr(4,4)+'-'+scope.row.classifyName;
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         obscureCode:'__0000',
+            //         codeLength:6,
+            //         tableNo:'t31',
+            //         projId:this.projId,
+            //         type:1
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         if(response.data.rt){
+            //             response.data.rt.forEach(item=>{
+            //                 if(item.classifyCode.substr(0,2) == scope.row.entityNumber.substr(0,2)){
+            //                     this.firstSelectTitle = item.classifyCode.substr(0,2)+'-'+item.classifyName;
+            //                 }
+            //             })
+            //         }
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // }) 
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/loadLevelXGenieClass',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         obscureCode:scope.row.entityNumber.substr(0,2)+'__00',
+            //         codeLength:6,
+            //         tableNo:'t31',
+            //         projId:this.projId,
+            //         type:1
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         if(response.data.rt){
+            //             response.data.rt.forEach(item=>{
+            //                 if(item.classifyCode.substr(2,2) == scope.row.entityNumber.substr(2,2)){
+            //                     this.secondSelectTitle = item.classifyCode.substr(2,2)+'-'+item.classifyName;
+            //                 }
+            //             })
+            //         }
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // }) 
+            // axios({
+            //     method:'post',
+            //     url:this.BDMSUrl+'project2/Config/getEngineeringInfo',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         projectId:this.projId,
+            //         entityNumber:scope.row.entityNumber,
+            //         tableNo:'t32',
+            //         classifyCode:this.setMaterialObject.row.number
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         this.addProjectMappingData = response.data.rt.rows;
+            //             this.addProjectMappingData.forEach(item=>{
+            //                 item = Object.assign(item,{
+            //                     valueType_:this.judgeValueType(item.valueType),
+            //                     formula_:item.formula===null? '@':item.formula
+            //                 })
+            //             })
+            //     }else if(response.data.cd  == '-1'){
+            //         alert(response.data.msg)
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // })
+            // axios({
+            //     method:'get',
+            //     url:this.BDMSUrl+'project2/Config/getEntityPropertiesForEngineering',
+            //     headers:{
+            //         token:this.token
+            //     },
+            //     params:{
+            //         entityNumber:scope.row.entityNumber,
+            //         projId:this.projId
+            //     }
+            // }).then(response=>{
+            //     if(response.data.cd == '0'){
+            //         this.goujianProperty = response.data.rt;
+            //     }else if(response.data.cd  == '-1'){
+            //         alert(response.data.msg)
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+            // })
         },
         //确认编辑
         editProjectMappedSure(scope){
-            var arr = [];
-            this.addProjectMappingData.forEach((item,index)=>{
-                arr.push({
-                    id:item.id,
-                    formula:$('.TextInput')[index].value
-                })
-            })
-            if(this.jiLiangCondition == '' || this.jiLiangResult == ''){
+            // var arr = [];
+            // this.addProjectMappingData.forEach((item,index)=>{
+            //     arr.push({
+            //         id:item.id,
+            //         formula:$('.TextInput')[index].value
+            //     })
+            // })
+            if(this.jiLiangResult == ''){
                 alert('请输入完整表单');
             }else{
-                axios({
+                 axios({
                     method:'post',
-                    url:this.BDMSUrl+'project2/Config/addDesignMapping',
+                    // url:this.BDMSUrl+'project2/Config/addDesignMapping',
+                    url:this.BDMSUrl+'projectInfo/setCodeFormula',//设置工程表达式
                     headers:{
                         token:this.token
                     },
-                    data:{
-                        projId:this.projId,
-                        condition:this.jiLiangCondition,
-                        entityNumber:this.projectNumber,
-                        engineeringNumber:this.setMaterialObject.row.number,
+                    params:{
+                        projectId:this.projId,
+                        componentCode:this.projectNumber,
                         formula:this.jiLiangResult,
-                        mappings:arr,
-                        type:2
+                        biddingCode:this.setMaterialObject.row.classifyCode
                     }
                 }).then(response=>{
                     if(response.data.cd == '0'){
-                        this.editProjectMappedShow = false;
+                       this.editProjectMappedShow = false;
                         this.jiLiangCondition = '';
                         this.jiLiangResult = '';
                         this.getEntityMapping();
@@ -1218,6 +1263,35 @@ export default {
                         })
                     }
                 })
+                // axios({
+                //     method:'post',
+                //     url:this.BDMSUrl+'project2/Config/addDesignMapping',
+                //     headers:{
+                //         token:this.token
+                //     },
+                //     data:{
+                //         projId:this.projId,
+                //         condition:this.jiLiangCondition,
+                //         entityNumber:this.projectNumber,
+                //         engineeringNumber:this.setMaterialObject.row.number,
+                //         formula:this.jiLiangResult,
+                //         mappings:arr,
+                //         type:2
+                //     }
+                // }).then(response=>{
+                //     if(response.data.cd == '0'){
+                //         this.editProjectMappedShow = false;
+                //         this.jiLiangCondition = '';
+                //         this.jiLiangResult = '';
+                //         this.getEntityMapping();
+                //     }else if(response.data.cd == '-1'){
+                //         alert(response.data.msg)
+                //     }else{
+                //         this.$router.push({
+                //             path:'/login'
+                //         })
+                //     }
+                // })
             }
         },
         //取消编辑
@@ -1235,7 +1309,8 @@ export default {
         deleteMappedSure(){
             axios({
                 method:'get',
-                url:this.BDMSUrl+'project2/Config/deleteEngineeringMapping',
+                // url:this.BDMSUrl+'project2/Config/deleteEngineeringMapping',
+                url:this.BDMSUrl+'projectInfo/deleteCodeFormula',
                 headers:{
                     token:this.token
                 },
@@ -1244,8 +1319,9 @@ export default {
                 }
             }).then(response=>{
                 if(response.data.cd == '0'){
+                     this.deletemappedDialog =false;
                     this.getEntityMapping();
-                    this.deletemappedDialog =false;
+                   
                 }else if (response.data.cd  == '-1'){
                     alert(response.data.msg)
                 }else{
@@ -1861,14 +1937,20 @@ export default {
         
         //显示快捷输入面板
         showConvenience(scope){
+            // this.goujianProperty=[];
             this.showConvenienceObject = scope;
             this.showConvenienceType = scope;
             this.convenientInput = true;
-            $('#CInput .el-dialog').draggable();
+            // this.goujianProperty.push({
+            //     'code':this.projectNumber,
+            //     'classifyName':(this.firstSelectName+'-'+this.secondSelectName+'-'+this.thirdSelectName)
+            // })
+            // $('#CInput .el-dialog').draggable();
         },
         saveConvenient(type){
             if(this.inputGouJianType.length != 0){
-                this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
+                // this.inputGouJianType = this.inputGouJianType[0].split('(')[0];
+                this.inputGouJianType = this.inputGouJianType[0]
             }else {
                 this.inputGouJianType = '';
             }
@@ -1891,7 +1973,9 @@ export default {
             if(this.showConvenienceType == 10000){
                 this.jiLiangCondition += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
             }else if(this.showConvenienceType == 20000){
-                this.jiLiangResult += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue;
+                this.jiLiangResult += this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianValue;
+                
+                // +this.inputGouJianFunction
             }else{
                 var str = this.addProjectMappingData[this.showConvenienceObject].formula_+this.inputGouJianType+this.inputGouJianCalculate+this.inputGouJianFunction+this.inputGouJianValue; 
                 this.addProjectMappingData.forEach((item,index)=>{
@@ -1902,11 +1986,13 @@ export default {
                     }
                 })
             }
+            this.convenientInput = false;
             this.inputGouJianType = [];
             this.inputGouJianCalculate = [];
             this.inputGouJianFunction = [];
             this.inputGouJianValue = [];
-            this.convenientInput = false;
+            
+            console.log(this.jiLiangResult,'this.jiLiangResult');
         },
         cancelConveient(){
             this.convenientInput = false;
@@ -2095,7 +2181,8 @@ export default {
                 border: none;
                 width: 159px;
                 height: 336px;
-                overflow: hidden;
+                // overflow: hidden;
+                overflow: auto;
             }
             .multipleSelectA:focus{
                 border: none;
@@ -2323,7 +2410,7 @@ export default {
             .calculateRight{
                 float: left;
                 text-align: left;
-                margin-left: 20px;
+                // margin-left: 20px;
             }
             .calculateResult{
                 color: #999;
@@ -2335,7 +2422,7 @@ export default {
             .calculateInp{
                 height: 30px;
                 border: 1px solid #ccc;
-                width: 183px;
+                width: 359px;
                 padding-left: 10px;
                 border-radius: 2px;
                 box-sizing: content-box;

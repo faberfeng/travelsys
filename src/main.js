@@ -10,7 +10,7 @@ import '../theme/index.css'
 import ZkTable from 'vue-table-with-tree-grid'
 import vuescroll from 'vue-scroll'
 import FullCalendar from 'vue-full-calendar'
-
+import './directives'
 import 'jquery'
 import 'uikit'
 // import "uikit-css"

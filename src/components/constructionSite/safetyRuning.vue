@@ -348,7 +348,7 @@
             </div>
             <div id="mask" v-if="labelListShow||labelListSingleShow" ></div>
             <div id="edit">
-                <el-dialog width="400px" title="安全状态修改" :visible="securityStatusShow" @close="srStatusCancle">
+                <el-dialog width="400px"  title="安全状态修改" v-dialogDrag :visible="securityStatusShow" @close="srStatusCancle">
                     <div class="editBody">
                         <div class="editBodytwo" style="margin-left:1px;">
                             <el-radio v-model="securityStatus" label="1">确认安全</el-radio>
@@ -366,7 +366,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog width="400px" title="补充安全状态修改" :visible="supplySecurityStatusShow" @close="srSupplyStatusCancle">
+                <el-dialog width="400px" title="补充安全状态修改" v-dialogDrag :visible="supplySecurityStatusShow" @close="srSupplyStatusCancle">
                     <div class="editBody">
                         <div class="editBodytwo" style="margin-left:1px;">
                             <el-radio v-model="securityStatus" label="1">确认安全</el-radio>
@@ -385,7 +385,6 @@
                                 value-format="yyyy-MM-dd HH:mm:ss">
                             </el-date-picker>
                         </div>
-                        
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="srSupplyStatusConfirm">确定</button>
@@ -393,7 +392,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog  title="临时点位" :visible="timePointShow" @close="timePointCancle">
+                <el-dialog  title="临时点位" v-dialogDrag :visible="timePointShow" @close="timePointCancle">
                     <div class="editBody">
                         <div class="editBodytwo">
                             <el-date-picker
@@ -425,7 +424,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog  title="正常点位" :visible="time1PointShow" @close="time1PointCancle">
+                <el-dialog  title="正常点位" v-dialogDrag :visible="time1PointShow" @close="time1PointCancle">
                     <div class="editBody">
                         <!-- <div class="editBodytwo">
                             <el-date-picker
@@ -457,7 +456,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog title="重命名目录" :visible.sync="fileNameShow" @close="addfileCancle">
+                <el-dialog title="重命名目录" v-dialogDrag :visible.sync="fileNameShow" @close="addfileCancle">
                     <div class="editBody">
                         <div class="editBodytwo imageBody">
                             <label class="imageBodyText">目录名称 :</label>
@@ -470,7 +469,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog width="500px" title="添加安全检查项目" :visible="addCheckItemNodeShow" @close="addCheckItemNodeCancle">
+                <el-dialog width="500px" v-dialogDrag title="添加安全检查项目" :visible="addCheckItemNodeShow" @close="addCheckItemNodeCancle">
                     <div class="editBody">
                         <div class="editBodytwo">
                             <label class="parentItem">父级项目:</label>
@@ -517,7 +516,7 @@
                     </div>
                 </el-dialog>
 
-                <el-dialog width="400px" title="点位编辑" :visible="spotEditDialog" @close="spotEditCancle">
+                <el-dialog width="400px" v-dialogDrag title="点位编辑" :visible="spotEditDialog" @close="spotEditCancle">
                     <div class="editBody">
                         <div class="editBody_left">
                             <table>
@@ -1149,6 +1148,7 @@ export default {
         console.log(this.addNodeparentItemId);
         this.getCheckItemData();
         this.getCheckPointsByItemId();
+        // this.checkItem(0,obj.itemId);
         
     },
     checkItem(num,id){

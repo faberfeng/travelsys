@@ -268,6 +268,11 @@ const router = new Router({
           name:'ConfigMappingTwo',
           component:resolve=>require(['@/components/planCost/ConfigMappingTwo'],resolve)
         },
+        {
+          path:'/Cost/wuliaoList',
+          name:'wuliaoList',
+          component:resolve=>require(['@/components/planCost/wuliaoList'],resolve)
+        }
       ]
     },
     //进度计划路由配置
@@ -597,6 +602,14 @@ const router = new Router({
             settingsCenter:true
           },
           component:resolve=>require(['@/components/Settings/ProjectSubmit'],resolve)
+        },
+        {
+          path:'/setting/wuliaoList',
+          name:'wuliaoList',
+          meta:{
+            settingsCenter:true
+          },
+          component:resolve=>require(['@/components/Settings/wuliaoList'],resolve)
         },
         {
           path:'/setting/materialpurchase',
