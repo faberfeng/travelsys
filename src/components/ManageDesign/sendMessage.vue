@@ -29,11 +29,11 @@
                  <div class="fileitem">   
                      <ul class="clearfix"  style="padding: 0px 0px 2px 2px;">
                         <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="val+'_attach'" style="padding:0;overflow: hidden;">
-                            <img  style="object-fit: cover;" :src="BDMSUrl+val"  class="item-file-attach"/>
+                            <img  style="object-fit: cover;" :src="BDMSUrl+val.path"  class="item-file-attach"/>
                             <div class="actionbox clearfix">
-                                <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                <i class="button-relocation" title="定位" @click="relocation(val.ScreenPara)"></i>
                                 <i class="line"></i>
-                                <i class="button-search"  @click="preview(BDMSUrl+val)"></i>
+                                <i class="button-search"  @click="preview(val.path)"></i>
                                  <i class="line"></i>
                                  <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
                             </div>
@@ -257,7 +257,13 @@ export default Vue.component('common-upload',{
                                 type:'success',
                                 message:'视点截图成功'
                             })
-                            this.uploadViewPointList.push(response.data.rt)
+                            this.uploadViewPointList.push({
+                                'path':response.data.rt,
+                                'ScreenPara':ScreenPara,
+                                'elementFilter':this.elementFilter
+                            })
+                            console.log(this.uploadViewPointList,'截图0000');
+
                         }
                     }).catch((err)=>{
                         console.log(err)
@@ -359,7 +365,7 @@ export default Vue.component('common-upload',{
             return tt; 
         },
         //重回定位
-        relocation(){
+        relocation(ScreenPara){
             const app = document.getElementById('webIframe').contentWindow;
             app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
             document.body.scrollTop = 0;
@@ -368,7 +374,7 @@ export default Vue.component('common-upload',{
         preview(val){
             var vm = this
             if(val){
-                window.open(vm.QJFileManageSystemURL+val+"/preview");
+                window.open(vm.BDMSUrl+val);
             }else{
                  vm.$message({
                     type:'info',
@@ -503,8 +509,8 @@ export default Vue.component('common-upload',{
             });
             vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
-                        elementFilter:this.elementFilter,
-                        relativePath:item,
+                        elementFilter:item.elementFilter,
+                        relativePath:item.path,
                         // extension:item.fileExtension,
                         // uuid:item.fileUuid,
                         // name:item.fileName,
@@ -565,67 +571,73 @@ export default Vue.component('common-upload',{
                 }
                 var url = '/design/'+vm.dcid+'/review/add'
             }
-            vm.fullscreenLoading = true;
+            
             // console.log(data);
-             axios({
-                method:'POST',
-                url:vm.BDMSUrl+url,//vm.BDMSUrl+url
-                headers:{
-                    'token':vm.token
-                },
-                data:data,
-                params:params
-            }).then((response)=>{
-                if(parseInt(response.data.cd) == 0){
-                     this.$message({
-                            type:'info',
-                            message:'发布成功'
-                        })
-                    
-                    if(vm.iscomment){
-                         vm.$emit('refresh')
-                    }else{
+            console.log(vm.valuemonomer,'vm.valuemonomer');
+            // if(vm.valuemonomer==undefined){
+            //         vm.$message({
+            //             type:'info',
+            //             message:'请新建目录上传模型'
+            //         })
+            // }else{
+                vm.fullscreenLoading = true;
+                 axios({
+                     method:'POST',
+                    url:vm.BDMSUrl+url,//vm.BDMSUrl+url
+                    headers:{
+                        'token':vm.token
+                    },
+                    data:data,
+                    params:params
+                }).then((response)=>{
+                    if(parseInt(response.data.cd) == 0){
+                        this.$message({
+                                type:'info',
+                                message:'发布成功'
+                            })
                         
-                        if(vm.checked){
-                            var recall = {
-                                isChecked:true,
-                                data:response.data.rt,
-                                count:1
-                            }
-                            vm.$emit('refreshcomment',recall)
+                        if(vm.iscomment){
+                            vm.$emit('refresh')
                         }else{
-                            var recall = {
-                                isChecked:false,
-                                data:response.data.rt,
-                                count:1
+                            
+                            if(vm.checked){
+                                var recall = {
+                                    isChecked:true,
+                                    data:response.data.rt,
+                                    count:1
+                                }
+                                vm.$emit('refreshcomment',recall)
+                            }else{
+                                var recall = {
+                                    isChecked:false,
+                                    data:response.data.rt,
+                                    count:1
+                                }
+                                vm.$emit('refreshcomment',recall)
                             }
-                            vm.$emit('refreshcomment',recall)
+                        
+                        vm.checked = false
                         }
-                       
-                       vm.checked = false
+                        vm.filesList = null
+                        vm.fileId = []
+                        vm.attachId = []
+                        vm.uploadViewPointList=[]                     
+                    vm.$refs.message.value = ''
+                        vm.newStmt = false
+                    }else{
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
                     }
-                    vm.filesList = null
-                    vm.fileId = []
-                    vm.attachId = []
-                    vm.uploadViewPointList=[]                     
-                   vm.$refs.message.value = ''
-                    vm.newStmt = false
-                }else if(!vm.valuemonomer){
-                    vm.$message({
-                        type:'info',
-                        message:'请新建目录上传模型'
-                    })
-                }else{
-                    vm.$message({
-                        type:'error',
-                        message:response.data.msg
-                    })
-                }
-                vm.fullscreenLoading = false
-            }).catch((err)=>{
-                vm.imageName ='未选择任何文件'
-                console.log(err)
-            })
+                    vm.fullscreenLoading = false
+                }).catch((err)=>{
+                    vm.imageName ='未选择任何文件'
+                    console.log(err)
+                })
+                
+            // }
+            
         },
         uploadIMG(){
             var vm = this

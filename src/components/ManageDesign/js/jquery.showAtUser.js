@@ -277,7 +277,8 @@ $.fn.showAtUsers = function(setting) {
                 };
 
                 $.ajax({
-                    url: setting.basePath + 'project2/dc/findProjectUserByKeyword?projId='+projId+'&ugId='+ugId+'&keyword='+keyword,
+                    url:setting.basePath +'userGroup/getGroupUser?groupId='+ugId,
+                    // url: setting.basePath + 'project2/dc/findProjectUserByKeyword?projId='+projId+'&ugId='+ugId+'&keyword='+keyword,
                     type: 'post',
                     contentType: "application/json;charset=utf-8",
                     // data: JSON.stringify(data),
@@ -300,7 +301,7 @@ $.fn.showAtUsers = function(setting) {
 			if (users && users.length > 0) {
 				searchResult[projId + '-' + keyword] = users;
 				for (var i=0; i<users.length; i++) {
-					html += '<li  class="tit">' + users[i].realName + '</li>';
+					html += '<li  class="tit">' + users[i].name + '</li>';
 				}
 			} else {
 				html = '<li class="tit">轻敲空格完成输入</li>';

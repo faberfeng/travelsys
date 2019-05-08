@@ -975,6 +975,27 @@ export default {
                         // vm.$router.push({
                         //     path:'/Drive/costover'//资产管理
                         // })
+                    }else if(vm.navigationPath==='052'){
+                         this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'052','05201','/entranceCheck/todayAttendRecord','05202','/entranceCheck/monthAttendRecord','05203','/entranceCheck/entranceRecord')
+                        })
+                    }else if(vm.navigationPath==='053'){
+                    }else if(vm.navigationPath==='054'){
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'054','05401','/safetyEducation/visitorSafety','05402','/safetyEducation/safeEducation','05403','/safetyEducation/safeTechnology')
+                            
+                        })
+                    }
+                    else if(vm.navigationPath==='055'){
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'055','05501','/honestyManagement/allEvaluate','05502','/honestyManagement/goodRecord','05503','/honestyManagement/badRecord','05504','/honestyManagement/complaintHandling')
+                        })
+                    }else if(vm.navigationPath==='056'){
+                        this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'056','05601','/visitorRegister/visitorRegister','05602','/visitorRegister/carRegister')
+                        })
+                    }else if(vm.navigationPath==='057'){
+
                     }else if(vm.navigationPath==='001'){
 
                         vm.$router.push({
@@ -982,10 +1003,10 @@ export default {
                             path:'/setting/initalsettings'//配置中心
                         })
                     }
-                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00105','00104')
+                    this.ellist=this.getSecondGradeList(this.moduleLists,'001','00101','00102','00103','00105','00104','00106')
             }
         },
-        getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4,Code5){
+        getSecondGradeList(itemList,oneGradeCode,Code1,Code2,Code3,Code4,Code5,Code6){
             var vm=this;
             //   console.log(vm.moduleList,'获取的东西');
             var secondList=[];
@@ -1074,8 +1095,6 @@ export default {
                                 title:'/setting/usermanage',
                                 linkUrl:'用户管理'
                             },
-                           
-                           
                         )
                         vm.$set(item,'routerLink',routerLink3);
                     }
@@ -1128,6 +1147,38 @@ export default {
                             // }
                         )
                         vm.$set(item,'routerLink',routerLink4);
+                    }
+
+                    if(item.moduleCode==Code6){
+                         vm.$set(item,'isShowUrl','settings/accessControl');
+                        let routerLink3=[];
+                        routerLink3.push(
+                            {
+                                title:'/setting/accessControl',
+                                linkUrl:'门禁管理'
+                            },
+                            {
+                                title:'/setting/icCordControl',
+                                linkUrl:'IC卡管理'
+                            },
+                            {
+                                title:'/setting/faceAndfingerInput',
+                                linkUrl:'人脸及指纹管理'
+                            },
+                            {
+                                title:'/setting/controlVideo',
+                                linkUrl:'监控视频管理'
+                            },
+                            {
+                                title:'/setting/carManage',
+                                linkUrl:'车辆管理'
+                            },
+                            {
+                                title:'/setting/projectModel',
+                                linkUrl:'项目模型'
+                            }
+                        )
+                        vm.$set(item,'routerLink',routerLink3);
                     }
                 }
             })
@@ -1271,6 +1322,51 @@ export default {
             }else if(tab.name === '015'){
                 this.navigationPath = tab.name;
                 // sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '052'){
+                 this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'052','05201','/entranceCheck/todayAttendRecord','05202','/entranceCheck/monthAttendRecord','05203','/entranceCheck/entranceRecord')
+                    })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath);
+            }else if(tab.name === '053'){
+                this.$router.push({
+                    path:'/videoControl/videoControl'
+                });
+                this.navigationPath = tab.name;
+                // sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '054'){
+                this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'054','05401','/safetyEducation/visitorSafety','05402','/safetyEducation/safeEducation','05403','/safetyEducation/safeTechnology')
+                            // ,'01204','/Cost/inventory'
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '055'){
+                this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'055','05501','/honestyManagement/allEvaluate','05502','/honestyManagement/goodRecord','05503','/honestyManagement/badRecord','05504','/honestyManagement/complaintHandling')
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name ==='056'){
+                // this.$router.push({
+                //     path:'/liveConnect/fieldConnection'
+                // })
+                // this.$router.push({
+                //     path:this.firstGetSecondGradeList(this.moduleLists,'016','01602','/liveConnect/fieldMessage','01601','/liveConnect/fieldConnection','01603','/liveConnect/qualityChecking','01604','/liveConnect/qualityAcceptance')
+                // })
+                 this.$router.push({
+                            path:this.firstGetSecondGradeList(this.moduleLists,'056','05601','/visitorRegister/visitorRegister','05602','/visitorRegister/carRegister')
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+
+            }
+            else if(tab.name === '057'){
+                this.$router.push({
+                    path:'/projectPerson/projectPerson'
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
             }else if(tab.name === '001'){
                 this.$router.push({
                     // path:this.firstGetSecondGradeList(this.moduleLists,'001','00101','/setting/initalsettings','00102','/setting/datatransform','00103','/setting/jobmanage','00104','/setting/projectstationmanage'),

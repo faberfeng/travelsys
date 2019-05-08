@@ -534,7 +534,7 @@
     </el-dialog>
 </div>
 </template>
-<style  lang='less'>
+<style  lang='less' >
     #DesignManagement{
         /*
             修改eleUI树形组件
@@ -2968,7 +2968,7 @@ export default {
         sendMes
   },
   data(){
-       window.addEventListener("message", (evt)=>{this.callback(evt)});
+       
       return {
           CurrentSelectPara:"",//图形引擎选中数据
           mapInfo:'',//设计属性
@@ -3142,6 +3142,7 @@ export default {
   },
   created(){
         var vm = this
+        window.addEventListener("message", this.ls);
         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         vm.token = localStorage.getItem('token')
         vm.projId = localStorage.getItem('projId')
@@ -3178,6 +3179,11 @@ export default {
         //         vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
         //     }
         // },100)
+    },
+    destroyed(){
+         window.removeEventListener("message", this.ls)
+
+
     },
   watch:{
     //   <!-- options_monomer:[],//单体选项
@@ -3232,6 +3238,11 @@ export default {
       },
   },
   methods:{
+       ls(evt){
+          
+          this.callback(evt),
+          false
+        },
       callback(e){
            // console.log(e)
             switch(e.data.command){

@@ -67,11 +67,11 @@
                     </ul> -->
                      <ul class="clearfix"  style="padding: 0px 0px 2px 2px;">
                         <li   class="item-file"  v-for="(val,key) in uploadViewPointList" :key="val+'_attach'" style="padding:0;overflow: hidden;">
-                            <img  style="object-fit: cover;" :src="BDMSUrl+val"  class="item-file-attach"/>
+                            <img  style="object-fit: cover;" :src="BDMSUrl+val.path"  class="item-file-attach"/>
                             <div class="actionbox clearfix">
-                                <i class="button-relocation" title="定位" @click="relocation()"></i>
+                                <i class="button-relocation" title="定位" @click="relocation(val.ScreenPara)"></i>
                                 <i class="line"></i>
-                                <i class="button-search"  @click="preview(BDMSUrl+val)"></i>
+                                <i class="button-search"  @click="preview(val.path)"></i>
                                  <i class="line"></i>
                                  <i class="icon-goujian icon-delete" @click="deleteFile1(key)"></i>
                             </div>
@@ -179,7 +179,7 @@ import '../ManageCost/js/jquery-1.8.3.js'
 import './js/jquery.showAtUser.js'
 export default Vue.component('common-upload',{
     data(){
-        window.addEventListener("message", (evt)=>{this.callback(evt)});
+       
         return {
             QJFileManageSystemURL:'',
             BDMSUrl:'',
@@ -218,6 +218,7 @@ export default Vue.component('common-upload',{
     props:['showBox','selectugid','holderid','iscomment','keycomment','dcid','valuemonomer','valuestatus','valueabout','checkTypeName','dirId'],
     mounted(){
         var vm = this
+         window.addEventListener("message", (evt)=>{this.callback(evt)});
         vm.token  = localStorage.getItem('token')
         vm.userId  = localStorage.getItem('userid')
         vm.projId = localStorage.getItem('projId');
@@ -246,6 +247,9 @@ export default Vue.component('common-upload',{
                 $('#dc-add-content'+vm.dcid+vm.selectugid).showAtUsers(setting)
             },1000)
         },
+    },
+    destoryed(){
+         window.removeEventListener("message", (evt)=>{this.callback(evt)});
     },
     methods:{
         checkItem(index){
@@ -315,7 +319,7 @@ export default Vue.component('common-upload',{
             return tt; 
         },
         //重回定位
-        relocation(){
+        relocation(ScreenPara){
              const app = document.getElementById('webIframe').contentWindow;
             app.postMessage({command:"MoveToViewpoint",parameter:ScreenPara},"*");
             document.body.scrollTop = 0;
@@ -324,7 +328,7 @@ export default Vue.component('common-upload',{
         preview(val){
             var vm = this
             if(val){
-                window.open(vm.QJFileManageSystemURL+val+"/preview");
+                window.open(vm.BDMSUrl+val);
             }else{
                  vm.$message({
                     type:'info',
@@ -380,7 +384,7 @@ export default Vue.component('common-upload',{
                  var vm = this
                     axios({
                         method:'POST',
-                        url:this.BDMSUrl+'design/uploadViewPoint/1/'+this.projId,
+                        url:this.BDMSUrl+'design/uploadViewPoint/'+this.projId,
                         headers:{
                             'token':vm.token
                         },
@@ -391,7 +395,12 @@ export default Vue.component('common-upload',{
                                 type:'success',
                                 message:'视点截图成功'
                             })
-                            this.uploadViewPointList.push(response.data.rt)
+                             this.uploadViewPointList.push({
+                                'path':response.data.rt,
+                                'ScreenPara':ScreenPara,
+                                'elementFilter':this.elementFilter
+                            })
+                            // this.uploadViewPointList.push(response.data.rt)
                         }
                     }).catch((err)=>{
                         console.log(err)
@@ -504,8 +513,8 @@ export default Vue.component('common-upload',{
             });
              vm.uploadViewPointList.forEach((item,index)=>{
                     vpListUid.push({
-                        elementFilter:this.elementFilter,
-                        relativePath:item,
+                        elementFilter:item.elementFilter,
+                        relativePath:item.path,
                         // elementFilter:this.elementFilter,
                         // extension:item.fileExtension,
                         // relativePath:item.filePath,

@@ -67,7 +67,7 @@
                         <ul class="operation">
                             <!-- checkedRound.checked || -->
                             <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow "  @click="copyfile(true)">剪切</li>
-                            <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder&&wordDownload" @click="downloadFile" >下载</li>
+                            <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder&&checkAll" @click="downloadFile" >下载</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
                             <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="goujianBindByWord()">构件绑定文件</li>
                             <!-- <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li> -->
@@ -3087,7 +3087,7 @@ export default {
         },
        initAll(){
           var vm = this
-            // vm.checkedFile_Folder.file=false;
+            // vm.checkedFile_Folder.file=true;
             // vm.checkedFile_Folder.folder=false;
             // vm.checkedFile_Folder.fileCheckedNum=0;
             // vm.checkedFile_Folder.folderCheckedNum=0;
@@ -4417,35 +4417,44 @@ export default {
                 }
                 msg = '文件'
             }
-            axios({
-                method:'POST',
-                // url:vm.BDMSUrl+'project2/doc/delFileGroup',
-                url:vm.BDMSUrl+'/doc/deleteFile',
-                headers:{
-                    'token':vm.token
-                },
-                params:{
-                    projId:vm.projId,
-                },
-                data:fgIdList
-            }).then((response)=>{
-                if(Math.ceil(response.data.cd) == 0){
-                    if(vm.showQuanJing){
-                        vm.getPanoramaFgId(vm.checkFileDir.dirId)
-                        vm.getPanoramaPoint(vm.checkFileDir.dirId)
-                        vm.checkedRound.checked=false;
-                        // vm.searchFileGroupInfo()
-                    }else{
-                        vm.getInfo()
+            if(fgIdList.length==0){
+                this.$message({
+                    type:'info',
+                    message:"请勾选需要删除的文件"
+                })
+            }else{
+                 axios({
+                    method:'POST',
+                    // url:vm.BDMSUrl+'project2/doc/delFileGroup',
+                    url:vm.BDMSUrl+'/doc/deleteFile',
+                    headers:{
+                        'token':vm.token
+                    },
+                    params:{
+                        projId:vm.projId,
+                    },
+                    data:fgIdList
+                }).then((response)=>{
+                    if(Math.ceil(response.data.cd) == 0){
+                        if(vm.showQuanJing){
+                            vm.getPanoramaFgId(vm.checkFileDir.dirId)
+                            vm.getPanoramaPoint(vm.checkFileDir.dirId)
+                            vm.checkedRound.checked=false;
+                            // vm.searchFileGroupInfo()
+                        }else{
+                            vm.getInfo()
+                        }
+                        vm.$message({
+                            type:'success',
+                            message:msg+'删除成功'
+                        })
                     }
-                    vm.$message({
-                        type:'success',
-                        message:msg+'删除成功'
-                    })
-                }
-            }).catch((err)=>{
-                console.log(err)
-            })
+                }).catch((err)=>{
+                    console.log(err)
+                })
+
+            }
+           
         }
       },
       updateImg(val,is,index,type,imgUpType){
@@ -4934,7 +4943,26 @@ export default {
         //     // let objectUrl = URL.createObjectURL(blob);  //生成一个url
         //     // window.location.href = objectUrl;   //浏览器打开这个url
         // })
-        window.open(vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId);
+        if(fileId.length>1){
+             axios({
+                    url:this.BDMSUrl+'doc/download',
+                    headers:{
+                        'token':this.token
+                    },
+                    method:"post",
+                    data:{"dirIds":[],"fgIds":fileId},
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/zip'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+                })
+        }else{
+             window.open(vm.BDMSUrl+'doc/download/'+fileId[0]+'?token='+vm.token+'&groupId='+vm.selectUgId);
+        }
+       
         // axios({
         //     // method:'POST',
         //     method:'get',
@@ -4960,16 +4988,33 @@ export default {
         var vm = this
         // var url = '/multiDownloadUrl?'
         var hasFilePath = false
-        var fileId = ''
+        var fileId = []
         var fileName = ''
+        this.$message({
+                type:'info',
+                message:'正在压缩下载,请等待'
+        })
         vm.fileList.forEach((item,key)=>{
             if(item.checked){
                 hasFilePath = true
                 // url += 'urls='+item.filePath+'&'
-                fileId=item.fgId;
+                fileId.push(item.fgId);
                 fileName += item.fgName+','
             }
         })
+        console.log(fileId,'vm.fileList,fileId');
+        // for(var i=0;i<vm.fileList.length;i++){
+        //                 if(vm.fileList[i].checked){
+        //                     if (vm.fileList[i].isAutoCreated == 1||vm.fileList[i].isDrawing==1) {
+        //                         vm.$message({
+        //                             type:'error',
+        //                             message:'系统文件，不能操作！'
+        //                         })
+        //                         return false
+        //                     }
+        //                     fgIdList.push(vm.fileList[i].fgId)
+        //                 }
+        //             }
         if(hasFilePath){
              vm.downLoadWithURL(fileId,fileName)
         }else{
@@ -4987,6 +5032,7 @@ export default {
         var fgIds=[]
         var dirIds=[]
         var empty = false
+        
 
         // var url_API  = vm.BDMSUrl+'project2/doc/getFileListByDirOrFile?'
         // for(var i=0;i<vm.folderList.length;i++){
@@ -5018,20 +5064,29 @@ export default {
                 token:vm.token,//文件id
                 groupId:vm.selectUgId
             },
+             responseType:'blob'
         }).then((response)=>{
+            
+            let blob=new Blob([response.data],{
+                        type:'application/zip'      //将会被放入到blob中的数组内容的MIME类型 
+            });
+            let objectUrl = URL.createObjectURL(blob);  //生成一个url
+            window.location.href = objectUrl;   //浏览器打开这个url
             
         }).catch((err)=>{
             console.log(err)
         })
-        // var timer = setInterval(function(){
-        //     if(url != '/multiDownloadUrl?'){//如果url变化，结束定时器
-        //         vm.downLoadWithURL(url)
-        //         clearInterval(timer)
-        //     }
-        //     if(empty){//若ajax 执行完 empty为true，结束定时器
-        //          clearInterval(timer)
-        //     }
-        // },100)
+        // axios({
+        //             url:this.BDMSUrl+'doc/download',
+        //             headers:{
+        //                 'token':this.token
+        //             },
+        //             method:"post",
+        //             data:{"dirIds":[],"fgIds":fileId},
+        //             responseType:'blob'
+        //         }).then((response)=>{
+                    
+        //         })
     },
     checkItem(val,file,isMultiSelect){
         

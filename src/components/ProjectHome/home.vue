@@ -6,6 +6,7 @@
                     <img style="width:340px;height:237px" src="../../assets/nopic.jpg"/>
                     <el-carousel-item v-for="(item,index) in projectImageList" :key="index">
                         <img style="width:340px;height:242px" :src="BDMSUrl+item.path"/>
+                        <!-- <video :src="BDMSUrl+item.path" controls="controls"></video> -->
                         </el-carousel-item>
                 </el-carousel>
             </div>

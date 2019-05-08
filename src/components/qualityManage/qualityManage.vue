@@ -46,6 +46,8 @@
                         </ul>
                         <p class="header">
                             <span class="item-upload" @click="sendChange">发起整改</span>
+                            <span class="item-upload_list" v-show="tableShow" @click="tableChange">表格显示</span>
+                            <span class="item-upload_list" v-show="listShow" @click="listChange">列表显示</span>
                         </p>
                     </div>
                 <div class="checkName" v-show="showName">{{'[检查类型]'+'-'+checkTypeValue}}</div>
@@ -54,7 +56,7 @@
                         <img style="width:140px;height:115px" src="../../assets/nodata.png"/>
                         <p style="font-size:16px;color:#ccc">暂无数据</p>
                 </div> -->
-                <div class="project" v-loading="loading">
+                <div class="project" v-show="tableShow" v-loading="loading">
                         <ul class="projectList">
                             <li v-for="(item,index) in CommunicationList" :key="index">
                                 <div class="projectListInfo">
@@ -290,8 +292,56 @@
                     </div>
 
                 </div>
+                <div id="projectTable" v-show="listShow">
+                    <div class="tableBody">
+                        <table class="tableList" border="1" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>检查人</th>
+                                    <th>检查内容</th>
+                                    <th>附件</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in CommunicationList" :key="index">
+                                    <td>{{index+1}}</td>
+                                    <td>{{item.createUserStr}}</td>
+                                    <td v-html="item.dcContent"></td>
+                                    <td>
+                                        <span class="icon-eye" title="视点" @click="getViewPoint(item.viewPointInfo)">视点</span>
+                                        <span class="icon-image" title="图片" @click="getPicture(item.attachList)">图片</span>
+                                        <span class="icon-file" title="文档" @click="getFile(item.fileList)">文档</span>
+                                    </td>
+                                    <td>
+                                        <span class="icon-finish" v-if="item.dcStatus == 8" @click="updateStatus(item.dcId,9,'提交',index)">提交</span>
+                                        <!-- canEditMes &&  -->
+                                        <span class="icon-reconsider" v-if="item.dcStatus == 9" @click="updateStatus(item.dcId,0,'检查',index)">检查</span>
+                                        <!-- canEditMes &&  -->
+                                        <span class="icon-finish" v-if="item.dcStatus == 10" @click="updateStatus(item.dcId,9,'提交',index)">提交</span>
+                                        <!-- v-if="canDeleteMes" -->
+                                        <span class="icon-delete"  @click="deleteMes(item.dcId,index)"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-if="!CommunicationList" style="height: 450px;text-align: center;font-size: 18px;line-height: 450px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                        当前列表无数据
+                    </div>
+                    <div class="tableBodyPagination">
+                        <div class="tableBodyPaginationRight">
+                            <el-pagination class="elPagination"
+                                background layout="prev, pager, next" :total="pageTotal" :current-page.sync="pageNo" @current-change="changePage" @prev-click="changePage" @next-click="changePage">
+                            </el-pagination>
+                        </div>
+                    </div>
+
+                </div>
             </div>
             <div id="edit">
+
                 <el-dialog width="450px" title="检查类型选择" :visible.sync="checkTypeSelectDialog" @close="checkTypeSelectCancle">
                         <div class="tree">
                             <!-- <el-tree id="ugGroupTree" ref="ugGroupTree" highlight-current  node-key="dirId" :empty-text="'没有可选择的类型，请至文档管理建立所需的项目类型'" :data="CheckTypeSubDirList"  :props="defaultProps" @node-click="nodeClick" >
@@ -327,6 +377,64 @@
                         <button class="editBtnC" @click="dcStatusCancle">取消</button>
                     </div>
                 </el-dialog>
+                <el-dialog  title="视点列表" v-dialogDrag :visible.sync="viewPointShow" @close="viewPointCancle">
+                    <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li :class="['item-file']" v-for="(val,key) in itemviewPointInfo" :key="key+'attach1'" style="padding:0;overflow: hidden;">
+                            <img style="object-fit: contain" :src="BDMSUrl+val.relativePath" :title="val.fileName" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                    <i class="line"></i>
+                                <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                <i class="line"></i>
+                                <i class="button-download" @click="downLoad(val.relativePath)"></i>
+                            </div>
+                        </li>
+                    </ul> 
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="viewPointCancle">确定</button>
+                        <button class="editBtnC" @click="viewPointMakeSure">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog  title="图片列表" v-dialogDrag :visible.sync="pictureShow" @close="pictureCancle">
+                    <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li :class="['item-file']" v-for="(val,key1) in itemattachList" :key="key1+'attach'" style="padding:0;overflow: hidden;">
+                            <img style="object-fit: contain" :src="BDMSUrl+val.path" :title="val.name" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
+                                    <i class="line"></i>
+                                <i class="button-search"   @click="preview(val.path)"></i>
+                                <i class="line"></i>
+                                <i class="button-download" @click="downLoad(val.path)"></i>
+                            </div>
+                        </li>
+                    </ul>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="pictureCancle">确定</button>
+                        <button class="editBtnC" @click="pictureMakeSure">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog  title="文件列表" v-dialogDrag :visible.sync="fileListShow" @close="fileListCancle">
+                    <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li :class="['item-file']" v-for="(val,key) in itemfileList" :key="key+'file'">
+                            <div class="item-file-box clearfix">
+                                <span  class="item-file-image">
+                                    <img :src="require('../ManageCost/images/icon/'+checkIcon1(sliceType(val.name).toUpperCase())+'.png')" />
+                                </span>
+                                <span  class="item-file-detial">
+                                    <h3 v-text="val.name"></h3>
+                                    <p class="operation">
+                                        <i class="icon-goujian icon-search" @click="preview(val.path)"></i>
+                                        <i class="icon-goujian icon-download" @click="downLoad(val.path)"></i>
+                                    </p>
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="fileListCancle">确定</button>
+                        <button class="editBtnC" @click="fileListMakeSure">取消</button>
+                    </div>
+                </el-dialog>
             </div>
             
     </div>
@@ -344,10 +452,20 @@ export default {
   },
     data(){
         return{
+            itemviewPointInfo:'',
+            itemattachList:'',
+            itemfileList:'',
+            viewPointShow:false,
+            fileListShow:false,
+            pictureShow:false,
             routerList:'',
             moduleList:'',
             dataShow:true,
             loading:true,
+            tableShow:true,
+            listShow:false,
+            TableListLength:1,//表格长度
+            currentPage:1,//当前页
             token:'',
             projId:'',
             userId:'',
@@ -359,26 +477,26 @@ export default {
             value_status: '-1',//单体 筛选关键词
             value_about: '-1',//单体 筛选关键词
             options_status:[
-            {
-                id:'-1',
-                Name:'全部状态'
-            },{
-                id:'8',
-                Name:'等待整改'
-            },{
-                id:'9',
-                Name:'等待检查'
-            },{
-                id:'10',
-                Name:'继续整改'
-            },{
-                id:'11',
-                Name:'整改撤销'
-            },{
-                id:'12',
-                Name:'整改完成'
-            }
-        ],//状态选项
+                {
+                    id:'-1',
+                    Name:'全部状态'
+                },{
+                    id:'8',
+                    Name:'等待整改'
+                },{
+                    id:'9',
+                    Name:'等待检查'
+                },{
+                    id:'10',
+                    Name:'继续整改'
+                },{
+                    id:'11',
+                    Name:'整改撤销'
+                },{
+                    id:'12',
+                    Name:'整改完成'
+                }
+            ],//状态选项
         options_about:[
             {
                 id:'-1',
@@ -530,7 +648,7 @@ export default {
             }
         },
         //检查图标
-           checkIcon(val){
+        checkIcon(val){
           var vm = this
           var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
           if(iconArr.indexOf(val) > -1){
@@ -538,6 +656,57 @@ export default {
           }else{
               return false
           }
+      },
+         handleSizeChange(){
+
+        },
+        handleCurrentChange(){
+
+        },
+        getViewPoint(val){
+            this.itemviewPointInfo=val;
+            this.viewPointShow=true;
+        },
+        getFile(val){
+             this.itemfileList=val;
+            this.fileListShow=true;
+        },
+        getPicture(val){
+            this.itemattachList=val;
+            this.pictureShow=true;
+        },
+        viewPointCancle(){
+            this.viewPointShow=false;
+        },
+        viewPointMakeSure(){
+            this.viewPointShow=false;
+        },
+        pictureCancle(){
+            this.pictureShow=false;
+
+        },
+        pictureMakeSure(){
+            this.pictureShow=false;
+
+        },
+        fileListCancle(){
+            this.fileListShow=false;
+
+        },
+        fileListMakeSure(){
+            this.fileListShow=false;
+        },
+
+      //表格显示
+      tableChange(){
+          this.tableShow=false;
+          this.listShow=true;
+      },
+      //列表显示
+      listChange(){
+          this.tableShow=true;
+          this.listShow=false;
+
       },
       sliceType(val){
             return val.substr(val.length-3)
@@ -600,10 +769,13 @@ export default {
          */
     preview(val){
         var vm = this
-        this.$message({
-            type:'info',
-            message:'该功能正在开发'
-        })
+        // this.$message({
+        //     type:'info',
+        //     message:'该功能正在开发'
+        // })
+        if(val){
+            window.open(vm.BDMSUrl+val)
+        }
         // if(val){
         //      window.open(vm.QJFileManageSystemURL+val+"/preview");
         // }else{
@@ -1227,6 +1399,175 @@ export default {
                     margin:0px 0px;
                     overflow-y:auto;
                 }
+             .item-file{
+                        float: left;
+                        width: 290px;
+                        height: 160px;
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 160px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                            object-fit: contain;
+                            background:#f2f2f2;
+                        }
+                        .actionbox{
+                            display: block;
+                            position: absolute;
+                            bottom: 0;
+                            width: 100%;
+                            height: 36px;
+                            background: rgba(40, 40, 40, .4);
+                            transform: translateY(36px);
+                                transition: all ease .5s;
+                                .button-relocation{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../planCost/images/location.png') no-repeat 0 0;
+                                    // background: url('./images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                    }
+                                .button-search{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../ManageDesign/images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                }
+                                .button-download{
+                                float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../ManageDesign/images/download2.png')no-repeat 0 0;
+                                cursor: pointer;
+                                }
+                                .icon-delete{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    cursor: pointer;
+                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                } 
+                                .line{
+                                float: left;
+                                    margin: 6px 0px;
+                                    width: 1px;
+                                    height: 24px;
+                                    background: #cccccc;
+                                }
+                            }
+                            .checkbox-fileItem{
+                                display:block;
+                                position: absolute;
+                                top: 8px;
+                                left: 8px;
+                                width: 14px;
+                                height: 14px;
+                                border: 1px solid #cccccc;
+                                cursor: pointer;
+                            }
+                            .active{
+                                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                                border: 1px solid #fc3439;
+                            }
+                            .item-file-box{
+                                .item-file-image{
+                                    float: left;
+                                    margin-top:16px;
+                                    width: 70px;
+                                    height: 70PX;
+                                    border-radius: 50%;
+                                    background: #f2f2f2;
+                                    img{
+                                        width: 48px;
+                                        height: 48px;
+                                        display: block;
+                                        margin-top: 13PX;
+                                        margin-left: 11px;
+                                    } 
+                                }
+                                .item-file-detial{
+                                    display: block;
+                                    margin-left:80px;
+                                    margin-top:20px;
+                                    .icon-goujian{
+                                        float: right;
+                                        width: 16px;
+                                        height: 16px;
+                                        cursor: pointer;
+                                    }
+                                    .icon-download{
+                                        background: url('../ManageCost/images/download.png')no-repeat 0 0;
+                                        margin-right: 20px;
+                                        &:hover{
+                                            background: url('../ManageCost/images/download1.png')no-repeat 0 0;
+                                        }
+                                    }
+                                    .icon-search{
+                                        background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                                        margin-right: 20px;
+                                        &:hover{
+                                            background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                                        }
+                                    } 
+                                    .icon-delete{
+                                        margin-right: 20px;
+                                        background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                        } 
+                                    } 
+                                    >h3{
+                                        text-align: left;
+                                        font-size: 14px;
+                                        color: #333333;
+                                        line-height: 20px;
+                                        margin: 9px 0 8px;
+                                        max-height: 40px;
+                                        overflow: hidden;
+                                    }   
+                                    >p{
+                                        font-size: 12px;
+                                        line-height: 12px;
+                                        color: #b3b3b3;
+                                        text-align: left;
+                                        margin-bottom:6px; 
+                                    }
+                                    .text-name{
+                                        color: #336699;
+                                    }
+                                    .operation{
+                                        display: block;
+                                        position: absolute;
+                                        bottom: 15px;
+                                        left: 88px;
+                                        right: 0;
+                                        span{
+                                            color: #fc3439;
+                                        }
+                                    }
+                                }
+                            }
+                }
+                .item-file:hover{
+                    box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                    .actionbox{
+                        transform: translateY(0px);
+                        transition: all ease .5s;
+                    }
+                }
         }
         .clearfix{
             clear: both;
@@ -1295,6 +1636,187 @@ export default {
                     background: #ffffff;
                 }
         }
+         #projectTable{
+                margin:0 auto;
+                width: 96%;
+                .tableBody{
+                    margin-top:30px;
+                    .tableList{
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                        thead{
+                            background: #f2f2f2;
+                            th{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 36px;
+                                text-align: center;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 14px;
+                                color: #333333;
+                                font-weight: normal;
+                            }
+                        }
+                        tbody{
+                            tr{
+                                .red{
+                                    color: red;
+                                }
+                                td{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 36px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-top: 1px solid #e6e6e6;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    .actionBtn{
+                                        width: 18px;
+                                        height: 18px;
+                                        border: none;
+                                        cursor: pointer;
+                                        margin-left: 10px;
+
+                                    }
+                                    span{
+                                        line-height: 16px;
+                                        height: 16px;
+                                        float: left;
+                                        position: relative;
+                                        cursor: pointer;
+                                        margin-left: 20px
+                                    }
+                                    .icon-finish::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -18px;
+                                        top: 2px;
+                                        width: 14px;
+                                        height: 14px;
+                                        line-height: 14px;
+                                        background: url('../ManageDesign/images/finish.png')no-repeat 0 0;
+                                        content: '';
+                                    }
+                                    .icon-reconsider::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -18px;
+                                        top: 2px;
+                                        width: 14px;
+                                        height: 14px;
+                                        line-height: 14px;
+                                        background: orange;
+                                        content: '';
+                                    }
+                                    .icon-start::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -18px;
+                                        top: 2px;
+                                        width: 14px;
+                                        height: 14px;
+                                        line-height: 14px;
+                                        background: green;
+                                        content: '';
+                                    }
+                                    .icon-delete{
+                                        display: inline-block;
+                                        width: 16px;
+                                        height: 16px;
+                                        background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                    }
+                                    span{
+                                        line-height: 16px;
+                                        height: 16px;
+                                        float: left;
+                                        position: relative;
+                                        cursor: pointer;
+                                        margin-left: 24px;
+                                        margin-right: 20px;
+                                        font-size: 12px;
+                                        color: #666666;
+                                    }
+                                    .icon-eye::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -24px;
+                                        top: 2px;
+                                        width: 18px;
+                                        height: 12px;
+                                        line-height: 14px;
+                                        background: url('../ManageDesign/images/eye.png')no-repeat 0 0;
+                                        content: '';
+                                    }
+                                    .icon-image::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -24px;
+                                        top: 2px;
+                                        width: 18px;
+                                        height: 14px;
+                                        line-height: 14px;
+                                        background: url('../ManageDesign/images/image.png')no-repeat 0 0;
+                                        content: '';
+                                    }
+                                    .icon-file::before{
+                                        display: inline-block;
+                                        position: absolute;
+                                        left: -24px;
+                                        top: 2px;
+                                        width: 16px;
+                                        height: 18px;
+                                        line-height: 14px;
+                                        background: url('../ManageDesign/images/file.png')no-repeat 0 0;
+                                        content: '';
+                                    }
+                                    // .deleteBtn{
+                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
+                                    // }
+                                    // .editBtn{
+                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
+                                    // }
+                                    // .upmoveBtn{
+                                    //     background: url('./images/overviewup.png') no-repeat 0 0;
+                                    // }
+                                    // .downmoveBtn{
+                                    //     background: url('./images/downmove.png') no-repeat 0 0;
+                                    // }
+                                    // .detailBtn{
+                                    //     background: url('./images/overfile.png') no-repeat 0 0;
+                                    // }
+                                    // .exportBtn{
+                                    //     background: url('./images/overviewdown.png') no-repeat 0 0;
+                                    // }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                .tableBodyPagination{
+                        display: block;
+                        height: 62px;
+                        width: auto;
+                        border-left: 1px solid #d4d4d4;
+                        border-right: 1px solid #d4d4d4;
+                        border-bottom: 1px solid #d4d4d4;
+                        box-sizing: border-box;
+                        background: #fafafa;
+                        position: relative;
+                        .tableBodyPaginationRight{
+                            position: absolute;
+                            right: 2px;
+                            bottom: 16px;
+                            .el-pagination .el-select .el-input .el-input__inner{
+                                    height: 28px !important;
+                            }
+                        }
+                }
+
+            }
         #containerMessage{
             margin-top:20px;
             padding-left:30px;
@@ -1368,6 +1890,21 @@ export default {
                         background: url('../ManageDesign/images/whiteJiahao.png') no-repeat 0 0;
                         }
                     }
+                    .item-upload_list{
+                        float: right;
+                        margin-right: 30px;
+                        background: #ccc;
+                        color: #ffffff;
+                        font-size: 12px;
+                        height: 26px;
+                        border-radius: 2px;
+                        text-align: left;
+                        line-height: 26px;
+                        padding-left: 12px;
+                        padding-right: 12px;    
+                        position: relative;
+                        cursor: pointer;
+                    }
                 }
             }
             .checkName{
@@ -1378,6 +1915,7 @@ export default {
                 line-height: 14px;
                 // margin-bottom: 10px;
             }
+           
             .project{
                 margin: 20px 0px 0 0px;
                     .pagenation{

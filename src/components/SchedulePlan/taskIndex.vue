@@ -60,7 +60,7 @@
               <div class="taskHeadRight">
                 <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
-                <span class="btn-operate" v-show="projectGanntShow" @click="fDplay()">4D播放</span>
+                <span class="btn-operate" v-show="projectWorkShow" @click="fDplay()">4D播放</span>
                 <span class="btn-operate"  v-show="projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
                 <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
 

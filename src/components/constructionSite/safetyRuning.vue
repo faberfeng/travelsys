@@ -1226,7 +1226,6 @@ export default {
                     this.checkPointsByItemIdList.forEach((item)=>{
                         item.checkNum=false;
                     })
-
                 })
             }else{
                 this.$message({
