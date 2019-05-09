@@ -379,6 +379,7 @@
                 </el-dialog>
                 <el-dialog  title="视点列表" v-dialogDrag :visible.sync="viewPointShow" @close="viewPointCancle">
                     <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li v-if="!itemviewPointInfo">当前无视点</li>
                         <li :class="['item-file']" v-for="(val,key) in itemviewPointInfo" :key="key+'attach1'" style="padding:0;overflow: hidden;">
                             <img style="object-fit: contain" :src="BDMSUrl+val.relativePath" :title="val.fileName" class="item-file-attach"/>
                             <div class="actionbox clearfix">
@@ -397,6 +398,7 @@
                 </el-dialog>
                 <el-dialog  title="图片列表" v-dialogDrag :visible.sync="pictureShow" @close="pictureCancle">
                     <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li v-if="!itemattachList">当前无图片</li>
                         <li :class="['item-file']" v-for="(val,key1) in itemattachList" :key="key1+'attach'" style="padding:0;overflow: hidden;">
                             <img style="object-fit: contain" :src="BDMSUrl+val.path" :title="val.name" class="item-file-attach"/>
                             <div class="actionbox clearfix">
@@ -415,6 +417,7 @@
                 </el-dialog>
                 <el-dialog  title="文件列表" v-dialogDrag :visible.sync="fileListShow" @close="fileListCancle">
                     <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li v-if="!itemfileList">当前无文件</li>
                         <li :class="['item-file']" v-for="(val,key) in itemfileList" :key="key+'file'">
                             <div class="item-file-box clearfix">
                                 <span  class="item-file-image">
@@ -757,7 +760,7 @@ export default {
             })
         }else{
                 const app = document.getElementById('webIframe').contentWindow;
-                app.postMessage({command:"Init",parameter:null},"*");
+                // app.postMessage({command:"Init",parameter:null},"*");
                 app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;

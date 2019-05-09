@@ -176,6 +176,8 @@
                                                 <th width="100px">待查状态</th>
                                                 <th width="100px">检查人</th>
                                                 <th width="100px">检查时间</th>
+                                                <th width="100px">检查内容摘要</th>
+                                                <th width="100px">附件</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -190,6 +192,10 @@
                                                 <td width="100px">{{item.expectCheckStatus|expectCheckStatusChange()}}</td>
                                                 <td width="100px">{{item.checkUserName|nameChange()}}</td>
                                                 <td width="100px">{{item.checkTime| changeTime()}}</td>
+                                                <td width="100px">{{item.content}}</td>
+                                                <td width="100px">
+                                                    <span v-if="item.filePath" class="el-icon-document" :title="item.fileName" @click="downFile(item.filePath)"></span>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -348,16 +354,27 @@
             </div>
             <div id="mask" v-if="labelListShow||labelListSingleShow" ></div>
             <div id="edit">
-                <el-dialog width="400px"  title="安全状态修改" v-dialogDrag :visible="securityStatusShow" @close="srStatusCancle">
+                <el-dialog width="500px"  title="安全状态修改" v-dialogDrag :visible="securityStatusShow" @close="srStatusCancle">
                     <div class="editBody">
                         <div class="editBodytwo" style="margin-left:1px;">
                             <el-radio v-model="securityStatus" label="1">确认安全</el-radio>
-                        </div>
-                        <div class="editBodytwo" style="margin-left: 1px;">
                             <el-radio v-model="securityStatus"  label="2">需要整改</el-radio>
+                            <el-radio v-model="securityStatus"  label="3">急需整改</el-radio>
+                        </div>
+                        <div class="editBodytwo imageBody" style="margin-left: 1px;">
+                           
+                            <span class="updataImageSpan">
+                                <span @click="selectImg">
+                                    <button class="upImgBtn">选择文件</button>
+                                </span>
+                                <input class="upInput"  type="file" accept="*" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
+                            </span>
+                            <span class="upImgText1">{{imageName}}</span>
+                            <span  class="icon-eye" @click="AddViewpoint()">视点</span>
                         </div>
                         <div class="editBodytwo" style="margin-left: 1px;">
-                            <el-radio v-model="securityStatus"  label="3">急需整改</el-radio>
+                            <label style="margin:10px 53px;display:block">内容摘要:</label>
+                            <textarea class="textareaContent" v-model="content" placeholder="请输入检查内容摘要"></textarea>
                         </div>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -585,9 +602,13 @@
 import axios from 'axios'
 import data from '../Settings/js/date.js'
 import moment from 'moment'
+var app;
+var ScreenPara;
+var CurrentSelectPara;
 export default {
     name:'safetyChecking',
     data(){
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         return{
             bottomExpend2:{
                 title:'收起',
@@ -641,7 +662,7 @@ export default {
                 total:0,//所有数据
             },
             singleLable:false,
-            securityStatus:'',
+            securityStatus:'1',
             securityStatusShow:false,
             supplySecurityStatusShow:false,
             fileNameShow:false,//重命名显示
@@ -716,6 +737,12 @@ export default {
             getClassificationsList:'',
             classifyValue:'',
             checkPointIdsData:'',
+            imageName:'请选择文件',
+            filesList:null,
+            content:'',
+            uploadViewPointList:[],
+            base64Str:'',
+            elementFilter:'',
 
         }
     },
@@ -736,6 +763,7 @@ export default {
         vm.loadzTreeData();
         vm.getCheckPointsByItemId();
         vm.getClassifications();
+
         // vm.getCheckItemData();
     },
     mount(){
@@ -836,6 +864,49 @@ export default {
 
     },
     methods:{
+        callback(e){
+           // console.log(e)
+            switch(e.data.command){
+			case "EngineReady":
+				{
+                    // let Horder = {"ID":this.WebGlSaveId,"Type":this.WebGlSaveType,"Name":this.WebGlSaveName,"ParentID":""};
+					// let para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
+					// app.postMessage({command:"EnterProject",parameter:para},"*");
+				}
+				break;
+            case "CurrentSelectedEnt":
+			case "ViewpointSubmited":
+                ScreenPara = e.data.parameter;
+                this.base64Str=ScreenPara.para2;
+                this.elementFilter=ScreenPara.para1;
+                 var vm = this
+                    axios({
+                        method:'POST',
+                        url:this.BDMSUrl+'design/uploadViewPoint/'+this.projId,
+                        headers:{
+                            'token':vm.token
+                        },
+                        data:{"base64":this.base64Str}
+                    }).then((response)=>{
+                        if(response.data.cd == 0){
+                            this.$message({
+                                type:'success',
+                                message:'视点截图成功'
+                            })
+                            this.securityStatusShow=true;
+                            this.uploadViewPointList.push({
+                                'path':response.data.rt,
+                                'ScreenPara':ScreenPara,
+                                'elementFilter':this.elementFilter
+                            })
+                            console.log(this.uploadViewPointList,'截图0000');
+
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
+		    }
+        },
         changeBottomExpend2(){
              var vm = this
             vm.bottomExpend2.isExpend = !vm.bottomExpend2.isExpend
@@ -850,6 +921,11 @@ export default {
                 document.getElementsByClassName('header_body')[0].style.height='150px'
             }
            
+        },
+        downFile(val){
+            if(val){
+                window.open(this.BDMSUrl+val);
+            }
         },
         //打印当前标签
         printCurrentLabel(){
@@ -1360,32 +1436,74 @@ export default {
     srStatusCancle(){
         this.securityStatusShow=false;
     },
+    selectImg(){
+        this.$refs.file.click()
+    },
+    AddViewpoint(){
+        if(document.getElementById('webgl').style.display=='none'){
+            this.$message({
+                type:'info',
+                message:'请打开顶部的虚拟场景'
+            })}else{
+                this.securityStatusShow=false;
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                 const app = document.getElementById('webIframe').contentWindow;
+                app.postMessage({command:"AddViewpoint",parameter:123},"*");
+            }
+    },
+    fileChanged(){
+        var vm = this
+        vm.filesList = vm.$refs.file.files[0]
+        vm.imageName = vm.filesList.name
+    },
     srStatusConfirm(){
         var vm=this;
-         axios({
-            method:'get',
-            headers:{
-                'token':this.token
-            },
-            params:{
-               currCheckStatus:this.securityStatus,
-               projId:this.projId,
-               checkPointId:this.checkPointId
-            },
-            url:this.BDMSUrl+'security/updateCheckPointSecurityStatus'
-        }).then(response=>{
-            if(response.data.cd=='0'){
-                vm.securityStatusShow=false;
-                vm.securityStatus='',
-                vm.$message(
-                    {type:'success',
-                    message:'安全状态修改成功'})
-                    vm.getCheckPointsByItemId();
+        if(this.securityStatus==''){
+            this.$message({
+                type:'info',
+                message:'请选择状态'
+            })
+        }else if(vm.filesList == null){
+            vm.$message({
+                type:'info',
+                message:'请选择文件！'
+            })
+        }else{
+            var formData = new FormData()
+            formData.append('file',vm.filesList);
+            axios({
+                method:'post',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    currCheckStatus:this.securityStatus,
+                    projId:this.projId,
+                    checkPointId:this.checkPointId,
+                    content:this.content,
+                    viewPath:this.uploadViewPointList[0].path,
+                    elementFilter:this.uploadViewPointList[0].elementFilter
+                },
+                data:formData,
+                url:this.BDMSUrl+'security/updateCheckPointSecurityStatus'
+            }).then(response=>{
+                if(response.data.cd=='0'){
+                    vm.securityStatusShow=false;
+                    vm.securityStatus='',
+                    vm.content='';
+                    vm.imageName="未选择任何文件"
+                    vm.$message(
+                        {type:'success',
+                        message:'安全状态修改成功'})
+                        vm.getCheckPointsByItemId();
 
-            }else if(response.data.cd=='-1'){
-                alert(response.data.msg);
-            }
-        })
+                }else if(response.data.cd=='-1'){
+                    alert(response.data.msg);
+                }
+            })
+        }
+        
     },
     srSupplyStatusConfirm(){
         var vm=this;
@@ -2628,18 +2746,22 @@ export default {
                                                 font-size: 12px;
                                                 color: #333333;
                                                 font-weight: normal;
-                                                // /*
-                                                // 溢出隐藏
-                                                // */
-                                                // overflow: hidden;
-                                                // /*
-                                                // 显示省略号
-                                                // */
-                                                // text-overflow: ellipsis;
-                                                // /*
-                                                // 不换行
-                                                // */
-                                                // white-space: nowrap;
+                                                /*
+                                                溢出隐藏
+                                                */
+                                                overflow: hidden;
+                                                /*
+                                                显示省略号
+                                                */
+                                                text-overflow: ellipsis;
+                                                /*
+                                                不换行
+                                                */
+                                                white-space: nowrap;
+                                                .el-icon-document{
+                                                    font-size:16px;
+                                                    cursor: pointer;
+                                                }
                                             }
                                         }
                                     }
@@ -2702,18 +2824,22 @@ export default {
                                                 font-size: 12px;
                                                 color: #333333;
                                                 font-weight: normal;
-                                                // /*
-                                                // 溢出隐藏
-                                                // */
-                                                // overflow: hidden;
-                                                // /*
-                                                // 显示省略号
-                                                // */
-                                                // text-overflow: ellipsis;
-                                                // /*
-                                                // 不换行
-                                                // */
-                                                // white-space: nowrap;
+                                                /*
+                                                溢出隐藏
+                                                */
+                                                overflow: hidden;
+                                                /*
+                                                显示省略号
+                                                */
+                                                text-overflow: ellipsis;
+                                                /*
+                                                不换行
+                                                */
+                                                white-space: nowrap;
+                                                .el-icon-document{
+                                                    font-size:16px;
+                                                    cursor: pointer;
+                                                }
                                             }
                                         }
                                     }
@@ -2941,6 +3067,97 @@ export default {
             .el-dialog__body {
             .editBody {
                 .editBodytwo{
+                    .upInput{
+                            display: none;
+                        }
+                        /* 上传文件按钮 */
+                        .imageBody{
+                            text-align: left!important;
+                        }
+                        .el-radio__label{
+                            padding-left: 10px;
+                            padding-right: 10px;
+                        }
+                        .imageBodyText{
+                            color: #666;
+                            font-size: 14px;
+                            line-height: 14px;
+                            font-weight: normal;
+                            display: inline-block;
+                            width: 175px;
+                            padding-left: 94px;
+                            text-align: left;
+                        }
+                        .updataImageSpan{
+                            overflow: hidden;
+                            width: 98px;
+                            margin-left:-40px;
+                        }
+                        .updataImageSpan input{
+                            position: absolute;
+                            left: 0px;
+                            top: 0px;
+                            opacity: 0;
+                            /* -ms-filter: 'alpha(opacity=0)'; */
+                        }
+                        .upImgText1{
+                                font-size: 14px;
+                                line-height: 14px;
+                                display: inline-block;
+                                margin-left: 10px;
+                                font-weight: normal;
+                                color: #999;
+                                /* width: 300px; */
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                text-align: left;
+                                width: 200px;
+                        }
+                        //  span{
+                        //         line-height: 16px;
+                        //         height: 16px;
+                        //         float: left;
+                        //         position: relative;
+                        //         cursor: pointer;
+                        //         margin-left: 24px;
+                        //         margin-right: 20px;
+                        //         font-size: 12px;
+                        //         color: #666666;
+                        //     }
+                            .icon-eye::before{
+                                display: inline-block;
+                                position: absolute;
+                                right: 137px;
+                                top: 160px;
+                                width: 18px;
+                                height: 12px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/eye.png')no-repeat 0 0;
+                                content: '';
+                            }
+                            .icon-image::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 18px;
+                                height: 14px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/image.png')no-repeat 0 0;
+                                content: '';
+                            }
+                            .icon-file::before{
+                                display: inline-block;
+                                position: absolute;
+                                left: -24px;
+                                top: 2px;
+                                width: 16px;
+                                height: 18px;
+                                line-height: 14px;
+                                background: url('../ManageDesign/images/file.png')no-repeat 0 0;
+                                content: '';
+                            }
                         .itemName{
                             // float: left;
                             // position: relative;
@@ -2948,6 +3165,12 @@ export default {
                             // top:40px;
                             // display:inline-block;
                             // font-size: 14px;
+                        }
+                        .textareaContent{
+                            width: 350px;
+                            height: 200px;
+                            font-size:12px;
+                            padding: 4px;
                         }
                         .itemInp{
                             -webkit-appearance: none;

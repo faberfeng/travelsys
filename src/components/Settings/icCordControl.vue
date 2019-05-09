@@ -11,27 +11,28 @@
                         <tr>
                             <th>序号</th>
                             <th>IC卡号</th>
-                            <th>IC卡列表</th>
+                            <th>IC卡类别</th>
                             <th>绑定人员</th>
                             <th>状态</th>
                             <th>编辑</th>
                         </tr>
                         </thead>
                         <tbody>
-                            <!-- <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr> -->
+                            <tr v-for="(item,index) in cardLists" :key="index">
+                                <td>{{index+1}}</td>
+                                <td>{{item.cardNo}}</td>
+                                <td>{{item.cardType==1?'项目卡':'临时卡'}}</td>
+                                <td>{{item.ownerName}}</td>
+                                <td>{{statusChange(item.status)}}</td>
+                                <td>
+                                    <button class="actionBtn editBtn" @click="editicCard(item)" title="更新"></button>
+                                    <button class="actionBtn deleteBtn" @click="deleteicCard(item)" title="删除"></button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-                <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                <div v-if="!cardLists" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                     当前列表无数据
                 </div>
                 <div class="tableBodyPagination">
@@ -44,7 +45,7 @@
                             :page-sizes="[10,20,30]"
                             :page-size="1"
                             layout="sizes,prev, pager, next"
-                            :total="TableListLength">
+                            :total="cardListLength">
                         </el-pagination>
                     </div>
                 </div>
@@ -82,7 +83,7 @@
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="添加IC卡" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                <el-dialog title="更新IC卡" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
                     <div class="editBody">
                         <div class="editBodyone"><label class="editInpText">IC卡编号 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div>
                         <div class="editBodytwo">
@@ -91,15 +92,6 @@
                                 <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
                             </select>
                             <i class="icon-sanjiao"></i>
-
-                            <!-- <el-select  v-model="icCordType" placeholder="请选择">
-                                <el-option
-                                v-for="item in icOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select> -->
                         </div>
                         <div class="editBodytwo"><label class="editInpText">绑定人员 :</label>
                             <select class="editSelect" v-model="icCordOwner" >
@@ -145,8 +137,13 @@ export default {
                 label:'临时卡'
             }],
             cardList:[],
+            cardLists:[],
             userLists:[],
             editDialog:false,
+            pageSize:10,
+            pageNum:1,
+            cardListLength:1,
+
 
         }
     },
@@ -161,12 +158,16 @@ export default {
         this.getCardList();
     },
     methods:{
-        handleSizeChange(){
-
+        statusChange(val){
+            if(val==1){
+                return '持有中'
+            }else if(val==2){
+                return '已借出'
+            }else if(val==3){
+                return '未使用'
+            }
         },
-        handleCurrentChange(){
-
-        },
+       
         //改变时间
         changeDatePicker(){
 
@@ -179,18 +180,46 @@ export default {
         },
         addCancle(){
             this.addDialog=false;
-            this.icCordName='';
-            this.icCordUrl='';
+            this.cardNo='';
         },
         editCancle(){
-
+            this.editDialog=false;
+            this.cardNo='';
         },
         buildIcCord(){
             this.addDialog=true;
+            this.icCordType=1;
+        },
+         handleSizeChange(val){
+            this.cardLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.cardListLength-1>=NumB&&this.cardListLength-1<=NumE){
+                NumE=this.cardListLength-1;
+            }
+          
+            for(var i=NumB;i<NumE+1;i++){
+                this.cardLists.push(this.cardList[i])
+            }
+
+        },
+        handleCurrentChange(val){
+            this.cardLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.cardListLength-1>=NumB&&this.cardListLength-1<=NumE){
+                NumE=this.cardListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.cardLists.push(this.cardList[i])
+            }
         },
         //获取卡片列表
         getCardList(){
             var vm=this;
+            this.cardLists=[];
             axios({
                 url:vm.BDMSUrl+'ic/getCard',
                 method:'get',
@@ -203,6 +232,16 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.cardList=response.data.rt;
+                    this.cardListLength=response.data.rt.length;
+                    if(this.cardListLength<11){
+                        for(var i=0;i<this.cardListLength;i++){
+                            this.cardLists.push(this.cardList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.cardLists.push(this.cardList[i])
+                        }
+                    }
                    
                 }
             })
@@ -247,34 +286,68 @@ export default {
                     // this.addCancle=false;
                     this.icCordNum='';
                     this.icCordType='';
-                    this.icCordOwner='';
                 }
             })
+        },
+        editicCard(val){
+            this.editDialog=true;
+            this.icCordNum=val.cardNo;
+            this.icCordType=val.cardType;
+            this.icCordOwner=val.owner;
+            this.cardId=val.id;
         },
         //更新卡片
         editCard(){
              var vm=this;
             axios({
-                url:vm.BDMSUrl+'ic/addCard',
+                url:vm.BDMSUrl+'ic/updateCard',
                 method:'get',
                 headers:{
                     'token':this.token
                 },
                 params:{
-                    id:'',
-                     cardNo:vm.icCordNum,
-                     cardType:vm.icCordType,
-                     owner:vm.icCordOwner
+                    id:vm.cardId,
+                    cardNo:vm.icCordNum,
+                    cardType:vm.icCordType,
+                    owner:vm.icCordOwner
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.addDialog=false;
+                    this.editDialog=false;
                     this.getCardList();
                     // this.addCancle=false;
                     this.icCordNum='';
                     this.icCordType='';
-                    this.icCordOwner='';
+                    // this.icCordOwner='';
                 }
+            })
+        },
+        deleteicCard(val){
+            var vm=this;
+            this.$confirm('您要删除当前所选卡？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'ic/deleteCard',
+                    method:'GET',
+                    params:{
+                        id:val.id
+                    },
+                    headers:{
+                        'token':this.token
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getCardList();
+                    }else{
+                        // this.$message({
+                        //     type:'error',
+                        //     message:response.data.msg
+                        // })
+                    }
+                })
             })
         }
 

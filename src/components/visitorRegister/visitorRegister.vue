@@ -6,7 +6,78 @@
                 </router-link>
             </div>
         </div>
-        
+        <div class="contentBody">
+            <div class="ForumSelector">
+                <span class="name">筛选条件</span>
+                <ul>
+                    <li class="selectItem">
+                        <!-- <span class="title">时间</span> -->
+                        <span class="itemContent">
+                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                         </span>
+                    </li>
+                    <li class="selectItem">
+                       <span class="title-right">
+                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
+                        </span>
+                    </li>
+                     
+                </ul>
+                <span class="selectItemRight" >
+                        导出
+                </span>
+            </div>
+            <div class="tableBody">
+                <table class="tableList" border="1" cellspacing="0" width="100%">
+                    <thead>
+                       <tr>
+                           <th>序号</th>
+                           <th>访客登记</th>
+                           <th>随行人员</th>
+                           <th>单位</th>
+                           <th>门禁</th>
+                           <th>是否有车辆</th>
+                           <th>登记时间</th>
+                           <th>离开时间</th>
+                           <th>安全告知</th>
+                           <th>备注</th>
+                           <th>编辑</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                当前列表无数据
+            </div>
+            <div class="tableBodyPagination">
+                <div class="tableBodyPaginationRight">
+                    <el-pagination class="elPagination"
+                        background
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10,20,30]"
+                        :page-size="1"
+                        layout="sizes,prev, pager, next"
+                        :total="TableListLength">
+                    </el-pagination>
+                </div>
+            </div>
+
+        </div>
     </div>
 </template>
 
@@ -16,6 +87,11 @@ export default {
     data(){
         return{
             routerList:"",
+            moduleList:'',
+            TableListLength:1,//表格长度
+            currentPage:1,//当前页
+            selectTime:"",//筛选时间
+            selectName:"",//筛选名称
 
         }
     },
@@ -72,6 +148,17 @@ export default {
                 return value1 - value2;
             }
         },
+        handleSizeChange(){
+
+        },
+        handleCurrentChange(){
+
+        },
+        //改变时间
+        changeDatePicker(){
+        },
+        selectNameInfo(){
+        }
 
     },
 
@@ -92,7 +179,7 @@ li{
         .topHeader{
             box-sizing: border-box;
             // margin-top:107px;
-            float: left;
+            // float: left;
             width: 100%;
             max-height: 800px;
             overflow: auto;
@@ -128,6 +215,184 @@ li{
                     border-bottom: 1px solid #fff;
                     background: #ffffff;
                 }
+        }
+        .contentBody{
+            margin-top:20px;
+            padding: 20px 20px;
+           .ForumSelector{
+                        border: 1px solid #d9d9d9;
+                        height: 50px;
+                        color: #999999;
+                        font-size: 12px;
+                        // margin-right: 30px;
+                        margin-right: 5px;
+                        .name{
+                            float: left;
+                            width: 96px;
+                            height: 48px;
+                            line-height: 48px;
+                            text-align: left;
+                            padding-left: 10px;
+                            background: #fafafa;
+                        }
+                        .selectItemRight{
+                                float: right;
+                                 width: 96px;
+                                height: 48px;
+                                line-height: 48px;
+                                text-align: left;
+                                padding-left: 10px;
+                                font-size: 16px;
+                                color:rgb(141, 141, 190);
+                                cursor: pointer;
+                        }
+                        >ul{
+                            float: left;
+                            .selectItem{
+                                float: left;
+                                .itemContent{
+                                    display: inline-block;
+                                    padding: 8px 15px 0 30px;
+                                    height: 48px;
+                                    line-height: 48px;
+                                }
+                                .title{
+                                    display: inline-block;
+                                    padding: 0 15px 0 30px;
+                                    height: 48px;
+                                    line-height: 48px;
+                                }
+                                .el-select{
+                                    .el-input__inner{
+                                        border:none;
+                                        width: 100px;
+                                        color:#333333;
+                                        height: 38px;
+                                    }
+                                }
+                                .title-right{
+                                    float: left;;
+                                    width: 214px;
+                                    height: 33px;
+                                    margin-left: 20px;
+                                    margin-top:8px;
+                                    position: relative;
+                                    .title-right-icon{
+                                        display: block;
+                                        width: 100%;
+                                        height: 100%;
+                                        border-radius: 15px;
+                                        border: 1px solid #e6e6e6;
+                                        position: relative;
+                                        background: #fafafa;
+                                        padding-left:10px;
+                                        padding-right:40px;
+                                        margin-right: 5px;
+                                        outline: none;
+                                        &:focus{
+                                            background: #ffffff;  
+                                        }
+                                    }
+                                    .el-icon-search{
+                                        position: absolute;
+                                        right: 16px;
+                                        top: 10px;
+                                        cursor: pointer;
+                                    }
+                                }
+                            
+                            }
+                            .selectItem:first-of-type .el-select .el-input__inner{
+                                width: 170px;
+                            }
+                        }
+                }
+
+            .tableBody{
+                  margin-top:30px;
+                    .tableList{
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                        thead{
+                            background: #f2f2f2;
+                            th{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 36px;
+                                text-align: center;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 14px;
+                                color: #333333;
+                                font-weight: normal;
+                            }
+                        }
+                        tbody{
+                            tr{
+                                .red{
+                                    color: red;
+                                }
+                                td{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 36px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    .actionBtn{
+                                        width: 18px;
+                                        height: 18px;
+                                        border: none;
+                                        cursor: pointer;
+                                        margin-left: 10px;
+
+                                    }
+                                    // .deleteBtn{
+                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
+                                    // }
+                                    // .editBtn{
+                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
+                                    // }
+                                    // .upmoveBtn{
+                                    //     background: url('./images/overviewup.png') no-repeat 0 0;
+                                    // }
+                                    // .downmoveBtn{
+                                    //     background: url('./images/downmove.png') no-repeat 0 0;
+                                    // }
+                                    // .detailBtn{
+                                    //     background: url('./images/overfile.png') no-repeat 0 0;
+                                    // }
+                                    // .exportBtn{
+                                    //     background: url('./images/overviewdown.png') no-repeat 0 0;
+                                    // }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            .tableBodyPagination{
+                        display: block;
+                        height: 62px;
+                        width: auto;
+                        border-left: 1px solid #d4d4d4;
+                        border-right: 1px solid #d4d4d4;
+                        border-bottom: 1px solid #d4d4d4;
+                        box-sizing: border-box;
+                        background: #fafafa;
+                        position: relative;
+                        .tableBodyPaginationRight{
+                            position: absolute;
+                            right: 2px;
+                            bottom: 16px;
+                            .el-pagination .el-select .el-input .el-input__inner{
+                                    height: 28px !important;
+                            }
+                        }
+            }
+
         }
 
 }
