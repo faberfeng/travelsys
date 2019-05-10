@@ -27,6 +27,9 @@
                 <span class="selectItemRight" >
                         导出
                 </span>
+                <div class="wrapperHead" @click="buildVisitorRegister">
+                    <span class="el-icon-plus"></span><span class="elName">访客登记</span>
+                </div>
             </div>
             <div class="tableBody">
                 <table class="tableList" border="1" cellspacing="0" width="100%">
@@ -76,12 +79,44 @@
                     </el-pagination>
                 </div>
             </div>
-
+        </div>
+        <div id="edit">
+                <el-dialog title="添加访客登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                    <div class="editBody">
+                        <!-- <div class="editBodyone"><label class="editInpText">访客登记 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div> -->
+                        <div class="editBodytwo"><label class="editInpText">访客登记 :</label>
+                            <select class="editSelect" v-model="mainVisitor" >
+                                <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
+                            </select>
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
+                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入人数" v-model="company"/></div>
+                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
+                        <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
+                        <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
+                        <!-- <div class="editBodytwo"><label class="editInpText">门禁方式 :</label>
+                        </div> -->
+                        <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" placeholder="请输入" v-model="remark"/></div>
+                         <!-- <div class="editBodytwo">
+                            <label class="editInpText">IC卡类别 :</label>
+                             <select class="editSelect" v-model="icCordType" >
+                                <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </div> -->
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addvisitorRecord()">确定</button>
+                        <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog>
         </div>
     </div>
 </template>
 
 <script>
+import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
@@ -92,6 +127,18 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
+            addDialog:false,
+            userLists:[],
+            mainVisitor:'',//主要访客
+            BDMSUrl:'',
+            carInfo:"",
+            contactInfo:'',//联系方式
+            entourage:'',//随行人员
+            icCardNo:'',//临时卡号
+            company:'',//公司
+            remark:'',//备注
+            getVisitorInfoList:[],
+
 
         }
     },
@@ -101,8 +148,10 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
+        vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.loadingTitle();
+        this.getUserList();
 
     },
     methods:{
@@ -148,6 +197,54 @@ export default {
                 return value1 - value2;
             }
         },
+        addvisitorRecord(){
+            var data={}
+            var vm=this;
+            // var data=moment(new Date().getTime()).format('YYYY-MM')
+            data={
+                "carInfo":vm.carInfo,
+                "company":vm.company,
+                "contactInfo":vm.contactInfo,
+                "entourage":vm.entourage,
+                "icCardNo":vm.icCardNo,
+                "mainVisitor": vm.mainVisitor,
+                "projId": vm.projId,
+                "remark": vm.remark
+            }
+            axios({
+                url:this.BDMSUrl+'visitor/addVisitorInfo',
+                headers:{
+                    'token':this.token
+                },
+                method:'post',
+                data:data
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getVisitorInfo();
+                    this.addDialog=false;
+                }
+            })
+        },
+        getVisitorInfo(time){
+            axios({
+                url:this.BDMSUrl+'visitor/getVisitorInfo',
+                method:'GET',
+                params:{
+                    projId:this.projId,
+                    time:time
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                     this.getVisitorInfoList=response.data.rt;
+                }
+            })
+        },
+        addCancle(){
+            this.addDialog=false;
+        },
+        addCard(){
+
+        },
         handleSizeChange(){
 
         },
@@ -158,7 +255,29 @@ export default {
         changeDatePicker(){
         },
         selectNameInfo(){
-        }
+
+        },
+        buildVisitorRegister(){
+            this.addDialog=true;
+
+        },
+        getUserList(){
+            axios({
+                url:this.BDMSUrl+'user/getUserList',
+                method:'GET',
+                params:{
+                    projectId:this.projId
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.userLists=response.data.rt;
+                    this.mainVisitor=this.userLists[0].userId;
+                }
+            })
+        },
 
     },
 
@@ -236,7 +355,7 @@ li{
                             background: #fafafa;
                         }
                         .selectItemRight{
-                                float: right;
+                                // float: right;
                                  width: 96px;
                                 height: 48px;
                                 line-height: 48px;
@@ -245,6 +364,24 @@ li{
                                 font-size: 16px;
                                 color:rgb(141, 141, 190);
                                 cursor: pointer;
+                        }
+                        .wrapperHead{
+                                float: right;
+                                line-height: 48px;
+                                height: 48px;
+                                margin-right:15px;
+                                cursor: pointer;
+                                .el-icon-plus{
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    color:rgb(46,140,185);
+                                }
+                                .elName{
+                                    margin-left:4px;
+                                    font-size:16px;
+                                    font-weight: bold;
+                                    color:rgb(46,140,185);
+                                }
                         }
                         >ul{
                             float: left;
@@ -393,6 +530,16 @@ li{
                         }
             }
 
+        }
+        #edit{
+            .editSelect{
+                    width: 447px;
+                    height: 38px;
+                    color: #333333;
+                    background: #fafafa;
+                    border: 1px solid #d1d1d1;
+                    padding:0px 0px 0px 10px;
+                }
         }
 
 }

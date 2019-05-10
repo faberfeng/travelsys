@@ -832,7 +832,7 @@ const router = new Router({
           component:resolve=>require(['@/components/Settings/icCordControl'],resolve)
         },
         {
-          path:'/setting/projectModel',
+          path:'/setting/attendManage',
           name:'projectModel',
           meta:{
             settingsCenter:true

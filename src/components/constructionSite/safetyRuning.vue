@@ -194,7 +194,9 @@
                                                 <td width="100px">{{item.checkTime| changeTime()}}</td>
                                                 <td width="100px">{{item.content}}</td>
                                                 <td width="100px">
-                                                    <span v-if="item.filePath" class="el-icon-document" :title="item.fileName" @click="downFile(item.filePath)"></span>
+                                                    <span v-if="item.viewPath" class="icon-eye" title="视点" @click="getViewPointShow(item.viewPath,item.elementFilter)" >视点</span>
+                                                    <span v-if="item.filePath" class="icon-file"  :title="item.fileName" @click="downFile(item.filePath)">文档</span>
+                                                    <!-- <span  class="el-icon-document" :title="item.fileName" @click="downFile(item.filePath)"></span> -->
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -363,14 +365,14 @@
                         </div>
                         <div class="editBodytwo imageBody" style="margin-left: 1px;">
                            
-                            <span class="updataImageSpan">
+                            <span class="updataImageSpan1">
                                 <span @click="selectImg">
                                     <button class="upImgBtn">选择文件</button>
                                 </span>
                                 <input class="upInput"  type="file" accept="*" @change="fileChanged($event)" ref="file"  id="fileInfo" multiple="multiple">
                             </span>
                             <span class="upImgText1">{{imageName}}</span>
-                            <span  class="icon-eye" @click="AddViewpoint()">视点</span>
+                            <span  class="icon-eye" @click="AddViewpoint()">{{cutViewPoint}}</span>
                         </div>
                         <div class="editBodytwo" style="margin-left: 1px;">
                             <label style="margin:10px 53px;display:block">内容摘要:</label>
@@ -572,6 +574,25 @@
                         <button class="editBtnC" @click="spotEditCancle">取消</button> -->
                     </div>
                 </el-dialog>
+                <el-dialog  title="视点列表" v-dialogDrag :visible.sync="viewPointShow" @close="viewPointCancle">
+                    <ul class="clearfix" style="padding: 0px 0px 0px 2px;">
+                        <li v-if="!viewPointPath">当前无视点</li>
+                        <li :class="['item-file']"  style="padding:0;overflow: hidden;">
+                            <img style="object-fit: contain" :src="BDMSUrl+viewPointPath" class="item-file-attach"/>
+                            <div class="actionbox clearfix">
+                                <i class="button-relocation" v-show="locationInfo"  @click="relocation(locationInfo)"></i>
+                                    <i class="line"></i>
+                                <i class="button-search"   @click="downLoad(viewPointPath)"></i>
+                                <i class="line"></i>
+                                <i class="button-download" v-show="viewPointPath" @click="downLoad(viewPointPath)"></i>
+                            </div>
+                        </li>
+                    </ul> 
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="viewPointCancle">确定</button>
+                        <button class="editBtnC" @click="viewPointMakeSure">取消</button>
+                    </div>
+                </el-dialog>
             </div>
             <div id="inital">
                 <!-- 检查点位删除 -->
@@ -608,12 +629,13 @@ var CurrentSelectPara;
 export default {
     name:'safetyChecking',
     data(){
-        window.addEventListener("message", (evt)=>{this.callback(evt)});
+        
         return{
             bottomExpend2:{
                 title:'收起',
                 isExpend:true
             },
+            viewPointShow:false,
             listData:[],
             valueDate:'',
             routerList:'',
@@ -738,17 +760,22 @@ export default {
             classifyValue:'',
             checkPointIdsData:'',
             imageName:'请选择文件',
+            cutViewPoint:'视点',
             filesList:null,
+            filePath:'',
             content:'',
             uploadViewPointList:[],
             base64Str:'',
             elementFilter:'',
+            viewPointPath:'',
+            locationInfo:'',
 
         }
     },
     created(){
         var vm = this;
         // vm.defaultSubProjId = localStorage.getItem('defaultSubProjId')
+        window.addEventListener("message", (evt)=>{this.callback(evt)});
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
         vm.userId  = localStorage.getItem('userid');
@@ -767,7 +794,10 @@ export default {
         // vm.getCheckItemData();
     },
     mount(){
-
+       
+    },
+    destoryed(){
+         window.removeEventListener("message", (evt)=>{this.callback(evt)});
     },
     watch:{
         'pageDetial.currentPage':function(val,oldval){
@@ -893,6 +923,7 @@ export default {
                                 type:'success',
                                 message:'视点截图成功'
                             })
+                            this.cutViewPoint='已截屏'
                             this.securityStatusShow=true;
                             this.uploadViewPointList.push({
                                 'path':response.data.rt,
@@ -907,6 +938,32 @@ export default {
                     })
 		    }
         },
+        relocation(val){
+            if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+                    const app = document.getElementById('webIframe').contentWindow;
+                    // app.postMessage({command:"Init",parameter:null},"*");
+                    app.postMessage({command:"MoveToViewpoint",parameter:{para1:val}},"*");
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+            }
+
+        },
+        downLoad(val){
+            if(val){
+                window.open(this.BDMSUrl+val)
+            }
+        },
+        viewPointCancle(){
+            this.viewPointShow=false;
+        },
+        viewPointMakeSure(){
+            this.viewPointShow=false;
+        },
         changeBottomExpend2(){
              var vm = this
             vm.bottomExpend2.isExpend = !vm.bottomExpend2.isExpend
@@ -920,12 +977,16 @@ export default {
                 document.getElementsByClassName('bottom')[0].style.marginTop='0px';
                 document.getElementsByClassName('header_body')[0].style.height='150px'
             }
-           
         },
         downFile(val){
             if(val){
                 window.open(this.BDMSUrl+val);
             }
+        },
+        getViewPointShow(path,locationInfo){
+            this.viewPointShow=true;
+            this.viewPointPath=path;
+            this.locationInfo=locationInfo;
         },
         //打印当前标签
         printCurrentLabel(){
@@ -1434,7 +1495,13 @@ export default {
         this.supplySecurityStatusShow=true;
     },
     srStatusCancle(){
+        var vm=this;
         this.securityStatusShow=false;
+        // vm.securityStatus='1',
+        // vm.content='';
+        // vm.cutViewPoint='视点'
+        // vm.imageName="未选择任何文件"
+        // document.getElementById('fileInfo').value='';
     },
     selectImg(){
         this.$refs.file.click()
@@ -1450,12 +1517,30 @@ export default {
                 document.documentElement.scrollTop = 0;
                  const app = document.getElementById('webIframe').contentWindow;
                 app.postMessage({command:"AddViewpoint",parameter:123},"*");
+                // this.cutViewPoint='已截屏'
             }
     },
     fileChanged(){
         var vm = this
         vm.filesList = vm.$refs.file.files[0]
         vm.imageName = vm.filesList.name
+        if(vm.filesList){
+            var formData = new FormData()
+            formData.append('file',vm.filesList);
+            axios({
+                url:this.BDMSUrl+'design/dcUpload',
+                headers:{
+                    'token':this.token
+                },
+                data:formData,
+                method:'post'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.filePath=response.data.rt.uri
+                }
+            })
+        }
+        
     },
     srStatusConfirm(){
         var vm=this;
@@ -1464,39 +1549,47 @@ export default {
                 type:'info',
                 message:'请选择状态'
             })
-        }else if(vm.filesList == null){
-            vm.$message({
-                type:'info',
-                message:'请选择文件！'
-            })
         }else{
-            var formData = new FormData()
-            formData.append('file',vm.filesList);
             axios({
                 method:'post',
                 headers:{
                     'token':this.token
                 },
-                params:{
-                    currCheckStatus:this.securityStatus,
-                    projId:this.projId,
-                    checkPointId:this.checkPointId,
-                    content:this.content,
-                    viewPath:this.uploadViewPointList[0].path,
-                    elementFilter:this.uploadViewPointList[0].elementFilter
+                // params:{
+                //     currCheckStatus:this.securityStatus,
+                //     projId:this.projId,
+                //     checkPointId:this.checkPointId,
+                //     content:this.content,
+                //     viewPath:this.uploadViewPointList[0].path,
+                //     filePath:this.filePath,
+                //     fileName:this.imageName
+                // },
+                // data:this.uploadViewPointList[0].elementFilter,
+                data:{
+                    'currCheckStatus':this.securityStatus,
+                    'projId':this.projId,
+                    'checkPointId':this.checkPointId,
+                    'content':this.content,
+                    'viewPath':this.uploadViewPointList.length==0?'':this.uploadViewPointList[0].path,
+                    'filePath':this.filePath,
+                    'fileName':this.imageName,
+                    'elementFilter':this.uploadViewPointList.length==0?'':this.uploadViewPointList[0].elementFilter
                 },
-                data:formData,
                 url:this.BDMSUrl+'security/updateCheckPointSecurityStatus'
+                // ?currCheckStatus='+this.securityStatus+'&projId='+this.projId+'&checkPointId='+this.checkPointId+'&content='+this.content+'&viewPath='+this.uploadViewPointList[0].path+'&filePath='+this.filePath+'&fileName='+this.imageName
             }).then(response=>{
                 if(response.data.cd=='0'){
                     vm.securityStatusShow=false;
-                    vm.securityStatus='',
+                    vm.securityStatus='1',
                     vm.content='';
+                    vm.cutViewPoint='视点'
                     vm.imageName="未选择任何文件"
                     vm.$message(
                         {type:'success',
                         message:'安全状态修改成功'})
                         vm.getCheckPointsByItemId();
+                        // vm.checkItem(this.isshow,this.checkPointId);
+
 
                 }else if(response.data.cd=='-1'){
                     alert(response.data.msg);
@@ -2762,6 +2855,51 @@ export default {
                                                     font-size:16px;
                                                     cursor: pointer;
                                                 }
+                                                span{
+                                                    line-height: 16px;
+                                                    height: 16px;
+                                                    float: left;
+                                                    position: relative;
+                                                    cursor: pointer;
+                                                    margin-left: 24px;
+                                                    margin-right: 20px;
+                                                    font-size: 12px;
+                                                    color: #666666;
+                                                }
+                                                .icon-eye::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 18px;
+                                                    height: 12px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/eye.png')no-repeat 0 0;
+                                                    content: '';
+                                                    cursor: pointer;
+                                                }
+                                                .icon-image::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 18px;
+                                                    height: 14px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/image.png')no-repeat 0 0;
+                                                    content: '';
+                                                }
+                                                .icon-file::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 16px;
+                                                    height: 18px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/file.png')no-repeat 0 0;
+                                                    content: '';
+                                                }
                                             }
                                         }
                                     }
@@ -2839,6 +2977,50 @@ export default {
                                                 .el-icon-document{
                                                     font-size:16px;
                                                     cursor: pointer;
+                                                }
+                                                span{
+                                                    line-height: 16px;
+                                                    height: 16px;
+                                                    float: left;
+                                                    position: relative;
+                                                    cursor: pointer;
+                                                    margin-left: 24px;
+                                                    margin-right: 10px;
+                                                    font-size: 12px;
+                                                    color: #666666;
+                                                }
+                                                .icon-eye::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 18px;
+                                                    height: 12px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/eye.png')no-repeat 0 0;
+                                                    content: '';
+                                                }
+                                                .icon-image::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 18px;
+                                                    height: 14px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/image.png')no-repeat 0 0;
+                                                    content: '';
+                                                }
+                                                .icon-file::before{
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    left: -24px;
+                                                    top: 2px;
+                                                    width: 16px;
+                                                    height: 18px;
+                                                    line-height: 14px;
+                                                    background: url('../ManageDesign/images/file.png')no-repeat 0 0;
+                                                    content: '';
                                                 }
                                             }
                                         }
@@ -3088,12 +3270,12 @@ export default {
                             padding-left: 94px;
                             text-align: left;
                         }
-                        .updataImageSpan{
+                        .updataImageSpan1{
                             overflow: hidden;
                             width: 98px;
-                            margin-left:-40px;
+                            margin-left:71px;
                         }
-                        .updataImageSpan input{
+                        .updataImageSpan1 input{
                             position: absolute;
                             left: 0px;
                             top: 0px;
@@ -3429,6 +3611,175 @@ export default {
                     }
                 }
 
+                }
+            .item-file{
+                        float: left;
+                        width: 290px;
+                        height: 160px;
+                        margin: 20px 15px 0 0;
+                        border-radius: 6px;
+                        box-shadow: 0px 1px 8px rgba(93,94,94,.16);
+                        position: relative;
+                        padding: 8px;
+                        .item-file-attach{
+                            width: 100%;
+                            height: 160px;
+                            margin: 0;
+                            padding: 0;
+                            border-radius:2px;
+                            cursor: pointer;
+                            object-fit: contain;
+                            background:#f2f2f2;
+                        }
+                        .actionbox{
+                            display: block;
+                            position: absolute;
+                            bottom: 0;
+                            width: 100%;
+                            height: 36px;
+                            background: rgba(40, 40, 40, .4);
+                            transform: translateY(36px);
+                                transition: all ease .5s;
+                                .button-relocation{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../planCost/images/location.png') no-repeat 0 0;
+                                    // background: url('./images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                    }
+                                .button-search{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../ManageDesign/images/search2.png')no-repeat 0 0;
+                                    cursor: pointer;
+                                }
+                                .button-download{
+                                float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    background: url('../ManageDesign/images/download2.png')no-repeat 0 0;
+                                cursor: pointer;
+                                }
+                                .icon-delete{
+                                    float: left;
+                                    margin: 10px 40px;
+                                    width: 16px;
+                                    height: 16px;
+                                    cursor: pointer;
+                                    background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                } 
+                                .line{
+                                float: left;
+                                    margin: 6px 0px;
+                                    width: 1px;
+                                    height: 24px;
+                                    background: #cccccc;
+                                }
+                            }
+                            .checkbox-fileItem{
+                                display:block;
+                                position: absolute;
+                                top: 8px;
+                                left: 8px;
+                                width: 14px;
+                                height: 14px;
+                                border: 1px solid #cccccc;
+                                cursor: pointer;
+                            }
+                            .active{
+                                background: url('../ManageCost/images/checked.png') no-repeat 1px 2px;
+                                border: 1px solid #fc3439;
+                            }
+                            .item-file-box{
+                                .item-file-image{
+                                    float: left;
+                                    margin-top:16px;
+                                    width: 70px;
+                                    height: 70PX;
+                                    border-radius: 50%;
+                                    background: #f2f2f2;
+                                    img{
+                                        width: 48px;
+                                        height: 48px;
+                                        display: block;
+                                        margin-top: 13PX;
+                                        margin-left: 11px;
+                                    } 
+                                }
+                                .item-file-detial{
+                                    display: block;
+                                    margin-left:80px;
+                                    margin-top:20px;
+                                    .icon-goujian{
+                                        float: right;
+                                        width: 16px;
+                                        height: 16px;
+                                        cursor: pointer;
+                                    }
+                                    .icon-download{
+                                        background: url('../ManageCost/images/download.png')no-repeat 0 0;
+                                        margin-right: 20px;
+                                        &:hover{
+                                            background: url('../ManageCost/images/download1.png')no-repeat 0 0;
+                                        }
+                                    }
+                                    .icon-search{
+                                        background: url('../ManageCost/images/search.png')no-repeat 0 0;
+                                        margin-right: 20px;
+                                        &:hover{
+                                            background: url('../ManageCost/images/search1.png')no-repeat 0 0;
+                                        }
+                                    } 
+                                    .icon-delete{
+                                        margin-right: 20px;
+                                        background: url('../ManageCost/images/delete.png')no-repeat 0 0;
+                                        &:hover{
+                                            background: url('../ManageCost/images/delete1.png')no-repeat 0 0;
+                                        } 
+                                    } 
+                                    >h3{
+                                        text-align: left;
+                                        font-size: 14px;
+                                        color: #333333;
+                                        line-height: 20px;
+                                        margin: 9px 0 8px;
+                                        max-height: 40px;
+                                        overflow: hidden;
+                                    }   
+                                    >p{
+                                        font-size: 12px;
+                                        line-height: 12px;
+                                        color: #b3b3b3;
+                                        text-align: left;
+                                        margin-bottom:6px; 
+                                    }
+                                    .text-name{
+                                        color: #336699;
+                                    }
+                                    .operation{
+                                        display: block;
+                                        position: absolute;
+                                        bottom: 15px;
+                                        left: 88px;
+                                        right: 0;
+                                        span{
+                                            color: #fc3439;
+                                        }
+                                    }
+                                }
+                            }
+                }
+                .item-file:hover{
+                    box-shadow: 0px 1px 8px rgba(252,52,57,.2);
+                    .actionbox{
+                        transform: translateY(0px);
+                        transition: all ease .5s;
+                    }
                 }
             }
 

@@ -1174,8 +1174,8 @@ export default {
                                 linkUrl:'车辆管理'
                             },
                             {
-                                title:'/setting/projectModel',
-                                linkUrl:'项目模型'
+                                title:'/setting/attendManage',
+                                linkUrl:'考勤管理'
                             }
                         )
                         vm.$set(item,'routerLink',routerLink3);

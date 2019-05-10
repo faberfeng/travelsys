@@ -18,6 +18,7 @@ export default {
     },
     created(){
         var vm=this;
+        // window.addEventListener("message", (evt)=>{this.callback(evt)});
         vm.projId = localStorage.getItem('projId');//获取工程编号
         vm.entId=localStorage.getItem('entId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
@@ -25,6 +26,7 @@ export default {
         vm.token  = localStorage.getItem('token');
         vm.getUserGroup()
     },
+    
     methods:{
         // token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl
         linkVideo(){
@@ -58,6 +60,12 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+*{
+    margin:0px;
+    padding: 0px;
+}
+
+
 
 </style>

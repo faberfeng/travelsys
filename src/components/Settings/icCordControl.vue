@@ -61,15 +61,6 @@
                                 <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
                             </select>
                             <i class="icon-sanjiao"></i>
-
-                            <!-- <el-select  v-model="icCordType" placeholder="请选择">
-                                <el-option
-                                v-for="item in icOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select> -->
                         </div>
                         <div class="editBodytwo"><label class="editInpText">绑定人员 :</label>
                             <select class="editSelect" v-model="icCordOwner" >
@@ -77,7 +68,7 @@
                             </select>
                         </div>
                     </div>
-                    <p class="err" v-show="showErr">请输入完整信息</p>
+                    <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addCard()">确定</button>
                         <button class="editBtnC" @click="addCancle">取消</button>

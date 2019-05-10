@@ -23,7 +23,7 @@
                         <tbody>
                             <tr v-for="(item,index) in cardLists" :key="index">
                                 <td>{{index+1}}</td>
-                                <td></td>
+                                <td>{{item.typeName}}</td>
                                 <td>
                                     <button class="actionBtn editBtn" @click="editicCard(item)" title="更新"></button>
                                     <button class="actionBtn deleteBtn" @click="deleteicCard(item)" title="删除"></button>
@@ -123,6 +123,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.getUserList();
         this.getCardList();
+        this.getParkingCount();
         
     },
     methods:{
@@ -290,13 +291,13 @@ export default {
             // this.icCordType=val.cardType;
             // this.icCordOwner=val.owner;
             this.cardId=val.id;
-            this.carType=val.name;
+            this.carType=val.typeName;
         },
         //更新卡片
         editCard(){
              var vm=this;
             axios({
-                url:vm.BDMSUrl+'ic/updateCard',
+                url:vm.BDMSUrl+'vehicle/updateType',
                 method:'get',
                 headers:{
                     'token':this.token
@@ -310,8 +311,8 @@ export default {
                     this.editDialog=false;
                     this.getCardList();
                     // this.addCancle=false;
-                    this.icCordNum='';
-                    this.icCordType='';
+                    this.cardId='';
+                    this.carType='';
                     // this.icCordOwner='';
                 }
             })

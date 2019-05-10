@@ -1,8 +1,8 @@
 <template>
     <div id="wrapper">
-        <div id="item-box-file">
-            <span :class="['label-item',{'label-item-active':itemShow}]" @click="projectPerson()">项目成员</span>
-            <span :class="['label-item',{'label-item-active':!itemShow}]" @click="temporaryPerson()">临时成员</span>
+        <div id="item-box-file1">
+            <span :class="['label-item1',{'label-item-active1':itemShow}]" @click="projectPerson()">项目成员</span>
+            <span :class="['label-item1',{'label-item-active1':!itemShow}]" @click="temporaryPerson()">临时成员</span>
             <div v-show="itemShow" class="wrapperHead" @click="buildProperson">
                 <span class="el-icon-plus"></span><span class="elName">添加</span>
             </div>
@@ -246,7 +246,7 @@ export default {
         },
         downFile(val){
             if(val){
-                window.opne(this.BDMSUrl+val);
+                window.open(this.BDMSUrl+val);
             }
         },
         fileChanged(){
@@ -481,7 +481,7 @@ export default {
     #wrapper{
         margin-top:51px;
         margin-right: 20px;
-        #item-box-file {
+        #item-box-file1 {
             display: block;
             border: 1px solid #e6e6e6;
             height: 36px;
@@ -490,7 +490,7 @@ export default {
             
             background: #fafbfc;
             position: relative;
-            .label-item {
+            .label-item1 {
                 float: left;
                 height: 34px;
                 font-size: 14px;
@@ -502,7 +502,7 @@ export default {
                 color: #999999;
                 text-decoration: none;
             }
-            .label-item-active {
+            .label-item-active1 {
                 color: #fc3439;
                 font-weight: bold;
                 border-top: 3px solid #fc3439;
