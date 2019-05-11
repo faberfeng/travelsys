@@ -484,7 +484,8 @@ export default {
         #item-box-file1 {
             display: block;
             border: 1px solid #e6e6e6;
-            height: 36px;
+            // height: 36px;
+             height: 51px;
             padding-top: 16px;
             padding-left: 20px;
             

@@ -41,25 +41,27 @@
                            <th>车辆类别</th>
                            <th>登记时间</th>
                            <th>离去时间</th>
-                           <th>白名单</th>
                            <th>编辑</th>
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in getCarRegisterLists" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{item.carNumber}}</td>
+                            <td>{{item.contactUser}}</td>
+                            <td>{{item.contactInfo}}</td>
+                            <td>{{returnCarType(item.carType)}}</td>
+                            <td>{{timeChange(item.enterTime)}}</td>
+                            <td>{{timeChange(item.leaveTime)}}</td>
+                            <td>
+                                <button class="actionBtn editBtn" @click="editCarResiger(item)"></button>
+                                <button class="actionBtn deleteBtn" @click="deleteCarResiger(item.id)"></button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getCarRegisterList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -72,39 +74,46 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getCarRegisterListLength">
                     </el-pagination>
                 </div>
             </div>
         </div>
         <div id="edit">
-                <el-dialog title="添加访客登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                <el-dialog title="添加车辆登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
-                        <!-- <div class="editBodyone"><label class="editInpText">访客登记 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div> -->
-                        <div class="editBodytwo"><label class="editInpText">访客登记 :</label>
-                            <select class="editSelect" v-model="mainVisitor" >
-                                <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
-                            </select>
-                        </div>
-                        <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
-                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入人数" v-model="company"/></div>
-                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
-                        <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
-                        <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
-                        <!-- <div class="editBodytwo"><label class="editInpText">门禁方式 :</label>
-                        </div> -->
-                        <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" placeholder="请输入" v-model="remark"/></div>
-                         <!-- <div class="editBodytwo">
-                            <label class="editInpText">IC卡类别 :</label>
-                             <select class="editSelect" v-model="icCordType" >
-                                <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
+                        <div class="editBodyone"><label class="editInpText">姓名 :</label><input class="inp" placeholder="请输入" v-model="contactUser"/></div>
+                        <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入联系方式" v-model="contactInfo"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">车辆类别 :</label>
+                             <select class="editSelect" v-model="carType" >
+                                <option v-for="(item,index) in carTypeList" :value="item.id" :key="index">{{item.typeName}}</option>
                             </select>
                             <i class="icon-sanjiao"></i>
-                        </div> -->
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">车牌登记 :</label><input class="inp" placeholder="请输入车牌号码" v-model="carNumber"/></div>
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addCarRegisterMakeSure()">确定</button>
                         <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog title="修改车辆登记" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                    <div class="editBody">
+                        <div class="editBodyone"><label class="editInpText">姓名 :</label><input class="inp" placeholder="请输入" v-model="contactUser"/></div>
+                        <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入联系方式" v-model="contactInfo"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">车辆类别 :</label>
+                             <select class="editSelect" v-model="carType" >
+                                <option v-for="(item,index) in carTypeList" :value="item.id" :key="index">{{item.typeName}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">车牌登记 :</label><input class="inp" placeholder="请输入车牌号码" v-model="carNumber"/></div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="editCarRegisterMakeSure()">确定</button>
+                        <button class="editBtnC" @click="editCancle">取消</button>
                     </div>
                 </el-dialog>
         </div>
@@ -114,27 +123,32 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
         return{
             routerList:"",
-            TableListLength:1,//表格长度
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
             addDialog:false,
             userLists:[],
-            mainVisitor:'',//主要访客
             BDMSUrl:'',
+            contactUser:"",//姓名
             carInfo:"",
             contactInfo:'',//联系方式
-            entourage:'',//随行人员
-            icCardNo:'',//临时卡号
-            company:'',//公司
-            remark:'',//备注
             getVisitorInfoList:[],
-
+            carTypeList:[],//车辆
+            carNumber:'',//车辆牌号
+            carType:'',
+            getCarRegisterList:[],
+            getCarRegisterLists:[],
+            getCarRegisterListLength:1,
+            pageSize:10,
+            pageNum:1,
+            editId:'',
+            editDialog:false,
         }
     },
     created(){
@@ -146,6 +160,8 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.loadingTitle();
+        vm.getCarTypeList();
+        vm.getCarRegister();
 
     },
     methods:{
@@ -191,11 +207,31 @@ export default {
                 return value1 - value2;
             }
         },
-        handleSizeChange(){
+        handleSizeChange(val){
+            this.getCarRegisterLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getCarRegisterListLength-1>=NumB&&this.getCarRegisterListLength-1<=NumE){
+                NumE=this.getCarRegisterListLength-1;
+            }
+          
+            for(var i=NumB;i<NumE+1;i++){
+                this.getCarRegisterLists.push(this.getCarRegisterList[i])
+            }
 
         },
-        handleCurrentChange(){
-
+        handleCurrentChange(val){
+            this.getCarRegisterLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getCarRegisterListLength-1>=NumB&&this.getCarRegisterListLength-1<=NumE){
+                NumE=this.getCarRegisterListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getCarRegisterLists.push(this.getCarRegisterList[i])
+            }
         },
         //改变时间
         changeDatePicker(){
@@ -206,13 +242,167 @@ export default {
         buildCarRegister(){
             this.addDialog=true;
         },
+        editCarResiger(val){
+            var vm=this;
+            vm.editDialog=true;
+            vm.editId=val.id;
+            vm.carNumber=val.carNumber;
+            vm.carType=val.carType;
+            vm.contactInfo=val.contactInfo;
+            vm.contactUser=val.contactUser;
+
+        },
+        deleteCarResiger(val){
+            this.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'car/deleteCarInfo',
+                    method:'GET',
+                    params:{
+                        id:val
+                    },
+                    headers:{
+                        'token':this.token
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getCarRegister();
+                    }
+                })
+            })
+
+        },
         addCancle(){
             this.addDialog=false;
         },
+        editCarRegisterMakeSure(){
+            var vm=this;
+            var data={
+                    "id":vm.editId,
+                    "carNumber": vm.carNumber,
+                    "carType": vm.carType,
+                    "contactInfo":vm.contactInfo,
+                    "contactUser": vm.contactUser,
+                    "projId": vm.projId
+            }
+            $.ajax({
+                url:this.BDMSUrl+'car/alterCarInfo',
+                type:'post',
+                dataType:'json',
+                headers:{
+                    'token':this.token
+                },
+                data:JSON.stringify(data),
+                contentType:'application/json;charset=utf-8',
+                success:(response)=>{
+                    this.editDialog=false;
+                    this.getCarRegister();
+                    vm.carNumber="";
+                    vm.contactInfo="";
+                    vm.contactUser="";
+                }
+            })
+        },
+        editCancle(){
+            var vm=this;
+            vm.editDialog=false;
+            vm.carNumber="";
+            vm.contactInfo="";
+            vm.contactUser="";
+        },
         addCarRegisterMakeSure(){
-
+            var vm=this;
+            var data={
+                    "carNumber": vm.carNumber,
+                    "carType": vm.carType,
+                    "contactInfo":vm.contactInfo,
+                    "contactUser": vm.contactUser,
+                    "projId": vm.projId
+            }
+            $.ajax({
+                url:this.BDMSUrl+'car/addCarInfo',
+                type:'post',
+                dataType:'json',
+                headers:{
+                    'token':this.token
+                },
+                data:JSON.stringify(data),
+                contentType:'application/json;charset=utf-8',
+                success:(response)=>{
+                    this.addDialog=false;
+                    this.getCarRegister();
+                    vm.carNumber="";
+                    vm.contactInfo="";
+                    vm.contactUser="";
+                }
+            })
+        },
+        getCarRegister(time){
+            var vm=this;
+            this.getCarRegisterLists=[];
+            $.ajax({
+                url:this.BDMSUrl+'car/listCarInfo',
+                type:'get',
+                headers:{
+                    'token':this.token
+                },
+                data:{
+                    projId:this.projId,
+                    time:time
+                },
+                success:(response)=>{
+                    if(response.cd==0){
+                        this.getCarRegisterList=response.rt;
+                        this.getCarRegisterListLength=this.getCarRegisterList.length;
+                        if(this.getCarRegisterListLength<11){
+                            for(var i=0;i<this.getCarRegisterListLength;i++){
+                                this.getCarRegisterLists.push(this.getCarRegisterList[i])
+                            }
+                        }else{
+                            for(var i=0;i<10;i++){
+                                this.getCarRegisterLists.push(this.getCarRegisterList[i])
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        getCarTypeList(){
+            var vm=this;
+            this.cardLists=[];
+            axios({
+                url:vm.BDMSUrl+'vehicle/getType',
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                     projectId:this.projId
+                }
+            }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.carTypeList=response.data.rt;
+                        this.carType=this.carTypeList[0].id;
+                    }
+                })
+        },
+        returnCarType(val){
+            var data='';
+            this.carTypeList.forEach((item)=>{
+                if(item.id==val){
+                    data=item.typeName
+                }
+            })
+            return data;
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD HH:mm:ss')
+            }
         }
-
     },
 
 }
@@ -420,12 +610,12 @@ li{
                                         margin-left: 10px;
 
                                     }
-                                    // .deleteBtn{
-                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
-                                    // }
-                                    // .editBtn{
-                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
-                                    // }
+                                    .deleteBtn{
+                                        background: url('../../assets/delete.png') no-repeat 0 0;
+                                    }
+                                    .editBtn{
+                                        background: url('../../assets/edit.png') no-repeat 0 0;
+                                    }
                                     // .upmoveBtn{
                                     //     background: url('./images/overviewup.png') no-repeat 0 0;
                                     // }

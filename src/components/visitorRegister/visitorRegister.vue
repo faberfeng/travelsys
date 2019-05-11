@@ -24,7 +24,7 @@
                     </li>
                      
                 </ul>
-                <span class="selectItemRight" >
+                <span class="selectItemRight" @click="exportVisiterWord" >
                         导出
                 </span>
                 <div class="wrapperHead" @click="buildVisitorRegister">
@@ -49,20 +49,29 @@
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in getVisitorInfoLists" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{returnUserName(item.mainVisitor)}}</td>
+                            <td>{{item.entourage}}</td>
+                            <td>{{item.company}}</td>
+                            <td>
+                                <span v-show="item.isReturnCard=='0'">{{item.contactInfo}}</span>
+                                <span v-show="item.isReturnCard=='1'" class="iconBtn">已归还</span>
+                            </td>
+                            <td>{{item.carInfo}}</td>
+                            <td>{{item.addtime}}</td>
+                            <td>{{item.leavetime}}</td>
+                            <td>{{item.safetyNotification}}</td>
+                            <td>{{item.remark}}</td>
+                            <td>
+                                <button class="actionBtn editBtn" @click="updateVisiter(item)"></button>
+                                <button class="actionBtn deleteBtn" @click="deleteVisiter(item.id)"></button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getVisitorInfoList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -75,7 +84,7 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getVisitorInfoListLength">
                     </el-pagination>
                 </div>
             </div>
@@ -90,7 +99,7 @@
                             </select>
                         </div>
                         <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
-                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入人数" v-model="company"/></div>
+                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
                         <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
                         <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
                         <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
@@ -108,6 +117,35 @@
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addvisitorRecord()">确定</button>
                         <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog title="添加访客登记" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                    <div class="editBody">
+                        <!-- <div class="editBodyone"><label class="editInpText">访客登记 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div> -->
+                        <div class="editBodytwo"><label class="editInpText">访客登记 :</label>
+                            <select class="editSelect" v-model="mainVisitor" >
+                                <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
+                            </select>
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
+                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
+                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
+                        <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
+                        <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
+                        <!-- <div class="editBodytwo"><label class="editInpText">门禁方式 :</label>
+                        </div> -->
+                        <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" placeholder="请输入" v-model="remark"/></div>
+                         <!-- <div class="editBodytwo">
+                            <label class="editInpText">IC卡类别 :</label>
+                             <select class="editSelect" v-model="icCordType" >
+                                <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </div> -->
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="editvisitorRecord()">确定</button>
+                        <button class="editBtnC" @click="editCancle">取消</button>
                     </div>
                 </el-dialog>
         </div>
@@ -138,8 +176,11 @@ export default {
             company:'',//公司
             remark:'',//备注
             getVisitorInfoList:[],
-
-
+            getVisitorInfoLists:[],
+            getVisitorInfoListLength:1,
+            editDialog:false,
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -152,6 +193,7 @@ export default {
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.loadingTitle();
         this.getUserList();
+        this.getVisitorInfo();
 
     },
     methods:{
@@ -222,39 +264,173 @@ export default {
                 if(response.data.cd==0){
                     this.getVisitorInfo();
                     this.addDialog=false;
+                    data={};
+                    vm.carInfo='';
+                    vm.company='';
+                    vm.contactInfo='';
+                    vm.entourage='';
+                    vm.icCardNo='';
+                    vm.remark='';
                 }
             })
         },
+        editCancle(){
+            var vm=this;
+            vm.editDialog=false;
+            vm.carInfo='';
+            vm.company='';
+            vm.contactInfo='';
+            vm.entourage='';
+            vm.icCardNo='';
+            vm.remark='';
+
+        },
+        //更新
+        updateVisiter(item){
+            this.editId=item.id;
+            this.carInfo=item.carInfo;
+            this.company=item.company;
+            this.contactInfo=item.contactInfo;
+            this.entourage=item.entourage;
+            this.icCardNo=item.icCardNo;
+            this.mainVisitor=item.mainVisitor;
+            this.remark=item.remark;
+            this.editDialog=true;
+        },
+        editvisitorRecord(){
+            var data={}
+            var vm=this;
+            // var data=moment(new Date().getTime()).format('YYYY-MM')
+            data={
+                "id":vm.editId,
+                "carInfo":vm.carInfo,
+                "company":vm.company,
+                "contactInfo":vm.contactInfo,
+                "entourage":vm.entourage,
+                "icCardNo":vm.icCardNo,
+                "mainVisitor": vm.mainVisitor,
+                "projId": vm.projId,
+                "remark": vm.remark
+            }
+            axios({
+                url:this.BDMSUrl+'visitor/addVisitorInfo',
+                headers:{
+                    'token':this.token
+                },
+                method:'post',
+                data:data
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getVisitorInfo();
+                    this.editDialog=false;
+                    this.$message({
+                        type:'info',
+                        message:'修改访客信息成功'
+                    })
+                }
+            })
+
+        },
+        //删除
+        deleteVisiter(val){
+            this.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+"visitor/deleteVisitorInfo",
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:val
+                    },
+                    method:'get'
+                }).then(((response)=>{
+                    if(response.data.cd==0){
+                        this.getVisitorInfo();
+                    }
+                }))
+            })
+            
+        },
         getVisitorInfo(time){
+            this.getVisitorInfoLists=[];
             axios({
                 url:this.BDMSUrl+'visitor/getVisitorInfo',
                 method:'GET',
                 params:{
                     projId:this.projId,
                     time:time
+                },
+                headers:{
+                    'token':this.token
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
                      this.getVisitorInfoList=response.data.rt;
+                     this.getVisitorInfoListLength=this.getVisitorInfoList.length;
+                     if(this.getVisitorInfoListLength<11){
+                        for(var i=0;i<this.getVisitorInfoListLength;i++){
+                            this.getVisitorInfoLists.push(this.getVisitorInfoList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getVisitorInfoLists.push(this.getVisitorInfoList[i])
+                        }
+                    }
                 }
             })
         },
         addCancle(){
+            var vm=this;
             this.addDialog=false;
+             vm.carInfo='';
+            vm.company='';
+            vm.contactInfo='';
+            vm.entourage='';
+            vm.icCardNo='';
+            vm.remark='';
         },
         addCard(){
 
         },
-        handleSizeChange(){
+        handleSizeChange(val){
+            this.getVisitorInfoLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getVisitorInfoListLength-1>=NumB&&this.getVisitorInfoListLength-1<=NumE){
+                NumE=this.getVisitorInfoListLength-1;
+            }
+          
+            for(var i=NumB;i<NumE+1;i++){
+                this.getVisitorInfoLists.push(this.getVisitorInfoList[i])
+            }
 
         },
-        handleCurrentChange(){
+        handleCurrentChange(val){
+            this.getVisitorInfoLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getVisitorInfoListLength-1>=NumB&&this.getVisitorInfoListLength-1<=NumE){
+                NumE=this.getVisitorInfoListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getVisitorInfoLists.push(this.getVisitorInfoList[i])
+            }
 
         },
         //改变时间
         changeDatePicker(){
         },
         selectNameInfo(){
+
+        },
+        //导出
+        exportVisiterWord(){
 
         },
         buildVisitorRegister(){
@@ -278,6 +454,15 @@ export default {
                 }
             })
         },
+        returnUserName(val){
+            var data='';
+            this.userLists.forEach((item)=>{
+                if(item.userId==val){
+                    data=item.name
+                }
+            })
+            return data
+        }
 
     },
 
@@ -486,12 +671,12 @@ li{
                                         margin-left: 10px;
 
                                     }
-                                    // .deleteBtn{
-                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
-                                    // }
-                                    // .editBtn{
-                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
-                                    // }
+                                    .deleteBtn{
+                                        background: url('../../assets/delete.png') no-repeat 0 0;
+                                    }
+                                    .editBtn{
+                                        background: url('../../assets/edit.png') no-repeat 0 0;
+                                    }
                                     // .upmoveBtn{
                                     //     background: url('./images/overviewup.png') no-repeat 0 0;
                                     // }
@@ -504,6 +689,15 @@ li{
                                     // .exportBtn{
                                     //     background: url('./images/overviewdown.png') no-repeat 0 0;
                                     // }
+                                    .iconBtn{
+                                        width: 30px;
+                                        height: 20px;
+                                        line-height: 18px;
+                                        border: 1px solid #ccc;
+                                        background: white;
+                                        color: #ccddaa;
+                                        display: inline-block;
+                                    }
 
                                 }
                             }

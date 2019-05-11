@@ -11,12 +11,17 @@
             </div> -->
         </div>
         <div class="itemBody">
-            <ul>
-                <li>
-
+            <ul class="cardUl">
+                <li class="cardLi" v-for="(item,index) in getCameraLists" :key="index">
+                    <h4>{{item.name}}</h4>
+                    <h3>危险源级别:<span style="color:red;">{{item.level}}</span></h3>
+                    <div class="operation">
+                        <span @click="locationVideo(item)" class="el-icon-location actBtn"></span>
+                        <span @click="editVideo(item)" class="el-icon-edit-outline actBtn"></span>
+                        <span @click="deleteVideo(item.id)" class="el-icon-delete actBtn"></span>
+                    </div>
                 </li>
             </ul>
-
         </div>
         <div id="edit">
                 <el-dialog title="添加视频监控" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
@@ -29,25 +34,31 @@
                                 <option v-for="(item,index) in dangerList" :value="item.value" :key="index">{{item.label}}</option>
                             </select>
                         </div>
-                        <!-- <div class="editBodytwo">
-                            <label class="editInpText">IC卡类别 :</label>
-                             <select class="editSelect" v-model="icCordType" >
-                                <option v-for="(item,index) in icOptions" :value="item.value" :key="index">{{item.label}}</option>
-                            </select>
-                            <i class="icon-sanjiao"></i>
-                        </div>
-                        <div class="editBodytwo"><label class="editInpText">绑定人员 :</label>
-                            <select class="editSelect" v-model="icCordOwner" >
-                                <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
-                            </select>
-                        </div> -->
                     </div>
-                    <!-- <p class="err" v-show="showErr">请输入完整信息</p> -->
+
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="setVideo(videoName,videoUrl,dangerLevels)">放置摄像头</button>
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
+
+                 <!-- <el-dialog title="添加视频监控" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                    <div class="editBody">
+                        <div class="editBodyone"><label class="editInpText">摄像头名称 :</label><input class="inp" placeholder="请输入" v-model="videoName"/></div>
+                        <div class="editBodytwo"><label class="editInpText">摄像头地址 :</label><input class="inp" placeholder="请输入" v-model="videoUrl"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">危险源级别 :</label>
+                            <select class="editSelect" v-model="dangerLevel" >
+                                <option v-for="(item,index) in dangerList" :value="item.value" :key="index">{{item.label}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="setVideo(videoName,videoUrl,dangerLevels)">放置摄像头</button>
+                        <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog> -->
         </div>
     </div>
 </template>
@@ -82,7 +93,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.appShareUrl= vm.$store.state.appShareUrl;
         vm.token  = localStorage.getItem('token');
-        // this.getCameraList();
+        this.getCameraList();
 
     },
     destoryed(){
@@ -95,7 +106,7 @@ export default {
 			case "EngineReady":
 				break;
             case "CameraListUpdate":
-                // this.getCameraList();
+                this.getCameraList();
                 break;
 		    }
         },
@@ -126,6 +137,7 @@ export default {
                     app.postMessage({command:"startSetCamera",parameter:parList},"*");
                     document.body.scrollTop = 0;
                     document.documentElement.scrollTop = 0;
+                    this.addDialog=false;
             }
 
         },
@@ -144,6 +156,47 @@ export default {
                 if(response.data.cd==0){
                     this.getCameraLists=response.data.rt;
                 }
+            })
+        },
+        locationVideo(val){
+            if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+            }else{
+                    const app = document.getElementById('webIframe').contentWindow;
+                    app.postMessage({command:"LookAtCamera",parameter:val.position},"*");
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+            }
+        },
+        editVideo(){
+
+        },
+
+        deleteVideo(id){
+            this.$confirm('你是否删除该摄像头','提示',{
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'camera/deleteCamera',
+                    method:"GET",
+                    params:{
+                        id:id
+                    },
+                    headers:{
+                        'token':this.token
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getCameraList();
+                        const app = document.getElementById('webIframe').contentWindow;
+                        app.postMessage({command:"CameraListUpdate",parameter:null},"*");
+                    }
+                })
             })
         },
         addCancle(){
@@ -171,6 +224,7 @@ ul,li{
             display: block;
             border: 1px solid #e6e6e6;
             height: 36px;
+            // height: 51px;
             padding-top: 16px;
             padding-left: 20px;
             
@@ -215,6 +269,92 @@ ul,li{
                     color:rgb(46,140,185);
                 }
             }
+        }
+        .itemBody{
+            width: 98%;
+            margin:0 auto;
+            height: 600px;
+            // border: 1px solid #ccc;
+            overflow: auto;
+            padding: 5px;
+            .cardUl{
+                display: flex;
+                flex-direction:row;
+                flex-wrap:wrap;
+                justify-content: flex-start;
+                .cardLi{
+                    position: relative;
+                    width: 22%;
+                    height: 200px;
+                    background: #fff;
+                    box-sizing: border-box;
+                    float: left;
+                    list-style: none;
+                    border: 1px solid #eaebec;
+                    border-top: solid 2px #2e8cb9;
+                    padding: 20px;
+                    transition: all .2s linear;
+                    margin: 20px;
+                    &:hover{
+                        box-shadow: 0 15px 30px rgba(0,0,0,.1);
+                        transform: translate3d(0,-5px,0);
+                    }
+                    h4{
+                        font-weight: 400;
+                        font-size: 16px;
+                        line-height: 16px;
+                        color: #2e8cb5;
+                        padding: 18px 0 10px;
+                    }
+                     h3{
+                            font-weight: 400;
+                            font-size: 28px;
+                            line-height: 28px;
+                            color: #2e8cb5;
+                            padding-bottom: 18px;
+                    }
+                    .operation{
+                        margin-top:20px;
+                        justify-content:center
+                        .actBtn{
+                            display: inline-block;
+                            margin:5px;
+                            cursor: pointer;
+
+                        }
+                        .el-icon-location{
+                            font-size: 20px;
+                            color: #2e8cb0;
+                            margin:5px;
+                            cursor: pointer;
+                            &:hover{
+                                color: #2e8c80;
+                            }
+                        }
+                        .el-icon-edit-outline{
+                            font-size: 20px;
+                            color: #2e8cb0;
+                             margin:5px;
+                            cursor: pointer;
+                             &:hover{
+                                color: #2e8c80;
+                            }
+                        }
+                        .el-icon-delete{
+                            font-size: 20px;
+                            color: #2e8cb0;
+                             margin:5px;
+                            cursor: pointer;
+                             &:hover{
+                                color: #2e8c80;
+                            }
+                        }
+                    }
+                    
+                }
+
+            }
+
         }
         #edit{
             .editSelect{

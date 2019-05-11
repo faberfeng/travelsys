@@ -82,11 +82,41 @@
                 </div>
             </div>
         </div>
+         <div id="edit">
+                <el-dialog title="添加车辆登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                    <div class="editBody">
+                        <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="eventName"/></div>
+                        <div class="editBodytwo"><label class="editInpText">授权部门:</label><input class="inp" placeholder="请输入" v-model="companyName"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">奖励方式 :</label>
+                            <input class="inp" placeholder="请输入" v-model="modeName"/>
+                             <!-- <select class="editSelect" v-model="mode" >
+                                <option v-for="(item,index) in goodList" :value="item.value" :key="index">{{item.label}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">时间 :</label>
+                            <el-date-picker
+                                v-model="evenTime"
+                                type="date"
+                                placeholder="选择日期">
+                            </el-date-picker>
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" placeholder="请输入" v-model="remark"/></div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addGoodRecordMakeSure()">确定</button>
+                        <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog>
+         </div>
         
     </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name:'',
     data(){
@@ -101,6 +131,16 @@ export default {
                 label:'活动发起者'
             }],
             onePerson:1,
+            addDialog:false,
+            mode:'',
+            eventName:'',
+            evenTime:'',
+            addDialog:false,
+            remark:'',
+            modeName:'',
+            companyName:'',
+            eventName:'',
+
         }
     },
     created(){
@@ -110,6 +150,7 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
 
     },
@@ -170,9 +211,51 @@ export default {
 
         },
         buildGoodRecord(){
+            this.addDialog=true;
+        },
+        addGoodRecordMakeSure(){
+            var data={}
+            data={
+                'company':this.companyName,
+                'mode':this.modeName,
+                'name':this.eventName,
+                'remark':this.remark,
+                'time':this.evenTime,
+                'type':0,
+                'users':''
+            }
+            axios({
+                url:this.BDMSUrl+'sincerity/addSincerityInfo',
+                method:"post",
+                headers:{
+                    'token':this.token
+                },
+                data:data
+            }).then((response)=>{
+                
+            })
+        },
+        getGoodRecord(){
+            axios({
+                url:this.BDMSUrl+'sincerity/getSincerityInfo',
+                method:'get',
+                params:{
+                    time:'',
+                    userName:'',
+                    
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+
+                }
+            })
+        },
+        addCancle(){
 
         }
-
     },
 
 }
@@ -424,6 +507,16 @@ li{
                         }
                     }
             }
+        }
+        #edit{
+            .editSelect{
+                    width: 447px;
+                    height: 38px;
+                    color: #333333;
+                    background: #fafafa;
+                    border: 1px solid #d1d1d1;
+                    padding:0px 0px 0px 10px;
+                }
         }
 
 }
