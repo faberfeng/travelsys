@@ -42,29 +42,38 @@
                 <table class="tableList" border="1" cellspacing="0" width="100%">
                     <thead>
                        <tr>
-                           <th>首刷时间</th>
-                           <th>复刷时间</th>
-                           <th>门禁号</th>
-                           <th>验证方式</th>
+                           <th>序号</th>
+                           <th>事件</th>
+                           <th>单位对象</th>
+                           <th>方式</th>
+                           <th>时间</th>
                            <th>相关人员</th>
-                           <th>关闭本轮门禁</th>
+                           <th>备注</th>
+                           <th>编辑</th>
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in goodRecordList" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.company}}</td>
+                            <td>{{item.mode}}</td>
+                            <td>{{timeChange(item.time)}}</td>
+                            <td>
+                                <el-tag style="width:80px;margin:2px;" v-for="tag in item.users" :key="tag.id">
+                                        {{tag.userName}}
+                                </el-tag>
+                            </td>
+                            <td>{{item.remark}}</td>
+                            <td>
+                                <button class="actionBtn editBtn"></button>
+                                 <button class="actionBtn deleteBtn"></button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="goodRecordList==null" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -83,7 +92,7 @@
             </div>
         </div>
          <div id="edit">
-                <el-dialog title="添加车辆登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                <el-dialog title="添加良好记录" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
                         <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="eventName"/></div>
                         <div class="editBodytwo"><label class="editInpText">授权部门:</label><input class="inp" placeholder="请输入" v-model="companyName"/></div>
@@ -104,11 +113,40 @@
                             </el-date-picker>
                         </div>
                         <div class="editBodytwo"><label class="editInpText">备注 :</label><input class="inp" placeholder="请输入" v-model="remark"/></div>
+                         <div class="editBodytwo"><label class="editInpText">相关人员 :</label>
+                        <div @click="clickSelectUser" class="tagLable" style="text-align:left;display:inline-block;width:415px;height:50px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                            <el-tag 
+                            style="width:95px;margin:2px;text-align:center;"
+                                v-for="tag in selectUserList"
+                                :key="tag.name"
+                               closable
+                                @close="closeTag(tag)"
+                                type="">
+                                {{tag.name}}
+                            </el-tag>
+                        </div>
+                         <!-- <el-input style="display:inline-block;width:415px" placeholder="请输入" v-model="remark"></el-input> -->
+                         <span @click="clickSelectUser" class="el-icon-circle-plus"></span></div>
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addGoodRecordMakeSure()">确定</button>
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
+                </el-dialog>
+                <el-dialog title="用户列表" v-dialogDrag width="400px" :visible.sync="addUserDialog" @close="addUserCancle">
+                    <div class="usersList">
+                        <ul class="usersListUl">
+                            <li class="usersListLi" v-for="(item,index) in userLists" :key="index">
+                                <el-checkbox v-model="item.checkBoxShow"></el-checkbox><label style="margin-left:4px;">{{item.name+'-'+item.name2}}</label>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addUserListMakeSure()">保存</button>
+                        <button class="editBtnC" @click="addUserCancle">取消</button>
+                    </div>
+
                 </el-dialog>
          </div>
         
@@ -117,6 +155,7 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
@@ -140,7 +179,10 @@ export default {
             modeName:'',
             companyName:'',
             eventName:'',
-
+            addUserDialog:false,
+            userLists:[],
+            selectUserList:[],
+            goodRecordList:[],
         }
     },
     created(){
@@ -152,7 +194,8 @@ export default {
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
-
+        this.getUserList();
+        this.getGoodRecord();
     },
     methods:{
          loadingTitle(){
@@ -197,11 +240,26 @@ export default {
                 return value1 - value2;
             }
         },
+        timeChange(val){
+            if(val){
+                return moment(val).format("YYYY-MM-DD HH:ss:mm")
+            }
+
+        },
         handleSizeChange(){
 
         },
         handleCurrentChange(){
 
+        },
+        addUserListMakeSure(){
+            this.userLists.forEach((item)=>{
+                if(item.checkBoxShow==true){
+                    this.selectUserList.push(item)
+                }
+                item.checkBoxShow=false;
+            })
+            this.addUserDialog=false;
         },
         //改变时间
         changeDatePicker(){
@@ -213,16 +271,37 @@ export default {
         buildGoodRecord(){
             this.addDialog=true;
         },
+        //点击选择用户
+        clickSelectUser(){
+            this.addUserDialog=true;
+        },
+        addUserCancle(){
+            this.addUserDialog=false;
+            this.userLists.forEach((item)=>{
+                item.checkBoxShow=false;
+            })
+        },
+        closeTag(tag){
+            this.selectUserList.splice(this.selectUserList.indexOf(tag), 1)
+        },
         addGoodRecordMakeSure(){
             var data={}
+            var userData=[];
+            this.selectUserList.forEach((item)=>{
+                userData.push({
+                    'userId':item.userId,
+                    'userName':item.name
+                })
+            })
             data={
                 'company':this.companyName,
                 'mode':this.modeName,
                 'name':this.eventName,
                 'remark':this.remark,
                 'time':this.evenTime,
-                'type':0,
-                'users':''
+                'projId':this.projId,
+                'type':1,
+                'users':userData
             }
             axios({
                 url:this.BDMSUrl+'sincerity/addSincerityInfo',
@@ -232,29 +311,65 @@ export default {
                 },
                 data:data
             }).then((response)=>{
+                this.getGoodRecord();
+                this.addDialog=false;
+                this.selectUserList=[];
+                this.companyName='';
+                this.modeName='';
+                this.eventName='';
+                this.remark='';
+                this.evenTime='';
                 
             })
         },
-        getGoodRecord(){
+
+        getUserList(){
             axios({
-                url:this.BDMSUrl+'sincerity/getSincerityInfo',
-                method:'get',
+                url:this.BDMSUrl+'user/getUserList',
+                method:'GET',
                 params:{
-                    time:'',
-                    userName:'',
-                    
+                    projectId:this.projId
                 },
                 headers:{
                     'token':this.token
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
+                    this.userLists=response.data.rt;
+                    this.userLists.forEach((item)=>{
+                        this.$set(item,'checkBoxShow',false);
+                    })
+                }
+            })
+        },
+        getGoodRecord(){
+            axios({
+                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                method:'get',
+                params:{
+                    // time:'',
+                    // userName:'',
+                    // company:'',
+                    type:1,
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.goodRecordList=response.data.rt;
 
                 }
             })
         },
         addCancle(){
-
+            this.addDialog=false;
+            this.selectUserList=[];
+            this.companyName='';
+            this.modeName='';
+            this.eventName='';
+            this.remark='';
+            this.evenTime='';
         }
     },
 
@@ -464,12 +579,12 @@ li{
                                         margin-left: 10px;
 
                                     }
-                                    // .deleteBtn{
-                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
-                                    // }
-                                    // .editBtn{
-                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
-                                    // }
+                                    .deleteBtn{
+                                        background: url('../../assets/delete.png') no-repeat 0 0;
+                                    }
+                                    .editBtn{
+                                        background: url('../../assets/edit.png') no-repeat 0 0;
+                                    }
                                     // .upmoveBtn{
                                     //     background: url('./images/overviewup.png') no-repeat 0 0;
                                     // }
@@ -517,6 +632,40 @@ li{
                     border: 1px solid #d1d1d1;
                     padding:0px 0px 0px 10px;
                 }
+            .el-icon-circle-plus{
+                font-size:22px;
+                color: #2e8cb9;
+                margin-left:5px;
+                cursor: pointer;
+            }
+            .usersList{
+                .usersListUl{
+                    display: flex;
+                    flex-direction: column;
+                    text-align: left;
+                    width: 80%;
+                    margin: 0 auto;
+                    height: 300px;
+                    border:1px solid #58adfb;
+                    overflow: auto;
+                    padding: 5px;
+                    background: white;
+                    .usersListLi{
+                        height: 30px;
+                        line-height: 30px;
+                        color:#58adfb;
+                        font-size:16px;
+                        padding:2px;
+                        cursor: pointer;
+                        &:hover{
+                           color:#3279e3;
+
+                        }
+                    }
+
+                }
+
+            }
         }
 
 }

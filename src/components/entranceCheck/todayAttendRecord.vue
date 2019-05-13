@@ -18,7 +18,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名字"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -80,6 +80,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
@@ -90,6 +92,10 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
+            BDMSUrl:'',
+            getTodayAttendancyList:[],
+            getTodayAttendancyLists:[],
+            timeStamp:'',
 
         }
     },
@@ -99,8 +105,11 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
-        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'))
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
+        vm.timeStamp=new Date().getTime();
         vm.loadingTitle();
+        vm.getTodayAttendancy('',vm.timeStamp)
     },
     methods:{
          loadingTitle(){
@@ -156,7 +165,27 @@ export default {
         changeDatePicker(){
         },
         selectNameInfo(){
-        }
+        },
+        getTodayAttendancy(name,date){
+            axios({
+                url:this.BDMSUrl+'attendancy/getAttendancy',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    userName:name,
+                    projectId:this.projId,
+                    date:moment(date).format('YYYY-MM-DD')
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getTodayAttendancyList=response.data.rt;
+                }else{
+
+                }
+            })
+        },
+
 
 
     },

@@ -727,7 +727,7 @@ li{
         }
         #edit{
             .editSelect{
-                    width: 447px;
+                    width: 436px;
                     height: 38px;
                     color: #333333;
                     background: #fafafa;

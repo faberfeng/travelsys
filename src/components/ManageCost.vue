@@ -1153,10 +1153,10 @@ export default {
                          vm.$set(item,'isShowUrl','settings/accessControl');
                         let routerLink3=[];
                         routerLink3.push(
-                            {
-                                title:'/setting/accessControl',
-                                linkUrl:'门禁管理'
-                            },
+                            // {
+                            //     title:'/setting/accessControl',
+                            //     linkUrl:'门禁管理'
+                            // },
                             {
                                 title:'/setting/icCordControl',
                                 linkUrl:'IC卡管理'

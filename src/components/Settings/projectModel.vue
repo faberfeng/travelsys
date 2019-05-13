@@ -1,6 +1,36 @@
 <template>
     <div id="attentManageWarrp">
-        <div class="itemtop"></div>
+        <div class="itemtop">
+            <div class="flex">
+                <div>
+                    <calendar
+                        ref="calendar1"
+                        :multi="calendar1.multi"
+                        :zero="calendar1.zero"
+                        :events="calendar1.events" 
+                        :lunar="calendar1.lunar" 
+                        :value="calendar1.value" 
+                        :begin="calendar1.begin" 
+                        :end="calendar1.end" 
+                        :weeks="calendar1.weeks" 
+                        :months="calendar1.months" 
+                        
+                        ></calendar>
+                </div>
+            </div>
+            <div class="flexLeft">
+                <div class="canlenCard">
+                    <h5>5月</h5>
+                    <span>上班天数:21天</span>
+                    <span>休息天数：9天</span>
+                </div>
+                <div class="canendBtn">
+                    <span class="spanBtn">编辑</span>
+                </div>
+
+            </div>
+
+        </div>
         <div class="itembottom">
             <div class="itemSeting"><span class="el-icon-setting" @click="timeSetting()">考勤时间设置</span></div>
              <div class="contentBody">
@@ -113,8 +143,12 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import calendar from './calendar.vue'
 export default {
     name:'attentManage',
+    components: {
+        calendar
+    },
     data(){
         return{
             cardLists:[],
@@ -126,6 +160,34 @@ export default {
             addTimeSettingDialog:false,
             BDMSUrl:'',
             getCheckOnTimeList:[],
+            //日历
+             calendar1:{
+                 multi:true,
+                 zero:true,
+                value:[[2019,5,12],[2019,5,13],[2019,5,14],[2019,5,15],[2019,5,16],], //默认日期
+                lunar:true, //显示农历
+                weeks:['日', '一', '二', '三', '四', '五', '六'],
+                display:"2018/02/16",
+                months:['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                events:{
+                    // '2018-7-2':'工作日',
+                    // '2017-7-20':'$408',
+                    // '2017-7-21':'$460',
+                    // '2017-7-22':'$500',
+                },
+                // begin:[2019,5,11], //可选开始日期
+                // end:[2019,6,11], //可选结束日期
+                select(value){
+                    console.log(value,'value');
+                },
+                selectMonth(month,year){
+                    
+                },
+                selectYear(year){
+                   
+                },
+                timestamp:Date.now()
+            },
 
         }
     },
@@ -138,6 +200,10 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
     },
     methods:{
+        selectTime(value){
+            console.log('12111');
+            // console.log(value,'value000');
+        },
         timeSetting(){
             this.addTimeSettingDialog=true;
         },
@@ -206,8 +272,79 @@ export default {
         margin:0 auto;
         .itemtop{
             margin-top:20px;
-            height:350px;
+            height:380px;
             border: 1px solid #ccc;
+            display: flex;
+            flex-direction: row;
+            .flex{
+                padding:10px;
+                width: 70%;
+                // border-right:1px solid #ccc;
+            }
+            .flexLeft{
+                height: inherit;
+                width: 30%;
+                border-left:1px solid #ccc;
+                display: flex;
+                flex-direction: column;
+                justify-content:center;
+                align-items: center;
+                animation: dataList-ani2 2s forwards;
+                .canlenCard{
+                    // margin-top:20px;
+                    width: 200px;
+                    height: 200px;
+                    border: 2px solid #44e2ba;
+                    display: flex;
+                    justify-content:center;
+                    flex-direction: column;
+                    // align-items:center;
+
+                    &:hover{
+                        box-shadow: 0 15px 30px rgba(0,0,0,.1);
+                        transform: translate3d(0,-5px,0);
+                    }
+                    h5{
+                        
+                        color: #44e2ba;
+                        font-size:40px;
+                        font-weight: bold;
+                        line-height: 44px;
+                        height: 44px;
+                        margin:10px;
+                    }
+                    span{
+                        color: #666;
+                        font-size:16px;
+                        line-break: 20px;
+                        height: 20px;
+                        display: block;
+                    }
+                }
+                .canendBtn{
+                    margin-top:20px;
+                    .spanBtn{
+                        width: 150px;
+                        height: 44px;
+                        color: #58adfb;
+                        text-align: center;
+                        line-height: 44px;
+                        text-decoration: none;
+                        border: 1px solid #58adfb;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        display: inline-block;
+                        cursor: pointer;
+                        &:hover{
+                            background: #58adfb;
+                            color: #fff;
+                        }
+                    }
+
+                }
+            }
+            
+            // float: left;
         }
         .itembottom{
             .itemSeting{

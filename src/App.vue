@@ -223,7 +223,7 @@ padding-right: 14px;
 }
 .el-tabs--border-card>.el-tabs__header .el-tabs__item{
   font-size: 16px;
-  width: 106px;
+  width: 122px;
   font-weight: bold;
   color: #666666;
 }
@@ -237,7 +237,7 @@ padding-right: 14px;
   padding-left: 0;
 }
 .el-tabs__header{
-  height: 48px;
+  height: 41px;
 }
 .el-tabs__nav{
   height: 48px;
@@ -313,8 +313,8 @@ padding-right: 14px;
         width: 435px;
         height: 38px;
         border: 1px solid #d1d1d1;
-        border-radius: 2px;
-        background: #fafafa;
+        border-radius: 4px;
+        // background: #fafafa;
         padding-left: 10px;
     }
     #edit .inp::-webkit-input-placeholder,#edit .inp::-ms-input-placeholder,#edit .inp::-moz-input-placeholder{

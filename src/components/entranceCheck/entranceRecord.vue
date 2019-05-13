@@ -42,20 +42,22 @@
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in this.getDoorRecordLists" :key="index">
+                            <td>{{timeChange(item.checkTime)}}</td>
+                            <td>{{timeChange(item.checkTime)}}</td>
+                            <td>{{item.doorName}}</td>
+                            <td>{{item.type==1?'门禁':'人脸'}}</td>
+                            <td>
+                                {{item.userName}}
+                            </td>
+                            <td>
+                                <i class="el-icon-refresh"></i>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getDoorRecordList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -79,6 +81,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
@@ -89,6 +93,11 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
+            BDMSUrl:'',
+            getDoorRecordList:[],
+            getDoorRecordLists:[],
+            getDoorRecordListLength:'',
+            timeStamp:'',
         }
     },
     created(){
@@ -98,10 +107,18 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=vm.$store.state.BDMSUrl;
+        vm.timeStamp=new Date().getTime();
+        vm.getDoorRecord('',vm.timeStamp);
         vm.loadingTitle();
 
     },
     methods:{
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD HH:mm:ss')
+            }
+        },
          loadingTitle(){
           var vn=this;
           vn.routerList=vn.getSecondGradeList(vn.moduleList,'052','05203','/entranceCheck/entranceRecord','05202','/entranceCheck/monthAttendRecord','05201','/entranceCheck/todayAttendRecord');
@@ -157,8 +174,35 @@ export default {
         },
         selectNameInfo(){
 
-        }
-
+        },
+       getDoorRecord(name,date){
+           this.getDoorRecordLists=[];
+           axios({
+               url:this.BDMSUrl+'attendancy/getDoorRecord',
+               headers:{
+                   'token':this.token
+               },
+               params:{
+                   date:moment(date).format('YYYY-MM-DD'),
+                   name:name,
+                   projectId:this.projId
+               }
+           }).then((response)=>{
+               if(response.data.cd==0){
+                   this.getDoorRecordList=response.data.rt;
+                   this.getDoorRecordListLength=this.getDoorRecordList.length;
+                   if(this.getDoorRecordListLength<11){
+                        for(var i=0;i<this.getDoorRecordListLength;i++){
+                            this.getDoorRecordLists.push(this.getDoorRecordList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getDoorRecordLists.push(this.getDoorRecordList[i])
+                        }
+                    }
+               }
+           })
+       }
     },
 
 }
@@ -347,6 +391,9 @@ li{
                                         cursor: pointer;
                                         margin-left: 10px;
 
+                                    }
+                                    .el-icon-refresh{
+                                        font-size:20px;
                                     }
                                     // .deleteBtn{
                                     //     background: url('../../assets/delete.png') no-repeat 0 0;

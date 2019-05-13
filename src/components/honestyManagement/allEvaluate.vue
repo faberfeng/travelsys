@@ -33,17 +33,17 @@
                 <table class="tableList" border="1" cellspacing="0" width="100%">
                     <thead>
                        <tr>
-                           <th>首刷时间</th>
-                           <th>复刷时间</th>
-                           <th>门禁号</th>
-                           <th>验证方式</th>
-                           <th>相关人员</th>
-                           <th>关闭本轮门禁</th>
+                           <th>序号</th>
+                           <th>姓名</th>
+                           <th>所属单位</th>
+                           <th>良好记录</th>
+                           <th>不良记录</th>
+                           <th>投诉处理</th>
+                           <th>综合评分</th>
                        </tr>
                     </thead>
                     <tbody>
                         <!-- <tr>
-                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name:'',
     data(){
@@ -89,6 +90,8 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
+            onePerson:'',
+            getEvaluateInfoList:[],
 
         }
     },
@@ -99,6 +102,7 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
 
     },
@@ -157,6 +161,19 @@ export default {
         },
         selectNameInfo(){
 
+        },
+        getEvaluateInfo(){
+            axios({
+                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getEvaluateInfoList=response.data.rt;
+                }
+            })
         }
 
     },

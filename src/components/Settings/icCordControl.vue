@@ -1,8 +1,10 @@
 <template>
-    <div id="wrapper">
-            <div class="leftTxt">IC卡管理</div>
-            <div class="wrapperHead" @click="buildIcCord">
-                <span class="el-icon-plus"></span><span class="elName">添加IC卡</span>
+    <div id="wrapperIc">
+            <div class="bodyHead">
+                <div class="leftTxt">IC卡管理</div>
+                <div class="wrapperHead" @click="buildIcCord">
+                    <span class="el-icon-plus"></span><span class="elName">添加IC卡</span>
+                </div>
             </div>
             <div class="contentBody">
                 <div class="tableBody">
@@ -348,42 +350,43 @@ export default {
 </script>
 
 <style lang="less" scoped>
-    #wrapper{
-        
-        border: 1px solid #d9d9d9;
-        height: 50px;
-        background: rgb(250, 251, 252);
-        font-size: 12px;
-        margin-right: 10px;
-        margin-top:51px;
-        .leftTxt{
-            float: left;
-            line-height: 48px;
-            height: 48px;
-            margin-left:15px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .wrapperHead{
-            float: right;
-            line-height: 48px;
-            height: 48px;
-            margin-right:15px;
-            cursor: pointer;
-            .el-icon-plus{
+    #wrapperIc{
+        .bodyHead{
+            border: 1px solid #d9d9d9;
+            height: 50px;
+            background: rgb(250, 251, 252);
+            font-size: 12px;
+            margin-right: 10px;
+            margin-top:51px;
+            .leftTxt{
+                float: left;
+                line-height: 48px;
+                height: 48px;
+                margin-left:15px;
                 font-size: 16px;
                 font-weight: bold;
-                color:rgb(46,140,185);
             }
-            .elName{
-                margin-left:4px;
-                font-size:16px;
-                font-weight: bold;
-                color:rgb(46,140,185);
+            .wrapperHead{
+                float: right;
+                line-height: 48px;
+                height: 48px;
+                margin-right:15px;
+                cursor: pointer;
+                .el-icon-plus{
+                    font-size: 16px;
+                    font-weight: bold;
+                    color:rgb(46,140,185);
+                }
+                .elName{
+                    margin-left:4px;
+                    font-size:16px;
+                    font-weight: bold;
+                    color:rgb(46,140,185);
+                }
             }
         }
+        
         .contentBody{
-                margin-top:20px;
                 padding: 20px 0px;
                 .tableBody{
                     margin-top:30px;
@@ -478,7 +481,7 @@ export default {
                     //     width: 435px !important;
                     // }
                     .editSelect{
-                        width: 447px;
+                        width: 436px;
                         height: 38px;
                         color: #333333;
                         background: #fafafa;

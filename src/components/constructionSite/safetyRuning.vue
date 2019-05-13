@@ -178,6 +178,9 @@
                                                 <th width="100px">检查时间</th>
                                                 <th width="100px">检查内容摘要</th>
                                                 <th width="100px">附件</th>
+                                                <th width="100px">是否验证</th>
+                                                <th width="100px">验证内容</th>
+                                                <th width="100px">验证时间</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -198,6 +201,15 @@
                                                     <span v-if="item.filePath" class="icon-file"  :title="item.fileName" @click="downFile(item.filePath)">文档</span>
                                                     <!-- <span  class="el-icon-document" :title="item.fileName" @click="downFile(item.filePath)"></span> -->
                                                 </td>
+                                                <td width="100px">
+                                                    <span v-if="item.valid==null" @click="Verifiy(item.id)" class="el-icon-circle-check-outline" >
+                                                    </span>
+                                                    <span v-if="item.valid">
+                                                        {{item.valid}}
+                                                    </span>
+                                                </td>
+                                                <td width="100px">{{item.vaildInfo}}</td>
+                                                <td width="100px">{{item.vaildTime|changeTime()}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -487,6 +499,18 @@
                         <button class="editBtnC" @click="addfileCancle">取消</button>
                     </div>
                 </el-dialog>
+                <el-dialog width="500px" v-dialogDrag title="验证内容" :visible="verfiyShow" @close="verfiyShow=false;this.vaildInfo=''">
+                    <div class="editBody">
+                        <div class="editBodytwo imageBody">
+                            <input type="text" class="inp" v-model="vaildInfo">
+                        </div>
+                    </div>
+                   <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="verfiyConfirm">确定</button>
+                        <button class="editBtnC" @click="verfiyShow=false;this.vaildInfo=''">取消</button>
+                    </div>
+                </el-dialog> 
+
 
                 <el-dialog width="500px" v-dialogDrag title="添加安全检查项目" :visible="addCheckItemNodeShow" @close="addCheckItemNodeCancle">
                     <div class="editBody">
@@ -769,6 +793,9 @@ export default {
             elementFilter:'',
             viewPointPath:'',
             locationInfo:'',
+            verfiyShow:false,
+            verfiyId:'',
+            vaildInfo:'',
 
         }
     },
@@ -828,11 +855,14 @@ export default {
     },
     filters:{
         changeTime(val){
-            if(val==''){
-                return ''
-            }else {
-                return moment(val).format("YYYY-MM-DD HH:mm:ss");
+            if(val){
+                    return moment(val).format("YYYY-MM-DD HH:mm:ss");
             }
+            // if(val==''){
+            //     return ''
+            // }else {
+                
+            // }
         },
         nameChange(val){
             if(val==null){
@@ -957,6 +987,29 @@ export default {
             if(val){
                 window.open(this.BDMSUrl+val)
             }
+        },
+        Verifiy(id){
+            this.verfiyShow=true;
+            this.verfiyId=id;
+        },
+        verfiyConfirm(){
+            axios({
+                url:this.BDMSUrl+'security/checkRecordValid',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    vaildInfo:this.vaildInfo,
+                    id:this.verfiyId,
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.verfiyShow=false;
+                    this.vaildInfo='';
+                    this.getCheckRecordList(this.checkPointId)
+                }
+            })
+
         },
         viewPointCancle(){
             this.viewPointShow=false;
@@ -1285,6 +1338,7 @@ export default {
         console.log(this.addNodeparentItemId);
         this.getCheckItemData();
         this.getCheckPointsByItemId();
+        this.listData=[];
         // this.checkItem(0,obj.itemId);
         
     },
@@ -1317,6 +1371,29 @@ export default {
                 })
             }
         })
+    },
+    getCheckRecordList(id){
+        var vm=this;
+         axios({
+            url:this.BDMSUrl+'security/getCheckRecord',
+            headers:{
+                'token':vm.token
+            },
+            params:{
+                checkPointId:id
+            },
+            method:'get'
+        }).then((response)=>{
+            if(response.data.cd==0){
+                this.listData=response.data.rt;
+            }else{
+                this.$message({
+                    type:'success',
+                    message:response.data.msg
+                })
+            }
+        })
+
     },
     //打印全部标签
     printAllLabel(){
@@ -3021,6 +3098,9 @@ export default {
                                                     line-height: 14px;
                                                     background: url('../ManageDesign/images/file.png')no-repeat 0 0;
                                                     content: '';
+                                                }
+                                                .el-icon-circle-check-outline{
+                                                    font-size:18px;
                                                 }
                                             }
                                         }

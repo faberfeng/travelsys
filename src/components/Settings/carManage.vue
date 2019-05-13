@@ -1,15 +1,15 @@
 <template>
-    <div id="wrapper">
+    <div id="wrapperCar">
+        <div class="bodyHead">
             <div class="leftTxt">
-               
                 项目停车位总数:<span style="display:inline-block;margin-left:5px;">{{parkingCount}}</span>
-                
                 <el-input-number size="medium" class="allChange" v-model="parkingCount" @change="changeParkingCount()"></el-input-number>
-                
             </div>
             <div class="wrapperHead" @click="bulidCarType" >
                  <span class="el-icon-plus"></span><span class="elName">添加车辆类型</span>
             </div>
+        </div>
+            
             <div class="contentBody">
                 <div class="tableBody">
                     <table class="tableList" border="1" cellspacing="0" width="100%">
@@ -352,52 +352,55 @@ export default {
 </script>
 
 <style lang="less" scoped>
-    #wrapper{
-        
-        border: 1px solid #d9d9d9;
-        height: 50px;
-        background: rgb(250, 251, 252);
-        font-size: 12px;
-        margin-right: 10px;
-        margin-top:51px;
-        .leftTxt{
-            float: left;
-            line-height: 48px;
-            height: 48px;
-            margin-left:15px;
-            font-size: 16px;
-            font-weight: bold;
-            .allChange{
-                margin-left:15px;
-            }
-        }
-        .allNum{
-            line-height: 48px;
+    #wrapperCar{
+        .bodyHead{
+             border: 1px solid #d9d9d9;
             height: 50px;
-            font-size:22px;
-            font-weight: bold;
-        }
-        .wrapperHead{
-            float: right;
-            line-height: 48px;
-            height: 48px;
-            margin-right:15px;
-            // margin-top:8px;
-            cursor: pointer;
-            .el-icon-plus{
+            background: rgb(250, 251, 252);
+            font-size: 12px;
+            margin-right: 10px;
+            margin-top:51px;
+            .leftTxt{
+                float: left;
+                line-height: 48px;
+                height: 48px;
+                margin-left:15px;
                 font-size: 16px;
                 font-weight: bold;
-                color:rgb(46,140,185);
+                .allChange{
+                    margin-left:15px;
+                }
             }
-            .elName{
-                margin-left:4px;
-                font-size:16px;
+            .allNum{
+                line-height: 48px;
+                height: 50px;
+                font-size:22px;
                 font-weight: bold;
-                color:rgb(46,140,185);
             }
+            .wrapperHead{
+                float: right;
+                line-height: 48px;
+                height: 48px;
+                margin-right:15px;
+                // margin-top:8px;
+                cursor: pointer;
+                .el-icon-plus{
+                    font-size: 16px;
+                    font-weight: bold;
+                    color:rgb(46,140,185);
+                }
+                .elName{
+                    margin-left:4px;
+                    font-size:16px;
+                    font-weight: bold;
+                    color:rgb(46,140,185);
+                }
+            }
+
         }
+        
         .contentBody{
-                margin-top:20px;
+                // margin-top:20px;
                 padding: 20px 0px;
                 .tableBody{
                     margin-top:30px;
@@ -446,18 +449,6 @@ export default {
                                         .editBtn{
                                             background: url('../../assets/edit.png') no-repeat 0 0;
                                         }
-                                        // .upmoveBtn{
-                                        //     background: url('./images/overviewup.png') no-repeat 0 0;
-                                        // }
-                                        // .downmoveBtn{
-                                        //     background: url('./images/downmove.png') no-repeat 0 0;
-                                        // }
-                                        // .detailBtn{
-                                        //     background: url('./images/overfile.png') no-repeat 0 0;
-                                        // }
-                                        // .exportBtn{
-                                        //     background: url('./images/overviewdown.png') no-repeat 0 0;
-                                        // }
 
                                     }
                                 }
@@ -492,7 +483,7 @@ export default {
                     //     width: 435px !important;
                     // }
                     .editSelect{
-                        width: 447px;
+                        width: 436px;
                         height: 38px;
                         color: #333333;
                         background: #fafafa;

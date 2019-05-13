@@ -83,6 +83,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'',
     data(){
@@ -92,7 +94,9 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
-
+            getAttendancyByMonthList:[],
+            getAttendancyByMonthLists:[],
+            timeStamp:'',
         }
     },
     created(){
@@ -102,7 +106,10 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
+        vm.timeStamp=new Date().getTime();
         vm.loadingTitle();
+        vm.getAttendancyByMonth('',vm.timeStamp);
 
     },
     methods:{
@@ -160,7 +167,26 @@ export default {
         },
         selectNameInfo(){
 
-        }
+        },
+        getAttendancyByMonth(name,date){
+            axios({
+                url:this.BDMSUrl+'attendancy/getAttendancyByMonth',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    name:name,
+                    projectId:this.projId,
+                    date:moment(date).format('YYYY-MM')+'-01'
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getAttendancyByMonthList=response.data.rt;
+                }else{
+
+                }
+            })
+        },
 
     },
 

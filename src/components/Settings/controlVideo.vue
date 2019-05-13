@@ -223,8 +223,8 @@ ul,li{
         #item-box-file1 {
             display: block;
             border: 1px solid #e6e6e6;
-            height: 36px;
-            // height: 51px;
+            // height: 36px;
+            height: 51px;
             padding-top: 16px;
             padding-left: 20px;
             
@@ -281,7 +281,9 @@ ul,li{
                 display: flex;
                 flex-direction:row;
                 flex-wrap:wrap;
+                // flex-wrap: nowrap;
                 justify-content: flex-start;
+                flex-shrink: 1;
                 .cardLi{
                     position: relative;
                     width: 22%;
@@ -358,7 +360,7 @@ ul,li{
         }
         #edit{
             .editSelect{
-                    width: 447px;
+                    width: 436px;
                     height: 38px;
                     color: #333333;
                     background: #fafafa;

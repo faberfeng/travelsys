@@ -11,24 +11,24 @@
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动名称:</label><input class="inp" v-model="workName"/>
                 </div>
                 <div class="bodyContent">
-                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动发起:</label>
-                    <el-select v-model="buildPerson" placeholder="请选择">
+                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动发起单位:</label>
+                    <input class="inp" v-model="workOriginator"/>
+                    <!-- <el-select v-model="buildPerson" placeholder="请选择">
                             <el-option
                             v-for="item in list"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
                             </el-option>
-                    </el-select>
-
+                    </el-select> -->
                 </div>
                 <div class="bodyContent">
-                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动负责人:</label><input class="inp" v-model="workName"/>
+                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动负责人:</label><input class="inp" v-model="workLeader"/>
                 </div>
             </div>
             <div style="width:50%;float:right;height:250px;">
                 <div class="bodyContent">
-                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">开始时间:</label>
+                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">时间范围:</label>
                      <el-date-picker
                         v-model="timeValue"
                         type="date"
@@ -36,21 +36,53 @@
                     </el-date-picker>
                 </div>
                  <div class="bodyContent">
-                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">活动名称:</label><input type="file" class="inp" style="width:280px !important" />
+                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">附件:</label>
+                    <!-- <span class="inp" style="width:280px !important;display:inline-block"></span> -->
+                    <input type="file" />
                     <span class="el-icon-upload"></span>
                 </div>
-                 <div class="bodyContent">
-                    <span class="makesureBtn">确认发布</span>
+                <div class="bodyContent">
+                    <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">抄送人员:</label>
+                    <div @click="clickSelectUser" class="tagLable" style="text-align:left;display:inline-block;width:300px;height:70px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                            <el-tag 
+                            style="width:95px;margin:2px;text-align:center;"
+                                v-for="tag in selectUserList"
+                                :key="tag.name"
+                               closable
+                                @close="closeTag(tag)"
+                                type="">
+                                {{tag.name}}
+                            </el-tag>
+                    </div>
+                     <span @click="clickSelectUser" class="el-icon-circle-plus"></span>
                 </div>
-
             </div>
         </div>
         <div class="projectMiddle">
             <textarea placeholder="活动内容说明"></textarea>
         </div>
+        <div class="projectBottom">
+            <span class="makesureBtn" @click="makeSureSubmit">确认发布</span>
+        </div>
+        <div id="edit">
+            <el-dialog title="用户列表" v-dialogDrag  width="400px" :visible.sync="addUserDialog" @close="addUserCancle">
+                    <div class="usersList">
+                        <ul class="usersListUl">
+                            <li class="usersListLi" v-for="(item,index) in userLists" :key="index">
+                                <el-checkbox v-model="item.checkBoxShow"></el-checkbox><label style="margin-left:4px;">{{item.name+'-'+item.name2}}</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addUserListMakeSure()">保存</button>
+                        <button class="editBtnC" @click="addUserCancle">取消</button>
+                    </div>
+            </el-dialog>
+        </div>
     </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
     name:'commonMessage',
     props:[],
@@ -63,16 +95,97 @@ export default {
                 label:'名称'
             }],
             timeValue:'',
+            startTimeValue:'',
+            endTimeValue:'',
+            selectUserList:[],
+            addUserDialog:false,
+            userLists:[],
+            workOriginator:'',//组织者
+            workName:'',
+            workLeader:'',
+
+
+
         }
     },
     created(){
+        var vm = this
+        vm.token = localStorage.getItem('token');
+        vm.projId = localStorage.getItem('projId');
+        vm.userId = localStorage.getItem('userid');
+        vm.projName = localStorage.getItem('projName');
+        vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
+        this.getUserList();
 
     },
     methods:{
         back(){
             var vm=this;
             vm.$emit('back')
-        }
+        },
+        clickSelectUser(){
+            this.addUserDialog=true;
+        },
+        addUserCancle(){
+            this.addUserDialog=false;
+            this.userLists.forEach((item)=>{
+                item.checkBoxShow=false;
+            })
+        },
+        addUserListMakeSure(){
+            this.userLists.forEach((item)=>{
+                if(item.checkBoxShow==true){
+                    this.selectUserList.push(item)
+                }
+                item.checkBoxShow=false;
+            })
+            this.addUserDialog=false;
+        },
+        getUserList(){
+            axios({
+                url:this.BDMSUrl+'user/getUserList',
+                method:'GET',
+                params:{
+                    projectId:this.projId
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.userLists=response.data.rt;
+                    this.userLists.forEach((item)=>{
+                        this.$set(item,'checkBoxShow',false);
+                    })
+                }
+            })
+        },
+        makeSureSubmit(){
+            axios({
+                url:this.BDMSUrl+'safety/addSafetyEducation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    title:'',
+                    text:'',
+                    originator:'',
+                    leader:'',
+                    startTime:'',
+                    entTime:'',
+                    userIds:''
+                },
+                data:''
+            }).then((response)=>{
+                if(response.data.cd==0){
+
+                }
+            })
+
+        },
+
 
     }
 }
@@ -121,6 +234,9 @@ export default {
         }
         .bodyContent{
             margin:30px 20px;
+            input{
+                
+            }
             .el-select .el-input__inner{
                 width: 320px;
             }
@@ -133,27 +249,19 @@ export default {
             }
             .el-icon-upload{
                 font-size: 24px;
-                color:red;
+                color:#2e8cb0;
                 margin-left:10px;
                 // line-height: 34px;
                 vertical-align: center;
                 cursor: pointer;
             }
-            .makesureBtn{
-                display: inline-block;
-                height: 36px;
-                width: 80px;
-                border:1px solid red;
-                border-radius: 4px;
-                background: red;
-                color:white;
-                line-height: 34px;
-                font-size: 14px;
+            .el-icon-circle-plus{
+                font-size:22px;
+                color: #2e8cb9;
+                margin-left:5px;
                 cursor: pointer;
-                // margin-top:10px;
-                margin-left:400px;
-                margin-top:30px;
             }
+            
                 
         }
     }
@@ -167,6 +275,56 @@ export default {
             padding:15px;
             font-size:14px;
             color:#999;
+        }
+    }
+    .projectBottom{
+        .makesureBtn{
+            display: inline-block;
+            height: 40px;
+            width: 100px;
+            border:1px solid #2e8cb0;
+            border-radius: 4px;
+            background: #2e8cb0;
+            color:white;
+            line-height: 36px;
+            font-size: 14px;
+            cursor: pointer;
+            // margin-top:10px;
+            // margin-left:400px;
+            // margin-top:30px;
+            &:hover{
+                border:1px solid #2e8cb0;
+                background: white;
+                color:#2e8cb0;
+            }
+        }
+    }
+    #edit{
+       
+        .usersList{
+            .usersListUl{
+                display: flex;
+                flex-direction: column;
+                text-align: left;
+                width: 80%;
+                margin: 0 auto;
+                height: 300px;
+                border:1px solid #58adfb;
+                overflow: auto;
+                padding: 5px;
+                background: white;
+                .usersListLi{
+                    height: 30px;
+                    line-height: 30px;
+                    color:#58adfb;
+                    font-size:16px;
+                    padding:2px;
+                    cursor: pointer;
+                    &:hover{
+                        color:#3279e3;
+                    }
+                }
+            }
         }
     }
 }

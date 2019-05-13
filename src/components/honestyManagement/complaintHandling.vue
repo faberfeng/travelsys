@@ -6,16 +6,183 @@
                 </router-link>
             </div>
         </div>
+        <div class="contentBody" >
+            <div class="ForumSelector">
+                <span class="name">筛选条件</span>
+                <ul>
+                    <li class="selectItem">
+                        <el-select v-model="onePerson" placeholder="请选择">
+                                    <el-option
+                                    v-for="item in personList"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                    </el-option>
+                        </el-select>
+                    </li>
+                    <li class="selectItem">
+                        <!-- <span class="title">时间</span> -->
+                        <span class="itemContent">
+                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                         </span>
+                    </li>
+                    <li class="selectItem">
+                       <span class="title-right">
+                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
+                        </span>
+                    </li>
+                     
+                </ul>
+                <div class="wrapperHead" @click="buildComplain">
+                    <span class="el-icon-plus"></span><span class="elName">新建投诉处理</span>
+                </div>
+            </div>
+             <div class="tableBody">
+                <table class="tableList" border="1" cellspacing="0" width="100%">
+                    <thead>
+                       <tr>
+                           <th>序号</th>
+                           <th>事件</th>
+                           <th>投诉单位/对象</th>
+                           <th>被投诉对象</th>
+                           <th>投诉时间</th>
+                           <th>相关人员</th>
+                           <th>投诉单</th>
+                           <th>编辑</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                当前列表无数据
+            </div>
+            <div class="tableBodyPagination">
+                <div class="tableBodyPaginationRight">
+                    <el-pagination class="elPagination"
+                        background
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10,20,30]"
+                        :page-size="1"
+                        layout="sizes,prev, pager, next"
+                        :total="TableListLength">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <div id="edit">
+                <el-dialog title="添加投诉处理" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                    <div class="editBody">
+                        <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="eventName"/></div>
+                        <div class="editBodytwo"><label class="editInpText">投诉单位:</label><input class="inp" placeholder="请输入" v-model="companyName"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">被投诉对象 :</label>
+                            <input class="inp" placeholder="请输入" v-model="modeName"/>
+                             <!-- <select class="editSelect" v-model="mode" >
+                                <option v-for="(item,index) in goodList" :value="item.value" :key="index">{{item.label}}</option>
+                            </select>
+                            <i class="icon-sanjiao"></i> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">投诉时间 :</label>
+                            <el-date-picker
+                                v-model="evenTime"
+                                type="date"
+                                placeholder="选择日期">
+                            </el-date-picker>
+                        </div>
+                        <div class="editBodytwo"><label class="editInpText">投诉单 :</label>
+                            <div @click="clickInp" class="tagLable" style="display:inline-block;width:415px;height:38px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                                <input style="opacity:0" type="file" id="fileInput" @change="changeIndex($event)" ref="fileRef"/>
+                                <span></span>
+                            </div>
+                            <span @click="clickInp" class="el-icon-upload"></span>
+                         </div>
+                         <div class="editBodytwo"><label class="editInpText">相关人员 :</label>
+                            <div @click="clickSelectUser" class="tagLable" style="text-align:left;display:inline-block;width:415px;height:38px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                                <el-tag 
+                                style="width:95px;margin:2px;text-align:center;"
+                                    v-for="tag in selectUserList"
+                                    :key="tag.name"
+                                closable
+                                    @close="closeTag(tag)"
+                                    type="">
+                                    {{tag.name}}
+                                </el-tag>
+                            </div>
+                            <span @click="clickSelectUser" class="el-icon-circle-plus"></span>
+                         </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addGoodRecordMakeSure()">确定</button>
+                        <button class="editBtnC" @click="addCancle">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog title="用户列表" v-dialogDrag width="400px" :visible.sync="addUserDialog" @close="addUserCancle">
+                    <div class="usersList">
+                        <ul class="usersListUl">
+                            <li class="usersListLi" v-for="(item,index) in userLists" :key="index">
+                                <el-checkbox v-model="item.checkBoxShow"></el-checkbox><label style="margin-left:4px;">{{item.name+'-'+item.name2}}</label>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="addUserListMakeSure()">保存</button>
+                        <button class="editBtnC" @click="addUserCancle">取消</button>
+                    </div>
+
+                </el-dialog>
+         </div>
         
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+import moment from 'moment';
 export default {
     name:'',
     data(){
         return{
             routerList:"",
+            TableListLength:1,//表格长度
+            currentPage:1,//当前页
+            selectTime:"",//筛选时间
+            selectName:"",//筛选名称
+             personList:[{
+                value:1,
+                label:'活动发起者'
+            }],
+            onePerson:1,
+            addDialog:false,
+            mode:'',
+            eventName:'',
+            evenTime:'',
+            addDialog:false,
+            remark:'',
+            modeName:'',
+            companyName:'',
+            eventName:'',
+            addUserDialog:false,
+            userLists:[],
+            selectUserList:[],
+            fileList:null,
+            fileName:'',
 
         }
     },
@@ -26,7 +193,9 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
+        this.getUserList();
 
     },
     methods:{
@@ -72,7 +241,138 @@ export default {
                 return value1 - value2;
             }
         },
+        buildComplain(){
+            this.addDialog=true;
+        },
+        handleSizeChange(){
 
+        },
+        handleCurrentChange(){
+
+        },
+        addUserListMakeSure(){
+            this.userLists.forEach((item)=>{
+                if(item.checkBoxShow==true){
+                    this.selectUserList.push(item)
+                }
+                item.checkBoxShow=false;
+            })
+            this.addUserDialog=false;
+        },
+        //改变时间
+        changeDatePicker(){
+
+        },
+        selectNameInfo(){
+
+        },
+        clickInp(){
+            this.$refs.fileRef.click();
+        },
+        changeIndex(){
+            this.fileList=this.$refs.fileRef.files[0],
+            this.fileName=this.fileList.name;
+        },
+         //点击选择用户
+        clickSelectUser(){
+            this.addUserDialog=true;
+        },
+        addUserCancle(){
+            this.addUserDialog=false;
+            this.userLists.forEach((item)=>{
+                item.checkBoxShow=false;
+            })
+        },
+        closeTag(tag){
+            this.selectUserList.splice(this.selectUserList.indexOf(tag), 1)
+        },
+        addGoodRecordMakeSure(){
+            var data={}
+            var userData=[];
+            this.selectUserList.forEach((item)=>{
+                userData.push({
+                    'userId':item.userId,
+                    'userName':item.name
+                })
+            })
+            data={
+                'company':this.companyName,
+                'mode':this.modeName,
+                'name':this.eventName,
+                'remark':this.remark,
+                'time':this.evenTime,
+                'type':1,
+                'projId':this.projId,
+                'users':userData
+            }
+            axios({
+                url:this.BDMSUrl+'sincerity/addSincerityInfo',
+                method:"post",
+                headers:{
+                    'token':this.token
+                },
+                data:data
+            }).then((response)=>{
+                this.getGoodRecord();
+                this.addDialog=false;
+                this.selectUserList=[];
+                this.companyName='';
+                this.modeName='';
+                this.eventName='';
+                this.remark='';
+                this.evenTime='';
+                
+            })
+        },
+        getUserList(){
+            axios({
+                url:this.BDMSUrl+'user/getUserList',
+                method:'GET',
+                params:{
+                    projectId:this.projId
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.userLists=response.data.rt;
+                    this.userLists.forEach((item)=>{
+                        this.$set(item,'checkBoxShow',false);
+                    })
+                }
+            })
+        },
+        getGoodRecord(){
+            axios({
+                url:this.BDMSUrl+'sincerity/getSincerityInfo',
+                method:'get',
+                params:{
+                    time:'',
+                    userName:'',
+                    company:'',
+                    type:1,
+                    projId:this.projId
+                },
+                headers:{
+                    'token':this.token
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.goodRecordList=response.data.rt;
+
+                }
+            })
+        },
+        addCancle(){
+            this.addDialog=false;
+            this.selectUserList=[];
+            this.companyName='';
+            this.modeName='';
+            this.eventName='';
+            this.remark='';
+            this.evenTime='';
+        }
     },
 
 }
@@ -92,7 +392,7 @@ li{
         .topHeader{
             box-sizing: border-box;
             // margin-top:107px;
-            float: left;
+            // float: left;
             width: 100%;
             max-height: 800px;
             overflow: auto;
@@ -128,6 +428,248 @@ li{
                     border-bottom: 1px solid #fff;
                     background: #ffffff;
                 }
+        }
+        .contentBody{
+            margin-top:20px;
+            padding: 20px 20px;
+            .ForumSelector{
+                            border: 1px solid #d9d9d9;
+                            height: 50px;
+                            color: #999999;
+                            font-size: 12px;
+                            // margin-right: 30px;
+                            margin-right: 5px;
+                            .name{
+                                float: left;
+                                width: 96px;
+                                height: 48px;
+                                line-height: 48px;
+                                text-align: left;
+                                padding-left: 10px;
+                                background: #fafafa;
+                            }
+                            // .selectItemRight{
+                            //         float: right;
+                            //          width: 96px;
+                            //         height: 48px;
+                            //         line-height: 48px;
+                            //         text-align: left;
+                            //         padding-left: 10px;
+                            //         font-size: 16px;
+                            //         color:rgb(141, 141, 190);
+                            //         cursor: pointer;
+                            // }
+                            .wrapperHead{
+                                float: right;
+                                line-height: 48px;
+                                height: 48px;
+                                margin-right:15px;
+                                cursor: pointer;
+                                .el-icon-plus{
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    color:rgb(46,140,185);
+                                }
+                                .elName{
+                                    margin-left:4px;
+                                    font-size:16px;
+                                    font-weight: bold;
+                                    color:rgb(46,140,185);
+                                }
+                            }
+                            >ul{
+                                float: left;
+                                .selectItem{
+                                    float: left;
+                                    .itemContent{
+                                        display: inline-block;
+                                        padding: 8px 15px 0 30px;
+                                        height: 48px;
+                                        line-height: 48px;
+                                    }
+                                    .title{
+                                        display: inline-block;
+                                        padding: 0 15px 0 30px;
+                                        height: 48px;
+                                        line-height: 48px;
+                                    }
+                                    .el-select{
+                                        margin-top:4px;
+                                        margin-left:4px;
+                                        .el-input__inner{
+                                            border:none;
+                                            width: 100px;
+                                            color:#333333;
+                                            height: 38px;
+                                        }
+                                    }
+                                    .title-right{
+                                        float: left;;
+                                        width: 214px;
+                                        height: 33px;
+                                        margin-left: 20px;
+                                        margin-top:8px;
+                                        position: relative;
+                                        .title-right-icon{
+                                            display: block;
+                                            width: 100%;
+                                            height: 100%;
+                                            border-radius: 15px;
+                                            border: 1px solid #e6e6e6;
+                                            position: relative;
+                                            background: #fafafa;
+                                            padding-left:10px;
+                                            padding-right:40px;
+                                            margin-right: 5px;
+                                            outline: none;
+                                            &:focus{
+                                                background: #ffffff;  
+                                            }
+                                        }
+                                        .el-icon-search{
+                                            position: absolute;
+                                            right: 16px;
+                                            top: 10px;
+                                            cursor: pointer;
+                                        }
+                                    }
+                                
+                                }
+                                .selectItem:first-of-type .el-select .el-input__inner{
+                                    width: 170px;
+                                }
+                            }
+                    }
+            .tableBody{
+                    margin-top:30px;
+                    .tableList{
+                        border-collapse: collapse;
+                        border: 1px solid #e6e6e6;
+                        thead{
+                            background: #f2f2f2;
+                            th{
+                                padding-left: 6px;
+                                padding-right: 15px;
+                                height: 36px;
+                                text-align: center;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 14px;
+                                color: #333333;
+                                font-weight: normal;
+                            }
+                        }
+                        tbody{
+                            tr{
+                                .red{
+                                    color: red;
+                                }
+                                td{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 36px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    .actionBtn{
+                                        width: 18px;
+                                        height: 18px;
+                                        border: none;
+                                        cursor: pointer;
+                                        margin-left: 10px;
+
+                                    }
+                                    // .deleteBtn{
+                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
+                                    // }
+                                    // .editBtn{
+                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
+                                    // }
+                                    // .upmoveBtn{
+                                    //     background: url('./images/overviewup.png') no-repeat 0 0;
+                                    // }
+                                    // .downmoveBtn{
+                                    //     background: url('./images/downmove.png') no-repeat 0 0;
+                                    // }
+                                    // .detailBtn{
+                                    //     background: url('./images/overfile.png') no-repeat 0 0;
+                                    // }
+                                    // .exportBtn{
+                                    //     background: url('./images/overviewdown.png') no-repeat 0 0;
+                                    // }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            .tableBodyPagination{
+                    display: block;
+                    height: 62px;
+                    width: auto;
+                    border-left: 1px solid #d4d4d4;
+                    border-right: 1px solid #d4d4d4;
+                    border-bottom: 1px solid #d4d4d4;
+                    box-sizing: border-box;
+                    background: #fafafa;
+                    position: relative;
+                    .tableBodyPaginationRight{
+                        position: absolute;
+                        right: 2px;
+                        bottom: 16px;
+                        .el-pagination .el-select .el-input .el-input__inner{
+                                height: 28px !important;
+                        }
+                    }
+            }
+        }
+        #edit{
+            .editSelect{
+                    width: 447px;
+                    height: 38px;
+                    color: #333333;
+                    background: #fafafa;
+                    border: 1px solid #d1d1d1;
+                    padding:0px 0px 0px 10px;
+                }
+            .el-icon-circle-plus,.el-icon-upload{
+                font-size:22px;
+                color: #2e8cb9;
+                margin-left:5px;
+                cursor: pointer;
+            }
+            .usersList{
+                .usersListUl{
+                    display: flex;
+                    // flex-direction: row;
+                    flex-direction: column;
+                    text-align: left;
+                    width: 80%;
+                    margin: 0 auto;
+                    height: 300px;
+                    border:1px solid #58adfb;
+                    overflow: auto;
+                    padding: 5px;
+                    background: white;
+                    .usersListLi{
+                        height: 30px;
+                        line-height: 30px;
+                        
+                         color:#58adfb;
+                        font-size:16px;
+                        padding:2px;
+                        cursor: pointer;
+                        &:hover{
+                           color:#3279e3;
+
+                        }
+                    }
+
+                }
+
+            }
         }
 
 }
