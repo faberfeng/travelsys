@@ -13,12 +13,12 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <v2-datepicker format="yyyy-MM" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入姓名"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -41,25 +41,27 @@
                            <th>休息天数</th>
                            <th>迟到</th>
                            <th>早退</th>
-                           <th>矿工</th>
+                           <th>旷工</th>
                            <th>加班</th>
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
+                        <tr v-for="(item,index) in getAttendancyByMonthLists" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.department}}</td>
+                            <td>{{item.kind}}</td>
+                            <td>{{item.workingDay}}</td>
+                            <td>{{item.restDay}}</td>
+                            <td>{{item.lateDay}}</td>
+                            <td>{{item.leaveEarlyDay}}</td>
+                            <td>{{item.overtimeDay}}</td>
                             <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getAttendancyByMonthLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -72,7 +74,7 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getAttendancyByMonthListLength">
                     </el-pagination>
                 </div>
             </div>
@@ -96,7 +98,10 @@ export default {
             selectName:"",//筛选名称
             getAttendancyByMonthList:[],
             getAttendancyByMonthLists:[],
+            getAttendancyByMonthListLength:1,
             timeStamp:'',
+            pageSize:10,
+            pageNum:1,
         }
     },
     created(){
@@ -155,20 +160,41 @@ export default {
                 return value1 - value2;
             }
         },
-         handleSizeChange(){
+         handleSizeChange(val){
+            this.getAttendancyByMonthLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getAttendancyByMonthListLength-1>=NumB&&this.getAttendancyByMonthListLength-1<=NumE){
+                NumE=this.getAttendancyByMonthListLength-1;
+            }
+          
+            for(var i=NumB;i<NumE+1;i++){
+                this.getAttendancyByMonthLists.push(this.getAttendancyByMonthList[i])
+            }
 
         },
-        handleCurrentChange(){
-
+        handleCurrentChange(val){
+            this.getAttendancyByMonthLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getAttendancyByMonthListLength-1>=NumB&&this.getAttendancyByMonthListLength-1<=NumE){
+                NumE=this.getAttendancyByMonthListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getAttendancyByMonthLists.push(this.getAttendancyByMonthList[i])
+            }
         },
         //改变时间
         changeDatePicker(){
-
+            this.getAttendancyByMonth(this.selectName,this.selectTime);
         },
         selectNameInfo(){
-
+            this.getAttendancyByMonth(this.selectName,this.selectTime)
         },
         getAttendancyByMonth(name,date){
+            this.getAttendancyByMonthLists=[];
             axios({
                 url:this.BDMSUrl+'attendancy/getAttendancyByMonth',
                 headers:{
@@ -182,6 +208,16 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getAttendancyByMonthList=response.data.rt;
+                    this.getAttendancyByMonthListLength=this.getAttendancyByMonthList.length;
+                    if(this.getAttendancyByMonthListLength<11){
+                        for(var i=0;i<this.getAttendancyByMonthListLength;i++){
+                            this.getAttendancyByMonthLists.push(this.getAttendancyByMonthList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getAttendancyByMonthLists.push(this.getAttendancyByMonthList[i])
+                        }
+                    }
                 }else{
 
                 }

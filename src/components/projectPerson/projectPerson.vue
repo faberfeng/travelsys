@@ -7,30 +7,30 @@
             <div class="contentHeadRight">
                 <ul style="width:50%;height:inherit;float:left;">
                     <li class="rightLi">
-                        <label class="nameLabel">姓名：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">姓名：</label><label class="itemLabel">发</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">账号：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">账号：</label><label class="itemLabel">faber</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">岗位：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">岗位：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">成员类型：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">成员类型：</label><label class="itemLabel"></label>
                     </li>
                 </ul>
                 <ul style="width:50%;height:inherit;float:right;">
                     <li class="rightLi">
-                        <label class="nameLabel">诚信评价：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">诚信评价：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">本月考勤：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">本月考勤：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">出勤班次：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">出勤班次：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">休息天数：</label><label class="itemLabel">封伟波</label>
+                        <label class="nameLabel">休息天数：</label><label class="itemLabel"></label>
                     </li>
 
                 </ul>
@@ -43,93 +43,181 @@
                         <div class="leftWrapper">
                             <div class="boxInp">
                                 <label class="wrapperLabel">姓名:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="name" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">民族:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="nation" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">性别:</label>
-                                <input class="wrapperInp"/>
+                                <select v-model="sex" class="wrapperInp" placeholder="请选择">
+                                    <option class="optionClass" v-for="item in sexOptions"
+                                    :key="item.value"
+                                    :value="item.value">
+                                    {{item.label}}
+                                    </option>
+                                </select>
+                                <!-- <el-select v-model="sex" width="65%" placeholder="请选择">
+                                    <el-option
+                                    v-for="item in sexOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                    </el-option>
+                                </el-select> -->
+                                <!-- <input v-model="sex" class="wrapperInp"/> -->
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">出生年月:</label>
-                                <input class="wrapperInp"/>
+                                <!-- <input v-model="birthday" class="wrapperInp"/> -->
+                                <span class="wrapperInp">
+                                    <v2-datepicker format="yyyy-MM-DD" v-model="birthday" width="100%" ></v2-datepicker>
+                                </span>
+                                <!-- <el-date-picker
+                                    v-model="birthday"
+                                    type="date"
+                                    width="65% !important"
+                                    placeholder="选择日期">
+                                </el-date-picker> -->
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">文化程度:</label>
-                                <input class="wrapperInp"/>
+                                <select v-model="education" class="wrapperInp" placeholder="请选择">
+                                    <option class="optionClass" v-for="item in eduOptions"
+                                    :key="item.value"
+                                    :value="item.value">
+                                    {{item.label}}
+                                    </option>
+                                </select>
+                                <!-- <input v-model="education" class="wrapperInp"/> -->
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">专业:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="profession" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">联系方式:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="phone" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">住址:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="address" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">现住址:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="registeredAddress" class="wrapperInp"/>
+                            </div>
+                            <div class="boxInp">
+                                <label class="wrapperLabel">身份证号:</label>
+                                <input v-model="certificationNo" class="wrapperInp"/>
+                            </div>
+                            <div class="boxInp">
+                                <label class="wrapperLabel">职称:</label>
+                                <input v-model="technicalTitle" class="wrapperInp"/>
                             </div>
                         </div>
                         <div class="rightWrapper">
                             <div class="rightBox">
-                                <!-- <label class="wrapperLabel">头像</label> -->
-                                <span class="imgCircle">
-                                    <i class="el-icon-circle-plus">
-                                    </i>
-                                    <label style="display:block">上传头像</label>
-                                    <!-- <input > -->
+                                <label class="wrapperLabel"></label>
+                                <span style="width:65%;display:inline-block;position:relative;height:132px;">
+                                    <span class="imgCircle" @click="clickUserImg()">
+                                        <img v-if="avaterUri" :src="avaterUriFile"/>
+                                        <i v-if="!avaterUri" class="el-icon-circle-plus">
+                                        </i>
+                                        <label v-if="!avaterUri" style="display:block">上传头像</label>
+                                        <input type="file" ref="uploadUserImg" accept="images/*" @change="changeUserImg($event)" style="opacity:0">
+                                    </span>
                                 </span>
                             </div>
-                            <div class="rightBox">
+                            <!-- <div class="rightBox">
                                 <label class="wrapperLabel">身份证号:</label>
-                                <input class="wrapperInp"/>
+                                <input v-model="certificationNo" class="wrapperInp"/>
+                            </div> -->
+                            <div class="rightBox">
+                                 <label class="wrapperLabel"></label>
+                                  <span style="width:65%;display:inline-block;position:relative;height:140px;">
+                                    <span class="personCircle" @click="clickCertificate()">
+                                        <img v-if="certificationPhoto" :src="certificationPhoto">
+                                        <i v-if="!certificationPhoto" class="el-icon-upload"></i>
+                                        <label v-if="!certificationPhoto" style="display:block">上传身份证照片</label>
+                                    </span>
+                                    <input type="file" ref="uploadCertificateImg" accept="images/*" @change="changeCertificateImg($event)" style="opacity:0">
+                                  </span>
                             </div>
                             <div class="rightBox">
-                               <span class="personCircle">
-                                   <i class="el-icon-upload"></i>
-                                   <label style="display:block">上传身份证照片</label>
-                                </span>
+                                <!-- 岗位证书: -->
+                                <label class="wrapperLabel"></label>
+                                <span style="width:65%;display:inline-block;position:relative;height:140px;">
+                                    <span class="personCircle" @click="clickstationCertificate()">
+                                        <img v-if="stationCertiyPhoto" :src="stationCertiyPhoto">
+                                        <i v-if="!stationCertiyPhoto" class="el-icon-upload"></i>
+                                        <label v-if="!stationCertiyPhoto" style="display:block">上传岗位证书照</label>
+                                    </span>
+                                    <input type="file" ref="uploadStationCertificateImg" accept="images/*" @change="changestationCertiImg($event)" style="opacity:0">
+                                  </span>
                             </div>
-                            <div class="rightBox">
-                                <label class="wrapperLabel">岗位证书:</label>
-                                <input class="wrapperInp"/>
-                            </div>
-                            <div class="rightBox">
+                            <!-- <div class="rightBox">
                                 <label class="wrapperLabel">职称:</label>
-                                <input class="wrapperInp"/>
-                            </div>
+                                <input v-model="technicalTitle" class="wrapperInp"/>
+                            </div> -->
                             <div class="makeBtn">
-                                <span class="btnSure">确认</span>
+                                <span class="btnSure" @click="personInfoMakeSure">确认</span>
                             </div>
                         </div>
                     </div>
                     
                 </el-tab-pane>
                 <el-tab-pane label="考勤信息">
-                    <div class="enterInfWrapper">
-                            <div>
-                                <calendar
-                                    ref="calendar1"
-                                    :multi="calendar1.multi"
-                                    :zero="calendar1.zero"
-                                    :events="calendar1.events" 
-                                    :lunar="calendar1.lunar" 
-                                    :value="calendar1.value" 
-                                    :begin="calendar1.begin" 
-                                    :end="calendar1.end" 
-                                    :weeks="calendar1.weeks" 
-                                    :months="calendar1.months" 
-                                    ></calendar>
+                    <!-- <div class="enterInfWrapper">
+                        <div>
+                            <calendar
+                                ref="calendar1"
+                                :multi="calendar1.multi"
+                                :zero="calendar1.zero"
+                                :events="calendar1.events" 
+                                :lunar="calendar1.lunar" 
+                                :value="calendar1.value" 
+                                :begin="calendar1.begin" 
+                                :end="calendar1.end" 
+                                :weeks="calendar1.weeks" 
+                                :months="calendar1.months" 
+                                ></calendar>
+                        </div>
+                    </div> -->
+                    <div class="workInfoWrapper">
+                        <div class="bottom">
+                            <div class="bottomTable">
+                                <table class="tableList" border="1" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>姓名</th>
+                                            <th>部门</th>
+                                            <th>进场时间</th>
+                                            <th>打卡方式</th>
+                                            <th>考勤情况</th>
+                                            <th>出场时间</th>
+                                            <th>打卡方式</th>
+                                            <th>考勤情况</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item,index) in getAttendancyByUserIdList" :key="index">
+                                            <td>{{index+1}}</td>
+                                            <td>{{item.department}}</td>
+                                            <td>{{timeChange(item.enterTime)}}</td>
+                                            <td>{{entOutCheckType(item.checkInType)}}</td>
+                                            <td>{{doorType(item.enterStatus)}}</td>
+                                            <td>{{timeChange(item.leaveTime)}}</td>
+                                            <td>{{entOutCheckType(item.checkOutType)}}</td>
+                                            <td>{{doorType(item.leaveStatus)}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                    </div>
+                        </div>
+                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="从业信息">
                     <div class="workInfoWrapper">
@@ -279,6 +367,7 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 import calendar from '../Settings/calendar.vue'
 export default {
     name:'projectPerson',
@@ -290,9 +379,34 @@ export default {
             projId:'',
             token:'',
             BDMSUrl:'',
-            userId:"",
             getStaffProfileList:'',
             userImg:'',
+            sexOptions:[{
+                value:1,
+                label:'男'
+            },
+            {
+                value:2,
+                label:'女'
+            }],
+            eduOptions:[
+                {
+                    value:0,
+                    label:'初中'
+                },
+                {
+                    value:1,
+                    label:'高中'
+                },
+                {
+                    value:2,
+                    label:'专科'
+                },
+                {
+                    value:3,
+                    label:'本科及以上'
+                }
+            ],
             calendar1:{
                  multi:true,
                  zero:true,
@@ -320,7 +434,27 @@ export default {
                 },
                 timestamp:Date.now()
             },
-
+            address:'',
+            avaterUri:'',
+            birthday:'',
+            certificationNo:'',	
+            certificationPhoto:'',
+            stationCertiyPhoto:'',
+            education:1,
+            name:'',
+            nation:'',
+            phone:'',
+            profession:'',
+            registeredAddress:'',
+            sex:1,
+            stationCertificate:'',
+            technicalTitle:'',
+            userImgList:null,
+            cerfiticateImgList:null,
+            stationCerfiticateImgList:null,
+            getStaffProfileList:'',
+            getAttendancyByUserIdList:[],
+            timestamps:'',
         }
     },
     created(){
@@ -328,9 +462,15 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.token = localStorage.getItem('token');
         vm.projName=localStorage.getItem('projName');
-        vm.userId = localStorage.getItem('userid');
+        vm.userId = localStorage.getItem('userId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         vm.userImg=localStorage.getItem('userImg');
+        vm.userName=localStorage.getItem('userName');
+        // console.log(vm.userName,'vm.userName');
+        vm.timestamps=moment(new Date().getTime()).format('YYYY-MM');
+        vm.name=vm.userName;
+        vm.getAttendancyByUserId(vm.timestamps)
+        console.log(vm.userId,'vm.userId000');
     },
     methods:{
         getStaffProfile(){
@@ -347,8 +487,168 @@ export default {
                     this.getStaffProfileList=response.data.rt;
                 }
             })
-        }
+        },
+        personInfoMakeSure(){
+            var vm=this;
+            var formData=new FormData();
+            formData.append('file',this.cerfiticateImgList);
+            formData.append('file',this.stationCerfiticateImgList);
+            // var data={
+            //             "address": this.address,
+            //             "avaterUri": this.avaterUri,
+            //             "birthday": this.birthday,
+            //             "certificationNo": this.certificationNo,
+            //             "certificationPhoto": this.certificationPhoto,
+            //             "education": this.education,
+            //             "name": this.name,
+            //             "nation": this.nation,
+            //             "phone": this.phone,
+            //             "profession": this.profession,
+            //             "registeredAddress": this.registeredAddress,
+            //             "sex": this.sex,
+            //             "stationCertificate": this.stationCertificate,
+            //             "technicalTitle": this.technicalTitle,
+            //             "userId":this.userId
+            //     }
+            axios({
+                url:this.BDMSUrl+'user/setStaffProfile',
+                headers:{
+                    'token':this.token,
+                    'Content-Type':'multipart/form-data'
+                },
+                method:'post',
+                params:{
+                    projectId:this.projId,
+                    address: this.address,
+                    avaterUri: this.avaterUri,
+                    birthday: moment(this.birthday).format('YYYY-MM-DD'),
+                    certificationNo: this.certificationNo,
+                    // certificationPhoto: this.certificationPhoto,
+                    education: this.education,
+                    name: this.name,
+                    nation: this.nation,
+                    phone: this.phone,
+                    profession: this.profession,
+                    registeredAddress: this.registeredAddress,
+                    sex: this.sex,
+                    // stationCertificate: this.stationCertificate,
+                    technicalTitle: this.technicalTitle,
+                    userId:this.userId
+                },
+                data:formData
+            }).then((response)=>{
+                this.getStaffProfile();
+            })
+        },
+        getStaffProfile(){
+            axios({
+                url:this.BDMSUrl+'user/getStaffProfile',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    userId:this.userId
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getStaffProfileList=response.data.rt;
+                }
+            })
+        },
+        getAttendancyByUserId(date){
+            axios({
+                url:this.BDMSUrl+'attendancy/getAttendancyByUserId',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    userId:this.userId,
+                    projectId:this.projId,
+                    date:date+'-01'
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getAttendancyByUserIdList=response.data.rt;
+                }
+            })
+        },
 
+        clickUserImg(){
+            this.$refs.uploadUserImg.click();
+        },
+        changeUserImg(){
+                this.userImgList=this.$refs.uploadUserImg.files[0];
+                this.avaterUriFile=URL.createObjectURL(this.userImgList);
+                if(this.userImgList){
+                    var formData=new FormData();
+                    formData.append('file',this.userImgList)
+                    axios({
+                        url:this.BDMSUrl+'register/uploadAvater',
+                        headers:{
+                            'token':this.token
+                        },
+                        method:'post',
+                        data:formData
+                    }).then((response)=>{
+                        if(response.data.cd==0){
+                                this.avaterUri=response.data.rt;
+                        }
+                    })
+                }
+        },
+        clickCertificate(){
+            this.$refs.uploadCertificateImg.click();
+        },
+        changeCertificateImg(){
+            this.cerfiticateImgList=this.$refs.uploadCertificateImg.files[0]
+            this.certificationPhoto=URL.createObjectURL(this.cerfiticateImgList);
+                // if(this.cerfiticateImgList){
+                //     var formData=new FormData();
+                //     formData.append('file',this.cerfiticateImgList)
+                //     axios({
+                //         url:this.BDMSUrl+'design/dcUpload',
+                //         method:'post',
+                //         headers:{
+                //             'token':this.token
+                //         },
+                //         params:{
+                //             projectId:this.projId
+                //         },
+                //         data:formData
+                //     }).then((response)=>{
+                //         if(response.data.cd==0){
+                //                 this.certificationPhoto=response.data.rt.uri;
+                //         }
+                //     })
+                // }
+        },
+        clickstationCertificate(){
+            this.$refs.uploadStationCertificateImg.click();
+        },
+        changestationCertiImg(){
+            this.stationCerfiticateImgList=this.$refs.uploadStationCertificateImg.files[0]
+            this.stationCertiyPhoto=URL.createObjectURL(this.stationCerfiticateImgList);
+            //  if(this.stationCerfiticateImgList){
+            //         var formData=new FormData();
+            //         formData.append('file',this.stationCerfiticateImgList)
+            //         axios({
+            //             url:this.BDMSUrl+'design/dcUpload',
+            //             method:'post',
+            //             headers:{
+            //                 'token':this.token
+            //             },
+            //             params:{
+            //                 projectId:this.projId
+            //             },
+            //             data:formData
+            //         }).then((response)=>{
+            //             if(response.data.cd==0){
+            //                     this.stationCertiyPhoto=response.data.rt.uri;
+            //             }
+            //         })
+            // }
+        }
     },
 
 
@@ -373,7 +673,7 @@ ul,li{
         flex-direction: row;
         justify-content: center;
         flex-wrap: nowrap;
-        border:1px solid #ccc;
+        // border:1px solid #ccc;
         height: 250px;
         border-radius: 4px;
         .contentHeadLeft{
@@ -381,8 +681,16 @@ ul,li{
             height: 250px;
             // display: flex;
             background: #f8f8f8;
+            position: relative;
             // text-align: left;
             .imgCenter{
+                position: absolute;
+                top:-21px;
+                left:10%;
+                width: 80%;
+                margin:0 auto;
+
+                height: 250px;
                 // width: 100%;
                 // height: 100%;
                 margin:20px auto;
@@ -461,6 +769,9 @@ ul,li{
                         line-height: 1;
                         outline: 0;
                         padding: 0 15px;
+                        .optionClass{
+                            height: 28px;
+                        }
                     }
                 }
                 
@@ -485,10 +796,20 @@ ul,li{
                         height: 125px;
                         border:1px solid #ccc;
                         border-radius: 4px;
-                        margin-left:-184px;
+                        // margin-left:-184px;
+                        position: absolute;
+                        top: 9px;
+                        left: 0px;
                         // margin-bottom: 10px;
                         &:hover{
                             border:1px dashed #06c;
+                        }
+                        img{
+                            position: absolute;
+                            top:0px;
+                            left:0px;
+                            width: 125px;
+                            height: 125px;
                         }
                         .el-icon-circle-plus{
                             font-size: 26px;
@@ -503,7 +824,17 @@ ul,li{
                         height: 140px;
                         border:1px solid #ccc;
                         border-radius: 4px;
-                        margin-left:-58px;
+                        position: absolute;
+                        top:0px;
+                        left:0px;
+                        img{
+                            position: absolute;
+                            top:0px;
+                            left:0px;
+                            width: 250px;
+                            height: 140px;
+                        }
+                        // margin-left:-58px;
                         // margin-bottom: 10px;
                         &:hover{
                             border:1px dashed #06c;

@@ -129,18 +129,17 @@ export default new Vuex.Store({
         // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
         WebGlUrl:"https://bim.arctron.cn",
         GMDUrl:"https://bim.arctron.cn",
-        shareUrl:"http://42.159.153.210:8080/bdms/#",
-        appShareUrl:'http://42.159.153.210:8080/bdms/',
+        shareUrl:"http://42.159.153.210:8080/BDWorks/#",
+        appShareUrl:'http://42.159.153.210:8080/BDWorks/',
         // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
         iframeWebGlUrl:'http://42.159.153.210:8080/BDView/',
         applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
         messageUrl:'http://42.159.153.210:8079',
         webSocketUrl:"ws://42.159.153.210:16800/websocket",
-        qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
-        loginUrl:"http://42.159.153.210:8080/bdms/#/registerIndex",
-        userCenterUrl:'http://42.159.153.210:8080/bdms/#/userLogin',
-        BDMSLoginUrl:'http://42.159.153.210:8080/bdms/#/login',
-
+        qrShareUrl:"https://bim.arctron.cn/BDWorks/#/qr",
+        loginUrl:"http://42.159.153.210:8080/BDWorks/#/registerIndex",
+        userCenterUrl:'http://42.159.153.210:8080/BDWorks/#/userLogin',
+        BDMSLoginUrl:'http://42.159.153.210:8080/BDWorks/#/login',
 
         //无锡市政院（最新版本）
 

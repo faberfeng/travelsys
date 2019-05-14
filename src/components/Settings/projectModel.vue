@@ -196,7 +196,7 @@ export default {
         vm.projId = localStorage.getItem('projId');
         vm.token = localStorage.getItem('token');
         vm.projName=localStorage.getItem('projName');
-        vm.userId = localStorage.getItem('userid');
+        vm.userId = localStorage.getItem('userId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
     },
     methods:{

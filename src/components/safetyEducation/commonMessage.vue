@@ -29,21 +29,30 @@
             <div style="width:50%;float:right;height:250px;">
                 <div class="bodyContent">
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">时间范围:</label>
-                     <el-date-picker
+                     <!-- <el-date-picker
                         v-model="timeValue"
                         type="date"
                         placeholder="选择日期">         
+                    </el-date-picker> -->
+                    <el-date-picker
+                        v-model="timeValue"
+                        type="datetimerange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
                     </el-date-picker>
                 </div>
                  <div class="bodyContent">
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">附件:</label>
-                    <!-- <span class="inp" style="width:280px !important;display:inline-block"></span> -->
-                    <input type="file" />
-                    <span class="el-icon-upload"></span>
+                    <span style="width:380px !important;display:inline-block">
+                         <input type="file" ref="fileRef" @click="changeFile($event)" />
+                        <span class="el-icon-upload" @click="uploadFile()"></span>
+                    </span>
+                   
                 </div>
                 <div class="bodyContent">
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">抄送人员:</label>
-                    <div @click="clickSelectUser" class="tagLable" style="text-align:left;display:inline-block;width:300px;height:70px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                    <div @click="clickSelectUser" class="tagLable" style="text-align:left;display:inline-block;width:360px;height:70px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
                             <el-tag 
                             style="width:95px;margin:2px;text-align:center;"
                                 v-for="tag in selectUserList"
@@ -59,7 +68,7 @@
             </div>
         </div>
         <div class="projectMiddle">
-            <textarea placeholder="活动内容说明"></textarea>
+            <textarea placeholder="活动内容说明" v-model="workText"></textarea>
         </div>
         <div class="projectBottom">
             <span class="makesureBtn" @click="makeSureSubmit">确认发布</span>
@@ -83,6 +92,7 @@
 </template>
 <script>
 import axios from 'axios'
+import moment from 'moment'
 export default {
     name:'commonMessage',
     props:[],
@@ -103,9 +113,8 @@ export default {
             workOriginator:'',//组织者
             workName:'',
             workLeader:'',
-
-
-
+            workText:'',
+            fileList:null,
         }
     },
     created(){
@@ -162,31 +171,45 @@ export default {
             })
         },
         makeSureSubmit(){
+            var userIds=''
+            this.selectUserList.forEach((item)=>{
+                userIds=userIds+'&userIds='+item.userId
+            })
+            this.startTimeValue=this.timeValue[0],
+            this.endTimeValue=this.timeValue[1]
+            if(this.fileList){
+
+            }
+            var formData=new FormData();
+            formData.append('file',this.fileList)
             axios({
-                url:this.BDMSUrl+'safety/addSafetyEducation',
+                url:this.BDMSUrl+'safety/addSafetyEducation?projId='+this.projId+userIds,
                 headers:{
                     'token':this.token
                 },
+                method:'post',
                 params:{
-                    projId:this.projId,
-                    title:'',
-                    text:'',
-                    originator:'',
-                    leader:'',
-                    startTime:'',
-                    entTime:'',
-                    userIds:''
+                    title:this.workName,
+                    text:this.workText,
+                    originator:this.workOriginator,
+                    leader:this.workLeader,
+                    startTime:moment(this.startTimeValue).format('YYYY-MM-DD HH:mm:ss'),
+                    entTime:moment(this.endTimeValue).format('YYYY-MM-DD HH:mm:ss')
                 },
-                data:''
+                data:formData
             }).then((response)=>{
                 if(response.data.cd==0){
-
+                    this.$emit('refreshPage')
                 }
             })
-
         },
-
-
+        changeFile(){
+            this.fileList=this.$refs.fileRef.files[0];
+            console.log(this.fileList,'this.fileList');
+        },
+        uploadFile(){
+            this.$refs.fileRef.click();
+        }
     }
 }
 </script>
@@ -230,7 +253,7 @@ export default {
                 outline: 0;
                 padding: 0 15px;
                 height: 36px;
-                width: 320px;
+                width: 400px;
         }
         .bodyContent{
             margin:30px 20px;

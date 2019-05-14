@@ -18,7 +18,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入姓名"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -70,7 +70,7 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getDoorRecordListLength">
                     </el-pagination>
                 </div>
             </div>
@@ -96,8 +96,10 @@ export default {
             BDMSUrl:'',
             getDoorRecordList:[],
             getDoorRecordLists:[],
-            getDoorRecordListLength:'',
+            getDoorRecordListLength:1,
             timeStamp:'',
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -162,18 +164,38 @@ export default {
             }
         },
         //
-        handleSizeChange(){
+        handleSizeChange(val){
+            this.getDoorRecordLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getDoorRecordListLength-1>=NumB&&this.getDoorRecordListLength-1<=NumE){
+                NumE=this.getDoorRecordListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getDoorRecordLists.push(this.getDoorRecordList[i])
+            }
 
         },
-        handleCurrentChange(){
+        handleCurrentChange(val){
+            this.getDoorRecordLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getDoorRecordListLength-1>=NumB&&this.getDoorRecordListLength-1<=NumE){
+                NumE=this.getDoorRecordListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getDoorRecordLists.push(this.getDoorRecordList[i])
+            }
 
         },
         //改变时间
         changeDatePicker(){
-
+            this.getDoorRecord(this.selectName,this.selectTime)
         },
         selectNameInfo(){
-
+            this.getDoorRecord(this.selectName,this.selectTime)
         },
        getDoorRecord(name,date){
            this.getDoorRecordLists=[];

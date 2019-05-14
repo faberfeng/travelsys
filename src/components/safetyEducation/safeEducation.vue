@@ -57,7 +57,7 @@
                 </ul>
             </div>
         </div>
-        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @back="backHome"></commonMessage>
+        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @refreshPage="refresh()" @back="backHome"></commonMessage>
     </div>
 </template>
 
@@ -80,6 +80,7 @@ export default {
             }],
             onePerson:1,
             buildSafeEducationShow:false,
+            getSafetyEducationList:[],
         }
     },
     created(){
@@ -89,7 +90,9 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
+        vm.getSafetyEducation();
 
     },
     methods:{
@@ -147,6 +150,28 @@ export default {
         },
         backHome(){
             this.buildSafeEducationShow=false;
+        },
+        refresh(){
+            this.getSafetyEducation();
+            this.buildSafeEducationShow=false;
+        },
+        getSafetyEducation(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'safety/getSafetyEducation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                   
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getSafetyEducationList=response.data.rt;
+                }
+            })
         }
 
 

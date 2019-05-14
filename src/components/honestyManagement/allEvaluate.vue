@@ -43,19 +43,26 @@
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in getEvaluateInfoLists" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{item.userName}}</td>
+                            <td>{{item.company}}</td>
+                            <td>{{item.goodNote}}</td>
+                            <td>{{item.badNote}}</td>
+                            <td>{{item.complaintNote}}</td>
+                            <td>
+                            <el-rate
+                                v-model="item.compreScore"
+                                disabled
+                                text-color="#ff9900"
+                                >
+                            </el-rate>
+                                </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getEvaluateInfoLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -68,7 +75,7 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getEvaluateInfoListLength">
                     </el-pagination>
                 </div>
             </div>
@@ -92,7 +99,8 @@ export default {
             selectName:"",//筛选名称
             onePerson:'',
             getEvaluateInfoList:[],
-
+            getEvaluateInfoLists:[],
+            getEvaluateInfoListLength:1
         }
     },
     created(){
@@ -104,6 +112,7 @@ export default {
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
+        this.getEvaluateInfo();
 
     },
     methods:{
@@ -149,11 +158,30 @@ export default {
                 return value1 - value2;
             }
         },
-        handleSizeChange(){
+        handleSizeChange(val){
+            this.getEvaluateInfoLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getEvaluateInfoListLength-1>=NumB&&this.getEvaluateInfoList-1<=NumE){
+                NumE=this.getEvaluateInfoList-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getEvaluateInfoLists.push(this.getEvaluateInfoList[i])
+            }
 
         },
-        handleCurrentChange(){
-
+        handleCurrentChange(val){
+            this.getEvaluateInfoLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getEvaluateInfoListLength-1>=NumB&&this.getEvaluateInfoListLength-1<=NumE){
+                NumE=this.getEvaluateInfoListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getEvaluateInfoLists.push(this.getEvaluateInfoList[i])
+            }
         },
         //改变时间
         changeDatePicker(){
@@ -163,8 +191,9 @@ export default {
 
         },
         getEvaluateInfo(){
+            this.getEvaluateInfoLists=[];
             axios({
-                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                url:this.BDMSUrl+'sincerity/evaluateInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
                 method:'get',
                 headers:{
                     'token':this.token
@@ -172,6 +201,20 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getEvaluateInfoList=response.data.rt;
+                    this.getEvaluateInfoList.forEach((item)=>{
+                        item.compreScore=item.compreScore*5;
+                    })
+                    this.getEvaluateInfoListLength=this.getEvaluateInfoList.length;
+                    if(this.getEvaluateInfoListLength<11){
+                        for(var i=0;i<this.getEvaluateInfoListLength;i++){
+                            this.getEvaluateInfoLists.push(this.getEvaluateInfoList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getEvaluateInfoLists.push(this.getEvaluateInfoList[i])
+                        }
+                    }
+                console.log(this.getEvaluateInfoLists,'this.getEvaluateInfoLists');
                 }
             })
         }

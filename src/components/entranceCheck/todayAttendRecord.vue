@@ -34,6 +34,7 @@
                        <tr>
                            <th>序号</th>
                            <th>姓名</th>
+                           <th>部门</th>
                            <th>进场时间</th>
                            <th>打卡方式</th>
                            <th>考勤情况</th>
@@ -43,20 +44,21 @@
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in getTodayAttendancyLists" :key="index">
+                            <td>{{index+1}}</td>
+                            <td>{{item.userName}}</td>
+                            <td>{{item.department}}</td>
+                            <td>{{timeChange(item.enterTime)}}</td>
+                            <td>{{entOutCheckType(item.checkInType)}}</td>
+                            <td>{{doorType(item.enterStatus)}}</td>
+                            <td>{{timeChange(item.leaveTime)}}</td>
+                            <td>{{entOutCheckType(item.checkOutType)}}</td>
+                            <td>{{doorType(item.leaveStatus)}}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getTodayAttendancyLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -69,7 +71,7 @@
                         :page-sizes="[10,20,30]"
                         :page-size="1"
                         layout="sizes,prev, pager, next"
-                        :total="TableListLength">
+                        :total="getTodayAttendancyListLength">
                     </el-pagination>
                 </div>
             </div>
@@ -95,7 +97,10 @@ export default {
             BDMSUrl:'',
             getTodayAttendancyList:[],
             getTodayAttendancyLists:[],
+            getTodayAttendancyListLength:1,
             timeStamp:'',
+            pageSize:10,
+            pageNum:1
 
         }
     },
@@ -155,18 +160,73 @@ export default {
             }
         },
         //
-        handleSizeChange(){
+        handleSizeChange(val){
+            this.getTodayAttendancyLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getTodayAttendancyListLength-1>=NumB&&this.getTodayAttendancyListLength-1<=NumE){
+                NumE=this.getTodayAttendancyListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getTodayAttendancyLists.push(this.getTodayAttendancyList[i])
+            }
 
         },
-        handleCurrentChange(){
+        handleCurrentChange(val){
+            this.getTodayAttendancyLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getTodayAttendancyListLength-1>=NumB&&this.getTodayAttendancyListLength-1<=NumE){
+                NumE=this.getTodayAttendancyListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.getTodayAttendancyLists.push(this.getTodayAttendancyList[i])
+            }
 
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD HH:ss:mm')
+            }
+        },
+        doorType(val){
+            if(val==1){
+                return 'IC卡'
+            }else if(val==2){
+                return '人脸识别'
+            }else if(val==3){
+                return '指纹'
+            }
+        },
+        entinCheckType(val){
+            if(val==1){
+                return '正常'
+            }else if(val==2){
+                return '迟到'
+            }else if(val==3){
+                return '加班'
+            }
+        },
+        entOutCheckType(val){
+            if(val==1){
+                return '正常'
+            }else if(val==2){
+                return '早退'
+            }else if(val==3){
+                return '加班'
+            }
         },
         //改变时间
         changeDatePicker(){
+            this.getTodayAttendancy(this.selectName,this.selectTime);
         },
         selectNameInfo(){
+            this.getTodayAttendancy(this.selectName,this.selectTime);
         },
         getTodayAttendancy(name,date){
+            this.getTodayAttendancyLists=[];
             axios({
                 url:this.BDMSUrl+'attendancy/getAttendancy',
                 headers:{
@@ -180,6 +240,16 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getTodayAttendancyList=response.data.rt;
+                    this.getTodayAttendancyListLength=this.getTodayAttendancyList.length;
+                    if(this.getTodayAttendancyListLength<11){
+                        for(var i=0;i<this.getTodayAttendancyListLength;i++){
+                            this.getTodayAttendancyLists.push(this.getTodayAttendancyList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.getTodayAttendancyLists.push(this.getTodayAttendancyList[i])
+                        }
+                    }
                 }else{
 
                 }
