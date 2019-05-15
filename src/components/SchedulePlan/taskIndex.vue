@@ -178,7 +178,7 @@
               </div>
 
               <div v-show="projectGanntShow" style="overflow-y: auto;overflow-x:hidden" class="taskBody">
-                <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;">
+                <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;white-space: nowrap;">
                      <zk-table
                         index-text="序号"
                         :data="taskIndexData" :columns="columnsSetting" :max-height="props.height" :tree-type="props.treeType"

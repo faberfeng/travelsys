@@ -7,10 +7,10 @@
             <div class="contentHeadRight">
                 <ul style="width:50%;height:inherit;float:left;">
                     <li class="rightLi">
-                        <label class="nameLabel">姓名：</label><label class="itemLabel">发</label>
+                        <label class="nameLabel">姓名：</label><label class="itemLabel">{{getStaffProfileList.name}}-{{getStaffProfileList.address}}</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">账号：</label><label class="itemLabel">faber</label>
+                        <label class="nameLabel">账号：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
                         <label class="nameLabel">岗位：</label><label class="itemLabel"></label>
@@ -21,7 +21,14 @@
                 </ul>
                 <ul style="width:50%;height:inherit;float:right;">
                     <li class="rightLi">
-                        <label class="nameLabel">诚信评价：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">诚信评价：</label><label class="itemLabel">
+                            <el-rate
+                                v-model="honestyValue"
+                                disabled
+                                show-score
+                                text-color="#ff9900">
+                                </el-rate>
+                        </label>
                     </li>
                     <li class="rightLi">
                         <label class="nameLabel">本月考勤：</label><label class="itemLabel"></label>
@@ -314,11 +321,11 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                        <tr v-for="(item,index) in getSincerityInfoByUserIdList" :key="index">
+                                            <td>{{timeChange(item.time)}}</td>
+                                            <td>{{recordType(item.type)}}</td>
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.remark}}</td>
                                             <td></td>
                                         </tr>
                                     </tbody>
@@ -336,21 +343,19 @@
                                         <tr>
                                             <th>序号</th>
                                             <th>日期</th>
-                                            <th>安全教育</th>
-                                            <th>安全教育</th>
+                                            <th>安全教育名称</th>
                                             <th>教育类别</th>
                                             <th>活动发起单位</th>
                                             <th>更多</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                        <tr v-for="(item,index) in getSafetyEducationByUserIdList" :key="index">
+                                            <td>{{index+1}}</td>
+                                            <td>{{timeChange(item.startTime)}}--{{timeChange(item.endTime)}}</td>
+                                            <td>{{item.title}}</td>
+                                            <td>{{item.text}}</td>
+                                            <td>{{item.originator}}</td>
                                             <td></td>
                                         </tr>
                                     </tbody>
@@ -452,9 +457,11 @@ export default {
             userImgList:null,
             cerfiticateImgList:null,
             stationCerfiticateImgList:null,
-            getStaffProfileList:'',
             getAttendancyByUserIdList:[],
             timestamps:'',
+            getSincerityInfoByUserIdList:[],
+            getSafetyEducationByUserIdList:[],
+            honestyValue:1,
         }
     },
     created(){
@@ -469,24 +476,115 @@ export default {
         // console.log(vm.userName,'vm.userName');
         vm.timestamps=moment(new Date().getTime()).format('YYYY-MM');
         vm.name=vm.userName;
-        vm.getAttendancyByUserId(vm.timestamps)
+        vm.getAttendancyByUserId(vm.timestamps);
+        vm.getStaffProfile();
+        vm.getSincerityInfoByUserId();
+        vm.getSafetyEducationByUserId();
         console.log(vm.userId,'vm.userId000');
+        console.log('jdkfdkj')
     },
     methods:{
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD')
+            }
+        },
+        recordType(val){
+            if(val==1){
+                return '良好记录'
+            }else if(val==2){
+                return '不良记录'
+            }else{
+                return '投诉记录'
+            }
+
+        },
         getStaffProfile(){
+            // axios({
+            //     url:this.BDMSUrl+'user/getStaffProfile',
+            //     headers:{
+            //         'token':this.token
+            //     },
+            //     params:{
+            //         userId:this.userId
+            //     }
+            // }).then((response)=>{
+            //     console.log(response.data.rt,'response.data.rt');
+            //     if(response.data.cd==0){
+            //         console.log(response.data.rt,'response.data.rt');
+            //         this.getStaffProfileList=response.data.rt;
+            //         console.log(this.getStaffProfileList,'this.getStaffProfileList');
+            //         // this.address=this.getStaffProfileList.address;
+            //         // this.avaterUri=this.getStaffProfileList.avaterUri;
+            //         // this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
+            //         // this.certificationNo= this.getStaffProfileList.certificationNo;
+            //         // // certificationPhoto: this.certificationPhoto,
+            //         // this.education=this.getStaffProfileList.education;
+            //         // this.name=this.getStaffProfileList.name;
+            //         // this.nation=this.getStaffProfileList.nation;
+            //         // this.phone=this.getStaffProfileList.phone;
+            //         // this.profession=this.getStaffProfileList.profession;
+            //         // this.registeredAddress=this.getStaffProfileList.registeredAddress;
+            //         // this.sex=this.getStaffProfileList.sex;
+            //         // // stationCertificate: this.stationCertificate,
+            //         // this.technicalTitle=this.getStaffProfileList.technicalTitle;
+            //         // console.log(this.getStaffProfileList,this.name,'this.name');
+            //     }
+            // })
+                $.ajax({
+                    url:this.BDMSUrl+'user/getStaffProfile',
+                    headers:{
+                        'token':this.token
+                    },
+                    data:{
+                        userId:this.userId
+                    },
+                    type:'get',
+                    success:(response)=>{
+                        alert('0000')
+                        this.getStaffProfileList=response.rt;
+                        console.log(this.getStaffProfileList,'this.getStaffProfileList');
+                    }
+                }
+               
+            )
+        },
+        //获取个人诚信管理
+        getSincerityInfoByUserId(){
             axios({
-                url:this.BDMSUrl+'user/getStaffProfile',
+                url:this.BDMSUrl+'sincerity/getSincerityInfoByUserId',
                 headers:{
                     'token':this.token
                 },
                 params:{
+                    projId:this.projId,
                     userId:this.userId
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getStaffProfileList=response.data.rt;
+                    this.getSincerityInfoByUserIdList=response.data.rt;
+                    // this.honestyValue=this.getSincerityInfoByUserIdList;
                 }
             })
+        },
+
+        getSafetyEducationByUserId(){
+            axios({
+                url:this.BDMSUrl+'safety/getSafetyEducationByUserId',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    userId:this.userId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getSafetyEducationByUserIdList=response.data.rt;
+                    // this.honestyValue=this.getSincerityInfoByUserIdList;
+                }
+            })
+
         },
         personInfoMakeSure(){
             var vm=this;

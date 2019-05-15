@@ -6,11 +6,11 @@
             <div v-show="itemShow" class="wrapperHead" @click="buildVideo">
                 <span class="el-icon-plus"></span><span class="elName">添加监控视频</span>
             </div>
-            <!-- <div v-show="!itemShow" class="wrapperHead" @click="buildDangerLevel">
-                <span class="el-icon-plus"></span><span class="elName">添加</span>
-            </div> -->
+            <div v-show="!itemShow" class="wrapperHead" @click="buildDangerLevel">
+                <span class="el-icon-plus"></span><span class="elName">添加危险源等级</span>
+            </div>
         </div>
-        <div class="itemBody">
+        <div v-if="itemShow" class="itemBody">
             <ul class="cardUl">
                 <li class="cardLi" v-for="(item,index) in getCameraLists" :key="index">
                     <h4>{{item.name}}</h4>
@@ -23,6 +23,46 @@
                 </li>
             </ul>
         </div>
+        <div v-if="!itemShow" class="contentBody">
+                <div class="tableBody">
+                    <table class="tableList" border="1" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>危险级别类型</th>
+                            <th>编辑</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in dangerousLists" :key="index">
+                                <td>{{index+1}}</td>
+                                <td>{{item.name}}</td>
+                                <td>
+                                    <!-- <button class="actionBtn editBtn" @click="editicDanger(item)" title="更新"></button> -->
+                                    <button class="actionBtn deleteBtn" @click="deleteDanger(item.id)" title="删除"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div v-if="dangerousList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                    当前列表无数据
+                </div>
+                <div class="tableBodyPagination">
+                    <div class="tableBodyPaginationRight">
+                        <el-pagination class="elPagination"
+                            background
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page.sync="currentPage"
+                            :page-sizes="[10,20,30]"
+                            :page-size="1"
+                            layout="sizes,prev, pager, next"
+                            :total="dangerousListLength">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
         <div id="edit">
                 <el-dialog title="添加视频监控" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
@@ -41,24 +81,16 @@
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
-
-                 <!-- <el-dialog title="添加视频监控" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                <el-dialog title="添加危险源等级" v-dialogDrag :visible.sync="addDangerousDialog" @close="addDangerousCancle">
                     <div class="editBody">
-                        <div class="editBodyone"><label class="editInpText">摄像头名称 :</label><input class="inp" placeholder="请输入" v-model="videoName"/></div>
-                        <div class="editBodytwo"><label class="editInpText">摄像头地址 :</label><input class="inp" placeholder="请输入" v-model="videoUrl"/></div>
-                        <div class="editBodytwo">
-                            <label class="editInpText">危险源级别 :</label>
-                            <select class="editSelect" v-model="dangerLevel" >
-                                <option v-for="(item,index) in dangerList" :value="item.value" :key="index">{{item.label}}</option>
-                            </select>
-                        </div>
+                        <div class="editBodyone"><label class="editInpText">危险源名称 :</label><input class="inp" placeholder="请输入" v-model="dangerName"/></div>
                     </div>
-
                     <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="setVideo(videoName,videoUrl,dangerLevels)">放置摄像头</button>
-                        <button class="editBtnC" @click="addCancle">取消</button>
+                        <button class="editBtnS" @click="dangerousMakeSure()">确认</button>
+                        <button class="editBtnC" @click="addDangerousCancle">取消</button>
                     </div>
-                </el-dialog> -->
+                </el-dialog>
+
         </div>
     </div>
 </template>
@@ -80,9 +112,18 @@ export default {
                 label:'A'
             }],
             addDialog:false,
+            addDangerousDialog:false,
             videoName:'',
             videoUrl:'',
-            getCameraLists:[]
+            getCameraLists:[],
+            // dangerListLength:1,
+            dangerousListLength:1,
+            currentPage:1,
+            dangerName:'',
+            dangerousList:[],
+            dangerousLists:[],
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -94,6 +135,7 @@ export default {
         vm.appShareUrl= vm.$store.state.appShareUrl;
         vm.token  = localStorage.getItem('token');
         this.getCameraList();
+        this.getDangerSource()
 
     },
     destoryed(){
@@ -114,6 +156,7 @@ export default {
             this.addDialog=true;
         },
         buildDangerLevel(){
+            this.addDangerousDialog=true;
 
         },
         controlList(){
@@ -199,9 +242,107 @@ export default {
                 })
             })
         },
+        deleteDanger(id){
+            this.$confirm('你是否删除该危险源','提示',{
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'camera/deleteDangerSource',
+                    method:"GET",
+                    params:{
+                        id:id
+                    },
+                    headers:{
+                        'token':this.token
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getDangerSource()
+                    }
+                })
+            })
+
+        },
         addCancle(){
             this.addDialog=false;
+        },
+        handleSizeChange(){
+            this.dangerousLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.dangerousListLength-1>=NumB&&this.dangerousListLength-1<=NumE){
+                NumE=this.dangerousListLength-1;
+            }
+          
+            for(var i=NumB;i<NumE+1;i++){
+                this.dangerousLists.push(this.dangerousList[i])
+            }
+
+        },
+        handleCurrentChange(){
+            this.dangerousLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.dangerousListLength-1>=NumB&&this.dangerousListLength-1<=NumE){
+                NumE=this.dangerousListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.dangerousLists.push(this.dangerousList[i])
+            }
+
+        },
+        dangerousMakeSure(){
+            axios({
+                url:this.BDMSUrl+'camera/addDangerSource',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    name:this.dangerName,
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                   this.getDangerSource();
+                    this.addDangerousDialog=false;
+                    this.dangerName='';
+                }
+            })
+        },
+        getDangerSource(){
+            this.dangerousLists=[];
+            axios({
+                    url:this.BDMSUrl+'camera/getDangerSource',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        projectId:this.projId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.dangerousList=response.data.rt;
+                        this.dangerousListLength=response.data.rt.length;
+                        if(this.dangerousListLength<11){
+                            for(var i=0;i<this.dangerousListLength;i++){
+                                this.dangerousLists.push(this.dangerousList[i])
+                            }
+                        }else{
+                            for(var i=0;i<10;i++){
+                                this.dangerousLists.push(this.dangerousList[i])
+                            }
+                        }
+                    }
+                })
+        },
+        addDangerousCancle(){
+            this.addDangerousDialog=false;
         }
+
 
 
     }
@@ -356,6 +497,83 @@ ul,li{
                 }
 
             }
+
+        }
+        .contentBody{
+                // margin-top:20px;
+                padding: 20px 0px;
+                .tableBody{
+                    margin-top:30px;
+                        .tableList{
+                            border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 36px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    .red{
+                                        color: red;
+                                    }
+                                    td{
+                                        padding-left: 6px;
+                                        padding-right: 15px;
+                                        height: 36px;
+                                        text-align: center;
+                                        box-sizing: border-box;
+                                        border-right: 1px solid #e6e6e6;
+                                        font-size: 14px;
+                                        color: #333333;
+                                        .actionBtn{
+                                            width: 18px;
+                                            height: 18px;
+                                            border: none;
+                                            cursor: pointer;
+                                            margin-left: 10px;
+
+                                        }
+                                        .deleteBtn{
+                                            background: url('../../assets/delete.png') no-repeat 0 0;
+                                        }
+                                        .editBtn{
+                                            background: url('../../assets/edit.png') no-repeat 0 0;
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                .tableBodyPagination{
+                            display: block;
+                            height: 62px;
+                            width: auto;
+                            border-left: 1px solid #d4d4d4;
+                            border-right: 1px solid #d4d4d4;
+                            border-bottom: 1px solid #d4d4d4;
+                            box-sizing: border-box;
+                            background: #fafafa;
+                            position: relative;
+                            .tableBodyPaginationRight{
+                                position: absolute;
+                                right: 2px;
+                                bottom: 16px;
+                                .el-pagination .el-select .el-input .el-input__inner{
+                                        height: 28px !important;
+                                }
+                            }
+                        }
 
         }
         #edit{

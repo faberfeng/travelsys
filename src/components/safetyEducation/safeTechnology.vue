@@ -34,20 +34,20 @@
                     </li>
                      
                 </ul>
-                <div class="wrapperHead" @click="buildSafeEducation">
+                <div class="wrapperHead" @click="buildSafeEcology">
                     <span class="el-icon-plus"></span><span class="elName">新建安全技术交底</span>
                 </div>
             </div>
             <div class="bodyList">
                 <ul style="width:100%">
-                    <li class="bodyLi">
-                        <span class="liSpanOne">01</span>
+                    <li class="bodyLi" v-for="(item,index) in getSafetyTechnologyList" :key="index">
+                        <span class="liSpanOne">{{index+1}}</span>
                         <span class="liSpanTwo">
-                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">2月的安排</span><span></span></div>
+                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span></span></div>
                             <div style="height:70px;line-height:75px;">
-                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起人：kkk</span>
-                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：aaa</span>
-                                <span style="width:330px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动时间：2012-23-52————2015-25-12</span>
+                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起人：{{item.originator}}</span>
+                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：{{item.leader}}</span>
+                                <span style="width:330px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动时间：{{timeChange(item.startTime)}}————{{timeChange(item.endTime)}}</span>
                             </div>
                         </span>
                         <span class="liSpanThree">
@@ -57,13 +57,14 @@
                 </ul>
             </div>
         </div>
-        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @back="backHome"></commonMessage>
+        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @back="backHome" @refreshPage="refresh()" :wordType="wordType" :projectName="projectName"></commonMessage>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import commonMessage from './commonMessage.vue'
+import moment from 'moment'
 export default {
     name:'safeTechnology',
     components:{
@@ -80,6 +81,9 @@ export default {
             }],
             onePerson:1,
             buildSafeEducationShow:false,
+            wordType:2,
+            projectName:'安全技术交底',
+            getSafetyTechnologyList:[],
         }
     },
     created(){
@@ -89,7 +93,9 @@ export default {
         vm.userId = localStorage.getItem('userid');
         vm.projName = localStorage.getItem('projName');
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
+        vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
+        vm.getSafetyTechnology();
 
     },
     methods:{
@@ -141,12 +147,39 @@ export default {
         selectNameInfo(){
 
         },
-        buildSafeEducation(){
+        buildSafeEcology(){
             this.buildSafeEducationShow=true;
 
         },
         backHome(){
             this.buildSafeEducationShow=false;
+        },
+        refresh(){
+            this.getSafetyTechnology();
+            this.buildSafeEducationShow=false;
+        },
+        getSafetyTechnology(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'safety/getSafetyTechnology',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                   
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getSafetyTechnologyList=response.data.rt;
+                }
+            })
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD')
+            }
         }
 
     },

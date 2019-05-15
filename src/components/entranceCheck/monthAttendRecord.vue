@@ -61,7 +61,7 @@
                     </tbody>
                 </table>
             </div>
-            <div v-if="getAttendancyByMonthLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getAttendancyByMonthList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">

@@ -40,14 +40,14 @@
             </div>
             <div class="bodyList">
                 <ul style="width:100%">
-                    <li class="bodyLi">
-                        <span class="liSpanOne">01</span>
+                    <li class="bodyLi" v-for="(item,index) in getSafetyEducationList" :key="index">
+                        <span class="liSpanOne">{{index+1}}</span>
                         <span class="liSpanTwo">
-                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">2月的安排</span><span></span></div>
+                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span></span></div>
                             <div style="height:70px;line-height:75px;">
-                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起人：kkk</span>
-                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：aaa</span>
-                                <span style="width:330px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动时间：2012-23-52————2015-25-12</span>
+                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起单位：{{item.originator}}</span>
+                                <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：{{item.leader}}</span>
+                                <span style="width:330px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动时间：{{timeChange(item.startTime)}}————{{timeChange(item.endTime)}}</span>
                             </div>
                         </span>
                         <span class="liSpanThree">
@@ -57,13 +57,14 @@
                 </ul>
             </div>
         </div>
-        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @refreshPage="refresh()" @back="backHome"></commonMessage>
+        <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @refreshPage="refresh()" @back="backHome" :projectName="projectName" :wordType="wordType"></commonMessage>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import commonMessage from './commonMessage.vue'
+import moment from 'moment'
 export default {
     name:'safeEducation',
     components:{
@@ -81,6 +82,8 @@ export default {
             onePerson:1,
             buildSafeEducationShow:false,
             getSafetyEducationList:[],
+            projectName:'安全教育',
+            wordType:1
         }
     },
     created(){
@@ -172,6 +175,12 @@ export default {
                     this.getSafetyEducationList=response.data.rt;
                 }
             })
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD')
+            }
+
         }
 
 

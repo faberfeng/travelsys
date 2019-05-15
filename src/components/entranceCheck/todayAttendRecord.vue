@@ -49,16 +49,16 @@
                             <td>{{item.userName}}</td>
                             <td>{{item.department}}</td>
                             <td>{{timeChange(item.enterTime)}}</td>
-                            <td>{{entOutCheckType(item.checkInType)}}</td>
-                            <td>{{doorType(item.enterStatus)}}</td>
+                            <td>{{doorType(item.checkInType)}}</td>
+                            <td>{{entOutCheckType(item.enterStatus)}}</td>
                             <td>{{timeChange(item.leaveTime)}}</td>
-                            <td>{{entOutCheckType(item.checkOutType)}}</td>
-                            <td>{{doorType(item.leaveStatus)}}</td>
+                            <td>{{doorType(item.checkOutType)}}</td>
+                            <td>{{entOutCheckType(item.leaveStatus)}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div v-if="getTodayAttendancyLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getTodayAttendancyList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">

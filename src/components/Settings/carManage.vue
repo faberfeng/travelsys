@@ -52,7 +52,7 @@
 
             </div>
             <div id="edit">
-                <el-dialog title="添加IC卡" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
+                <el-dialog title="添加车辆信息" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
                         <div class="editBodyone"><label class="editInpText">车辆类型 :</label><input class="inp" placeholder="请输入" v-model="carType"/></div>
                     </div>
@@ -61,7 +61,7 @@
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="更新IC卡" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                <el-dialog title="更新车辆信息" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
                     <div class="editBody">
                         <div class="editBodyone"><label class="editInpText">车辆类型 :</label><input class="inp" placeholder="请输入" v-model="carType"/></div>
                     </div>

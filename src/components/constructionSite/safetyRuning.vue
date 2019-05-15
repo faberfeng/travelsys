@@ -489,8 +489,8 @@
 
                 <el-dialog title="重命名目录" v-dialogDrag :visible.sync="fileNameShow" @close="addfileCancle">
                     <div class="editBody">
-                        <div class="editBodytwo imageBody">
-                            <label class="imageBodyText">目录名称 :</label>
+                        <div class="editBodytwo">
+                            <label class="imageBodyTextValue">目录名称 :</label>
                             <input type="text" class="inp" v-model="newFileName">
                         </div>
                     </div>
@@ -499,15 +499,16 @@
                         <button class="editBtnC" @click="addfileCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog width="500px" v-dialogDrag title="验证内容" :visible="verfiyShow" @close="verfiyShow=false;this.vaildInfo=''">
+                
+                <el-dialog width="500px" v-dialogDrag title="验证内容" :visible="verfiyShow" @close="verfiyCancle">
                     <div class="editBody">
-                        <div class="editBodytwo imageBody">
+                        <div class="editBodytwo">
                             <input type="text" class="inp" v-model="vaildInfo">
                         </div>
                     </div>
                    <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="verfiyConfirm">确定</button>
-                        <button class="editBtnC" @click="verfiyShow=false;this.vaildInfo=''">取消</button>
+                        <button class="editBtnC" @click="verfiyCancle">取消</button>
                     </div>
                 </el-dialog> 
 
@@ -1010,6 +1011,10 @@ export default {
                 }
             })
 
+        },
+        verfiyCancle(){
+            this.verfiyShow=false;
+            this.vaildInfo=''
         },
         viewPointCancle(){
             this.viewPointShow=false;
@@ -1665,6 +1670,7 @@ export default {
                         {type:'success',
                         message:'安全状态修改成功'})
                         vm.getCheckPointsByItemId();
+                        vm.getCheckRecordList(this.checkPointId);
                         // vm.checkItem(this.isshow,this.checkPointId);
 
 
@@ -2928,6 +2934,7 @@ export default {
                                                 不换行
                                                 */
                                                 white-space: nowrap;
+                                                word-break: break-all;
                                                 .el-icon-document{
                                                     font-size:16px;
                                                     cursor: pointer;
@@ -3050,7 +3057,8 @@ export default {
                                                 /*
                                                 不换行
                                                 */
-                                                white-space: nowrap;
+                                                // white-space: nowrap;
+                                                word-break: break-all;
                                                 .el-icon-document{
                                                     font-size:16px;
                                                     cursor: pointer;
@@ -3349,6 +3357,17 @@ export default {
                             width: 175px;
                             padding-left: 94px;
                             text-align: left;
+                        }
+                        .imageBodyTextValue{
+                            color: #666;
+                            font-size: 14px;
+                            line-height: 14px;
+                            font-weight: normal;
+                            display: inline-block;
+                            width: 65px;
+                            // padding-left: 94px;
+                            // text-align: left;
+
                         }
                         .updataImageSpan1{
                             overflow: hidden;

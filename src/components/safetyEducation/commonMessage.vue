@@ -2,7 +2,7 @@
     <div id="commonMessage">
         <div class="projectInfo">
             <p class="antsLine">
-                安全教育<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">安全教育</span><i class="icon-sanjiao-right"></i>
+                安全教育<i class="icon-sanjiao-right"></i><span @click="back()" style="cursor:pointer">{{projectName}}</span><i class="icon-sanjiao-right"></i>
             </p>
         </div>
         <div class="projectBody">
@@ -45,7 +45,7 @@
                  <div class="bodyContent">
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">附件:</label>
                     <span style="width:380px !important;display:inline-block">
-                         <input type="file" ref="fileRef" @click="changeFile($event)" />
+                         <input type="file" ref="fileRef" @change="changeFile($event)" />
                         <span class="el-icon-upload" @click="uploadFile()"></span>
                     </span>
                    
@@ -71,7 +71,7 @@
             <textarea placeholder="活动内容说明" v-model="workText"></textarea>
         </div>
         <div class="projectBottom">
-            <span class="makesureBtn" @click="makeSureSubmit">确认发布</span>
+            <span  class="makesureBtn" @click="makeSureEducateSubmit">确认发布</span>
         </div>
         <div id="edit">
             <el-dialog title="用户列表" v-dialogDrag  width="400px" :visible.sync="addUserDialog" @close="addUserCancle">
@@ -95,7 +95,7 @@ import axios from 'axios'
 import moment from 'moment'
 export default {
     name:'commonMessage',
-    props:[],
+    props:['wordType','projectName'],
     data(){
         return{
             workName:'',
@@ -170,8 +170,9 @@ export default {
                 }
             })
         },
-        makeSureSubmit(){
+        makeSureEducateSubmit(){
             var userIds=''
+            var URl='';
             this.selectUserList.forEach((item)=>{
                 userIds=userIds+'&userIds='+item.userId
             })
@@ -180,10 +181,15 @@ export default {
             if(this.fileList){
 
             }
+            if(this.wordType==1){
+                URl=this.BDMSUrl+'safety/addSafetyEducation?projId='+this.projId+userIds
+            }else if(this.wordType==2){
+                URl=this.BDMSUrl+'safety/addSafetyTechnology?projId='+this.projId+userIds
+            }
             var formData=new FormData();
             formData.append('file',this.fileList)
             axios({
-                url:this.BDMSUrl+'safety/addSafetyEducation?projId='+this.projId+userIds,
+                url:URl,
                 headers:{
                     'token':this.token
                 },
@@ -203,6 +209,7 @@ export default {
                 }
             })
         },
+
         changeFile(){
             this.fileList=this.$refs.fileRef.files[0];
             console.log(this.fileList,'this.fileList');

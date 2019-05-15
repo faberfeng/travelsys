@@ -300,6 +300,9 @@
                                     <th>序号</th>
                                     <th>检查人</th>
                                     <th>检查内容</th>
+                                    <th>验证人</th>
+                                    <th>状态</th>
+                                    <th>操作时间</th>
                                     <th>附件</th>
                                     <th>操作</th>
                                 </tr>
@@ -309,11 +312,16 @@
                                     <td>{{index+1}}</td>
                                     <td>{{item.createUserStr}}</td>
                                     <td v-html="item.dcContent"></td>
+                                    <td>{{item.flowCharts[item.flowCharts.length-1].userName}}</td>
+                                    <td>{{item.flowCharts[item.flowCharts.length-1].dcStatus}}</td>
+                                    <td>{{timeChange(item.flowCharts[item.flowCharts.length-1].operateTime)}}</td>
+                                    
                                     <td>
                                         <span class="icon-eye" title="视点" @click="getViewPoint(item.viewPointInfo)">视点</span>
                                         <span class="icon-image" title="图片" @click="getPicture(item.attachList)">图片</span>
                                         <span class="icon-file" title="文档" @click="getFile(item.fileList)">文档</span>
                                     </td>
+                                    
                                     <td>
                                         <span class="icon-finish" v-if="item.dcStatus == 8" @click="updateStatus(item.dcId,9,'提交',index)">提交</span>
                                         <!-- canEditMes &&  -->
@@ -448,6 +456,7 @@ import sendMes from'./sendChange.vue'
 import data from '../Settings/js/date.js'
 import '../ManageCost/js/jquery-1.8.3.js'
 import '../ManageCost/js/date.js'
+import moment from 'moment'
 export default {
     name:'qualityChecking',
     components:{
@@ -649,6 +658,12 @@ export default {
                 var value2 = b[property];
                 return value1 - value2;
             }
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD HH:ss')
+            }
+
         },
         //检查图标
         checkIcon(val){
