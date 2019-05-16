@@ -78,8 +78,8 @@
                             <div class="boxInp">
                                 <label class="wrapperLabel">出生年月:</label>
                                 <!-- <input v-model="birthday" class="wrapperInp"/> -->
-                                <span class="wrapperInp">
-                                    <v2-datepicker format="yyyy-MM-DD" v-model="birthday" width="100%" ></v2-datepicker>
+                                <span class="wrapperInp" style="position:relative;">
+                                    <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="birthday" width="100%" ></v2-datepicker>
                                 </span>
                                 <!-- <el-date-picker
                                     v-model="birthday"
@@ -230,75 +230,145 @@
                     <div class="workInfoWrapper">
                         <div class="header">
                             <div class="titleBtn">
-                                <i class="el-icon-s-custom"></i>
+                                <i class="el-icon-edit"></i>
                                 当前工作信息
                             </div>
                             <div class="titleInfo">
                                 <div class="Wrapper" style="float:left;">
                                     <div class="boxInp">
                                         <label class="wrapperLabel">岗位:</label>
-                                        <input class="wrapperInp"/>
+                                        <input class="wrapperInp" v-model="duty"/>
                                     </div>
                                     <div class="boxInp">
-                                        <label class="wrapperLabel">入职时间:</label>
-                                        <input class="wrapperInp"/>
+                                        <label class="wrapperLabel" style="vertical-align:top;">入职时间:</label>
+                                        <!-- <el-date-picker
+                                        v-model="entryDate"
+                                            type="date"
+                                            placeholder="选择日期"  class="wrapperInp">
+                                        </el-date-picker> -->
+                                        <!-- <input class="wrapperInp"/> -->
+                                        <span class="wrapperInp" style="position:relative">
+                                            <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="entryDate" width="100%" ></v2-datepicker>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel">所属单位:</label>
-                                        <input class="wrapperInp"/>
+                                        <input class="wrapperInp" v-model="department"/>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel">成员类型:</label>
-                                        <input class="wrapperInp"/>
+                                        <select v-model="type"  class="wrapperInp">
+                                            <option v-for="(item,index) in personTypeList" :key="index" :value="item.value">{{item.label}}</option>
+                                        </select>
+                                        <!-- <input class="wrapperInp"/> -->
                                     </div>
                                     <div class="boxInp">
-                                        <label class="wrapperLabel">合同到期:</label>
-                                        <input class="wrapperInp"/>
+                                        <label class="wrapperLabel" style="vertical-align:top;">合同到期:</label>
+                                        <!-- <input class="wrapperInp"/> -->
+                                        
+                                        
+                                        <span class="wrapperInp" style="position:relative">
+                                            <!-- <el-date-picker
+                                                type="date" v-model="contractExpireDate"
+                                                placeholder="选择日期" style="border:none !important"  >
+                                            </el-date-picker> -->
+                                            <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="contractExpireDate" width="100%" ></v2-datepicker>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="Wrapper" style="float:right;">
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">三级安全教育卡:</label>
-                                        <input class="wrapperInp"/>
+                                        <span class="wrapperSpan">
+                                            <span class="buttonSpan" @click="educateClick">
+                                                <i class="el-icon-upload2"></i>
+                                                点击上传
+                                                <input type="file" style="display:none;" @change="changeEducate($event)" ref="educateFile"/>
+                                            </span>
+                                            <label class="buttonLabel">{{educateName}}</label>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">安全交底记录:</label>
-                                        <input class="wrapperInp"/>
+                                        <span class="wrapperSpan">
+                                            <span class="buttonSpan" @click="safeSubmitClick()">
+                                                <i class="el-icon-upload2"></i>
+                                                点击上传
+                                                <input type="file" style="display:none;" id="safeSubmitFile" @change="changesafeSubmit($event)" ref="safeSubmitFile"/>
+                                            </span>
+                                            <label class="buttonLabel">{{safeSubmitName}}</label>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">技术交底记录:</label>
-                                        <input class="wrapperInp"/>
+                                        <!-- <input class="wrapperInp"/> -->
+                                        <span class="wrapperSpan">
+                                            <span class="buttonSpan" @click="technologyClick">
+                                                <i class="el-icon-upload2"></i>
+                                                点击上传
+                                                <input type="file" style="display:none;" id="technologyFile" @change="changeTechnology($event)" ref="technologyFile"/>
+                                            </span>
+                                            <label class="buttonLabel">{{technologyName}}</label>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">特种操作证书:</label>
-                                        <input class="wrapperInp"/>
+                                        <!-- <input class="wrapperInp"/> -->
+                                        <span class="wrapperSpan">
+                                            <span class="buttonSpan" @click="specialClick">
+                                                <i class="el-icon-upload2"></i>
+                                                点击上传
+                                                <input type="file" style="display:none;" id="specialFile" @change="changeSpecial($event)" ref="specialFile"/>
+                                            </span>
+                                            <label class="buttonLabel">{{specialName}}</label>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">合同附件:</label>
-                                        <input class="wrapperInp"/>
+                                        <!-- <input class="wrapperInp"/> -->
+                                        <span class="wrapperSpan">
+                                            <span class="buttonSpan" @click="contractClick()">
+                                                <i class="el-icon-upload2"></i>
+                                                点击上传
+                                                <input type="file" style="display:none;" id="contractFile" @change="changeContract($event)" ref="contractFile"/>
+                                            </span>
+                                            <label class="buttonLabel">{{contractName}}</label>
+                                        </span>
+                                    </div>
+                                    <div class="boxInp">
+                                            <span class="makeSureBtn" @click="makeSureWork">确认</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="bottom">
-                            <div class="titleBtn">
-                                <i class="el-icon-s-custom"></i>
+                            <div class="titleBtnLeft">
+                                <i class="el-icon-document"></i>
                                 过往履历信息
+                            </div>
+                            <div class="titleBtnRight" @click="addWorkExperience()">
+                                <i class="el-icon-circle-plus"></i>
+                                添加工作经验
                             </div>
                             <div class="bottomTable">
                                 <table class="tableList" border="1" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>时间</th>
-                                            <th>单位</th>
-                                            <th>岗位</th>
+                                            <th>合同时间</th>
+                                            <th>从事单位</th>
+                                            <th>从事岗位</th>
+                                            <th>编辑</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                        <tr v-for="(item,index) in experienceList" :key="index">
+                                            <td>{{item.dateFrom}}--{{item.dateTo}}</td>
+                                            <td>{{item.company}}</td>
+                                            <td>{{item.duty}}</td>
+                                            <td>
+                                                <button class="actionBtn editBtn" @click="editWorkExperience(item)"></button>
+                                                <button class="actionBtn deleteBtn" @click="deleteWorkExperience(item.id)"></button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -367,6 +437,35 @@
                 <!-- <el-tab-pane label="账号安全">定时任务补偿</el-tab-pane> -->
             </el-tabs>
         </div>
+        <div id="edit">
+            <el-dialog :visible.sync="workExperienceShow" width="600px" title="添加加工作经验" @close="workExperienceCancle">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editInpText">从事职位：</label>
+                        <el-input style="width:75%;" v-model="workDuty" ></el-input>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText">聘任公司：</label>
+                        <el-input style="width:75%;" v-model="workCompany"></el-input>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText">合同时间：</label>
+                        <el-date-picker
+                        v-model="workTimes"
+                        type="datetimerange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期" style="width:75%;">
+                        </el-date-picker>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="workExperienceMakeSure()">确定</button>
+                    <button class="editBtnC" @click="workExperienceCancle()">取消</button>
+                </div>
+            </el-dialog>
+
+        </div>
     </div>
 </template>
 
@@ -384,7 +483,7 @@ export default {
             projId:'',
             token:'',
             BDMSUrl:'',
-            getStaffProfileList:'',
+            getStaffProfileList:{},
             userImg:'',
             sexOptions:[{
                 value:1,
@@ -410,6 +509,25 @@ export default {
                 {
                     value:3,
                     label:'本科及以上'
+                }
+            ],
+            type:1,
+            personTypeList:[
+                {
+                    value:1,
+                    label:'一般成员'
+                },
+                {
+                    value:2,
+                    label:'项目经理'
+                },
+                {
+                    value:3,
+                    label:'管理员'
+                },
+                {
+                    value:4,
+                    label:'门卫'
                 }
             ],
             calendar1:{
@@ -462,6 +580,28 @@ export default {
             getSincerityInfoByUserIdList:[],
             getSafetyEducationByUserIdList:[],
             honestyValue:1,
+            duty:"",
+            department:'',
+            entryDate:'',
+            contractExpireDate:'',
+            educateName:"未选择任何文件",
+            educateNameList:null,
+            safeSubmitName:"未选择任何文件",
+            safeSubmitNameList:null,
+            technologyName:'未选择任何文件',
+            technologyNameList:null,
+            specialName:'未选择任何文件',
+            specialNameList:null,
+            contractName:'未选择任何文件',
+            contractNameList:null,
+            getStaffWorkingInfoList:'',
+            workExperienceShow:false,
+            workTimes:'',
+            workCompany:'',
+            workDuty:'',
+            dateFrom:"",
+            dateTo:"",
+            experienceList:[]
         }
     },
     created(){
@@ -480,6 +620,8 @@ export default {
         vm.getStaffProfile();
         vm.getSincerityInfoByUserId();
         vm.getSafetyEducationByUserId();
+        vm.getStaffWorkingInfo();
+        vm.getStaffWorkingExperience();
         console.log(vm.userId,'vm.userId000');
         console.log('jdkfdkj')
     },
@@ -500,54 +642,55 @@ export default {
 
         },
         getStaffProfile(){
-            // axios({
-            //     url:this.BDMSUrl+'user/getStaffProfile',
-            //     headers:{
-            //         'token':this.token
-            //     },
-            //     params:{
-            //         userId:this.userId
-            //     }
-            // }).then((response)=>{
-            //     console.log(response.data.rt,'response.data.rt');
-            //     if(response.data.cd==0){
-            //         console.log(response.data.rt,'response.data.rt');
-            //         this.getStaffProfileList=response.data.rt;
-            //         console.log(this.getStaffProfileList,'this.getStaffProfileList');
-            //         // this.address=this.getStaffProfileList.address;
-            //         // this.avaterUri=this.getStaffProfileList.avaterUri;
-            //         // this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
-            //         // this.certificationNo= this.getStaffProfileList.certificationNo;
-            //         // // certificationPhoto: this.certificationPhoto,
-            //         // this.education=this.getStaffProfileList.education;
-            //         // this.name=this.getStaffProfileList.name;
-            //         // this.nation=this.getStaffProfileList.nation;
-            //         // this.phone=this.getStaffProfileList.phone;
-            //         // this.profession=this.getStaffProfileList.profession;
-            //         // this.registeredAddress=this.getStaffProfileList.registeredAddress;
-            //         // this.sex=this.getStaffProfileList.sex;
-            //         // // stationCertificate: this.stationCertificate,
-            //         // this.technicalTitle=this.getStaffProfileList.technicalTitle;
-            //         // console.log(this.getStaffProfileList,this.name,'this.name');
-            //     }
-            // })
-                $.ajax({
-                    url:this.BDMSUrl+'user/getStaffProfile',
-                    headers:{
-                        'token':this.token
-                    },
-                    data:{
-                        userId:this.userId
-                    },
-                    type:'get',
-                    success:(response)=>{
-                        alert('0000')
-                        this.getStaffProfileList=response.rt;
-                        console.log(this.getStaffProfileList,'this.getStaffProfileList');
-                    }
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'user/getStaffProfile',
+                headers:{
+                    'token':vm.token
+                },
+                method:"get",
+                params:{
+                    userId:vm.userId
                 }
+            }).then((response)=>{
+                console.log(response.data.rt,'response.data.rt');
+                if(response.data.cd==0){
+                    console.log(response.data.rt,'response.data.rt');
+                    vm.getStaffProfileList=response.data.rt;
+                    console.log(vm.getStaffProfileList,'this.getStaffProfileList');
+                    // this.address=this.getStaffProfileList.address;
+                    // this.avaterUri=this.getStaffProfileList.avaterUri;
+                    // this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
+                    // this.certificationNo= this.getStaffProfileList.certificationNo;
+                    // this.education=this.getStaffProfileList.education;
+                    // this.name=this.getStaffProfileList.name;
+                    // this.nation=this.getStaffProfileList.nation;
+                    // this.phone=this.getStaffProfileList.phone;
+                    // this.profession=this.getStaffProfileList.profession;
+                    // this.registeredAddress=this.getStaffProfileList.registeredAddress;
+                    // this.sex=this.getStaffProfileList.sex;
+                    // this.technicalTitle=this.getStaffProfileList.technicalTitle;
+                    // console.log(this.getStaffProfileList,this.name,'this.name');
+                }
+            })
+            //     $.ajax({
+            //         url:this.BDMSUrl+'user/getStaffProfile',
+            //         headers:{
+            //             'token':this.token
+            //         },
+            //         data:{
+            //             userId:this.userId
+            //         },
+            //         type:'get',
+            //         async:false,
+            //         success:(response)=>{
+            //             alert('0000')
+            //             this.getStaffProfileList=response.rt;
+            //             console.log(this.getStaffProfileList,'this.getStaffProfileList');
+            //         }
+            //     }
                
-            )
+            // )
         },
         //获取个人诚信管理
         getSincerityInfoByUserId(){
@@ -746,7 +889,163 @@ export default {
             //             }
             //         })
             // }
-        }
+        },
+        educateClick(){
+            this.$refs.educateFile.click();
+        },
+        changeEducate(){
+            this.educateNameList=this.$refs.educateFile.files[0];
+            this.educateName=this.educateNameList.name;
+        },
+        safeSubmitClick(){
+            this.$refs.safeSubmitFile.click();
+
+        },
+        changesafeSubmit(){
+            this.safeSubmitNameList=this.$refs.safeSubmitFile.files[0];
+            this.safeSubmitName=this.safeSubmitNameList.name;
+
+        },
+        technologyClick(){
+            this.$refs.technologyFile.click();
+
+        },
+        changeTechnology(){
+            this.technologyNameList=this.$refs.technologyFile.files[0];
+            this.technologyName=this.technologyNameList.name;
+
+        },
+        specialClick(){
+            this.$refs.specialFile.click();
+
+        },
+        changeSpecial(){
+            this.specialNameList=this.$refs.specialFile.files[0];
+            this.specialName=this.specialNameList.name;
+
+        },
+        contractClick(){
+            this.$refs.contractFile.click();
+        },
+        changeContract(){
+            this.contractNameList=this.$refs.contractFile.files[0];
+            this.contractName=this.contractNameList.name;
+        },
+        makeSureWork(){
+            var formData=new FormData();
+            formData.append('thirdLevelSecurityEducationCardFile',this.educateNameList);
+            formData.append('safeRecordFile',this.safeSubmitNameList);
+            formData.append('technicalRecordFile',this.technologyNameList);
+
+            formData.append('specialOperationCertificateFile',this.specialNameList);
+            formData.append('appendicesContractFile',this.contractNameList);
+            axios({
+                url:this.BDMSUrl+'user/setStaffWorkingInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    department:this.department,
+                    duty:this.duty,
+                    entryDate:moment(this.entryDate).format('YYYY-MM-DD'),
+                    type:this.type,
+                    contractExpireDate:moment(this.contractExpireDate).format('YYYY-MM-DD')
+                },
+                method:'post',
+                data:formData
+            }).then((response)=>{
+                if(response.data.cd==0){
+
+                }
+            })
+        },
+        getStaffWorkingInfo(){
+            axios({
+                url:this.BDMSUrl+'user/getStaffWorkingInfo',
+                headers:{
+                    'token':this.token
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getStaffWorkingInfoList=response.data.rt;
+                    console.log(this.getStaffWorkingInfoList,'this.getStaffWorkingInfoList');
+                }
+            })
+        },
+        workExperienceMakeSure(){
+            this.dateFrom=this.workTimes[0],
+            this.dateTo=this.workTimes[1]
+            axios({
+                url:this.BDMSUrl+'user/addExperience',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    company:this.workCompany,
+                    duty:this.workDuty,
+                    dateFrom:moment(this.dateFrom).format('YYYY-MM-DD'),
+                    dateTo:moment(this.dateTo).format('YYYY-MM-DD')
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getStaffWorkingExperience();
+                    this.workExperienceShow=false;
+                    this.workCompany='';
+                    this.dateFrom='';
+                    this.dateTo='';
+                    this.workDuty='';
+                }
+            })
+        },
+        getStaffWorkingExperience(){
+            axios({
+                url:this.BDMSUrl+'user/getStaffWorkingExperience',
+                headers:{
+                    'token':this.token
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.experienceList=response.data.rt;
+                }
+            })
+        },
+        workExperienceCancle(){
+            this.workExperienceShow=false;
+
+        },
+        addWorkExperience(){
+            this.workExperienceShow=true;
+
+        },
+        editWorkExperience(){
+            
+        },
+        deleteWorkExperience(id){
+            this.$confirm('你是否删除该工作经验','提示',{
+                confirmButtonText:'确认',
+                cancelButtonText:'取消',
+                type:'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'user/deleteStaffWorkingInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getStaffWorkingExperience()
+                    }
+                })
+            })
+        },
+
+
     },
 
 
@@ -802,24 +1101,25 @@ ul,li{
             height: 250px;
             background: #f8f8f8;
             .rightLi{
-                height: 26px;
-                padding: 15px;
+                // height: 56px;
+                // padding: 15px;
                 font-size:16px;
                 font-weight: 500;
                 .nameLabel{
                     width: 50%;
-                    height: inherit;
-                    line-height: 26px;
+                    height: 46px;
+                    line-height: 46px;
                     text-align: center;
                     display: inline-block;
 
                 }
                 .itemLabel{
                     width: 50%;
-                    height: inherit;
-                    line-height: 26px;
+                    height:46px;
+                    line-height: 46px;
                     text-align: center;
                     display: inline-block;
+                    vertical-align: middle;
 
                 }
 
@@ -871,6 +1171,7 @@ ul,li{
                             height: 28px;
                         }
                     }
+                   
                 }
                 
 
@@ -961,6 +1262,7 @@ ul,li{
                         padding: 0 15px;
                     }
                     
+                    
 
 
                 }
@@ -1010,6 +1312,13 @@ ul,li{
                     .el-icon-s-custom{
                         font-size:20px;
                     }
+                    .el-icon-edit{
+                        cursor: pointer;
+                        font-size: 18px;
+                    }
+                    .el-icon-document{
+                        font-size:18px;
+                    }
                 }
                 .titleInfo{
                     margin:30px auto;
@@ -1018,6 +1327,23 @@ ul,li{
                         
                         .boxInp{
                             margin-top:5px;
+                            .makeSureBtn{
+                                width: 120px;
+                                height: 36px;
+                                color: #58adfb;
+                                text-align: center;
+                                line-height: 36px;
+                                text-decoration: none;
+                                border: 1px solid #58adfb;
+                                border-radius: 5px;
+                                font-size: 14px;
+                                display: inline-block;
+                                cursor: pointer;
+                                &:hover{
+                                        background: #58adfb;
+                                        color: #fff;
+                                }
+                            }
                             .wrapperLabel{
                                 width: 15%;
                                 display: inline-block;
@@ -1027,7 +1353,7 @@ ul,li{
                                 text-align: left;
                             }
                             .wrapperInp{
-                                width: 65%;
+                                width: 65% !important;
                                 background-color: #fff;
                                 background-image: none;
                                 border-radius: 4px;
@@ -1040,13 +1366,48 @@ ul,li{
                                 line-height: 1;
                                 outline: 0;
                                 padding: 0 15px;
+                                .el-input__inner {
+                                    border:none;
+                                }
                             }
+                            
+                             .wrapperSpan{
+                                    width: 65%;
+                                    display: inline-block;
+                                    font-size: inherit;
+                                    height: 40px;
+                                    padding: 0 15px;
+                                    text-align: left;
+                                    .buttonSpan{
+                                        color: #fff;
+                                        background-color: #409eff;
+                                        border-color: #409eff;
+                                        width: 100px;
+                                        height: 32px;
+                                        line-height: 32px;
+                                        font-size: 16px;
+                                        display: inline-block;
+                                        border-radius: 4px;
+                                        text-align: center;
+                                        cursor: pointer;
+                                    }
+                                    .buttonLabel{
+                                        // width: 70%;
+                                        height: 32px;
+                                        display: inline-block;
+                                        text-align: left;
+                                        margin-left:10px;
+                                        color:#999;
+                                    }
+                                }
+
                         }
                     }
                 }
             }
             .bottom{
-                .titleBtn{
+                margin-top:30px;
+                .titleBtnLeft{
                     width: 200px;
                     height: 36px;
                     line-height: 36px;
@@ -1055,12 +1416,35 @@ ul,li{
                     border: 1px solid white;
                     border-radius: 4px;
                     box-shadow: 0 15px 30px rgba(0,0,0,.1);
+                    float: left;
+                    margin-bottom: 10px;
                     .el-icon-s-custom{
                         font-size:20px;
                     }
+                    .el-icon-document{
+                        font-size: 18px;
+                    }
+                }
+                .titleBtnRight{
+                    width: 150px;
+                    height: 36px;
+                    line-height: 36px;
+                    background: white;
+                    color:#58adfb;
+                    border: 1px solid #58adfb;
+                    border-radius: 4px;
+                    box-shadow: 0 15px 30px rgba(0,0,0,.1);
+                    float:right;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                    .el-icon-circle-plus{
+                        font-size:18px;
+                        color:#58adfb;
+                        
+                    }
                 }
                 .bottomTable{
-                    margin-top:20px;
+                    margin-top:65px;
                     .tableList{
                             border-collapse: collapse;
                             border: 1px solid #e6e6e6;

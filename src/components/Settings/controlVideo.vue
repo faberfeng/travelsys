@@ -70,8 +70,8 @@
                         <div class="editBodytwo"><label class="editInpText">摄像头地址 :</label><input class="inp" placeholder="请输入" v-model="videoUrl"/></div>
                         <div class="editBodytwo">
                             <label class="editInpText">危险源级别 :</label>
-                            <select class="editSelect" v-model="dangerLevel" >
-                                <option v-for="(item,index) in dangerList" :value="item.value" :key="index">{{item.label}}</option>
+                            <select class="editSelect" v-model="dangerLevels" >
+                                <option v-for="(item,index) in dangerousList" :value="item.name" :key="index">{{item.name}}</option>
                             </select>
                         </div>
                     </div>
@@ -106,7 +106,7 @@ export default {
     data(){
         return{
             itemShow:true,
-            dangerLevels:'1',
+            dangerLevels:'',
             dangerList:[{
                 value:'1',
                 label:'A'
@@ -154,6 +154,7 @@ export default {
         },
         buildVideo(){
             this.addDialog=true;
+            this.getDangerSource();
         },
         buildDangerLevel(){
             this.addDangerousDialog=true;
@@ -181,6 +182,8 @@ export default {
                     document.body.scrollTop = 0;
                     document.documentElement.scrollTop = 0;
                     this.addDialog=false;
+                    this.videoName='';
+                    this.videoUrl='';
             }
 
         },
@@ -326,6 +329,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.dangerousList=response.data.rt;
+                        this.dangerLevels=this.dangerousList[0].name;
                         this.dangerousListLength=response.data.rt.length;
                         if(this.dangerousListLength<11){
                             for(var i=0;i<this.dangerousListLength;i++){

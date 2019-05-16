@@ -23,8 +23,9 @@
         </div>
         <div class="projectTab">
             <div id="item-box">
-                <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
                 <span :class="[{'label-item-active':(tabShow == 2)},'label-item']" @click="switchTab(2)">通知</span>
+                <span :class="[{'label-item-active':(tabShow == 1)},'label-item']" @click="switchTab(1)">动态</span>
+                
             </div>
             <ul class="projectList" v-show="tabShow == 1">
                 <span v-show="tabdataShow1">
@@ -79,7 +80,7 @@ export default {
     data(){
         return{
             loading:false,
-            tabShow:1,
+            tabShow:2,
             token:'',
             QJFileManageSystemURL:'',
             commomHeadPictureFile:'',
@@ -209,9 +210,10 @@ export default {
                         this.projectStationInfoList = response.data.rt.rows;
 
                          this.tabdataShow1=false;
-                    }else if(response.data.rt.rows.length!=0){
-                       
                     }
+                    // else if(response.data.rt.rows){
+                       
+                    // }
                 }
 
             })

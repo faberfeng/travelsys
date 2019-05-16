@@ -66,8 +66,8 @@
                             </td>
                             <td>{{item.remark}}</td>
                             <td>
-                                <button class="actionBtn editBtn"></button>
-                                 <button class="actionBtn deleteBtn"></button>
+                                <button class="actionBtn editBtn" @click="editBadRecord(item.id)"></button>
+                                 <button class="actionBtn deleteBtn" @click="deleteBadRecord(item.id)"></button>
                             </td>
                         </tr>
                     </tbody>
@@ -357,6 +357,27 @@ export default {
                 if(response.data.cd==0){
                     this.goodRecordList=response.data.rt;
                 }
+            })
+        },
+        deleteBadRecord(id){
+            this.$confirm('你是否要删除该良好记录','提示',{
+                confirmButtonText:'确认',
+                concleButtonText:'取消',
+                type:'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'sincerity/deleteSincerityInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getGoodRecord();
+                    }
+                })
             })
         },
         addCancle(){

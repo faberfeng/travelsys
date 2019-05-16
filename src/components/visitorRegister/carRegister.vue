@@ -23,9 +23,9 @@
                         </span>
                     </li>
                 </ul>
-                <span class="selectItemRight" >
+                <!-- <span class="selectItemRight" >
                         导出
-                </span>
+                </span> -->
                 <div class="wrapperHead" @click="buildCarRegister">
                     <span class="el-icon-plus"></span><span class="elName">车辆登记</span>
                 </div>

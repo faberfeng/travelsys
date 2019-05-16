@@ -42,37 +42,20 @@
                             <th>上班时间</th>
                             <th>下班时间</th>
                             <th>工作时长</th>
-                            <th>编辑</th>
                         </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in cardLists" :key="index">
+                            <tr v-for="(item,index) in getCheckOnTimeList" :key="index">
                                 <td>{{index+1}}</td>
-                                <td>{{item.typeName}}</td>
-                                <td>
-                                    <button class="actionBtn editBtn" @click="editicCard(item)" title="更新"></button>
-                                    <button class="actionBtn deleteBtn" @click="deleteicCard(item)" title="删除"></button>
-                                </td>
+                                <td>{{timeChange(item.enterTime)}}</td>
+                                <td>{{timeChange(item.leaveTime)}}</td>
+                                <td>{{timeLength(item.leaveTime-item.enterTime)}}小时</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div v-if="cardList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                <div v-if="getCheckOnTimeList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                     当前列表无数据
-                </div>
-                <div class="tableBodyPagination">
-                    <div class="tableBodyPaginationRight">
-                        <el-pagination class="elPagination"
-                            background
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page.sync="currentPage"
-                            :page-sizes="[10,20,30]"
-                            :page-size="1"
-                            layout="sizes,prev, pager, next"
-                            :total="cardListLength">
-                        </el-pagination>
-                    </div>
                 </div>
 
             </div>
@@ -198,6 +181,7 @@ export default {
         vm.projName=localStorage.getItem('projName');
         vm.userId = localStorage.getItem('userId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
+        this.getCheckOnTime();
     },
     methods:{
         selectTime(value){
@@ -251,16 +235,22 @@ export default {
                 method:"get"
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getCheckOnTimeList=response.data.rt;
+                    this.getCheckOnTimeList.push(response.data.rt);
                 }
             })
+        },
+        timeChange(val){
+            if(val){
+                return moment(val).format('HH:ss')
+            }
+        },
+        timeLength(val){
+            return parseInt(val/(1000*60*60))
         },
         addTimeCancle(){
             this.addTimeSettingDialog=false;
 
-        }
-
-
+        },
     },
     
 }

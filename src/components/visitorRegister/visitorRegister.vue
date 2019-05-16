@@ -24,9 +24,9 @@
                     </li>
                      
                 </ul>
-                <span class="selectItemRight" @click="exportVisiterWord" >
+                <!-- <span class="selectItemRight" @click="exportVisiterWord" >
                         导出
-                </span>
+                </span> -->
                 <div class="wrapperHead" @click="buildVisitorRegister">
                     <span class="el-icon-plus"></span><span class="elName">访客登记</span>
                 </div>
@@ -99,7 +99,7 @@
                             </select>
                         </div>
                         <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
-                         <div class="editBodytwo"><label class="editInpText">随行单位 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
+                         <div class="editBodytwo"><label class="editInpText">单位名称 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
                         <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
                         <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
                         <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>

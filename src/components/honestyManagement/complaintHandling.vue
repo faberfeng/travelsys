@@ -28,7 +28,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -53,20 +53,29 @@
                        </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr> -->
+                        <tr v-for="(item,index) in getComplaintInfoLists" :key="index" >
+                            <td>{{index+1}}</td>
+                            <td>{{item.event}}</td>
+                            <td>{{item.complaintTarget}}</td>
+                            <td>{{item.beComplaintTarget}}</td>
+                            <td>{{item.time}}</td>
+                            <td>
+                                <el-tag style="width:80px;margin:2px;" v-for="tag in item.users" :key="tag.id">
+                                        {{tag.userName}}
+                                </el-tag>
+                            </td>
+                            <td>
+                                <i class="el-icon-download"></i>
+                            </td>
+                            <td>
+                                <button class="editBtn actionBtn" @click="editComplain(item.id)"></button>
+                                <button class="deleteBtn actionBtn" @click="deleteComplain(item.id)"></button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+            <div v-if="getComplaintInfoLists.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
                 当前列表无数据
             </div>
             <div class="tableBodyPagination">
@@ -87,11 +96,11 @@
         <div id="edit">
                 <el-dialog title="添加投诉处理" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
-                        <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="eventName"/></div>
+                        <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="complaintEvent"/></div>
                         <div class="editBodytwo"><label class="editInpText">投诉单位:</label><input class="inp" placeholder="请输入" v-model="companyName"/></div>
                         <div class="editBodytwo">
                             <label class="editInpText">被投诉对象 :</label>
-                            <input class="inp" placeholder="请输入" v-model="modeName"/>
+                            <input class="inp" placeholder="请输入" v-model="complaintTarget"/>
                              <!-- <select class="editSelect" v-model="mode" >
                                 <option v-for="(item,index) in goodList" :value="item.value" :key="index">{{item.label}}</option>
                             </select>
@@ -100,7 +109,7 @@
                         <div class="editBodytwo">
                             <label class="editInpText">投诉时间 :</label>
                             <el-date-picker
-                                v-model="evenTime"
+                                v-model="complainTime"
                                 type="date"
                                 placeholder="选择日期">
                             </el-date-picker>
@@ -164,6 +173,7 @@ export default {
             currentPage:1,//当前页
             selectTime:"",//筛选时间
             selectName:"",//筛选名称
+            selectCompany:"",
              personList:[{
                 value:1,
                 label:'活动发起者'
@@ -183,7 +193,13 @@ export default {
             selectUserList:[],
             fileList:null,
             fileName:'',
-
+            complaintFile:{},
+            complaintTarget:'',
+            // beComplaintTarget:'',
+            complaintEvent:'',
+            complainTime:'',
+            getComplaintInfoList:[],
+            getComplaintInfoLists:[]
         }
     },
     created(){
@@ -196,6 +212,7 @@ export default {
         vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
         this.getUserList();
+        this.getComplaintInfo();
 
     },
     methods:{
@@ -272,6 +289,29 @@ export default {
         changeIndex(){
             this.fileList=this.$refs.fileRef.files[0],
             this.fileName=this.fileList.name;
+            var formdata=new FormData();
+            var data='';
+            formdata.append('file',this.fileList);
+            axios({
+                url:this.BDMSUrl+'design/dcUpload',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                },
+                method:'post',
+                data:formdata
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    data=response.data.rt;
+                    this.complaintFile={
+                        "fileName":data.name,
+                        "filePath":data.uri,
+                        "fileSize":data.size
+                    }
+                }
+            })
         },
          //点击选择用户
         clickSelectUser(){
@@ -296,33 +336,82 @@ export default {
                 })
             })
             data={
-                'company':this.companyName,
-                'mode':this.modeName,
-                'name':this.eventName,
-                'remark':this.remark,
-                'time':this.evenTime,
-                'type':1,
-                'projId':this.projId,
-                'users':userData
-            }
+                    "beComplaintTarget":this.companyName,
+                    "complaintFile": this.complaintFile,
+                    "complaintTarget":this.complaintTarget,
+                    "event":this.complaintEvent,
+                    "projId":this.projId,
+                    "time": moment(this.complainTime).format('YYYY-MM-DD HH:ss:mm'),
+                    "users":userData
+                }
             axios({
-                url:this.BDMSUrl+'sincerity/addSincerityInfo',
+                url:this.BDMSUrl+'sincerity/addComplaintInfo',
                 method:"post",
                 headers:{
                     'token':this.token
                 },
                 data:data
             }).then((response)=>{
-                this.getGoodRecord();
-                this.addDialog=false;
+              this.getComplaintInfo();
+            this.addDialog=false;
                 this.selectUserList=[];
                 this.companyName='';
-                this.modeName='';
-                this.eventName='';
-                this.remark='';
-                this.evenTime='';
-                
+            //    this.beComplaintTarget='';
+               this.complaintFile='';
+               this.complaintTarget='';
+               this.complaintEvent='';
+                this.complainTime='';
             })
+        },
+        getComplaintInfo(){
+            this.getComplaintInfoLists=[];
+            $.ajax({
+                url:this.BDMSUrl+'sincerity/getComplaintInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectCompany==''?'':('&company='+this.selectCompany)),
+                headers:{
+                    'token':this.token
+                },
+                type:'get',
+                success:(response)=>{
+                    if(response.cd==0){
+                        this.getComplaintInfoList=response.rt;
+                        this.getComplaintInfoListLength=this.getComplaintInfoList.length;
+                        if(this.getComplaintInfoListLength<11){
+                        for(var i=0;i<this.getComplaintInfoListLength;i++){
+                            this.getComplaintInfoLists.push(this.getComplaintInfoList[i])
+                            }
+                        }else{
+                            for(var i=0;i<10;i++){
+                                this.getComplaintInfoLists.push(this.getComplaintInfoList[i])
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        deleteComplain(id){
+             this.$confirm('你是否要删除该投诉记录','提示',{
+                confirmButtonText:'确认',
+                concleButtonText:'取消',
+                type:'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'sincerity/deleteComplaintInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getComplaintInfo();
+                    }
+                })
+            })
+
+        },
+        editComplain(){
+
         },
         getUserList(){
             axios({
@@ -581,12 +670,15 @@ li{
                                         margin-left: 10px;
 
                                     }
-                                    // .deleteBtn{
-                                    //     background: url('../../assets/delete.png') no-repeat 0 0;
-                                    // }
-                                    // .editBtn{
-                                    //     background: url('./images/overviewedit.png') no-repeat 0 0;
-                                    // }
+                                    .el-icon-download{
+                                        font-size:18px;
+                                    }
+                                    .deleteBtn{
+                                        background: url('../../assets/delete.png') no-repeat 0 0;
+                                    }
+                                    .editBtn{
+                                        background: url('../../assets/edit.png') no-repeat 0 0;
+                                    }
                                     // .upmoveBtn{
                                     //     background: url('./images/overviewup.png') no-repeat 0 0;
                                     // }
