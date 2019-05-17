@@ -14,12 +14,12 @@
                             <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                        <span class="title-right">
                             <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
             <div class="wrapper_left">
@@ -27,10 +27,10 @@
                     <ul>
                         
                         <li v-for="(item,index) in getVisitorInfoLists" :key="index">
-                            <span class="one_Span"><i class="el-icon-menu"></i>{{item.remark}}</span>
-                            <span class="two_Span"><label>访客人数：{{item.entourage}}</label></span>
-                            <span class="three_Span"><label>日期：{{item.addtime}}</label></span>
-                            <span class="four_Span"><label>单位：{{item.company}}</label></span>
+                            <span class="one_Span"><i class="el-icon-success"></i>{{item.name}}</span>
+                            <span class="two_Span"><label>告知人数：{{item.people}}</label></span>
+                            <span class="three_Span"><label>日期：{{item.name.split(' ')[0]}}</label></span>
+                            <!-- <span class="four_Span"><label>单位：{{item.company}}</label></span> -->
                         </li>
                     </ul>
                 </div>
@@ -82,7 +82,7 @@
                         <span style="width:65%;display:inline-block;">
                             <span style="width: 98px;height: 26px;border: 1px solid #dcdfe6;cursor: pointer;background: #f9f9f9;font-size: 14px;font-weight: 400;color: #666;display:inline-block" @click="selectFile()">
                                 选择文件
-                                <input type="file" ref="fileInfo" id="fileInfos" @change="changeFile($event)" style="display:none"/>
+                                <input type="file" ref="fileInfo" accept="video/*" id="fileInfos" @change="changeFile($event)" style="display:none"/>
                             </span>
                             <span style="font-size: 14px;
                                 line-height: 14px;
@@ -192,7 +192,7 @@ export default {
         getVisitorInfo(time){
             this.getVisitorInfoLists=[];
             axios({
-                url:this.BDMSUrl+'visitor/getVisitorInfo',
+                url:this.BDMSUrl+'safety/getSafetyNotificationConfirm',
                 method:'GET',
                 params:{
                     projId:this.projId,
@@ -216,6 +216,11 @@ export default {
                     }
                 }
             })
+        },
+        timeChange(val){
+            
+                moment(val).format('YYYY-MM-DD');
+            
         },
         changeDatePicker(){
 
@@ -473,6 +478,7 @@ li{
                                 display: inline-block;
                                  position: absolute;
                                  left:0px;
+                                 white-space: nowrap;
                             }
                             .two_Span{
                                 width: 25%;

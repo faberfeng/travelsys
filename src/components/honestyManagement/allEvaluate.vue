@@ -18,7 +18,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -100,7 +100,9 @@ export default {
             onePerson:'',
             getEvaluateInfoList:[],
             getEvaluateInfoLists:[],
-            getEvaluateInfoListLength:1
+            getEvaluateInfoListLength:1,
+            pageSize:10,
+            pageNum:1
         }
     },
     created(){
@@ -185,10 +187,11 @@ export default {
         },
         //改变时间
         changeDatePicker(){
+            // this.getEvaluateInfo();
 
         },
         selectNameInfo(){
-
+            this.getEvaluateInfo();
         },
         getEvaluateInfo(){
             this.getEvaluateInfoLists=[];

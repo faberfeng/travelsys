@@ -188,7 +188,7 @@ export default {
         },
         timeChange(val){
             if(val){
-                return moment(val).format('YYYY-MM-DD HH:ss:mm')
+                return moment(val).format('YYYY-MM-DD HH:mm:ss')
             }
         },
         doorType(val){

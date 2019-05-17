@@ -149,6 +149,7 @@ export default {
             pageNum:1,
             editId:'',
             editDialog:false,
+            enterTime:'',
         }
     },
     created(){
@@ -250,6 +251,7 @@ export default {
             vm.carType=val.carType;
             vm.contactInfo=val.contactInfo;
             vm.contactUser=val.contactUser;
+            vm.enterTime=val.enterTime
 
         },
         deleteCarResiger(val){
@@ -285,6 +287,7 @@ export default {
                     "carNumber": vm.carNumber,
                     "carType": vm.carType,
                     "contactInfo":vm.contactInfo,
+                    'enterTime':vm.enterTime,
                     "contactUser": vm.contactUser,
                     "projId": vm.projId
             }

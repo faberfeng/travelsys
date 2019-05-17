@@ -6,7 +6,7 @@
                 </router-link>
             </div>
         </div>
-        <div class="contentBody">
+        <div class="contentBody" v-if="!safeNoticeShow">
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
@@ -59,9 +59,13 @@
                                 <span v-show="item.isReturnCard=='1'" class="iconBtn">已归还</span>
                             </td>
                             <td>{{item.carInfo}}</td>
-                            <td>{{item.addtime}}</td>
-                            <td>{{item.leavetime}}</td>
-                            <td>{{item.safetyNotification}}</td>
+                            <td>{{item.addtime|timeChange()}}</td>
+                            <td>{{item.leavetime|timeChange()}}</td>
+                            <!-- {{item.safetyNotification}} -->
+                            <td>
+                                <span class="noticeBtn" v-show="item.safetyNotification=='0'" @click="lookSafeVideo(item.id)">观看</span>
+                                <span class="noticeBtn" v-show="item.safetyNotification=='1'" @click="lookSafeVideoSuccess(item.safetyNotificationId)">已完成</span>
+                            </td>
                             <td>{{item.remark}}</td>
                             <td>
                                 <button class="actionBtn editBtn" @click="updateVisiter(item)"></button>
@@ -89,11 +93,12 @@
                 </div>
             </div>
         </div>
+         <safeNoticeMessage v-if="safeNoticeShow" @back="backHome()" :deliverValue="deliverValue" :visitorId='visitorId' :safetyNotificationId="selectValue" @refresh="refreshPage()"  ref="safeNoticeMessges"></safeNoticeMessage>
         <div id="edit">
                 <el-dialog title="添加访客登记" v-dialogDrag :visible.sync="addDialog" @close="addCancle">
                     <div class="editBody">
                         <!-- <div class="editBodyone"><label class="editInpText">访客登记 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div> -->
-                        <div class="editBodytwo"><label class="editInpText">访客登记 :</label>
+                        <div class="editBodytwo"><label class="editInpText">接待人 :</label>
                             <select class="editSelect" v-model="mainVisitor" >
                                 <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
                             </select>
@@ -119,10 +124,26 @@
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
-                <el-dialog title="添加访客登记" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                <el-dialog title="安全告知列表" width="400px" v-dialogDrag :visible.sync="safeNoticeListDialog" @close="safeVideoCancle">
+                    <div class="editBody">
+                        <el-select style="width:80%;" v-model="selectValue" placeholder="请选择">
+                            <el-option
+                            v-for="item in getSafetyNotificationList"
+                            :key="item.id"
+                            :label="item.title"
+                            :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="safeVideoMakeSure()">观看</button>
+                        <button class="editBtnC" @click="safeVideoCancle">取消</button>
+                    </div>
+                </el-dialog>
+                <el-dialog title="编辑访客登记" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
                     <div class="editBody">
                         <!-- <div class="editBodyone"><label class="editInpText">访客登记 :</label><input class="inp" placeholder="请输入" v-model="icCordNum"/></div> -->
-                        <div class="editBodytwo"><label class="editInpText">访客登记 :</label>
+                        <div class="editBodytwo"><label class="editInpText">接待人 :</label>
                             <select class="editSelect" v-model="mainVisitor" >
                                 <option v-for="(item,index) in userLists" :value="item.userId" :key="index">{{item.name}}</option>
                             </select>
@@ -149,14 +170,19 @@
                     </div>
                 </el-dialog>
         </div>
+       
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import safeNoticeMessage from './safeNoticeMessage.vue'
 export default {
-    name:'',
+    name:'visitorRegister',
+    components:{
+        safeNoticeMessage
+    },
     data(){
         return{
             routerList:"",
@@ -180,7 +206,20 @@ export default {
             getVisitorInfoListLength:1,
             editDialog:false,
             pageSize:10,
-            pageNum:1
+            pageNum:1,
+            safeNoticeListDialog:false,
+            getSafetyNotificationList:[],
+            selectValue:'',
+            deliverValue:"",
+            safeNoticeShow:false,
+            visitorId:'',
+        }
+    },
+    filters:{
+         timeChange(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD');
+            }
         }
     },
     created(){
@@ -194,6 +233,7 @@ export default {
         vm.loadingTitle();
         this.getUserList();
         this.getVisitorInfo();
+        this.getSafetyNotification();
 
     },
     methods:{
@@ -285,6 +325,7 @@ export default {
             vm.remark='';
 
         },
+       
         //更新
         updateVisiter(item){
             this.editId=item.id;
@@ -462,8 +503,52 @@ export default {
                 }
             })
             return data
-        }
+        },
+        lookSafeVideo(id){
+                this.safeNoticeListDialog=true;
+                this.visitorId=id;
+        },
+        lookSafeVideoSuccess(){
+            
 
+        },
+        getSafetyNotification(){
+            axios({
+                url:this.BDMSUrl+'safety/getSafetyNotification',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getSafetyNotificationList=response.data.rt;
+                    this.selectValue=this.getSafetyNotificationList[0].id;
+                }
+            })
+        },
+        safeVideoMakeSure(){
+            this.getSafetyNotificationList.forEach((item)=>{
+                if(this.selectValue==item.id){
+                    this.deliverValue=item;
+                }
+            })
+            this.safeNoticeShow=true;
+            this.safeNoticeListDialog=false;
+
+
+        },
+        safeVideoCancle(){
+            this.safeNoticeListDialog=false;
+        },
+        backHome(){
+            this.safeNoticeShow=false;
+        },
+        refreshPage(){
+            this.getVisitorInfo()
+            this.safeNoticeShow=false;
+        }
     },
 
 }
@@ -676,6 +761,16 @@ li{
                                     }
                                     .editBtn{
                                         background: url('../../assets/edit.png') no-repeat 0 0;
+                                    }
+                                    .noticeBtn{
+                                        display: inline-block;
+                                        width: 50px;
+                                        height: 24px;
+                                        line-height: 24px;
+                                        border:1px solid #58adfb;
+                                        color:#58adfb;
+                                        border-radius: 4px;
+                                        cursor: pointer;
                                     }
                                     // .upmoveBtn{
                                     //     background: url('./images/overviewup.png') no-repeat 0 0;

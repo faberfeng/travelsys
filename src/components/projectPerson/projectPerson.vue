@@ -7,7 +7,7 @@
             <div class="contentHeadRight">
                 <ul style="width:50%;height:inherit;float:left;">
                     <li class="rightLi">
-                        <label class="nameLabel">姓名：</label><label class="itemLabel">{{getStaffProfileList.name}}-{{getStaffProfileList.address}}</label>
+                        <label class="nameLabel">姓名：</label><label class="itemLabel">{{getStaffProfileList.name}}</label>
                     </li>
                     <li class="rightLi">
                         <label class="nameLabel">账号：</label><label class="itemLabel"></label>
@@ -230,14 +230,14 @@
                     <div class="workInfoWrapper">
                         <div class="header">
                             <div class="titleBtn">
-                                <i class="el-icon-edit"></i>
+                                <i class="el-icon-edit" @click="editWork"></i>
                                 当前工作信息
                             </div>
                             <div class="titleInfo">
                                 <div class="Wrapper" style="float:left;">
                                     <div class="boxInp">
                                         <label class="wrapperLabel">岗位:</label>
-                                        <input class="wrapperInp" v-model="duty"/>
+                                        <input class="wrapperInp" :readonly="getStaffWorkingInfoList==''?false:true" v-model="duty"/>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="vertical-align:top;">入职时间:</label>
@@ -253,11 +253,11 @@
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel">所属单位:</label>
-                                        <input class="wrapperInp" v-model="department"/>
+                                        <input class="wrapperInp" :readonly="getStaffWorkingInfoList==''?false:true" v-model="department"/>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel">成员类型:</label>
-                                        <select v-model="type"  class="wrapperInp">
+                                        <select :disabled="getStaffWorkingInfoList==''?false:true" v-model="type"  class="wrapperInp">
                                             <option v-for="(item,index) in personTypeList" :key="index" :value="item.value">{{item.label}}</option>
                                         </select>
                                         <!-- <input class="wrapperInp"/> -->
@@ -279,7 +279,7 @@
                                 <div class="Wrapper" style="float:right;">
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">三级安全教育卡:</label>
-                                        <span class="wrapperSpan">
+                                        <span v-if="!getStaffWorkingInfoList" class="wrapperSpan">
                                             <span class="buttonSpan" @click="educateClick">
                                                 <i class="el-icon-upload2"></i>
                                                 点击上传
@@ -287,10 +287,16 @@
                                             </span>
                                             <label class="buttonLabel">{{educateName}}</label>
                                         </span>
+                                        <span v-if="getStaffWorkingInfoList" @click="downloadFiles(thirdLevelSecurityEducationCard)" class="wrapperSpan">
+                                            <span class="buttonSpan">
+                                            <i class="el-icon-download" ></i>
+                                            点击查看
+                                            </span>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">安全交底记录:</label>
-                                        <span class="wrapperSpan">
+                                        <span v-if="!getStaffWorkingInfoList" class="wrapperSpan">
                                             <span class="buttonSpan" @click="safeSubmitClick()">
                                                 <i class="el-icon-upload2"></i>
                                                 点击上传
@@ -298,11 +304,17 @@
                                             </span>
                                             <label class="buttonLabel">{{safeSubmitName}}</label>
                                         </span>
+                                        <span v-if="getStaffWorkingInfoList" @click="downloadFiles(safeRecord)" class="wrapperSpan">
+                                            <span class="buttonSpan">
+                                            <i class="el-icon-download" ></i>
+                                            点击查看
+                                            </span>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">技术交底记录:</label>
                                         <!-- <input class="wrapperInp"/> -->
-                                        <span class="wrapperSpan">
+                                        <span v-if="!getStaffWorkingInfoList" class="wrapperSpan">
                                             <span class="buttonSpan" @click="technologyClick">
                                                 <i class="el-icon-upload2"></i>
                                                 点击上传
@@ -310,11 +322,17 @@
                                             </span>
                                             <label class="buttonLabel">{{technologyName}}</label>
                                         </span>
+                                        <span v-if="getStaffWorkingInfoList" @click="downloadFiles(technicalRecord)" class="wrapperSpan">
+                                            <span class="buttonSpan">
+                                            <i class="el-icon-download" ></i>
+                                            点击查看
+                                            </span>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">特种操作证书:</label>
                                         <!-- <input class="wrapperInp"/> -->
-                                        <span class="wrapperSpan">
+                                        <span v-if="!getStaffWorkingInfoList" class="wrapperSpan">
                                             <span class="buttonSpan" @click="specialClick">
                                                 <i class="el-icon-upload2"></i>
                                                 点击上传
@@ -322,11 +340,17 @@
                                             </span>
                                             <label class="buttonLabel">{{specialName}}</label>
                                         </span>
+                                        <span v-if="getStaffWorkingInfoList" @click="downloadFiles(specialOperationCertificate)" class="wrapperSpan">
+                                            <span class="buttonSpan">
+                                            <i class="el-icon-download" ></i>
+                                            点击查看
+                                            </span>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
                                         <label class="wrapperLabel" style="width:20% !important">合同附件:</label>
                                         <!-- <input class="wrapperInp"/> -->
-                                        <span class="wrapperSpan">
+                                        <span v-if="!getStaffWorkingInfoList" class="wrapperSpan">
                                             <span class="buttonSpan" @click="contractClick()">
                                                 <i class="el-icon-upload2"></i>
                                                 点击上传
@@ -334,9 +358,16 @@
                                             </span>
                                             <label class="buttonLabel">{{contractName}}</label>
                                         </span>
+                                        <span v-if="getStaffWorkingInfoList" @click="downloadFiles(appendicesContract)" class="wrapperSpan">
+                                            <span class="buttonSpan">
+                                            <i class="el-icon-download" ></i>
+                                            点击查看
+                                            </span>
+                                        </span>
                                     </div>
                                     <div class="boxInp">
-                                            <span class="makeSureBtn" @click="makeSureWork">确认</span>
+                                            <span v-if="!getStaffWorkingInfoList" class="makeSureBtn" @click="makeSureWork">确认</span>
+                                            <!-- <span v-if="getStaffWorkingInfoList" class="makeSureBtn" @click="editWork">编辑</span> -->
                                     </div>
                                 </div>
                             </div>
@@ -483,7 +514,7 @@ export default {
             projId:'',
             token:'',
             BDMSUrl:'',
-            getStaffProfileList:{},
+            getStaffProfileList:'',
             userImg:'',
             sexOptions:[{
                 value:1,
@@ -601,7 +632,13 @@ export default {
             workDuty:'',
             dateFrom:"",
             dateTo:"",
-            experienceList:[]
+            experienceList:[],
+            appendicesContract:'',
+            safeRecord:'',
+            specialOperationCertificate:'',
+            technicalRecord:'',
+            thirdLevelSecurityEducationCard:'',
+            attendInfo:''
         }
     },
     created(){
@@ -617,11 +654,14 @@ export default {
         vm.timestamps=moment(new Date().getTime()).format('YYYY-MM');
         vm.name=vm.userName;
         vm.getAttendancyByUserId(vm.timestamps);
+        vm.attendInfo=vm.getAttendancyByMonth(vm.timestamps);
+        console.log(vm.attendInfo,'vm.attendInfo');
         vm.getStaffProfile();
         vm.getSincerityInfoByUserId();
         vm.getSafetyEducationByUserId();
         vm.getStaffWorkingInfo();
         vm.getStaffWorkingExperience();
+        vm.avaterUriFile=vm.userImg;
         console.log(vm.userId,'vm.userId000');
         console.log('jdkfdkj')
     },
@@ -646,52 +686,82 @@ export default {
             axios({
                 url:this.BDMSUrl+'user/getStaffProfile',
                 headers:{
-                    'token':vm.token
+                    'token':this.token
                 },
-                method:"get",
+                method:'get',
                 params:{
-                    userId:vm.userId
+                    userId:this.userId
                 }
             }).then((response)=>{
-                console.log(response.data.rt,'response.data.rt');
-                if(response.data.cd==0){
-                    console.log(response.data.rt,'response.data.rt');
-                    vm.getStaffProfileList=response.data.rt;
-                    console.log(vm.getStaffProfileList,'this.getStaffProfileList');
-                    // this.address=this.getStaffProfileList.address;
-                    // this.avaterUri=this.getStaffProfileList.avaterUri;
-                    // this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
-                    // this.certificationNo= this.getStaffProfileList.certificationNo;
-                    // this.education=this.getStaffProfileList.education;
-                    // this.name=this.getStaffProfileList.name;
-                    // this.nation=this.getStaffProfileList.nation;
-                    // this.phone=this.getStaffProfileList.phone;
-                    // this.profession=this.getStaffProfileList.profession;
-                    // this.registeredAddress=this.getStaffProfileList.registeredAddress;
-                    // this.sex=this.getStaffProfileList.sex;
-                    // this.technicalTitle=this.getStaffProfileList.technicalTitle;
-                    // console.log(this.getStaffProfileList,this.name,'this.name');
-                }
-            })
-            //     $.ajax({
-            //         url:this.BDMSUrl+'user/getStaffProfile',
-            //         headers:{
-            //             'token':this.token
-            //         },
-            //         data:{
-            //             userId:this.userId
-            //         },
-            //         type:'get',
-            //         async:false,
-            //         success:(response)=>{
-            //             alert('0000')
-            //             this.getStaffProfileList=response.rt;
-            //             console.log(this.getStaffProfileList,'this.getStaffProfileList');
-            //         }
-            //     }
+                    if(response.data.cd==0){
+                        vm.getStaffProfileList=response.data.rt;
+                        this.address=this.getStaffProfileList.address;
+                        this.avaterUri=this.getStaffProfileList.avaterUri;
+                        this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
+                        this.certificationNo= this.getStaffProfileList.certificationNo;
+                        // this.avaterUriFile=this.BDMSUrl+this.avaterUri;
+                        this.education=this.getStaffProfileList.education;
+                        this.name=this.getStaffProfileList.name;
+                        this.nation=this.getStaffProfileList.nation;
+                        this.phone=this.getStaffProfileList.phone;
+                        this.profession=this.getStaffProfileList.profession;
+                        this.registeredAddress=this.getStaffProfileList.registeredAddress;
+                        this.sex=this.getStaffProfileList.sex;
+                        this.technicalTitle=this.getStaffProfileList.technicalTitle;
+                        console.log(vm.getStaffProfileList,'vm.getStaffProfileList');
+                    }
+                })
+            },
+        // getStaffProfile(){
+        //     var vm=this;
+        //     axios({
+        //         url:this.BDMSUrl+'user/getStaffProfile',
+        //         headers:{
+        //             'token':vm.token
+        //         },
+        //         method:"get",
+        //         params:{
+        //             userId:vm.userId
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd==0){
+        //             console.log(response.data.rt,'response.data.rt');
+        //             vm.getStaffProfileList=response.data.rt;
+        //             console.log(vm.getStaffProfileList,'this.getStaffProfileList');
+        //             // this.address=this.getStaffProfileList.address;
+        //             // this.avaterUri=this.getStaffProfileList.avaterUri;
+        //             // this.birthday=moment(this.getStaffProfileList.birthday).format('YYYY-MM-DD');
+        //             // this.certificationNo= this.getStaffProfileList.certificationNo;
+        //             // this.education=this.getStaffProfileList.education;
+        //             // this.name=this.getStaffProfileList.name;
+        //             // this.nation=this.getStaffProfileList.nation;
+        //             // this.phone=this.getStaffProfileList.phone;
+        //             // this.profession=this.getStaffProfileList.profession;
+        //             // this.registeredAddress=this.getStaffProfileList.registeredAddress;
+        //             // this.sex=this.getStaffProfileList.sex;
+        //             // this.technicalTitle=this.getStaffProfileList.technicalTitle;
+        //             // console.log(this.getStaffProfileList,this.name,'this.name');
+        //         }
+        //     })
+        //     //     $.ajax({
+        //     //         url:this.BDMSUrl+'user/getStaffProfile',
+        //     //         headers:{
+        //     //             'token':this.token
+        //     //         },
+        //     //         data:{
+        //     //             userId:this.userId
+        //     //         },
+        //     //         type:'get',
+        //     //         async:false,
+        //     //         success:(response)=>{
+        //     //             alert('0000')
+        //     //             this.getStaffProfileList=response.rt;
+        //     //             console.log(this.getStaffProfileList,'this.getStaffProfileList');
+        //     //         }
+        //     //     }
                
-            // )
-        },
+        //     // )
+        // },
         //获取个人诚信管理
         getSincerityInfoByUserId(){
             axios({
@@ -778,25 +848,28 @@ export default {
                 },
                 data:formData
             }).then((response)=>{
-                this.getStaffProfile();
-            })
-        },
-        getStaffProfile(){
-            axios({
-                url:this.BDMSUrl+'user/getStaffProfile',
-                headers:{
-                    'token':this.token
-                },
-                params:{
-                    userId:this.userId
-                },
-                method:'get'
-            }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getStaffProfileList=response.data.rt;
+                    this.getStaffProfile();
                 }
+                
             })
         },
+        // getStaffProfile(){
+        //     axios({
+        //         url:this.BDMSUrl+'user/getStaffProfile',
+        //         headers:{
+        //             'token':this.token
+        //         },
+        //         params:{
+        //             userId:this.userId
+        //         },
+        //         method:'get'
+        //     }).then((response)=>{
+        //         if(response.data.cd==0){
+        //             this.getStaffProfileList=response.data.rt;
+        //         }
+        //     })
+        // },
         getAttendancyByUserId(date){
             axios({
                 url:this.BDMSUrl+'attendancy/getAttendancyByUserId',
@@ -814,6 +887,32 @@ export default {
                 }
             })
         },
+        getAttendancyByMonth(date){
+            var datas='';
+            $.ajax({
+                url:this.BDMSUrl+'attendancy/getAttendancyByMonth',
+                headers:{
+                    'token':this.token
+                },
+                data:{
+                    projectId:this.projId,
+                    date:date+'-01',
+                    name:''
+                },
+                async:false,
+                success:(response)=>{
+                    if(response.cd==0){
+                        response.rt.forEach((item)=>{
+                            if(item.userId==this.userId){
+                                    datas=item;
+                            }
+                        })
+                        return datas;
+                    }
+                }
+            })
+        },
+        
 
         clickUserImg(){
             this.$refs.uploadUserImg.click();
@@ -897,6 +996,16 @@ export default {
             this.educateNameList=this.$refs.educateFile.files[0];
             this.educateName=this.educateNameList.name;
         },
+        downloadFiles(val){
+            if(val){
+                window.open(this.BDMSUrl+'dl/'+val)
+            }else{
+                this.$message({
+                    type:'info',
+                    message:'当前无上传文件'
+                })
+            }
+        },
         safeSubmitClick(){
             this.$refs.safeSubmitFile.click();
 
@@ -956,9 +1065,21 @@ export default {
                 data:formData
             }).then((response)=>{
                 if(response.data.cd==0){
-
+                    this.getStaffWorkingInfo();
+                    this.$message({
+                        type:'success',
+                        message:'从业信息编辑成功'
+                    })
                 }
             })
+        },
+        editWork(){
+            this.getStaffWorkingInfoList='';
+            this.appendicesContract='';
+            this.safeRecord='';
+            this.specialOperationCertificate='';
+            this.technicalRecord='';
+            this.thirdLevelSecurityEducationCard='';
         },
         getStaffWorkingInfo(){
             axios({
@@ -970,6 +1091,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getStaffWorkingInfoList=response.data.rt;
+                    this.department=this.getStaffWorkingInfoList.department;
+                    this.duty=this.getStaffWorkingInfoList.duty;
+                    this.type=this.getStaffWorkingInfoList.type;
+                    this.entryDate=this.getStaffWorkingInfoList.entryDate;
+                    this.contractExpireDate=this.getStaffWorkingInfoList.contractExpireDate;
+
+                    this.appendicesContract=this.getStaffWorkingInfoList.appendicesContract;
+                    this.safeRecord=this.getStaffWorkingInfoList.safeRecord;
+                    this.specialOperationCertificate=this.getStaffWorkingInfoList.specialOperationCertificate;
+                    this.technicalRecord=this.getStaffWorkingInfoList.technicalRecord;
+                    this.thirdLevelSecurityEducationCard=this.getStaffWorkingInfoList.thirdLevelSecurityEducationCard;
                     console.log(this.getStaffWorkingInfoList,'this.getStaffWorkingInfoList');
                 }
             })
@@ -1398,6 +1530,14 @@ ul,li{
                                         text-align: left;
                                         margin-left:10px;
                                         color:#999;
+                                    }
+                                    .el-icon-download{
+                                        font-size:18px;
+                                        // font-weight:bold;
+                                        cursor: pointer;
+                                        // &:hover{
+                                        //     color:#58adfb;
+                                        // }
                                     }
                                 }
 

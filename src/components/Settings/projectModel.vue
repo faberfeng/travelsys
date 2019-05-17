@@ -14,7 +14,7 @@
                         :end="calendar1.end" 
                         :weeks="calendar1.weeks" 
                         :months="calendar1.months" 
-                        
+                        @select="selectTime"
                         ></calendar>
                 </div>
             </div>
@@ -147,7 +147,8 @@ export default {
              calendar1:{
                  multi:true,
                  zero:true,
-                value:[[2019,5,12],[2019,5,13],[2019,5,14],[2019,5,15],[2019,5,16],], //默认日期
+                //  [2019,5,12],[2019,5,13],[2019,5,14],[2019,5,15],[2019,5,16],
+                value:[], //默认日期
                 lunar:true, //显示农历
                 weeks:['日', '一', '二', '三', '四', '五', '六'],
                 display:"2018/02/16",
@@ -185,8 +186,8 @@ export default {
     },
     methods:{
         selectTime(value){
-            console.log('12111');
-            // console.log(value,'value000');
+            console.log(value,'选择了当前时间');
+            
         },
         timeSetting(){
             this.addTimeSettingDialog=true;

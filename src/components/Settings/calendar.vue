@@ -251,7 +251,7 @@
         </thead>
         <tbody>
         <tr v-for="(day,k1,index) in days" :key="index" style="{'animation-delay',(k1*30)+'ms'}">
-            <td v-for="(child,k2,index) in day" :key="index" :class="{'selected':child.selected,'disabled':child.disabled}" >
+            <td v-for="(child,k2,index) in day" :key="index" @click="select(k1,k2,$event)" :class="{'selected':child.selected,'disabled':child.disabled}" >
                 <span :class="{'red':k2==0||k2==6||((child.isLunarFestival||child.isGregorianFestival) && lunar)}">{{child.day}}</span>
                 <div class="text" v-if="child.eventName!=undefined">{{child.eventName}}</div>
                 <div class="text" :class="{'isLunarFestival':child.isLunarFestival,'isGregorianFestival':child.isGregorianFestival}" v-if="lunar">{{child.lunar}}</div>
@@ -682,7 +682,7 @@ export default {
             this.render(this.year, this.month)
             this.$emit('selectMonth',this.month+1,this.year)
             this.$emit('prev',this.month+1,this.year)
-            console.log('000q');
+            // console.log('000q');
         },
         //  下月
         next(e) {
@@ -696,13 +696,14 @@ export default {
             this.render(this.year, this.month)
             this.$emit('selectMonth',this.month+1,this.year)
             this.$emit('next',this.month+1,this.year)
-            console.log('是否选择0');
+            // console.log('是否选择0');
         },
         // 选中日期
         select(k1, k2, e) {
-            // if (e != undefined)
-             e.stopPropagation()
-             console.log('是否选择');
+            if (e != undefined)e.stopPropagation()
+            console.log(k1,k2,'k1k2');
+            
+             console.log('是否选择日期111');
                 // 日期范围
             if (this.range) {
                 if (this.rangeBegin.length == 0 || this.rangeEndTemp != 0) {
@@ -752,6 +753,7 @@ export default {
                     this.multiDays.push([this.year,this.month+1,this.days[k1][k2].day]);
                 }
                 this.days[k1][k2].selected = !this.days[k1][k2].selected
+                // this.multiDays.
                 this.$emit('select',this.multiDays)
             } else {
                 // 取消上次选中

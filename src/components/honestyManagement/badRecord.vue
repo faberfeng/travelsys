@@ -58,7 +58,7 @@
                             <td>{{item.name}}</td>
                             <td>{{item.company}}</td>
                             <td>{{item.mode}}</td>
-                            <td>{{timeChange(item.time)}}</td>
+                            <td>{{item.time}}</td>
                             <td>
                                 <el-tag style="width:80px;margin:2px;" v-for="tag in item.users" :key="tag.id">
                                         {{tag.userName}}
@@ -97,7 +97,7 @@
                         <div class="editBodyone"><label class="editInpText">事件 :</label><input class="inp" placeholder="请输入" v-model="eventName"/></div>
                         <div class="editBodytwo"><label class="editInpText">授权部门:</label><input class="inp" placeholder="请输入" v-model="companyName"/></div>
                         <div class="editBodytwo">
-                            <label class="editInpText">奖励方式 :</label>
+                            <label class="editInpText">惩罚方式 :</label>
                             <input class="inp" placeholder="请输入" v-model="modeName"/>
                              <!-- <select class="editSelect" v-model="mode" >
                                 <option v-for="(item,index) in goodList" :value="item.value" :key="index">{{item.label}}</option>
@@ -169,7 +169,7 @@ export default {
                 value:1,
                 label:'活动发起者'
             }],
-            onePerson:1,
+            onePerson:'',
             addDialog:false,
             mode:'',
             eventName:'',
@@ -299,7 +299,7 @@ export default {
                 'mode':this.modeName,
                 'name':this.eventName,
                 'remark':this.remark,
-                'time':this.evenTime,
+                'time':moment(this.evenTime).format('YYYY-MM-DD HH:mm:ss'),
                 'type':2,
                 'projId':this.projId,
                 'users':userData
@@ -360,7 +360,7 @@ export default {
             })
         },
         deleteBadRecord(id){
-            this.$confirm('你是否要删除该良好记录','提示',{
+            this.$confirm('你是否要删除该不良记录','提示',{
                 confirmButtonText:'确认',
                 concleButtonText:'取消',
                 type:'warning'
@@ -379,6 +379,9 @@ export default {
                     }
                 })
             })
+        },
+        editBadRecord(){
+
         },
         addCancle(){
             this.addDialog=false;

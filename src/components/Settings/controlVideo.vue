@@ -81,6 +81,25 @@
                         <button class="editBtnC" @click="addCancle">取消</button>
                     </div>
                 </el-dialog>
+
+                <el-dialog title="编辑视频监控" v-dialogDrag :visible.sync="editDialog" @close="editCancle">
+                    <div class="editBody">
+                        <div class="editBodyone"><label class="editInpText">摄像头名称 :</label><input class="inp" placeholder="请输入" v-model="videoName"/></div>
+                        <div class="editBodytwo"><label class="editInpText">摄像头地址 :</label><input class="inp" placeholder="请输入" v-model="videoUrl"/></div>
+                        <div class="editBodytwo">
+                            <label class="editInpText">危险源级别 :</label>
+                            <select class="editSelect" v-model="dangerLevels" >
+                                <option v-for="(item,index) in dangerousList" :value="item.name" :key="index">{{item.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="editVideoMakeSure()">确认</button>
+                        <button class="editBtnC" @click="editCancle">取消</button>
+                    </div>
+                </el-dialog>
+
                 <el-dialog title="添加危险源等级" v-dialogDrag :visible.sync="addDangerousDialog" @close="addDangerousCancle">
                     <div class="editBody">
                         <div class="editBodyone"><label class="editInpText">危险源名称 :</label><input class="inp" placeholder="请输入" v-model="dangerName"/></div>
@@ -90,7 +109,6 @@
                         <button class="editBtnC" @click="addDangerousCancle">取消</button>
                     </div>
                 </el-dialog>
-
         </div>
     </div>
 </template>
@@ -112,6 +130,7 @@ export default {
                 label:'A'
             }],
             addDialog:false,
+            editDialog:false,
             addDangerousDialog:false,
             videoName:'',
             videoUrl:'',
@@ -185,6 +204,12 @@ export default {
                     this.videoName='';
                     this.videoUrl='';
             }
+
+        },
+        editVideoMakeSure(){
+
+        },
+        editCancle(){
 
         },
         getCameraList(){

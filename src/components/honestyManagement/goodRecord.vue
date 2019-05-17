@@ -58,7 +58,7 @@
                             <td>{{item.name}}</td>
                             <td>{{item.company}}</td>
                             <td>{{item.mode}}</td>
-                            <td>{{timeChange(item.time)}}</td>
+                            <td>{{item.time}}</td>
                             <td>
                                 <el-tag style="width:80px;margin:2px;" v-for="tag in item.users" :key="tag.id">
                                         {{tag.userName}}
@@ -169,7 +169,7 @@ export default {
                 value:1,
                 label:'活动发起者'
             }],
-            onePerson:1,
+            onePerson:'',
             addDialog:false,
             mode:'',
             eventName:'',
@@ -298,7 +298,7 @@ export default {
                 'mode':this.modeName,
                 'name':this.eventName,
                 'remark':this.remark,
-                'time':this.evenTime,
+                'time':moment(this.evenTime).format('YYYY-MM-DD HH:mm:ss'),
                 'projId':this.projId,
                 'type':1,
                 'users':userData
