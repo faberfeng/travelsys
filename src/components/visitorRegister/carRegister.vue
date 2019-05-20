@@ -18,7 +18,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -54,7 +54,8 @@
                             <td>{{timeChange(item.enterTime)}}</td>
                             <td>{{timeChange(item.leaveTime)}}</td>
                             <td>
-                                <button class="actionBtn editBtn" @click="editCarResiger(item)"></button>
+                                <i v-if="!item.leaveTime" class="el-icon-remove-outline" title="车辆离开" @click="editCarResiger(item)"></i>
+                                <!-- <button class="actionBtn editBtn" @click="editCarResiger(item)"></button> -->
                                 <button class="actionBtn deleteBtn" @click="deleteCarResiger(item.id)"></button>
                             </td>
                         </tr>
@@ -150,6 +151,7 @@ export default {
             editId:'',
             editDialog:false,
             enterTime:'',
+            leaveTime:'',
         }
     },
     created(){
@@ -163,6 +165,7 @@ export default {
         vm.loadingTitle();
         vm.getCarTypeList();
         vm.getCarRegister();
+        this.leaveTime=new Date().getTime();
 
     },
     methods:{
@@ -245,13 +248,14 @@ export default {
         },
         editCarResiger(val){
             var vm=this;
-            vm.editDialog=true;
+            // vm.editDialog=true;
             vm.editId=val.id;
             vm.carNumber=val.carNumber;
             vm.carType=val.carType;
             vm.contactInfo=val.contactInfo;
             vm.contactUser=val.contactUser;
             vm.enterTime=val.enterTime
+            vm.editCarRegisterMakeSure();
 
         },
         deleteCarResiger(val){
@@ -289,7 +293,8 @@ export default {
                     "contactInfo":vm.contactInfo,
                     'enterTime':vm.enterTime,
                     "contactUser": vm.contactUser,
-                    "projId": vm.projId
+                    "projId": vm.projId,
+                    'leaveTime':vm.leaveTime
             }
             $.ajax({
                 url:this.BDMSUrl+'car/alterCarInfo',
@@ -301,7 +306,7 @@ export default {
                 data:JSON.stringify(data),
                 contentType:'application/json;charset=utf-8',
                 success:(response)=>{
-                    this.editDialog=false;
+                    // this.editDialog=false;
                     this.getCarRegister();
                     vm.carNumber="";
                     vm.contactInfo="";
@@ -612,6 +617,10 @@ li{
                                         cursor: pointer;
                                         margin-left: 10px;
 
+                                    }
+                                    .el-icon-remove-outline{
+                                        font-size: 20px;
+                                        cursor: pointer;
                                     }
                                     .deleteBtn{
                                         background: url('../../assets/delete.png') no-repeat 0 0;

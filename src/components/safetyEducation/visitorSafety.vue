@@ -11,7 +11,7 @@
                 <ul>
                     <li class="selectItem">
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <v2-datepicker format="YYYY-MM" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
                     <!-- <li class="selectItem">
@@ -24,8 +24,7 @@
             </div>
             <div class="wrapper_left">
                 <div class="wrapper_left_content">
-                    <ul>
-                        
+                    <ul class="wrapper_left_contentUl">
                         <li v-for="(item,index) in getVisitorInfoLists" :key="index">
                             <span class="one_Span"><i class="el-icon-success"></i>{{item.name}}</span>
                             <span class="two_Span"><label>告知人数：{{item.people}}</label></span>
@@ -196,7 +195,7 @@ export default {
                 method:'GET',
                 params:{
                     projId:this.projId,
-                    time:time
+                    time:moment(time).format('YYYY-MM')
                 },
                 headers:{
                     'token':this.token
@@ -223,7 +222,13 @@ export default {
             
         },
         changeDatePicker(){
-
+            // console.log(this.timeChange(this.selectTime,'this.selectTime'));
+            if(this.selectTime){
+                this.getVisitorInfo(this.selectTime);
+            }else{
+                this.getVisitorInfo()
+            }
+            
         },
         selectNameInfo(){
 
@@ -333,6 +338,29 @@ export default {
 }
 li{
     list-style: none;
+}
+/***********设置滚动条************/
+/* 设置滚动条的样式 */
+
+.wrapper_left_contentUl::-webkit-scrollbar {
+    width:7px !important;
+    height:50px;
+}
+/* 滚动槽 */
+.wrapper_left_contentUl::-webkit-scrollbar-track {
+    box-shadow: inset006pxrgba(0,0,0,0.5);
+    -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+    border-radius:10px;
+}
+/* 滚动条滑块 */
+.wrapper_left_contentUl::-webkit-scrollbar-thumb{
+    border-radius:10px;
+    background:rgba(0,0,0,0.1);
+    box-shadow: inset006pxrgba(0,0,0,0.5);
+    -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+}
+.wrapper_left_contentUl::-webkit-scrollbar-thumb:window-inactive {
+    background:rgba(255,0,0,0.4);
 }
 #content{
      width: 100%;
@@ -456,6 +484,9 @@ li{
                 .wrapper_left_content{
                     padding: 10px;
                     ul{
+                        height: 600px;
+                        overflow-x:hidden;
+                        overflow-y: auto;
                         li{
                             margin:10px;
                             height: 80px;

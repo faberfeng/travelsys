@@ -10,7 +10,7 @@
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                         <el-select v-model="onePerson" placeholder="请选择">
                                     <el-option
                                     v-for="item in personList"
@@ -19,16 +19,16 @@
                                     :value="item.value">
                                     </el-option>
                         </el-select>
-                    </li>
+                    </li> -->
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <v2-datepicker format="yyyy" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -263,10 +263,21 @@ export default {
         },
         //改变时间
         changeDatePicker(){
-
+            if(this.selectTime){
+                 this.getGoodRecord();
+            }else{
+                this.selectTime='';
+                this.getGoodRecord();
+            }
+           
         },
         selectNameInfo(){
-
+            if(this.selectTime){
+                 this.getGoodRecord();
+            }else{
+                this.selectTime='';
+                this.getGoodRecord();
+            }
         },
         buildGoodRecord(){
             this.addDialog=true;
@@ -344,7 +355,7 @@ export default {
         },
         getGoodRecord(){
             axios({
-                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.timeChangeByYears(this.selectTime)))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
                 method:'get',
                 params:{
                     // time:'',
@@ -361,6 +372,11 @@ export default {
 
                 }
             })
+        },
+        timeChangeByYears(val){
+            if(val){
+                return moment(val).format('YYYY')
+            }
         },
         deleteGoodRecord(id){
             this.$confirm('你是否要删除该良好记录','提示',{

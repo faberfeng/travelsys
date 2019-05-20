@@ -50,15 +50,15 @@
                         <div class="leftWrapper">
                             <div class="boxInp">
                                 <label class="wrapperLabel">姓名:</label>
-                                <input v-model="name" class="wrapperInp"/>
+                                <input v-model="name" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">民族:</label>
-                                <input v-model="nation" class="wrapperInp"/>
+                                <input v-model="nation" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">性别:</label>
-                                <select v-model="sex" class="wrapperInp" placeholder="请选择">
+                                <select v-model="sex" class="wrapperInp" :disabled="!editShow" placeholder="请选择">
                                     <option class="optionClass" v-for="item in sexOptions"
                                     :key="item.value"
                                     :value="item.value">
@@ -79,7 +79,7 @@
                                 <label class="wrapperLabel">出生年月:</label>
                                 <!-- <input v-model="birthday" class="wrapperInp"/> -->
                                 <span class="wrapperInp" style="position:relative;">
-                                    <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="birthday" width="100%" ></v2-datepicker>
+                                    <v2-datepicker format="yyyy-MM-DD" :disabled="!editShow" style="border:none;left:0px;top:3px;position:absolute;" v-model="birthday" width="100%" ></v2-datepicker>
                                 </span>
                                 <!-- <el-date-picker
                                     v-model="birthday"
@@ -90,7 +90,7 @@
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">文化程度:</label>
-                                <select v-model="education" class="wrapperInp" placeholder="请选择">
+                                <select v-model="education" :disabled="!editShow" class="wrapperInp" placeholder="请选择">
                                     <option class="optionClass" v-for="item in eduOptions"
                                     :key="item.value"
                                     :value="item.value">
@@ -101,39 +101,39 @@
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">专业:</label>
-                                <input v-model="profession" class="wrapperInp"/>
+                                <input v-model="profession" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">联系方式:</label>
-                                <input v-model="phone" class="wrapperInp"/>
+                                <input v-model="phone" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">住址:</label>
-                                <input v-model="address" class="wrapperInp"/>
+                                <input v-model="address" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">现住址:</label>
-                                <input v-model="registeredAddress" class="wrapperInp"/>
+                                <input v-model="registeredAddress" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">身份证号:</label>
-                                <input v-model="certificationNo" class="wrapperInp"/>
+                                <input v-model="certificationNo" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                             <div class="boxInp">
                                 <label class="wrapperLabel">职称:</label>
-                                <input v-model="technicalTitle" class="wrapperInp"/>
+                                <input v-model="technicalTitle" :readonly="!editShow" class="wrapperInp"/>
                             </div>
                         </div>
                         <div class="rightWrapper">
                             <div class="rightBox">
                                 <label class="wrapperLabel"></label>
                                 <span style="width:65%;display:inline-block;position:relative;height:132px;">
-                                    <span class="imgCircle" @click="clickUserImg()">
+                                    <span class="imgCircle" >
                                         <img v-if="avaterUri" :src="avaterUriFile"/>
-                                        <i v-if="!avaterUri" class="el-icon-circle-plus">
+                                        <i v-if="!avaterUri||editShow" class="el-icon-circle-plus" @click="clickUserImg()">
                                         </i>
                                         <label v-if="!avaterUri" style="display:block">上传头像</label>
-                                        <input type="file" ref="uploadUserImg" accept="images/*" @change="changeUserImg($event)" style="opacity:0">
+                                        <input type="file" ref="uploadUserImg"  accept="images/*" @change="changeUserImg($event)" style="opacity:0">
                                     </span>
                                 </span>
                             </div>
@@ -144,12 +144,13 @@
                             <div class="rightBox">
                                  <label class="wrapperLabel"></label>
                                   <span style="width:65%;display:inline-block;position:relative;height:140px;">
-                                    <span class="personCircle" @click="clickCertificate()">
+                                    <span class="personCircle"  @click="clickCertificate()">
+                                        <i v-if="!certificationPhoto||editShow" class="el-icon-upload"></i>
                                         <img v-if="certificationPhoto" :src="certificationPhoto">
-                                        <i v-if="!certificationPhoto" class="el-icon-upload"></i>
+                                        
                                         <label v-if="!certificationPhoto" style="display:block">上传身份证照片</label>
                                     </span>
-                                    <input type="file" ref="uploadCertificateImg" accept="images/*" @change="changeCertificateImg($event)" style="opacity:0">
+                                    <input type="file" ref="uploadCertificateImg"  accept="images/*" @change="changeCertificateImg($event)" style="opacity:0">
                                   </span>
                             </div>
                             <div class="rightBox">
@@ -158,10 +159,10 @@
                                 <span style="width:65%;display:inline-block;position:relative;height:140px;">
                                     <span class="personCircle" @click="clickstationCertificate()">
                                         <img v-if="stationCertiyPhoto" :src="stationCertiyPhoto">
-                                        <i v-if="!stationCertiyPhoto" class="el-icon-upload"></i>
+                                        <i v-if="!stationCertiyPhoto||editShow" class="el-icon-upload"></i>
                                         <label v-if="!stationCertiyPhoto" style="display:block">上传岗位证书照</label>
                                     </span>
-                                    <input type="file" ref="uploadStationCertificateImg" accept="images/*" @change="changestationCertiImg($event)" style="opacity:0">
+                                    <input type="file" ref="uploadStationCertificateImg"  accept="images/*" @change="changestationCertiImg($event)" style="opacity:0">
                                   </span>
                             </div>
                             <!-- <div class="rightBox">
@@ -169,7 +170,8 @@
                                 <input v-model="technicalTitle" class="wrapperInp"/>
                             </div> -->
                             <div class="makeBtn">
-                                <span class="btnSure" @click="personInfoMakeSure">确认</span>
+                                <span v-if="editShow" class="btnSure" @click="personInfoMakeSure">确认</span>
+                                <span v-if="!editShow" class="btnSure" @click="editPersonInfoMakeSure">编辑</span>
                             </div>
                         </div>
                     </div>
@@ -248,7 +250,7 @@
                                         </el-date-picker> -->
                                         <!-- <input class="wrapperInp"/> -->
                                         <span class="wrapperInp" style="position:relative">
-                                            <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="entryDate" width="100%" ></v2-datepicker>
+                                            <v2-datepicker format="yyyy-MM-DD" :disabled="getStaffWorkingInfoList==''?false:true" style="border:none;left:0px;top:3px;position:absolute;" v-model="entryDate" width="100%" ></v2-datepicker>
                                         </span>
                                     </div>
                                     <div class="boxInp">
@@ -511,6 +513,7 @@ export default {
     },
     data(){
         return{
+            editShow:false,
             projId:'',
             token:'',
             BDMSUrl:'',
@@ -654,7 +657,7 @@ export default {
         vm.timestamps=moment(new Date().getTime()).format('YYYY-MM');
         vm.name=vm.userName;
         vm.getAttendancyByUserId(vm.timestamps);
-        vm.attendInfo=vm.getAttendancyByMonth(vm.timestamps);
+       
         console.log(vm.attendInfo,'vm.attendInfo');
         vm.getStaffProfile();
         vm.getSincerityInfoByUserId();
@@ -662,6 +665,7 @@ export default {
         vm.getStaffWorkingInfo();
         vm.getStaffWorkingExperience();
         vm.avaterUriFile=vm.userImg;
+        vm.attendInfo=vm.getAttendancyByMonth(vm.timestamps);
         console.log(vm.userId,'vm.userId000');
         console.log('jdkfdkj')
     },
@@ -708,6 +712,8 @@ export default {
                         this.registeredAddress=this.getStaffProfileList.registeredAddress;
                         this.sex=this.getStaffProfileList.sex;
                         this.technicalTitle=this.getStaffProfileList.technicalTitle;
+                        this.certificationPhoto=this.BDMSUrl+this.getStaffProfileList.certificationPhoto;
+                        this.stationCertiyPhoto=this.BDMSUrl+this.getStaffProfileList.stationCertificate;
                         console.log(vm.getStaffProfileList,'vm.getStaffProfileList');
                     }
                 })
@@ -799,11 +805,14 @@ export default {
             })
 
         },
+        editPersonInfoMakeSure(){
+            this.editShow=true;
+        },
         personInfoMakeSure(){
             var vm=this;
             var formData=new FormData();
-            formData.append('file',this.cerfiticateImgList);
-            formData.append('file',this.stationCerfiticateImgList);
+            formData.append('certificationPhoto',this.cerfiticateImgList);
+            formData.append('stationCertificate',this.stationCerfiticateImgList);
             // var data={
             //             "address": this.address,
             //             "avaterUri": this.avaterUri,
@@ -849,6 +858,7 @@ export default {
                 data:formData
             }).then((response)=>{
                 if(response.data.cd==0){
+                    this.editShow=false;
                     this.getStaffProfile();
                 }
                 
@@ -1339,8 +1349,8 @@ ul,li{
                             position: absolute;
                             top:0px;
                             left:0px;
-                            width: 125px;
-                            height: 125px;
+                            width: 123px;
+                            height: 123px;
                         }
                         .el-icon-circle-plus{
                             font-size: 26px;
@@ -1362,8 +1372,8 @@ ul,li{
                             position: absolute;
                             top:0px;
                             left:0px;
-                            width: 250px;
-                            height: 140px;
+                            width: 248px;
+                            height: 138px;
                         }
                         // margin-left:-58px;
                         // margin-bottom: 10px;

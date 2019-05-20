@@ -10,7 +10,7 @@
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                         <el-select v-model="onePerson" placeholder="请选择">
                                     <el-option
                                     v-for="item in personList"
@@ -19,11 +19,11 @@
                                     :value="item.value">
                                     </el-option>
                         </el-select>
-                    </li>
+                    </li> -->
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <v2-datepicker format="yyyy" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
                     <li class="selectItem">
@@ -255,7 +255,17 @@ export default {
         },
         //改变时间
         changeDatePicker(){
-
+            if(this.selectTime){
+                this.getGoodRecord()
+            }else{
+                this.selectTime='';
+                this.getGoodRecord()
+            }
+        },
+        timeChangeByYears(val){
+            if(val){
+                return moment(val).format('YYYY')
+            }
         },
         addUserListMakeSure(){
             this.userLists.forEach((item)=>{
@@ -267,7 +277,12 @@ export default {
             this.addUserDialog=false;
         },
         selectNameInfo(){
-
+            if(this.selectTime){
+                this.getGoodRecord()
+            }else{
+                this.selectTime='';
+                this.getGoodRecord()
+            }
         },
          buildGoodRecord(){
             this.addDialog=true;
@@ -345,7 +360,7 @@ export default {
         },
         getGoodRecord(){
             axios({
-                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                url:this.BDMSUrl+'sincerity/getSincerityInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.timeChangeByYears(this.selectTime)))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
                 method:'get',
                 params:{
                     type:2,

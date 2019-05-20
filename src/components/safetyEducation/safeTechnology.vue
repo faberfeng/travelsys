@@ -10,7 +10,7 @@
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                         <el-select v-model="onePerson" placeholder="请选择">
                                     <el-option
                                     v-for="item in personList"
@@ -19,7 +19,7 @@
                                     :value="item.value">
                                     </el-option>
                         </el-select>
-                    </li>
+                    </li> -->
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
@@ -28,7 +28,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -96,6 +96,7 @@ export default {
         vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.loadingTitle();
         vm.getSafetyTechnology();
+        vm.timeStamp=new Date().getTime();
 
     },
     methods:{
@@ -142,10 +143,19 @@ export default {
             }
         },
         changeDatePicker(){
+            if(this.selectTime){
+                this.getSafetyTechnology(this.selectTime,this.selectName);
+            }else{
+                this.getSafetyTechnology(this.timeStamp,this.selectName);
+            }
 
         },
         selectNameInfo(){
-
+            if(this.selectTime){
+                    this.getSafetyTechnology(this.selectTime,this.selectName);
+            }else{
+                this.getSafetyTechnology(this.timeStamp,this.selectName);
+            }
         },
         buildSafeEcology(){
             this.buildSafeEducationShow=true;
@@ -158,7 +168,7 @@ export default {
             this.getSafetyTechnology();
             this.buildSafeEducationShow=false;
         },
-        getSafetyTechnology(){
+        getSafetyTechnology(time,title){
             var vm=this;
             axios({
                 url:this.BDMSUrl+'safety/getSafetyTechnology',
@@ -167,7 +177,8 @@ export default {
                 },
                 params:{
                     projId:this.projId,
-                   
+                    time:moment(time).format('YYYY-MM'),
+                    title:title
                 },
                 method:'get'
             }).then((response)=>{

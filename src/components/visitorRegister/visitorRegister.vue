@@ -18,7 +18,7 @@
                     </li>
                     <li class="selectItem">
                        <span class="title-right">
-                            <input type="text" v-model="selectName" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
+                            <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
@@ -68,8 +68,8 @@
                             </td>
                             <td>{{item.remark}}</td>
                             <td>
-                                <button class="actionBtn editBtn" @click="updateVisiter(item)"></button>
-                                <button class="actionBtn deleteBtn" @click="deleteVisiter(item.id)"></button>
+                                <i v-if="!item.leavetime" class="el-icon-remove-outline" title="访客离开" @click="updateVisiter(item)"></i>
+                                <button class="actionBtn deleteBtn" title="删除" @click="deleteVisiter(item.id)"></button>
                             </td>
                         </tr>
                     </tbody>
@@ -105,7 +105,8 @@
                         </div>
                         <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
                          <div class="editBodytwo"><label class="editInpText">单位名称 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
-                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="请输入人数" v-model="entourage"/></div>
+                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="姓名以'-'隔开(张三-李四)" v-model="entourage"/></div>
+                        <!-- <i class="el-icon-circle-plus" style="font-size:18px;cursor:pointer" @click="addPerson"></i> -->
                         <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
                         <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
                         <!-- <div class="editBodytwo"><label class="editInpText">门禁方式 :</label>
@@ -213,12 +214,13 @@ export default {
             deliverValue:"",
             safeNoticeShow:false,
             visitorId:'',
+            leavetime:'',
         }
     },
     filters:{
          timeChange(val){
             if(val){
-                return moment(val).format('YYYY-MM-DD');
+                return moment(val).format('YYYY-MM-DD HH:ss:mm');
             }
         }
     },
@@ -234,6 +236,7 @@ export default {
         this.getUserList();
         this.getVisitorInfo();
         this.getSafetyNotification();
+        this.leavetime=new Date().getTime()
 
     },
     methods:{
@@ -279,6 +282,32 @@ export default {
                 return value1 - value2;
             }
         },
+        addPerson(){
+
+        },
+        addCarRegisterMakeSure(){
+            var vm=this;
+            var data={
+                    "carNumber": vm.carInfo,
+                    "carType": 10,
+                    "contactInfo":vm.contactInfo,
+                    "contactUser": vm.entourage.split('-')[0],
+                    "projId": vm.projId
+            }
+            $.ajax({
+                url:this.BDMSUrl+'car/addCarInfo',
+                type:'post',
+                dataType:'json',
+                headers:{
+                    'token':this.token
+                },
+                data:JSON.stringify(data),
+                contentType:'application/json;charset=utf-8',
+                success:(response)=>{
+                        this.getVisitorInfo();
+                }
+            })
+        },
         addvisitorRecord(){
             var data={}
             var vm=this;
@@ -302,7 +331,8 @@ export default {
                 data:data
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getVisitorInfo();
+                    
+                    this.addCarRegisterMakeSure();
                     this.addDialog=false;
                     data={};
                     vm.carInfo='';
@@ -336,7 +366,8 @@ export default {
             this.icCardNo=item.icCardNo;
             this.mainVisitor=item.mainVisitor;
             this.remark=item.remark;
-            this.editDialog=true;
+            // this.editDialog=true;
+            this.editvisitorRecord();
         },
         editvisitorRecord(){
             var data={}
@@ -351,7 +382,9 @@ export default {
                 "icCardNo":vm.icCardNo,
                 "mainVisitor": vm.mainVisitor,
                 "projId": vm.projId,
-                "remark": vm.remark
+                "remark": vm.remark,
+                'isReturnCard':1,
+                'leavetime':moment(this.leavetime).format('YYYY-MM-DD HH:ss:mm')
             }
             axios({
                 url:this.BDMSUrl+'visitor/addVisitorInfo',
@@ -363,10 +396,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.getVisitorInfo();
-                    this.editDialog=false;
+                    // this.editDialog=false;
                     this.$message({
                         type:'info',
-                        message:'修改访客信息成功'
+                        message:'访客离开成功'
                     })
                 }
             })
@@ -466,6 +499,7 @@ export default {
         },
         //改变时间
         changeDatePicker(){
+
         },
         selectNameInfo(){
 
@@ -510,7 +544,6 @@ export default {
         },
         lookSafeVideoSuccess(){
             
-
         },
         getSafetyNotification(){
             axios({
@@ -758,6 +791,11 @@ li{
                                     }
                                     .deleteBtn{
                                         background: url('../../assets/delete.png') no-repeat 0 0;
+                                    }
+                                    .el-icon-remove-outline{
+                                        font-size: 20px;
+                                        cursor: pointer;
+                                        // color:#fff;
                                     }
                                     .editBtn{
                                         background: url('../../assets/edit.png') no-repeat 0 0;

@@ -50,7 +50,7 @@
                             <td>{{index+1}}</td>
                             <td>{{item.name}}</td>
                             <td>{{item.department}}</td>
-                            <td>{{item.kind}}</td>
+                            <td>{{item.kind.length==0?'/':item.kind}}</td>
                             <td>{{item.workingDay}}</td>
                             <td>{{item.restDay}}</td>
                             <td>{{item.lateDay}}</td>

@@ -25,7 +25,7 @@
                     <span>休息天数：9天</span>
                 </div>
                 <div class="canendBtn">
-                    <span class="spanBtn">编辑</span>
+                    <span class="spanBtn" @click="setWorkingDay">确认</span>
                 </div>
 
             </div>
@@ -142,7 +142,10 @@ export default {
             leaveTime:'',//下班打卡时间
             addTimeSettingDialog:false,
             BDMSUrl:'',
+            timeValues:'',
             getCheckOnTimeList:[],
+            timeList:[],
+            getWorkingDayList:[],
             //日历
              calendar1:{
                  multi:true,
@@ -183,14 +186,95 @@ export default {
         vm.userId = localStorage.getItem('userId');
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.getCheckOnTime();
+        this.getWorkingDay();
     },
     methods:{
         selectTime(value){
             console.log(value,'选择了当前时间');
+            this.timeValues=value;
             
+        },
+        setWorkingDay(){
+            this.timeValues.forEach((item)=>{
+                this.timeList.push({
+                    'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
+                    'isWorkingDay':1
+                })
+            })
+            // this.calendar1.value.forEach((item)=>{
+            //     this.timeValues.forEach((val)=>{
+            //         if(item==val){
+            //             this.timeList.push({
+            //                 'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
+            //                 'isWorkingDay':1
+            //             })
+            //         }else{
+            //             this.timeList.push({
+            //                 'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
+            //                 'isWorkingDay':0
+            //             })
+            //         }
+            //     })
+            // })
+            console.log(this.timeList,'this.timeList');
+            axios({
+                url:this.BDMSUrl+'attendancy/setWorkingDay',
+                headers:{
+                    'token':this.token
+                },
+                method:'post',
+                data:this.timeList,
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getWorkingDay();
+                }
+            })
+        },
+        //补零
+        addZero(val){
+            console.log(val.toString().length,val);
+            if(val.toString().length==1){
+                return '0'+val
+            }else{
+                return val
+            }
+        },
+        getWorkingDay(){
+            axios({
+                url:this.BDMSUrl+'attendancy/getWorkingDay',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getWorkingDayList=response.data.rt;
+                    // this.calendar1.value
+                    this.getWorkingDayList.forEach((item)=>{
+                        this.calendar1.value.push([parseInt(this.timesChange(item.id.checkDate).split('-')[0]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[1]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[2])]);
+                    })
+                    // console.log(this.calendar1.value,'this.calendar1.value');
+                }
+            })
+        },
+        timesChange(val){
+            return moment(val).format('YYYY-MM-DD')
+
         },
         timeSetting(){
             this.addTimeSettingDialog=true;
+        },
+        deleteZero(val){
+            if(val.toString().substr(0,1)=='0'){
+                return parseInt(val.toString().substr(1,1));
+            }else{
+                return parseInt(val);
+            }
         },
         editicCard(){
 

@@ -13,7 +13,7 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <v2-datepicker format="yyyy" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
                     <li class="selectItem">
@@ -187,8 +187,23 @@ export default {
         },
         //改变时间
         changeDatePicker(){
-            // this.getEvaluateInfo();
+            if(this.selectTime){
+                this.getEvaluateInfo();
+            }else{
+                this.selectTime='';
+                this.getEvaluateInfo();
+            }
+            // if(this.selectTime){
+            //     this.getSafetyTechnology(this.selectTime,this.selectName);
+            // }else{
+            //     this.getSafetyTechnology(this.timeStamp,this.selectName);
+            // }
 
+        },
+        timeChangeByYears(val){
+            if(val){
+                return moment(val).format('YYYY')
+            }
         },
         selectNameInfo(){
             this.getEvaluateInfo();
@@ -196,7 +211,7 @@ export default {
         getEvaluateInfo(){
             this.getEvaluateInfoLists=[];
             axios({
-                url:this.BDMSUrl+'sincerity/evaluateInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
+                url:this.BDMSUrl+'sincerity/evaluateInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.timeChangeByYears(this.selectTime)))+(this.selectName==''?'':('&userName='+this.selectName))+(this.onePerson==''?'':('&company='+this.onePerson)),
                 method:'get',
                 headers:{
                     'token':this.token

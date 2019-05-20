@@ -654,7 +654,7 @@ export default {
                     },
                     params:{
                         // projId:vm.projId,
-                        // queryParam:vm.userInfo
+                        name:vm.userInfo,
                         projectId:vm.projId
                     }
                 }).then((response)=>{

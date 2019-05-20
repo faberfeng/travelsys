@@ -133,6 +133,8 @@ export default {
             editDialog:false,
             addDangerousDialog:false,
             videoName:'',
+            videoId:'',
+            videoPosition:'',
             videoUrl:'',
             getCameraLists:[],
             // dangerListLength:1,
@@ -207,10 +209,32 @@ export default {
 
         },
         editVideoMakeSure(){
-
+            var formData=new FormData();
+            axios({
+                url:this.BDMSUrl+'camera/updateCamera',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.videoId,
+                    url:this.videoUrl,
+                    name:this.videoName,
+                    level:this.dangerLevels,
+                    position:this.videoPosition,
+                },
+                method:'post',
+                data:formData,
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getCameraList();
+                    this.editDialog=false;
+                    this.videoName='';
+                    this.videoUrl='';
+                }
+            })
         },
         editCancle(){
-
+            this.editDialog=false;
         },
         getCameraList(){
             var vm=this;
@@ -242,8 +266,13 @@ export default {
                     document.documentElement.scrollTop = 0;
             }
         },
-        editVideo(){
-
+        editVideo(val){
+            this.videoId=val.id;
+            this.videoName=val.name;
+            this.videoUrl=val.url;
+            this.editDialog=true;
+            this.videoPosition=val.position;
+            this.dangerLevels=val.level;
         },
 
         deleteVideo(id){

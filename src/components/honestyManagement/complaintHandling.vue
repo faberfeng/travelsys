@@ -10,7 +10,7 @@
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                         <el-select v-model="onePerson" placeholder="请选择">
                                     <el-option
                                     v-for="item in personList"
@@ -19,7 +19,7 @@
                                     :value="item.value">
                                     </el-option>
                         </el-select>
-                    </li>
+                    </li> -->
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
@@ -278,10 +278,20 @@ export default {
         },
         //改变时间
         changeDatePicker(){
-
+            if(this.selectTime){
+                this.getComplaintInfo()
+            }else{
+                this.selectTime='';
+                 this.getComplaintInfo()
+            }
         },
         selectNameInfo(){
-
+            if(this.selectTime){
+                this.getComplaintInfo()
+            }else{
+                this.selectTime='';
+                 this.getComplaintInfo()
+            }
         },
         clickInp(){
             this.$refs.fileRef.click();
@@ -366,13 +376,13 @@ export default {
         getComplaintInfo(){
             this.getComplaintInfoLists=[];
             $.ajax({
-                url:this.BDMSUrl+'sincerity/getComplaintInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.selectTime))+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectCompany==''?'':('&company='+this.selectCompany)),
+                url:this.BDMSUrl+'sincerity/getComplaintInfo?projId='+this.projId+(this.selectTime==''?'':('&time='+this.timeChangeByYears(this.selectTime)))+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectCompany==''?'':('&company='+this.selectCompany)),
                 headers:{
                     'token':this.token
                 },
                 type:'get',
                 success:(response)=>{
-                    if(response.cd==0){
+                    if(response.rt){
                         this.getComplaintInfoList=response.rt;
                         this.getComplaintInfoListLength=this.getComplaintInfoList.length;
                         if(this.getComplaintInfoListLength<11){
@@ -387,6 +397,11 @@ export default {
                     }
                 }
             })
+        },
+         timeChangeByYears(val){
+            if(val){
+                return moment(val).format('YYYY')
+            }
         },
         deleteComplain(id){
              this.$confirm('你是否要删除该投诉记录','提示',{
