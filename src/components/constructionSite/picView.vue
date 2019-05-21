@@ -340,6 +340,18 @@ export default {
             Y = position_temp.y;
 
             if(e.button == 0 || e.button == 2){
+
+                if(e.button == 2){
+                    if(this.editStatus2 == true && e.button == 2){
+                        this.drawCount = 0;
+                        this.drawing = false;
+                        this.editStatus = "move";
+                        this.sub_div.style.cursor = "default";
+                        this.Refresh();
+                        return;
+                    }
+                }
+
                 this.lastPostion = {x:X,y:Y};
                 
                     if(this.drawCount > 0 && this.drawing){ //  绘制标记
@@ -941,12 +953,6 @@ export default {
         },
         oncanvasmouseup(e){
             this.startMove = false;
-
-            if(this.editStatus2 == true){
-                this.drawing = false;
-                this.editStatus = "move"
-            }
-
             if(this.editStatus2 == true && this.Select_item.length > 0){
                 this.$emit('status_changed',true,this.SelectedList,"move");
             }
