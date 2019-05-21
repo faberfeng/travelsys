@@ -1,5 +1,5 @@
 <template>
-    <div  ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel">
+    <div  ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel" @keyup.enter="keyup_delete">
         
         <div id="pdfImport" ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" :rotate="R"></pdf>
@@ -91,6 +91,10 @@ export default {
         }
     },
     methods:{
+        keyup_delete(){
+            console.log("keyup_delete");
+            this.$emit('status_changed',true,this.SelectedList,"delete");
+        },
         Refresh_timer_fun(){
             
             // console.log(this.drawList);

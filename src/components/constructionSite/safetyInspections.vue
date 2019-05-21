@@ -1794,6 +1794,9 @@ export default {
         }
     },
     methods:{
+        // enter(){
+        //     console.log('enter000');
+        // },
          callback(e){
             // console.log(e.data,'e.data.command');
             switch(e.data.command){
