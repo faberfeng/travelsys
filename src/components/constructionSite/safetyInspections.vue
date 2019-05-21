@@ -3782,7 +3782,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
-            console.log(list,'list1111');
+            console.log(list,'list11110');
             // var list1=this.
             if(this.moveClick==false){
                      list.forEach((item)=>{
