@@ -7,23 +7,10 @@
             <i class="icon-sanjiao"></i>
         </div>
         <div class="topHeader">
-            <div id="item-box-file">
-                <!-- <router-link :to="'/constructionSite/safetyInspection'" class="label-item label-item-active">  
-                安全监测
-                </router-link>
-                <router-link :to="'/constructionSite/safetyCheckings'" class="label-item">  
-                安全检查  
-                </router-link>
-                <router-link :to="'/constructionSite/safetyRuning'" class="label-item">  
-                安全巡检  
-                </router-link>
-                <router-link :to="'/constructionSite/remoteVideo'" class="label-item">  
-                远程视频  
-                </router-link> -->
+            <!-- <div id="item-box-file">
                 <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                 </router-link>
-                
-            </div>
+            </div> -->
             <!-- v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" -->
             <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" >
                 <!-- v-show="exportReportEdit" -->
@@ -104,7 +91,7 @@
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"   @click="editSpot()">编辑点位</span>
                             <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
                             <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
-                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出保存</span>
+                            <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出图纸</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
                             <img id="fz_img_for_site1" src="./images/site1.png" style="display:none"/>
                         </div>
@@ -127,7 +114,7 @@
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText2']" @click="drawingText">文字</span>
-                            <span :class="[{'clickStyle':isClick4},'inputText2']" @click="enableMove" >移动</span>
+                            <!-- <span :class="[{'clickStyle':isClick4},'inputText2']" @click="enableMove" >移动</span> -->
                             <span :class="[{'clickStyle':isClick5},'inputText3']" @click="changeBroken()" >故障/修复</span>
                             <span :class="[{'clickStyle':isClick6},'inputText2']" @click="deleteDraw">删除</span>
                             <span :class="[{'clickStyle':isClick7},'inputText2']" style="margin-left:20px;" @click="saveDraw()">保存</span>
@@ -3737,6 +3724,7 @@ export default {
             this.editSpotShow=true;
             this.$refs.pic.Max_Select = 1000000;
             this.$refs.pic.Max_type = 1000000;
+            this.$refs.pic.setMoveStatus(true);
             // this.isClick=true;
         },
         returnData(array){
@@ -3909,7 +3897,7 @@ export default {
                 })
             }
            
-
+            this.$refs.pic.setMoveStatus(false);
 
         },
         cancleAll(){
@@ -3931,6 +3919,7 @@ export default {
             this.$refs.pic.Max_type = 2;
             this.startpointShow=false;
             this.isBindPoint=false;
+            this.$refs.pic.setMoveStatus(false);
         },
         checkboxChange(data){
             // console.log(data,'data');
@@ -7801,7 +7790,7 @@ export default {
 
                 }
                 .planeFigure{
-                    margin-top:26px;
+                    margin-top:15px;
                     .planeFigureHead{
                         height: 32px;
                         position: relative;

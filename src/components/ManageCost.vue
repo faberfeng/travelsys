@@ -960,6 +960,10 @@ export default {
                         this.$router.push({
                             path:this.firstGetSecondGradeList(this.moduleLists,'006','00604','/constructionSite/safetyInspection','00601','/constructionSite/safetyCheckings','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo')
                         })
+                    }else if(vm.navigationPath==='066'){
+                        this.$router.push({
+                            path:'/safetyInspection/safetyInspection'//基坑监测
+                        })
                     }else if(vm.navigationPath==='002'){
                         // vm.$router.push({
                         //     path:'/Drive/costover'//文档管理
@@ -1300,6 +1304,12 @@ export default {
                 // })
                 this.$router.push({
                     path:this.firstGetSecondGradeList(this.moduleLists,'006','00604','/constructionSite/safetyInspection','00601','/constructionSite/safetyCheckings','00602','/constructionSite/safetyRuning','00603','/constructionSite/remoteVideo')
+                })
+                this.navigationPath = tab.name;
+                sessionStorage.setItem('navigationPath',this.navigationPath)
+            }else if(tab.name === '066'){
+                this.$router.push({
+                    path:'/safetyInspection/safetyInspection'//基坑监测
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath)

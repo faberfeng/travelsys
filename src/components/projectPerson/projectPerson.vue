@@ -13,10 +13,10 @@
                         <label class="nameLabel">账号：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">岗位：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">工种：</label><label class="itemLabel">{{returnPosition(queryAttendancyRecordByUserList.positions)}}</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">成员类型：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">单位：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.groupName}}</label>
                     </li>
                 </ul>
                 <ul style="width:50%;height:inherit;float:right;">
@@ -31,13 +31,13 @@
                         </label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">本月考勤：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">本月考勤：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.absentDay}}天</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">出勤班次：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">出勤班次：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.presentDay}}天</label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">休息天数：</label><label class="itemLabel"></label>
+                        <label class="nameLabel">休息天数：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.restDay}}天</label>
                     </li>
 
                 </ul>
@@ -641,7 +641,8 @@ export default {
             specialOperationCertificate:'',
             technicalRecord:'',
             thirdLevelSecurityEducationCard:'',
-            attendInfo:''
+            attendInfo:'',
+            queryAttendancyRecordByUserList:'',
         }
     },
     created(){
@@ -665,7 +666,8 @@ export default {
         vm.getStaffWorkingInfo();
         vm.getStaffWorkingExperience();
         vm.avaterUriFile=vm.userImg;
-        vm.attendInfo=vm.getAttendancyByMonth(vm.timestamps);
+        // vm.attendInfo=vm.getAttendancyByMonth(vm.timestamps);
+        this.getPersonEnterInfo();
         console.log(vm.userId,'vm.userId000');
         console.log('jdkfdkj')
     },
@@ -684,6 +686,30 @@ export default {
                 return '投诉记录'
             }
 
+        },
+        returnPosition(val){
+            if(val.length==0){
+                return ''
+            }else{
+                return val
+            }
+        },
+        getPersonEnterInfo(){
+            axios({
+                url:this.BDMSUrl+'attendancy/queryAttendancyRecordByUser',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    date:this.timestamps+'-01'
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.queryAttendancyRecordByUserList=response.data.rt;
+                    console.log(this.queryAttendancyRecordByUserList,'this.queryAttendancyRecordByUserList');
+                }
+            })
         },
         getStaffProfile(){
             var vm=this;
@@ -860,6 +886,10 @@ export default {
                 if(response.data.cd==0){
                     this.editShow=false;
                     this.getStaffProfile();
+                    this.$message({
+                        type:'success',
+                        message:"个人信息修改成功"
+                    })
                 }
                 
             })

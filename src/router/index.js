@@ -344,6 +344,11 @@ const router = new Router({
           path:'/constructionSite/remoteVideo',
           name:'remoteVideo',
           component:resolve=>require(['@/components/constructionSite/remoteVideo'],resolve)
+        },
+        {
+          path:'/safetyInspection/safetyInspection',
+          name:'safetyInspection',
+          component:resolve=>require(['@/components/constructionSite/safetyInspections'],resolve)
         }
       ]
     },

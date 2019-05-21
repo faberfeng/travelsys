@@ -297,8 +297,8 @@ export default {
                 },
                 params:{
                     projectId:this.projId,
-                    enterTime:'1970-01-01'+'\0'+this.enterTime+':00',
-                    leaveTime:'1970-01-01'+'\0'+this.leaveTime+':00'
+                    enterTime:'1970-01-01'+' '+this.enterTime+':00',
+                    leaveTime:'1970-01-01'+' '+this.leaveTime+':00'
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
@@ -309,6 +309,7 @@ export default {
 
         },
         getCheckOnTime(){
+            this.getCheckOnTimeList=[];
             axios({
                 url:this.BDMSUrl+'attendancy/getCheckOnTime',
                 headers:{
