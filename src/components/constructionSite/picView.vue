@@ -1,5 +1,5 @@
 <template>
-    <div  ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel" @keyup.enter="keyup_delete">
+    <div id="picViewOutSide" ref="picViewOutSide" style="background-color:rgba(192,192,192,0);position:absolute;width:100%;height:100%" @mousedown="onmousedown" @contextmenu="oncontextmenu" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel" @keyup.enter="keyup_delete">
         
         <div id="pdfImport" ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">            
             <pdf id="pdfD" ref="pdfDocument" @loaded="load" @page-size="pageSize" :src="url" :rotate="R"></pdf>
@@ -55,6 +55,13 @@ export default {
         clearInterval(this.Refresh_timer);
     },
     mounted(){
+        var vm=this;
+        document.onkeydown = function(e) {
+            let key = window.event.keyCode;
+            if (key == 46) {
+                vm.deleteSubmit();
+            }
+        };
         
         this.drawStatus = "none";
         this.editStatus = "normal";
@@ -91,6 +98,9 @@ export default {
         }
     },
     methods:{
+        deleteSubmit(){
+            console.log('监听enter键盘');
+        },
         keyup_delete(){
             console.log("keyup_delete");
             this.$emit('status_changed',true,this.SelectedList,"delete");
@@ -957,7 +967,7 @@ export default {
         },
         oncanvasmouseup(e){
             this.startMove = false;
-            if(this.editStatus2 == true && this.Select_item.length > 0){
+            if(this.editStatus2 == true && this.SelectedList.length > 0){
                 this.$emit('status_changed',true,this.SelectedList,"move");
             }
             // this.editStatus = "normal";
