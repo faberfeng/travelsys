@@ -84,8 +84,8 @@
                         </div>
                         <div class="planeFigureHeadRight" v-show="!editSpotShow">
                             <!-- v-show="basePicEdit" -->
-                            <span v-if="isBindPoint"  class="bottomMap" @click="editPointNum()">编辑编号</span>
-                            <span v-if="isBindPoint" class="bottomMap" @click="bindPoint()">绑定</span>
+                            <!-- <span v-if="isBindPoint"  class="bottomMap" @click="editPointNum()">编辑编号</span>
+                            <span v-if="bindMorePoint"  class="bottomMap" @click="bindPoint()">绑定</span> -->
                             <span  :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
                             <!-- v-show="manageEdit" -->
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"   @click="editSpot()">编辑点位</span>
@@ -110,7 +110,8 @@
                             </span>
                             <!-- v-show="startpointShow" -->
                             <!-- <span :class="[{'clickStyle':isClick},'bottomMap']" @click="getBaseMapListBtn()">底图</span> -->
-                            
+                            <span v-if="isBindPoint" class="editNumSpot" @click="editPointNum()">编辑编号</span>
+                            <span v-if="bindMorePoint" class="singleSpot" @click="bindPoint()">绑定</span>
                             <span :class="[{'clickStyle':isClick1},'singleSpot']" @click="drawingOneSpot">单点</span>
                             <span :class="[{'clickStyle':isClick2},'singleSpot']" @click="drawingSpots">连续</span>
                             <span :class="[{'clickStyle':isClick3},'inputText2']" @click="drawingText">文字</span>
@@ -1023,6 +1024,7 @@ export default {
                 label: 'name'
             },
             isBindPoint:false,
+            bindMorePoint:false,
             loadings:false,
             typeSpotShow:false,
             sheetValue:'aaa',
@@ -2266,9 +2268,9 @@ export default {
             }
         },
         picView_status_changed(status,list){
-           
+           console.log(status,list,'list点中')
             this.listLength=list.length;
-            
+            this.bindMorePoint=status;
             if(this.listLength==1){
                 this.isBindPoint=true;
             }else{
@@ -2296,6 +2298,7 @@ export default {
                       
                     })
                 }
+                console.log(this.pointIds,'this.pointIds00');
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
@@ -3855,6 +3858,7 @@ export default {
                                         }
                                         this.startpointShow=false;
                                         this.isBindPoint=false;
+                                        this.bindMorePoint=false;
                                 }else if(response.data.cd=='-1'){
                                 
                                     this.$message({
@@ -3919,7 +3923,9 @@ export default {
             this.$refs.pic.Max_type = 2;
             this.startpointShow=false;
             this.isBindPoint=false;
+            this.bindMorePoint=false;
             this.$refs.pic.setMoveStatus(false);
+
         },
         checkboxChange(data){
             // console.log(data,'data');
@@ -4466,14 +4472,18 @@ export default {
                 this.bindSpotNumShow=false;
                 this.getAllMonitorPoint();
                 this.isBindPoint=false;
+                this.bindMorePoint=false;
             })
         },
         returnPlots(val){
-                var data='';
+                var data=[];
                 this.monitorPointInfo.forEach((item)=>{
-                    if(item.id==val){
-                        data=item.plotInfo
-                    }
+                    val.forEach((val)=>{
+                            if(item.id==val){
+                                data.push(item.plotInfo)
+                            }
+                    })
+                    
                 })
                 return data;
         },
@@ -4508,8 +4518,8 @@ export default {
             // })
             blist.push({
                     'itemId':this.drawItemId,
-                    'plotInfos':[this.returnPlots(this.pointId)],
-                    'pointGroupIds':[this.pointId],
+                    'plotInfos':this.returnPlots(this.pointIds),
+                    'pointGroupIds':this.pointIds,
                     'prefix':this.pointNameValue,
                     'startNo':this.pointNumValue
             });
@@ -4531,7 +4541,7 @@ export default {
                                 type:'success',
                                 message:'绑定监测点成功'
                             })
-                             this.$refs.pic.setDrawCancel();
+                            this.$refs.pic.setDrawCancel();
                             this.getMonitorMainTable();
                             this.getAllMonitorPoint();
                             if(this.picMark==true){
@@ -4539,9 +4549,9 @@ export default {
                                         this.getTagList();
                                     },400)
                                 }
-                                // this.startpointShow=false;
                                 this.bindInspectContentShow=false;
                                 this.isBindPoint=false;
+                                this.bindMorePoint=false;
                         }else if(response.data.cd=='-1'){
                             this.$message({
                                 type:'error',
@@ -8021,6 +8031,20 @@ export default {
                                 border-radius: 2px;
                                 cursor: pointer;
                             }
+                            .editNumSpot{
+                                display: inline-block;
+                                width: 75px;
+                                height: 25px;
+                                border:1px solid #f2f2f2;
+                                background: #f2f2f2;
+                                font-size: 14px;
+                                line-height: 24px;
+                                vertical-align: middle;
+                                color:#666666;
+                                border-radius: 2px;
+                                cursor: pointer;
+
+                            }
                             .singleSpot{
                                 display: inline-block;
                                 width: 52px;
@@ -8307,7 +8331,7 @@ export default {
                     
                 }
                 .inspectTable{
-                    margin-top:30px;
+                    margin-top:20px;
                     .inspectTableHead{
                         height: 32px;
                         .inspectTableHeadLeft{
