@@ -58,6 +58,7 @@ export default {
         
         this.drawStatus = "none";
         this.editStatus = "normal";
+        this.editStatus2 = false;
         this.ResolutionScale = 1.0;
         this.drawCount = 0;
         this.drawMaxCount = 0;
@@ -480,6 +481,188 @@ export default {
                             
                         }else{
                             // 选取元素
+                            
+                            if(this.editStatus2 == false){
+
+                                this.SelectedList = [];
+                                var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
+                                var red = selectColorID[0];
+                                var green = selectColorID[1];
+                                var blue = selectColorID[2];
+
+                                var SID = red + green * 256 + blue * 256 *256;
+
+                                // console.log(SID);
+
+                                if(selectColorID[3] != 255){
+                                    SID = 0;
+                                }
+
+                                if(SID < 1){
+                                    this.SelectedList = [];
+                                    this.Selected_typeNum_List = [];
+                                }
+
+                                /////////////////  Max_Select 为1特例 ////////////////
+
+                                if(this.Max_Select == 1){ 
+
+                                    this.SelectedList = [];
+                                    this.Selected_typeNum_List = [];
+
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        this.drawList[i].Selected = false;
+                                        if(this.drawList[i].SID == SID){
+                                            this.SelectedList.push(this.drawList[i]);
+                                            // this.SelectedList[0].Selected = true;
+                                            
+                                        }
+                                    }
+                                
+                                    if(SID > 0){
+                                        if(e.button == 2){
+                                            this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                            this.$refs.listItem.style.display = "block";
+                                            this.$refs.listItem.style.top = e.layerY + "px";
+                                            this.$refs.listItem.style.left = e.layerX  + "px";
+                                        }
+                                        this.$emit('status_changed',true,this.SelectedList);
+                                    }else{
+                                        this.$emit('status_changed',false,this.SelectedList);
+                                    }
+
+                                    this.Refresh();
+                                    return;
+                                
+                                }
+
+                                //////////////// Select_img_Mark 特例 /////////////////
+
+                                {
+                                    var find_Select_img_Mark = false;
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        if(this.drawList[i].SID == SID){
+                                            if(this.drawList[i].type == "Select_img_Mark"){
+                                                find_Select_img_Mark = true;
+                                            }
+                                        }
+                                    }
+
+                                    if(find_Select_img_Mark){
+
+                                        for(let i = 0; i < this.drawList.length;i++){
+                                            this.drawList[i].Selected = false;
+                                        }
+                                        
+                                        this.SelectedList = [];
+                                        this.Selected_typeNum_List = [];
+                                        // this.SelectedList.push(this.drawList[this.drawList.length - 1]);
+
+                                        for(let i = 0; i < this.drawList.length;i++){
+                                            if(this.drawList[i].SID == SID){
+                                                this.SelectedList.push(this.drawList[i]);
+                                            }
+                                        }
+                            
+
+                                        // this.SelectedList[0].Selected = true;
+
+                                        if(SID > 0){
+                                            if(e.button == 2){
+                                                this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                                this.$refs.listItem.style.display = "block";
+                                                this.$refs.listItem.style.top = e.layerY + "px";
+                                                this.$refs.listItem.style.left = e.layerX  + "px";
+                                            }
+                                            this.$emit('status_changed',true,this.SelectedList);
+                                        }else{
+                                            this.$emit('status_changed',false,this.SelectedList);
+                                        }
+
+                                        this.Refresh();
+                                        return;
+                                    }else{
+                                        let temp_SelectedList = this.SelectedList;
+                                        this.SelectedList = [];
+
+                                        for(let i = 0; i < this.drawList.length;i++){
+                                            this.drawList[i].Selected = false;
+                                        }
+
+                                        for(let i = 0; i < temp_SelectedList.length;i++){
+                                            if(temp_SelectedList[i].type != "Select_img_Mark"){
+                                                // temp_SelectedList[i].Selected = true;
+                                                this.SelectedList.push(temp_SelectedList[i]);
+                                            }
+                                        }
+
+                                    }
+
+                                    
+                                }
+
+                                ///////////////////////////////////////////////////////
+
+                                if(this.SelectedList.length < this.Max_Select){
+
+                                    for(let i = 0; i < this.drawList.length;i++){
+                                        this.drawList[i].Selected = false;
+                                        if(this.drawList[i].SID == SID){
+                                            // this.SelectedList.push(this.drawList[i]);
+                                            var find = false;
+                                            for(let j = 0;j < this.SelectedList.length;j++){
+                                                if(this.SelectedList[j].SID == SID){
+                                                    find = true;
+                                                }
+                                            }
+
+                                            var typeNum_enable = true;
+
+                                            if(this.Selected_typeNum_List.length >= this.Max_type){
+                                                
+                                                typeNum_enable = false;
+
+                                                for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                                    if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                        typeNum_enable = true;
+                                                    }
+                                                }
+
+                                                
+                                            }else{
+                                                let find_type = false;
+
+                                                for(let j = 0; j < this.Selected_typeNum_List.length;j++){
+                                                    if(this.Selected_typeNum_List[j] == this.drawList[i].typeNum){
+                                                        find_type = true;
+                                                    }
+                                                }
+                                                if(!find_type){this.Selected_typeNum_List.push(this.drawList[i].typeNum);}
+                                            }
+
+                                            if(!find && typeNum_enable){
+                                                this.SelectedList.push(this.drawList[i]);
+                                            }
+                                        }
+                                    }
+
+                                    for(let i = 0; i < this.SelectedList.length;i++){
+                                        // this.SelectedList[i].Selected = true;
+                                    }
+
+                                    if(SID > 0){
+                                        this.$emit('status_changed',true,this.SelectedList);
+                                    }else{
+                                        this.$emit('status_changed',false,this.SelectedList);
+                                    }
+
+                                    this.Refresh();
+                                }
+
+
+                                return;
+                            } 
+
                             var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
                             var red = selectColorID[0];
                             var green = selectColorID[1];
@@ -665,7 +848,7 @@ export default {
 
                             if(this.editStatus == "move" && SID != 0){   //  移动标记
                                 
-                                if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
+                                // if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
                                     
                                     var center={x:X,y:Y};
 
@@ -675,7 +858,9 @@ export default {
                                     }
 
                                     this.startMove = true;
-                                }
+                                    
+                                    
+                                // }
                             }
 
                             this.SelectedList_last_length = this.SelectedList.length;
@@ -756,6 +941,11 @@ export default {
         },
         oncanvasmouseup(e){
             this.startMove = false;
+
+            if(this.editStatus2 == true){
+                this.drawing = false;
+                this.editStatus = "move"
+            }
             // this.editStatus = "normal";
         },
         onmousemove(e){
@@ -2367,6 +2557,12 @@ export default {
             this.editStatus = "normal";
             this.drawing = false;
             this.needChangeBroken = false;
+
+            if(this.editStatus2 == true){
+                this.drawing = false;
+                this.editStatus = "move";
+            }
+
         },
         setHeader(prefix,startNo,value){
             this.prefix = prefix;
@@ -2449,10 +2645,18 @@ export default {
             this.$refs.number_input.style.display = "none";
 
         },
-        setMoveStatus(){
-            this.editStatus = "move";
-            this.sub_div.style.cursor = "default";
-            this.drawing = false;
+        setMoveStatus(enable){
+            
+            console.log(enable);
+            this.editStatus2 = enable;
+
+            if(enable == false){
+                this.editStatus = "normal";
+            }else{
+                 this.editStatus = "move";
+            }
+            // this.sub_div.style.cursor = "default";
+            // this.drawing = false;
         },
         deleteDraw(){
             if(this.SelectedList.length > 0){
