@@ -295,22 +295,7 @@
                             value-format="yyyy-MM-dd">                         
                         </el-date-picker>
                         <span class="searchBtn" @click="makeSureData1()">确认</span>
-
-                        <!-- <el-date-picker
-                            v-model="startValue"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-
-                         <el-date-picker
-                            v-model="endValue"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker> -->
                     </div>
-                    <!-- <div v-if="searchSpotChangeLineShow">
-                        <vue-highcharts  id="searchSpotChangeLine" style="max-height:900px"  :options="searchOptionSpotChangeLine" ref="searchSpotChangeLine"></vue-highcharts>
-                    </div> -->
                     <div v-if="spotChangeLineShow1">
                         <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                     </div>
@@ -2149,11 +2134,7 @@ export default Vue.component('commonDetail',{
                         })
                         var min=this.getMinValue(this.elevationYlist1)?this.getMinValue(this.elevationYlist1):0;
                         var max=this.getMaxValue(this.elevationYlist1)?this.getMaxValue(this.elevationYlist1):0;
-                        //  console.log(min,'min');
-                        //  console.log(max,'max');
                         var middle=(min+max)/2;
-                        // this.optionSpotChangeLine1.yAxis.min=(3*min-2*max);
-                        // this.optionSpotChangeLine1.yAxis.max=(3*max-2*min);
                         this.spotChangeLineShow1=true;
                         setTimeout(()=>{
                             let spotChangeLineChart=this.$refs.spotChangeLine1;
@@ -2168,10 +2149,8 @@ export default Vue.component('commonDetail',{
                     
                     this.startValue='';
                     this.endValue='';
-                    
                 }
             })
-
         },
         //获取30天曲线图（水平位移）
         getPointHorizontalShiftChartData(){
