@@ -946,6 +946,10 @@ export default {
                 this.drawing = false;
                 this.editStatus = "move"
             }
+
+            if(this.editStatus2 == true && this.Select_item.length > 0){
+                this.$emit('status_changed',true,this.SelectedList,"move");
+            }
             // this.editStatus = "normal";
         },
         onmousemove(e){
@@ -2647,8 +2651,8 @@ export default {
         },
         setMoveStatus(enable){
             
-            console.log(enable);
             this.editStatus2 = enable;
+            this.SelectedList = [];
 
             if(enable == false){
                 this.editStatus = "normal";
