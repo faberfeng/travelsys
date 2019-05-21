@@ -1799,12 +1799,6 @@ export default {
         this.curTime();
         this.curTime1();
         this.getUserInfo();
-        document.onkeydown = function(e) {
-            let key = window.event.keyCode;
-            if (key == 46) {
-                vm.submit();
-            }
-        };
         // setTimeout(()=>{
             
         // },200)
@@ -1890,9 +1884,6 @@ export default {
         }
     },
     methods:{
-        submit(){
-            console.log('监听enter键盘');
-        },
          callback(e){
             // console.log(e.data,'e.data.command');
             switch(e.data.command){
@@ -2468,6 +2459,11 @@ export default {
                 }
                 if(this.editSpotShow==false){
                     this.getAllCurve(this.plotGroupOne)
+                }
+                if(move=='move'){
+                    this.moveClick=true;
+                }else{
+                    this.moveClick=false;
                 }
             }
         },
