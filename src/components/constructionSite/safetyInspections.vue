@@ -191,8 +191,8 @@
                             <thead>
                             <tr>
                                 <th rowspan="2">序号</th>
-                                <th rowspan="2">监测类型</th>
-                                <th rowspan="2">类型标记</th>
+                                <!-- <th rowspan="2">监测类型</th>
+                                <th rowspan="2">类型标记</th> -->
                                 <th rowspan="2">监测内容</th>
                                 <th rowspan="2">简写</th>
                                 <th rowspan="2">测点数</th>
@@ -213,8 +213,8 @@
                             <tbody>
                                 <tr v-for="(item,index) in monitorMainTableList1" :key="index">
                                     <td v-text="index+1"></td>
-                                    <td>{{item.type|monitorTypeChange()}}</td>
-                                    <td>{{item.sign}}</td>
+                                    <!-- <td>{{item.type|monitorTypeChange()}}</td>
+                                    <td>{{item.sign}}</td> -->
                                     <td v-text="item.name"></td>
                                     <td v-text="item.logogram"></td>
                                     <td v-text="item.count"></td>
@@ -3782,7 +3782,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
-            console.log(list,'list1111');
+            console.log(list,'list11110');
             // var list1=this.
             if(this.moveClick==false){
                      list.forEach((item)=>{
@@ -4592,6 +4592,9 @@ export default {
                 data:data,
             }).then((response)=>{
                  vm.dataLists=response.data.rt;
+                //  vm.dataLists.forEach((item)=>{
+                //      item.name=item.name.replace('-0','')
+                //  })
                 //  console.log(vm.dataLists,'vm.dataList');
                  this.monitorPointInfo.forEach((item)=>{
                       var a=[]
@@ -6379,6 +6382,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorMainTableList=response.data.rt;
+                    // this.monitorMainTableList.forEach((item)=>{
+                    //     item.recentPointName=item.recentPointName.replace('-0','');
+                    //     item.recentPointName=item.recentPointName.replace('-0','');
+                    // })
                     this.monitorMainTableListLength=response.data.rt.length;
                      if(this.monitorMainTableListLength<11){
                         for(var i=0;i<this.monitorMainTableListLength;i++){
