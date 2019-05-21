@@ -58,6 +58,7 @@ export default {
         
         this.drawStatus = "none";
         this.editStatus = "normal";
+        this.editStatus2 = false;
         this.ResolutionScale = 1.0;
         this.drawCount = 0;
         this.drawMaxCount = 0;
@@ -480,6 +481,11 @@ export default {
                             
                         }else{
                             // 选取元素
+                            
+                            if(this.editStatus2 == false){
+                                return;
+                            } 
+
                             var selectColorID = this.drawcontextSelect.getImageData(e.layerX ,  e.layerY, 1, 1).data;
                             var red = selectColorID[0];
                             var green = selectColorID[1];
@@ -665,7 +671,7 @@ export default {
 
                             if(this.editStatus == "move" && SID != 0){   //  移动标记
                                 
-                                if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
+                                // if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
                                     
                                     var center={x:X,y:Y};
 
@@ -675,7 +681,9 @@ export default {
                                     }
 
                                     this.startMove = true;
-                                }
+                                    
+                                    
+                                // }
                             }
 
                             this.SelectedList_last_length = this.SelectedList.length;
@@ -756,6 +764,11 @@ export default {
         },
         oncanvasmouseup(e){
             this.startMove = false;
+
+            if(this.editStatus2 == true){
+                this.drawing = false;
+                this.editStatus = "move"
+            }
             // this.editStatus = "normal";
         },
         onmousemove(e){
@@ -2367,6 +2380,12 @@ export default {
             this.editStatus = "normal";
             this.drawing = false;
             this.needChangeBroken = false;
+
+            if(this.editStatus2 == true){
+                this.drawing = false;
+                this.editStatus = "move";
+            }
+
         },
         setHeader(prefix,startNo,value){
             this.prefix = prefix;
@@ -2449,10 +2468,18 @@ export default {
             this.$refs.number_input.style.display = "none";
 
         },
-        setMoveStatus(){
-            this.editStatus = "move";
-            this.sub_div.style.cursor = "default";
-            this.drawing = false;
+        setMoveStatus(enable){
+            
+            console.log(enable);
+            this.editStatus2 = enable;
+
+            if(enable == false){
+                this.editStatus = "normal";
+            }else{
+                 this.editStatus = "move";
+            }
+            // this.sub_div.style.cursor = "default";
+            // this.drawing = false;
         },
         deleteDraw(){
             if(this.SelectedList.length > 0){
