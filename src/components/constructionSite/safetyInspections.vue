@@ -186,7 +186,7 @@
                             <!-- v-show="editInspectWordEdit" -->
                         </div>
                     </div>
-                    <div class="inspectTableBody">
+                    <div class="inspectTableBody" id="inspect_TableBody">
                         <table class="inspectTableList" border="1" cellspacing="0" width="100%">
                             <thead>
                             <tr>
@@ -244,14 +244,14 @@
                         </table>
 
                     </div>
-                    <div class="tableBodyPagination">
+                    <!-- <div class="tableBodyPagination">
                         <div class="tableBodyPaginationLeft">
                             <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px">最新数据：</label><label style="color:#333;font-size:14px;line-height:62px">{{nowDate}}</label></span>
-                            <!-- <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
+                            <span class="leftTxtOne"><label style="color:#999;font-size:14px;line-height:62px;display:inline-block;margin-left:50px;">报警岗位：</label>
                                 <el-select v-model="positionValue" @change="positionChange()"><el-option v-for="(item,index) in positionList" :label="item.posName" :key="index" :value="item.id"></el-option></el-select>
                             </span>
-                            <span class="leftTxtOne"><label class="leftTxtOneBtn"  @click="previewAlert()">发送报警短信</label></span> -->
-                            <!-- style="color:#fc3439;font-size:14px;line-height:62px;cursor:pointer;" -->
+                            <span class="leftTxtOne"><label class="leftTxtOneBtn"  @click="previewAlert()">发送报警短信</label></span>
+                            
                         </div>
                         <div class="tableBodyPaginationRight">
                             <el-pagination class="elPagination"
@@ -265,7 +265,7 @@
                                 :total="monitorMainTableListLength">
                             </el-pagination>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>
@@ -988,6 +988,22 @@
                         <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:800px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
                     </div>
             </el-dialog>
+            <el-dialog width="1000px" title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
+                    <div style="margin-bottom:20px;">
+                        <el-date-picker
+                            v-model="selectValue1"
+                            type="datetimerange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd">                         
+                        </el-date-picker>
+                        <span class="searchBtn" @click="makeSureData1()">确认</span>
+                    </div>
+                    <div v-if="spotChangeLineShow1">
+                        <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
+                    </div>
+            </el-dialog>
         </div>
         <!-- <button @click="getPdf()">按钮</button> -->
     </div>
@@ -1018,6 +1034,7 @@ export default {
                 this.callback(evt)},true
         );
         return{
+            spotChangeLineShow1:false,
             singleData:{},
             defaultProps:{
                 children:'children',
@@ -1290,6 +1307,7 @@ export default {
             ],
             monitorMainTableList:'',//监测内容总表
             monitorMainTableList1:[],//
+            table_count:'',
             pageSize:10,
             pageNum:1,
             pageNum1:1,
@@ -1383,6 +1401,63 @@ export default {
             selectValue:'',
             startValue:'',
             endValue:'',
+            selectValue1:'',
+            optionSpotChangeLine1:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                            min:4268.5,
+                            max:43403.3542,
+                                title: {
+                                    text: '数量'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                                // tickPixelInterval:1000
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            },
             optionMoreSpotChangeLine:{
                         chart: {
                             type: 'spline',
@@ -1605,6 +1680,11 @@ export default {
                      name:'坑外承压水位',
                      type:3
                  },
+                 {
+                     value:'SW',
+                     name:'坑外潜水水位',
+                     type:3
+                 },
                 {
                     value:'W',
                     name:'围护顶竖向及水平位移',
@@ -1691,6 +1771,16 @@ export default {
             selectTypeTagList:[],
             dataList:[],
             dataLists:[],
+            acquisitionTimeXlist1:[],
+            elevationYlist1:[],
+            startValue1:'',
+            endValue1:'',
+            getAllCurveList:[],
+            getAllCurveId:'',
+            startValue1:'',
+            endValue1:'',
+            // getAllCurveList:'',
+            getAllCurveName:'',
         }
     },
     created(){
@@ -1708,7 +1798,13 @@ export default {
         // this.getPositionList();
         this.curTime();
         this.curTime1();
-         this.getUserInfo();
+        this.getUserInfo();
+        document.onkeydown = function(e) {
+            let key = window.event.keyCode;
+            if (key == 46) {
+                vm.submit();
+            }
+        };
         // setTimeout(()=>{
             
         // },200)
@@ -1794,9 +1890,9 @@ export default {
         }
     },
     methods:{
-        // enter(){
-        //     console.log('enter000');
-        // },
+        submit(){
+            console.log('监听enter键盘');
+        },
          callback(e){
             // console.log(e.data,'e.data.command');
             switch(e.data.command){
@@ -1981,6 +2077,68 @@ export default {
             })
            
            
+        },
+        spotChangeLineCancle1(){
+            this.spotChangeLineShow1=false;
+        },
+        makeSureData1(){
+            this.getAllCurve(this.getAllCurveId)
+        },
+         getAllCurve(id){
+            var vm=this;
+            this.acquisitionTimeXlist1=[];
+            this.elevationYlist1=[];
+            this.startValue1='';
+            this.endValue1='';
+            this.optionSpotChangeLine1.yAxis.min=undefined;
+            this.optionSpotChangeLine1.yAxis.max=undefined;
+            this.getAllCurveId=id;
+            this.getAllCurveList=[];
+            if(this.selectValue1){
+                 this.startValue1=this.selectValue1[0];
+                this.endValue1=this.selectValue1[1];
+            }
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:id,
+                    startDate:this.startValue1,
+                    endDate:this.endValue1
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getAllCurveList=response.data.rt;
+                    // console.log(this.getAllCurveList,'this.getAllCurveList');
+                    if(this.getAllCurveList.length>0){
+                            this.getAllCurveName=this.getAllCurveList[0].pointName;
+                    }
+                        this.getAllCurveList.forEach((item)=>{
+                            this.acquisitionTimeXlist1.push(this.timeChangeMethod(item.collectTime))
+                            this.elevationYlist1.push(item.data)
+                        })
+                        var min=this.getMinValue(this.elevationYlist1)?this.getMinValue(this.elevationYlist1):0;
+                        var max=this.getMaxValue(this.elevationYlist1)?this.getMaxValue(this.elevationYlist1):0;
+                        var middle=(min+max)/2;
+                        this.spotChangeLineShow1=true;
+                        setTimeout(()=>{
+                            let spotChangeLineChart=this.$refs.spotChangeLine1;
+                            spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+                            spotChangeLineChart.removeSeries();
+                            spotChangeLineChart.addSeries({name:this.getAllCurveName,data:this.elevationYlist1});
+                            spotChangeLineChart.hideLoading();
+                            spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist1});
+                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
+                        },200)
+                    
+                    this.startValue1='';
+                    this.endValue1='';
+                }
+            })
         },
          esChange(val){
              this.esList.forEach((item)=>{
@@ -2270,8 +2428,8 @@ export default {
                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
             }
         },
-        picView_status_changed(status,list){
-           console.log(status,list,'list点中')
+        picView_status_changed(status,list,move,value){
+           console.log(status,list,move,value,'list点中')
             this.listLength=list.length;
             this.bindMorePoint=status;
             if(this.listLength==1){
@@ -2284,6 +2442,8 @@ export default {
                 this.plotGroup=list[0].pointGroupData;
                 
                 this.plotGroupOne=list[0].pointGroupData[0].id;
+                console.log(this.plotGroupOne,'this.plotGroupOne');
+
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
                 this.broken=list[0].isBroken;
@@ -2305,10 +2465,11 @@ export default {
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
-                  
+                }
+                if(this.editSpotShow==false){
+                    this.getAllCurve(this.plotGroupOne)
                 }
             }
-           
         },
         timeChangeMethod1(val) {
             return moment(val).format("YYYY/MM/DD");
@@ -6390,21 +6551,28 @@ export default {
                     //     item.recentPointName=item.recentPointName.replace('-0','');
                     // })
                     this.monitorMainTableListLength=response.data.rt.length;
-                     if(this.monitorMainTableListLength<11){
-                        for(var i=0;i<this.monitorMainTableListLength;i++){
-                            this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                        }
-                    }else{
-                        for(var i=0;i<10;i++){
-                            this.monitorMainTableList1.push(this.monitorMainTableList[i])
-                        }
-                    }
+                    this.monitorMainTableList1=this.monitorMainTableList;
+                    //  if(this.monitorMainTableListLength<11){
+                    //     for(var i=0;i<this.monitorMainTableListLength;i++){
+                    //         this.monitorMainTableList1.push(this.monitorMainTableList[i])
+                    //     }
+                    // }else{
+                    //     for(var i=0;i<10;i++){
+                    //         this.monitorMainTableList1.push(this.monitorMainTableList[i])
+                    //     }
+                    // }
                   
                     // this.drawItemId=this.monitorMainTableList[0].id;
+                    this.table_count=document.querySelector('#inspect_TableBody');
+                    this.table_count.addEventListener('scroll',this.scrollHandle())
                 }
             })
-
         },
+        scrollHandle(){
+            var scrollTop=this.table_count.scrollTop;
+            this.table_count.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
+        },
+
         enter(val){
             this.hoverId=val;
         },
@@ -8404,6 +8572,8 @@ export default {
                                 }
                             }
                             tbody{
+                                height: 50px;
+                                overflow: auto;
                                 tr{
                                     .red{
                                         color: red;
