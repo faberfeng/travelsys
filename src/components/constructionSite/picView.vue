@@ -9,7 +9,7 @@
             <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
             <div ref="listItem" style="position:absolute;top:0px;left:0px;border: 1px solid #000000;background:#ffffff">
                 <ul>
-                    <li v-for="(item,index) in pointGroupDataList" :key="index">
+                    <li style="cursor:pointer;text-align:left" v-for="(item,index) in pointGroupDataList" :key="index" @click="itemOnCleck(item)">
                         <span>{{item.name}} - {{item.data}}</span>
                     </li>
                 </ul>
@@ -98,6 +98,18 @@ export default {
         }
     },
     methods:{
+        itemOnCleck(e){
+            // console.log(e);
+
+            var obj = {pointGroupData:[]};
+            obj.pointGroupData.push(e);
+            this.SelectedList = [];
+            this.SelectedList.push(obj);
+
+            this.$emit('status_changed',true,this.SelectedList);
+
+            this.$refs.listItem.style.display = "none";
+        },
         deleteSubmit(){
             this.$emit('status_changed',true,this.SelectedList,"","delete");
         },
@@ -547,8 +559,9 @@ export default {
                                             this.$refs.listItem.style.display = "block";
                                             this.$refs.listItem.style.top = e.layerY + "px";
                                             this.$refs.listItem.style.left = e.layerX  + "px";
+                                        }else{
+                                            this.$emit('status_changed',true,this.SelectedList);
                                         }
-                                        this.$emit('status_changed',true,this.SelectedList);
                                     }else{
                                         this.$emit('status_changed',false,this.SelectedList);
                                     }
@@ -595,8 +608,9 @@ export default {
                                                 this.$refs.listItem.style.display = "block";
                                                 this.$refs.listItem.style.top = e.layerY + "px";
                                                 this.$refs.listItem.style.left = e.layerX  + "px";
+                                            }else{
+                                                this.$emit('status_changed',true,this.SelectedList);
                                             }
-                                            this.$emit('status_changed',true,this.SelectedList);
                                         }else{
                                             this.$emit('status_changed',false,this.SelectedList);
                                         }
@@ -673,7 +687,14 @@ export default {
                                     }
 
                                     if(SID > 0){
-                                        this.$emit('status_changed',true,this.SelectedList);
+                                        if(e.button == 2){
+                                            this.pointGroupDataList =this.SelectedList[this.SelectedList.length - 1].pointGroupData;
+                                            this.$refs.listItem.style.display = "block";
+                                            this.$refs.listItem.style.top = e.layerY + "px";
+                                            this.$refs.listItem.style.left = e.layerX  + "px";
+                                        }else{
+                                         this.$emit('status_changed',true,this.SelectedList);
+                                        }
                                     }else{
                                         this.$emit('status_changed',false,this.SelectedList);
                                     }
@@ -725,8 +746,9 @@ export default {
                                         this.$refs.listItem.style.display = "block";
                                         this.$refs.listItem.style.top = e.layerY + "px";
                                         this.$refs.listItem.style.left = e.layerX  + "px";
+                                    }else{
+                                        this.$emit('status_changed',true,this.SelectedList);
                                     }
-                                    this.$emit('status_changed',true,this.SelectedList);
                                 }else{
                                     this.$emit('status_changed',false,this.SelectedList);
                                 }
@@ -773,8 +795,9 @@ export default {
                                             this.$refs.listItem.style.display = "block";
                                             this.$refs.listItem.style.top = e.layerY + "px";
                                             this.$refs.listItem.style.left = e.layerX  + "px";
+                                        }else{
+                                            this.$emit('status_changed',true,this.SelectedList);
                                         }
-                                        this.$emit('status_changed',true,this.SelectedList);
                                     }else{
                                         this.$emit('status_changed',false,this.SelectedList);
                                     }
@@ -857,8 +880,9 @@ export default {
                                         this.$refs.listItem.style.top = e.layerY + "px";
                                         this.$refs.listItem.style.left = e.layerX  + "px";
 
+                                    }else{
+                                        this.$emit('status_changed',true,this.SelectedList);
                                     }
-                                    this.$emit('status_changed',true,this.SelectedList);
                                 }else{
                                     this.$emit('status_changed',false,this.SelectedList);
                                 }
@@ -998,7 +1022,7 @@ export default {
         },
         onwheel(e){
 
-            if(e.shiftKey){
+            // if(e.shiftKey){
                 e.preventDefault();
                 
                 if(e.deltaY < 0){
@@ -1008,7 +1032,7 @@ export default {
 
                 }
                 this.Refresh();
-            }
+            // }
             
         },
         size_R(){
