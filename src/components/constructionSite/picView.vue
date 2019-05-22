@@ -99,11 +99,7 @@ export default {
     },
     methods:{
         deleteSubmit(){
-            console.log('监听enter键盘');
-        },
-        keyup_delete(){
-            console.log("keyup_delete");
-            this.$emit('status_changed',true,this.SelectedList,"delete");
+            this.$emit('status_changed',true,this.SelectedList,"","delete");
         },
         Refresh_timer_fun(){
             
