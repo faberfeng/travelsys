@@ -3885,6 +3885,8 @@ export default {
         editSpot(){
             var vm=this;
             this.editSpotShow=true;
+            this.isBindPoint=false;
+            this.bindMorePoint=false;
             this.$refs.pic.Max_Select = 1000000;
             this.$refs.pic.Max_type = 1000000;
             this.$refs.pic.setMoveStatus(true);
