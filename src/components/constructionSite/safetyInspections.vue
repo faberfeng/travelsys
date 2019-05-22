@@ -89,7 +89,7 @@
                             <span  :class="[{'clickStyle':isClick0},'bottomMap']" @click="getBaseMapListBtn()">底图管理</span>
                             <!-- v-show="manageEdit" -->
                             <span :class="[{'clickStyle':isClick},'editSpotBtn']"   @click="editSpot()">编辑点位</span>
-                            <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span>
+                            <!-- <span class="drawLineBtn" @click="moreSpotLine()">多点对比</span> -->
                             <span class="uploadPicBtn" @click="setSpotPic()">照片标记</span>
                             <span :class="[{'clickStyle':isClick},'exportSaveBtn']" @click="getPdf()">导出图纸</span>
                             <img id="fz_img_for_site" src="./images/site.png" style="display:none"/>
@@ -186,46 +186,50 @@
                             <!-- v-show="editInspectWordEdit" -->
                         </div>
                     </div>
+                    <div class="inspectTableBody1">
+                        <table border="1" cellspacing="0" width="100%" class="inspectTableList1">
+                             <thead>
+                                <tr>
+                                    <th width="80px" rowspan="2">序号</th>
+                                    <!-- <th rowspan="2">监测类型</th>
+                                    <th rowspan="2">类型标记</th> -->
+                                    <th width="150px" rowspan="2">监测内容</th>
+                                    <th width="100px" rowspan="2">简写</th>
+                                    <th width="100px" rowspan="2">测点数</th>
+                                    <th width="100px" rowspan="2">最新数据</th>
+                                    <th colspan="3">本次最大变化量</th>
+                                    <th colspan="3">累计最大变化量</th>
+                                    <th width="250px" rowspan="2">更多操作</th>
+                                </tr>
+                                <tr>
+                                    <th>点号</th>
+                                    <th>取值</th>
+                                    <th >报警</th>
+                                    <th>点号</th>
+                                    <th>取值</th>
+                                    <th>报警</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                     <div class="inspectTableBody" id="inspect_TableBody">
                         <table class="inspectTableList" border="1" cellspacing="0" width="100%">
-                            <thead>
-                            <tr>
-                                <th rowspan="2">序号</th>
-                                <!-- <th rowspan="2">监测类型</th>
-                                <th rowspan="2">类型标记</th> -->
-                                <th rowspan="2">监测内容</th>
-                                <th rowspan="2">简写</th>
-                                <th rowspan="2">测点数</th>
-                                <th rowspan="2">最新数据</th>
-                                <th colspan="3">本次最大变化量</th>
-                                <th colspan="3">累计最大变化量</th>
-                                <th rowspan="2">更多操作</th>
-                            </tr>
-                            <tr>
-                                <th>点号</th>
-                                <th>取值</th>
-                                <th >报警</th>
-                                <th>点号</th>
-                                <th>取值</th>
-                                <th>报警</th>
-                            </tr>
-                            </thead>
                             <tbody>
                                 <tr v-for="(item,index) in monitorMainTableList1" :key="index">
-                                    <td v-text="index+1"></td>
+                                    <td width="80px" v-text="index+1"></td>
                                     <!-- <td>{{item.type|monitorTypeChange()}}</td>
                                     <td>{{item.sign}}</td> -->
-                                    <td v-text="item.name"></td>
-                                    <td v-text="item.logogram"></td>
-                                    <td v-text="item.count"></td>
-                                    <td >{{item.latestTime|timeChange()}}</td>
+                                    <td width="150px" v-text="item.name"></td>
+                                    <td width="100px" v-text="item.logogram"></td>
+                                    <td width="100px" v-text="item.count"></td>
+                                    <td width="100px" >{{item.latestTime|timeChange()}}</td>
                                     <td >{{item.recentPointName|addSprit()}}</td>
                                     <td>{{item.recentVariation|addSprit1()}}</td>
                                     <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
                                     <td>{{item.totalPointName|addSprit()}}</td>
                                     <td>{{item.totalVariation|addSprit2()}}</td>
                                     <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
-                                    <td>
+                                    <td width="250px">
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
                                         <!-- v-show="editInspectWordEdit" -->
                                         <button title="编辑"  @click="editMonitorNameBtn(item.id)" class="editBtn actionBtn"></button>
@@ -1082,6 +1086,7 @@ export default {
             listLength:'',//判断选择了几条点位
             plotGroup:"",//选中当前数组
             plotGroupOne:'',//第一次集合绑定的监测点
+            plotGroupName:'',//选中点位名称
             picMarkName:'',
             baseMapShow:false,
             baseMapMonitor:false,
@@ -2085,6 +2090,7 @@ export default {
             this.optionSpotChangeLine1.yAxis.max=undefined;
             this.getAllCurveId=id;
             this.getAllCurveList=[];
+            this.getAllCurveName=this.plotGroupName;
             if(this.selectValue1){
                  this.startValue1=this.selectValue1[0];
                 this.endValue1=this.selectValue1[1];
@@ -2107,6 +2113,7 @@ export default {
                     if(this.getAllCurveList.length>0){
                             this.getAllCurveName=this.getAllCurveList[0].pointName;
                     }
+                    
                         this.getAllCurveList.forEach((item)=>{
                             this.acquisitionTimeXlist1.push(this.timeChangeMethod(item.collectTime))
                             this.elevationYlist1.push(item.data)
@@ -2419,8 +2426,8 @@ export default {
                 this.$refs.pic.setDrawStatus("onePoint",this.drawItemType,this.drawItemTagType,this.drawItemId,2);
             }
         },
-        picView_status_changed(status,list,move,value){
-           console.log(status,list,move,value,'list点中')
+        picView_status_changed(status,list,move,deleteValue){
+           console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
             this.bindMorePoint=status;
             if(this.listLength==1){
@@ -2433,7 +2440,8 @@ export default {
                 this.plotGroup=list[0].pointGroupData;
                 
                 this.plotGroupOne=list[0].pointGroupData[0].id;
-                console.log(this.plotGroupOne,'this.plotGroupOne');
+                this.plotGroupName=list[0].pointGroupData[0].name;
+                console.log(this.plotGroupOne,this.plotGroupName,'this.plotGroupOne');
 
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
@@ -2465,6 +2473,10 @@ export default {
                 }else{
                     this.moveClick=false;
                 }
+                if(deleteValue=='delete'){
+                    this.deleteDraw()
+                }
+
             }
         },
         timeChangeMethod1(val) {
@@ -7004,14 +7016,14 @@ export default {
                         headers:{
                             'token':vm.token
                         },
-                        params:{
-                            id:this.pointId
-                        }
+                        data:this.pointIds,
                     }).then((response)=>{
                         if(response.data.cd==0){
                             this.getAllMonitorPoint();
                             this.getMonitorMainTable();
                             this.isClick6=false;
+                            this.isBindPoint=false;
+                            this.bindMorePoint=false;
                             this.$message({
                                 type:'sucess',
                                 message:'删除点位集合成功'
@@ -8551,7 +8563,30 @@ export default {
                         }
 
                     }
+                    .inspectTableBody1{
+                        .inspectTableList1{
+                            border-collapse: collapse;
+                            border: 1px solid #e6e6e6;
+                            thead{
+                                background: #f2f2f2;
+                                th{
+                                    padding-left: 6px;
+                                    padding-right: 15px;
+                                    height: 30px;
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    border-right: 1px solid #e6e6e6;
+                                    font-size: 14px;
+                                    color: #333333;
+                                    font-weight: normal;
+                                }
+                            }
+                        }
+                    }
                     .inspectTableBody{
+                            width: 100%;
+                            height: 100px;
+                            overflow: auto;
                         .inspectTableList{
                             border-collapse: collapse;
                             border: 1px solid #e6e6e6;
@@ -8560,7 +8595,7 @@ export default {
                                 th{
                                     padding-left: 6px;
                                     padding-right: 15px;
-                                    height: 32px;
+                                    height: 30px;
                                     text-align: center;
                                     box-sizing: border-box;
                                     border-right: 1px solid #e6e6e6;
@@ -8579,7 +8614,7 @@ export default {
                                     td{
                                         padding-left: 6px;
                                         padding-right: 15px;
-                                        height: 32px;
+                                        height: 30px;
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;

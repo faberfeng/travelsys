@@ -8,9 +8,9 @@
             <div class="container">
                 <div class="containerHead">
                     <div class="containerHeadLeft">
-                        <span class="addOrder" @click="addIndexNum()">添加序列</span>
+                        <!-- <span class="addOrder" @click="addIndexNum()">添加序列</span> -->
                         <!-- v-show="exportDataEdit" -->
-                        <span class="exportOrder"  @click="getImportHistory">导出</span>
+                       
                     </div>
                     <div class="containerHeadMiddle">
                         <label>测试总数：{{itemSubmitCount}}</label>
@@ -27,6 +27,7 @@
                         </div>
                         <!-- &&importDataEdit -->
                         <span v-show="importMethod==1" @click="importExcelData()" class="import">导入</span>
+                         <span class="exportOrder"  @click="getImportHistory">导出</span>
                         <!-- &&importDataEdit -->
                         <span v-show="importMethod==2" class="import" @click="autoAcquisitionBtn()">配置</span>
                     </div>
@@ -2829,6 +2830,19 @@ select.autoImport{
                         width: 60px;
                         height: 26px;
                         line-height: 26px;
+                    }
+                    .exportOrder{
+                        display: inline-block;
+                        width: 50px;
+                        height: 26px;
+                        border:1px solid #f2f2f2;
+                        background: #f2f2f2;
+                        font-size: 14px;
+                        line-height: 26px;
+                        // vertical-align: middle;
+                        color:#666666;
+                        border-radius: 3px;
+                        cursor: pointer;
                     }
                     .import2{
                         display: inline-block;
