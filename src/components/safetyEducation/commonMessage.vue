@@ -45,8 +45,10 @@
                  <div class="bodyContent">
                     <label style="width:15%;display:inline-block;height:32px;line-height:32px;font-size:14px;color:#999;">附件:</label>
                     <span style="width:380px !important;display:inline-block">
-                         <input type="file" ref="fileRef" @change="changeFile($event)" />
                         <span class="el-icon-upload" @click="uploadFile()"></span>
+                        <span style="width:200px;color:#999;text-align:left;">{{imageName}}</span>
+                         <input type="file" style="opacity:0" ref="fileRef" @change="changeFile($event)" />
+                        
                     </span>
                    
                 </div>
@@ -115,6 +117,7 @@ export default {
             workLeader:'',
             workText:'',
             fileList:null,
+            imageName:"未选择任何文件"
         }
     },
     created(){
@@ -205,6 +208,7 @@ export default {
                 data:formData
             }).then((response)=>{
                 if(response.data.cd==0){
+                    this.imageName="未选择任何文件"
                     this.$emit('refreshPage')
                 }
             })
@@ -212,6 +216,7 @@ export default {
 
         changeFile(){
             this.fileList=this.$refs.fileRef.files[0];
+            this.imageName=this.fileList.name;
             console.log(this.fileList,'this.fileList');
         },
         uploadFile(){

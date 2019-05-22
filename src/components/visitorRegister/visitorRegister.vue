@@ -823,12 +823,13 @@ li{
                                     //     background: url('./images/overviewdown.png') no-repeat 0 0;
                                     // }
                                     .iconBtn{
-                                        width: 30px;
+                                        width: 50px;
                                         height: 20px;
                                         line-height: 18px;
-                                        border: 1px solid #ccc;
+                                        border-radius: 4px;
+                                        border: 1px solid #58adfb;
                                         background: white;
-                                        color: #ccddaa;
+                                        color: #58adfb;
                                         display: inline-block;
                                     }
 

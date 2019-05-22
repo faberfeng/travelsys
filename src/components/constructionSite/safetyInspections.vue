@@ -193,20 +193,20 @@
                                     <th width="80px" rowspan="2">序号</th>
                                     <!-- <th rowspan="2">监测类型</th>
                                     <th rowspan="2">类型标记</th> -->
-                                    <th width="150px" rowspan="2">监测内容</th>
+                                    <th width="220px" rowspan="2">监测内容</th>
                                     <th width="100px" rowspan="2">简写</th>
                                     <th width="100px" rowspan="2">测点数</th>
-                                    <th width="100px" rowspan="2">最新数据</th>
-                                    <th colspan="3">本次最大变化量</th>
-                                    <th colspan="3">累计最大变化量</th>
+                                    <th width="180px" rowspan="2">最新数据</th>
+                                    <th  colspan="3">本次最大变化量</th>
+                                    <th  colspan="3">累计最大变化量</th>
                                     <th width="250px" rowspan="2">更多操作</th>
                                 </tr>
                                 <tr>
-                                    <th>点号</th>
-                                    <th>取值</th>
-                                    <th >报警</th>
-                                    <th>点号</th>
-                                    <th>取值</th>
+                                    <th width="200px">点号</th>
+                                    <th width="150px">取值</th>
+                                    <th width="100px" >报警</th>
+                                    <th width="200px">点号</th>
+                                    <th  width="150px">取值</th>
                                     <th>报警</th>
                                 </tr>
                             </thead>
@@ -219,15 +219,15 @@
                                     <td width="80px" v-text="index+1"></td>
                                     <!-- <td>{{item.type|monitorTypeChange()}}</td>
                                     <td>{{item.sign}}</td> -->
-                                    <td width="150px" v-text="item.name"></td>
+                                    <td width="220px" v-text="item.name"></td>
                                     <td width="100px" v-text="item.logogram"></td>
                                     <td width="100px" v-text="item.count"></td>
-                                    <td width="100px" >{{item.latestTime|timeChange()}}</td>
-                                    <td >{{item.recentPointName|addSprit()}}</td>
-                                    <td>{{item.recentVariation|addSprit1()}}</td>
-                                    <td :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
-                                    <td>{{item.totalPointName|addSprit()}}</td>
-                                    <td>{{item.totalVariation|addSprit2()}}</td>
+                                    <td width="180px" >{{item.latestTime|timeChange()}}</td>
+                                    <td width="200px">{{item.recentPointName|addSprit()}}</td>
+                                    <td width="150px">{{item.recentVariation|addSprit1()}}</td>
+                                    <td width="100px" :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
+                                    <td width="200px">{{item.totalPointName|addSprit()}}</td>
+                                    <td width="150px">{{item.totalVariation|addSprit2()}}</td>
                                     <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     <td width="250px">
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
@@ -1008,6 +1008,11 @@
                         <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                     </div>
             </el-dialog>
+            <el-dialog width="1000px" title="斜度序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+                <div>
+                    <vue-highcharts id="leftHightchart"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                </div>
+            </el-dialog>
         </div>
         <!-- <button @click="getPdf()">按钮</button> -->
     </div>
@@ -1039,6 +1044,7 @@ export default {
         );
         return{
             spotChangeLineShow1:false,
+            pitchLineShow:false,
             singleData:{},
             defaultProps:{
                 children:'children',
@@ -1407,6 +1413,59 @@ export default {
             startValue:'',
             endValue:'',
             selectValue1:'',
+            optionOnesLeft:{
+                        chart: {
+                            type: 'spline',
+                            inverted: false
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                        },
+                        yAxis: {
+                                title: {
+                                    text: '位移'
+                                },
+                                labels:{
+                                    enabled: true
+                                },
+                               
+                            
+                                },
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            
+                            floating: true,
+                            borderWidth: 0
+                        },
+                        plotOptions: {
+                            spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            },
             optionSpotChangeLine1:{
                         chart: {
                             type: 'spline',
@@ -1786,6 +1845,15 @@ export default {
             endValue1:'',
             // getAllCurveList:'',
             getAllCurveName:'',
+            //斜度数据
+            leftDisplayListValue1:[],
+            leftDisplayListValue2:[],
+            leftDisplayListValueXdata:[],
+            leftDisplayListValueYdata1:[],
+            leftDisplayListValueYdata2:[],
+            pitchDetailDataListLeft:[],
+            leftDisplayList:'',
+            leftDisplayListValue:''
         }
     },
     created(){
@@ -1911,10 +1979,10 @@ export default {
                                 })
                                 
                             }else{
-                                console.log(this.monitorPointInfo,'getPointDatasList1');
+                             
 
                                 this.measureName=e.data.parameter.value.Tag.split(";")[0].split("=")[1]; //判断测点曲线
-                                console.log(this.measureName,'this.measureName');
+                             
 
                                 this.monitorPointInfo.forEach((item)=>{
                                     if(this.measureName==item.pointName){
@@ -2076,6 +2144,9 @@ export default {
         },
         spotChangeLineCancle1(){
             this.spotChangeLineShow1=false;
+        },
+        pitchLineCancle(){
+            this.pitchLineShow=false;
         },
         makeSureData1(){
             this.getAllCurve(this.getAllCurveId)
@@ -2441,7 +2512,8 @@ export default {
                 
                 this.plotGroupOne=list[0].pointGroupData[0].id;
                 this.plotGroupName=list[0].pointGroupData[0].name;
-                console.log(this.plotGroupOne,this.plotGroupName,'this.plotGroupOne');
+                this.plotGroupType=list[0].pointGroupData[0].itemType;
+            
 
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
@@ -2460,13 +2532,17 @@ export default {
                       
                     })
                 }
-                console.log(this.pointIds,'this.pointIds00');
+               
                 if(this.picMarkName=="Select_img_Mark"){
                     this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
                 }
                 if(this.editSpotShow==false){
-                    this.getAllCurve(this.plotGroupOne)
+                    if(this.plotGroupType==5){
+                        this.getPitchDetailDataBySeqId(this.plotGroupOne);
+                    }else{
+                        this.getAllCurve(this.plotGroupOne)
+                    } 
                 }
                 if(move=='move'){
                     this.moveClick=true;
@@ -2589,15 +2665,12 @@ export default {
                                 }else{
                                         fList[j].list=fList[j].list.slice(0,30)
                                 }
-                                // console.log(fList[j].list,'fList[j].list');
+                            
                                 for(let a=0;a<30;a++){
                                      fList[j].list[a].acquisitionTime=lastMonth[a]
                                 }
                             }
-                            // console.log(vList,'vList');
-                            // console.log(hList,'hList');
-                            // console.log(gList,'gList');
-                            // console.log(fList,'fList');
+                          
                            
                             //两种监测类型对比，有6种情况
                             if((f!=0&&g!=0)||(f!=0&&h!=0)||(f!=0&&v!=0)||(g!=0&&v!=0)||(g!=0&&h!=0)||(v!=0&&h!=0)){
@@ -2605,140 +2678,127 @@ export default {
                                
                                 {
                                     if((f!=0&&g!=0)){
-                                        // console.log('111');
+                                       
                                         this.moreTypeSpotList1=fList;
                                         this.moreTypeSpotList2=gList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.force)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                                     
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.gaugeHeight)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                       
                                         })
                                     }else if(f!=0&&h!=0){
                                         this.moreTypeSpotList1=fList;
                                         this.moreTypeSpotList2=hList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                      
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.force)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                                   
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.shiftDistance)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                 
                                         })
                                     }else if(f!=0&&v!=0){
                                         this.moreTypeSpotList1=fList;
                                         this.moreTypeSpotList2=vList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                      
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.force)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                                     
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.elevation)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                    
                                         })
                                     }else if(g!=0&&v!=0){
                                         this.moreTypeSpotList1=gList;
                                         this.moreTypeSpotList2=vList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                    
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.gaugeHeight)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                                    
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.elevation)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                     
                                         })
                                     }else if(g!=0&&h!=0){
                                         this.moreTypeSpotList1=gList;
                                         this.moreTypeSpotList2=hList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                                  
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.gaugeHeight)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                               
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.shiftDistance)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                     
                                         })
                                     }else if(v!=0&&h!=0){
                                         this.moreTypeSpotList1=vList;
                                         this.moreTypeSpotList2=hList;
-                                        // console.log(this.moreTypeSpotList1,'this.moreTypeSpotList1');
+                      
                                         this.moreTypeSpotList1.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X1List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y1List.push(item1.elevation)
                                             })
                                         })
-                                        // console.log(this.X1List,'this.X1List')
-                                        // console.log(this.Y1List,'this.Y1List')
+                                
                                         this.moreTypeSpotList2.forEach((item)=>{
                                             item.list.forEach((item1)=>{
                                                 this.X2List.push(this.timeChangeMethod(item1.acquisitionTime))
                                                 this.Y2List.push(item1.shiftDistance)
                                             })
-                                            // console.log(this.X2List,'this.X2List')
-                                            // console.log(this.Y2List,'this.Y2List')
+                                   
                                         })
                                     }
                                 }
                                 {
                                     var x1Length=this.X1List.length;
-                                    // console.log(x1Length,'x1Length');
-                                    // console.log(this.moreTypeSpotList1.length,'this.moreTypeSpotList1.length');
+                                
+                                 
                                     var x1=x1Length/this.moreTypeSpotList1.length;
                                     var x2Length=this.X2List.length;
-                                    // console.log(x2Length,'x2Length');
+                                    
                                     var x2=x2Length/this.moreTypeSpotList2.length;
                                     this.moreTypeSpotList1Length=this.moreTypeSpotList1.length;
                                     this.moreTypeSpotList2Length=this.moreTypeSpotList2.length;
-                                    // console.log(x1,'x1000');
-                                    // console.log(x2,'x2000');
+                               
                                     this.moreSpotShow=true;
                                     var yLeft1=[];
                                     var yLeft2=[];
@@ -2806,10 +2866,7 @@ export default {
                                      for(let a2=x2*7;a2<x2*8;a2++){
                                         yRight8.push(this.Y2List[a2])
                                     }
-                                    // console.log(yLeft1,'yLeft1');
-                                    // console.log(yRight1,'yRight1');
-                                    // console.log(yLeft2,'yLeft2');
-                                    // console.log(yRight2,'yRight2');
+                      
                                 }
                                 {
                                     setTimeout(()=>{
@@ -3315,9 +3372,7 @@ export default {
                                     {
                                         var xLength=this.acquisitionTimeXlist.length;
                                         var x=xLength/this.moreSpotLineListLength;
-                                        // console.log(x,'xx');
-                                        // console.log(this.acquisitionTimeXlist,'this.acquisitionTimeXlist');
-                                        // console.log(this.moreSpotLineListLength,'this.moreSpotLineListLength');
+                                  
                                         var xShow=[];
                                         for(var i=0;i<x;i++){
                                             xShow.push(this.acquisitionTimeXlist[i])
@@ -3480,6 +3535,14 @@ export default {
             return moment(val).format("MM-DD");
             }
         },
+        timeChangeMethodPitch(val){
+             if (val == null) {
+                return '/';
+            } else {
+                return moment(val).format("MM-DD HH:mm");
+            }
+
+        },
         moreSpotCancle(){
             this.moreSpotShow=false;
         },
@@ -3488,13 +3551,13 @@ export default {
         },
         drawFinish(){
             var vm=this;
-            // console.log('222');
+       
         
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
                 this.spotPicInfo=[];
                 var list1 = this.$refs.pic.saveList();
-                //   console.log(list1,'list1');  
+             
                 this.spotPicInfo.push({
                     "coordinateInfo":JSON.stringify(list1.pop()),
                     "operationType":1,
@@ -3555,7 +3618,7 @@ export default {
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
-                    // console.log(this.monitorPointInfo,'图片标记');
+                   
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                     this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 }
@@ -3956,7 +4019,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
-            console.log(list,'list11110');
+            
             // var list1=this.
             if(this.moveClick==false){
                      list.forEach((item)=>{
@@ -3992,16 +4055,16 @@ export default {
                             map.set(itemId,array);
                         }
                     }
-                    //  console.log(map,'map000');
+                   
                     var a='';
                     var b=[];
                     map.forEach((value, key, mapObject)=>{
                         a=this.returnData(value);
                         b.push(a);
                     })
-                    // console.log(b,'bbbb');
+                
                     dlist=blist.concat(b);
-                    // console.log(dlist,'添加点位数据');
+                  
                     if(this.alist==[]){
                         this.editSpotShow=false;
                     }else if(this.alist!=[]){
@@ -4053,7 +4116,7 @@ export default {
                          }
                     })
                 })
-                // console.log(elist,'elist');
+               
                 axios({
                     url:this.BDMSUrl+'detectionInfo/updatePointGroupPosition',
                     method:'post',
@@ -4102,15 +4165,13 @@ export default {
 
         },
         checkboxChange(data){
-            // console.log(data,'data');
-            // console.log(this.monitorMainItemList,'this.monitorMainItemList000');
 
             for(let i = 0; i < this.monitorMainItemList.length;i++){
                 this.$refs.pic.enableType(this.monitorMainItemList[i].type,this.monitorMainItemList[i].sign,this.monitorMainItemList[i].spotNum,this.monitorMainItemList[i].id);
             }
         },
         checkChange(){
-            // console.log(this.$refs.contentTree.getCheckedNodes(),'选中节点');
+        
         },
         displaySpot(){
             this.$refs.pic.enableLabel(this.displaySpotNum);
@@ -4437,7 +4498,7 @@ export default {
                              })
                     })
                     this.getDetectionDirectoryListLeft=Array.from(new Set(this.getDetectionDirectoryListLeft))
-                    console.log(this.getDetectionDirectoryListLeft,'树形结构');
+                   
                 }else{
                     this.$message({
                         type:'error',
@@ -4783,7 +4844,7 @@ export default {
                         //  }
                      })
                  })
-                 console.log(this.monitorPointInfo,'this.monitorPointInfo');  
+                //  console.log(this.monitorPointInfo,'this.monitorPointInfo');  
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
                   this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 
@@ -4954,15 +5015,11 @@ export default {
         },
         documentMethod(name,item){
             var a=0;
-            // console.log(name+item.itemId,'mingcheng')
-            // console.log(document.getElementById(name+item.itemId),'jiayou');
-            // console.log(document.getElementById(name+item.itemId).selectedIndex,name+item.itemId);
-            // console.log(document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value,'返回的值');
+          
             if(document.getElementById(name+item.itemId).selectedIndex==-1){
                 return ''
             }else{
-                // console.log('0000');
-                // console.log(document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value,'返回的值',name+item.itemId);
+              
                 return document.getElementById(name+item.itemId).options[document.getElementById(name+item.itemId).selectedIndex].value
                 
             }
@@ -4990,7 +5047,7 @@ export default {
         //批量导入验证
         batchImportVerify(){
             var listData=[];
-            // console.log(this.sheetList,'this.sheetList');
+          
             if(this.singleData){
                 
                 for(var id in this.singleData){
@@ -6573,14 +6630,8 @@ export default {
                     // }
                   
                     // this.drawItemId=this.monitorMainTableList[0].id;
-                    this.table_count=document.querySelector('#inspect_TableBody');
-                    this.table_count.addEventListener('scroll',this.scrollHandle())
                 }
             })
-        },
-        scrollHandle(){
-            var scrollTop=this.table_count.scrollTop;
-            this.table_count.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
         },
 
         enter(val){
@@ -7147,7 +7198,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
-                    // console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                    
                    
                     this.monitorPointInfo.forEach((item)=>{
                         data.push(item.id);
@@ -7160,7 +7211,7 @@ export default {
                         this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                     }
                     
-                    //  console.log(this.monitorPointInfo,'this.monitorPointInfo');
+                   
                     
                     // this.getTagList();
                 }
@@ -7615,6 +7666,140 @@ export default {
                     this.onlyNum=response.data.rt;
                 }
             })
+        },
+        //获取斜度曲线
+        getPitchDetailDataBySeqId(num){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getPitchDetailDataBySeqId',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    seqId:num
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    if(response.data.rt){
+                        this.pitchDetailDataListLeft=response.data.rt;
+                        if(this.pitchDetailDataListLeft.recent2PitchData.length==0){
+                            this.$message({
+                                type:'info',
+                                message:"当前无数据，请导入数据"
+                            })
+                            return ;
+                        }else{
+                            this.pitchLineShow=true;
+                            // this.totalShow=true;
+                            // this.leftShow=true;
+                            this.leftDisplayListValue1=[];
+                            this.leftDisplayListValue2=[];
+                            this.leftDisplayListValueXdata=[];
+                            this.leftDisplayListValueYdata1=[];
+                            this.leftDisplayListValueYdata2=[];
+                            if(this.pitchDetailDataListLeft){
+                                this.leftDisplayList=this.pitchDetailDataListLeft;
+                                var recentVariationLength=this.leftDisplayList.recentVariation.length;
+                                this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
+                                // var str='';
+                                // console.log(document.getElementById('tableListid'),'style');
+                                //  str=document.getElementById('tableListid').clientHeight-50;
+                                //  setTimeout(()=>{
+                                //         console.log(document.getElementById('tableListid').clientHeight);
+                                       
+
+                                // },20)
+                                if(this.leftDisplayListValue.length==recentVariationLength){
+                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    this.time1=null;
+                                    this.leftDisplayListValue.forEach((item,index,array)=>{
+                                        this.leftDisplayListValue1.push(item)
+                                        this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                        this.leftDisplayListValueXdata.push(item.depth)
+                                        this.leftDisplayListValueYdata1.push(item.shift)
+                                    })
+                                    
+                                    setTimeout(()=>{
+                                        let lineLeftChart=this.$refs.lineLeftChartOne;
+                                        lineLeftChart.delegateMethod('showLoading', 'Loading...');
+                                        lineLeftChart.removeSeries();
+                                        lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time),data:this.leftDisplayListValueYdata1});
+                                        lineLeftChart.hideLoading();
+                                        lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                    },20)
+                                }else if(this.leftDisplayListValue.length!=recentVariationLength){
+                                    // document.getElementById('leftHightchart').style.minHeight=str+'px';
+                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
+                                    this.leftDisplayListValue.forEach((item,index,array)=>{
+                                        if(array[index].acquisitionTime==this.time){
+                                            this.leftDisplayListValue1.push(array[index])
+                                            this.leftDisplayListValueXdata.push(array[index].depth)
+                                            this.leftDisplayListValueYdata1.push(array[index].shift)
+                                        }else if(array[index].acquisitionTime==this.time1){
+                                            this.leftDisplayListValue2.push(array[index])
+                                            this.leftDisplayListValueYdata2.push(array[index].shift)
+                                        }
+                                    })
+                                    
+                                    
+                                    setTimeout(()=>{
+                                        let lineLeftChart=this.$refs.lineLeftChartOne;
+                                        lineLeftChart.delegateMethod('showLoading', 'Loading...');
+                                        lineLeftChart.removeSeries();
+                                        lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time),data:this.leftDisplayListValueYdata1});
+                                        lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time1),data:this.leftDisplayListValueYdata2});
+                                        lineLeftChart.hideLoading();
+                                        lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                    },20)
+                                }
+                                this.leftDisplayShow==false;
+                                var maxShift1=[];
+                                this.leftDisplayListValue1.forEach((item)=>{
+                                    maxShift1.push(item.shift)
+                                })
+                                this.leftMaxShift1=this.getMaxValue(maxShift1);
+                                var maxShift2=[];
+                                this.leftDisplayListValue2.forEach((item)=>{
+                                    maxShift2.push(item.shift)
+                                })
+                                this.leftMaxShift2=this.getMaxValue(maxShift2);
+                                var maxVariation=[];
+                                var maxHeight=[];
+                                this.leftDisplayList.recentVariation.forEach((item)=>{
+                                    maxVariation.push(item.recentVariation)
+                                    maxHeight.push(parseInt(item.otherParam))
+                                })
+                                this.leftMaxVariation=this.getMaxValue(maxVariation)
+                                this.leftMaxHeight=this.getMaxValue(maxHeight)
+                            } 
+                        }
+                    }else if(respose.data.cd=='-1'){
+                        vm.$message({
+                            type:'error',
+                            message:response.data.msg
+                        })
+                    }
+
+                }
+            })
+        },
+        getMaxValue(val){
+                var m = val[0];
+                for(var i=1;i<val.length;i++){ //循环数组
+                if(m<val[i]){
+                        m=val[i]
+                    }
+                }
+                return m
+        },
+        getMinValue(val){
+            var m = val[0];
+            for(var i=1;i<val.length;i++){ //循环数组
+            if(m>val[i]){
+                    m=val[i]
+                }
+            }
+            return m
         },
         //html转PDF
         getPdf(){
@@ -8292,7 +8477,7 @@ export default {
                         margin-top:15px !important;
                         margin:0 auto;
                         border:1px solid #e6e6e6;
-                        height: 650px;
+                        height: 600px;
                         width: 100%;
                         position: relative;
                         .noDataFigure{
@@ -8473,7 +8658,7 @@ export default {
                         .planeFigureGround{
                             z-index: 8;
                             // height: 590px;
-                            height:630px;
+                            height:580px;
                             width: 100%;
                             position:absolute;
                             top:0px;

@@ -1475,10 +1475,10 @@ export default Vue.component('commonPitch-detail',{
                                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
                                     this.time1=null;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
-                                    this.leftDisplayListValue1.push(item)
-                                    this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
-                                    this.leftDisplayListValueXdata.push(item.depth)
-                                    this.leftDisplayListValueYdata1.push(item.shift)
+                                        this.leftDisplayListValue1.push(item)
+                                        this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                        this.leftDisplayListValueXdata.push(item.depth)
+                                        this.leftDisplayListValueYdata1.push(item.shift)
                                     })
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
@@ -1514,7 +1514,6 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
-                                // console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
                                 var maxShift1=[];
                                 this.leftDisplayListValue1.forEach((item)=>{
                                     maxShift1.push(item.shift)
@@ -1531,11 +1530,8 @@ export default Vue.component('commonPitch-detail',{
                                     maxVariation.push(item.recentVariation)
                                     maxHeight.push(parseInt(item.otherParam))
                                 })
-                                // console.log(maxHeight,'maxHeight')
-                                // console.log(maxVariation,'maxVariation')
                                 this.leftMaxVariation=this.getMaxValue(maxVariation)
                                 this.leftMaxHeight=this.getMaxValue(maxHeight)
-                                // console.log(this.leftMaxHeight,'this.leftMaxHeight')
                             }
                            
                             
