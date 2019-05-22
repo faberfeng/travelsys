@@ -6,7 +6,7 @@
                 </router-link>
             </div>
         </div>
-        <div class="contentBody" v-if="!buildSafeEducationShow">
+        <div class="contentBody" v-if="!buildSafeEducationShow&&!makeSureMessageShow">
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
@@ -51,24 +51,26 @@
                             </div>
                         </span>
                         <span class="liSpanThree">
-                            <span class="spanButton">查看详细</span>
+                            <span class="spanButton" @click="viewDetail(item)">查看详细</span>
                         </span>
                     </li>
                 </ul>
             </div>
         </div>
         <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @refreshPage="refresh()" @back="backHome" :projectName="projectName" :wordType="wordType"></commonMessage>
+        <makeSureMessage v-if="makeSureMessageShow" :submitData="submitData" @back="backHomePage" ref="makeSureMessage"></makeSureMessage>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import commonMessage from './commonMessage.vue'
+import makeSureMessage from './makeSureMessage.vue'
 import moment from 'moment'
 export default {
     name:'safeEducation',
     components:{
-        commonMessage
+        commonMessage,makeSureMessage
     },
     data(){
         return{
@@ -81,10 +83,12 @@ export default {
             }],
             onePerson:1,
             buildSafeEducationShow:false,
+            makeSureMessageShow:false,
             getSafetyEducationList:[],
             projectName:'安全教育',
             wordType:1,
             timeStamp:'',
+            submitData:{},
         }
     },
     created(){
@@ -143,6 +147,11 @@ export default {
                 return value1 - value2;
             }
         },
+        viewDetail(val){
+            this.makeSureMessageShow=true;
+            this.submitData=val;
+            console.log(val,'val00');
+        },
         changeDatePicker(){
             if(this.selectTime){
                 this.getSafetyEducation(this.selectTime,this.selectName);
@@ -157,7 +166,6 @@ export default {
             }else{
                 this.getSafetyEducation(this.timeStamp,this.selectName);
             }
-            
         },
         buildSafeEducation(){
             this.buildSafeEducationShow=true;
@@ -165,6 +173,9 @@ export default {
         },
         backHome(){
             this.buildSafeEducationShow=false;
+        },
+        backHomePage(){
+            this.makeSureMessageShow=false;
         },
         refresh(){
             this.getSafetyEducation();
@@ -210,6 +221,29 @@ export default {
 }
 li{
     list-style: none;
+}
+/***********设置滚动条************/
+/* 设置滚动条的样式 */
+
+.bodyList::-webkit-scrollbar {
+    width:7px !important;
+    height:50px;
+}
+/* 滚动槽 */
+.bodyList::-webkit-scrollbar-track {
+    box-shadow: inset006pxrgba(0,0,0,0.5);
+    -webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+    border-radius:10px;
+}
+/* 滚动条滑块 */
+.bodyList::-webkit-scrollbar-thumb{
+    border-radius:10px;
+    background:rgba(0,0,0,0.1);
+    box-shadow: inset006pxrgba(0,0,0,0.5);
+    -webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+}
+.bodyList::-webkit-scrollbar-thumb:window-inactive {
+    background:rgba(255,0,0,0.4);
 }
 #content{
      width: 100%;

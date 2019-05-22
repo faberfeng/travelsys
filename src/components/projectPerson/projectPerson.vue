@@ -231,8 +231,8 @@
                 <el-tab-pane label="从业信息">
                     <div class="workInfoWrapper">
                         <div class="header">
-                            <div class="titleBtn">
-                                <i class="el-icon-edit" @click="editWork"></i>
+                            <div class="titleBtn" @click="editWork">
+                                <i class="el-icon-edit"></i>
                                 当前工作信息
                             </div>
                             <div class="titleInfo">
@@ -274,7 +274,7 @@
                                                 type="date" v-model="contractExpireDate"
                                                 placeholder="选择日期" style="border:none !important"  >
                                             </el-date-picker> -->
-                                            <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" v-model="contractExpireDate" width="100%" ></v2-datepicker>
+                                            <v2-datepicker format="yyyy-MM-DD" style="border:none;left:0px;top:3px;position:absolute;" :disabled="getStaffWorkingInfoList==''?false:true" v-model="contractExpireDate" width="100%" ></v2-datepicker>
                                         </span>
                                     </div>
                                 </div>
@@ -1481,6 +1481,7 @@ ul,li{
                     border: 1px solid white;
                     border-radius: 4px;
                     box-shadow: 0 15px 30px rgba(0,0,0,.1);
+                    cursor: pointer;
                     .el-icon-s-custom{
                         font-size:20px;
                     }
