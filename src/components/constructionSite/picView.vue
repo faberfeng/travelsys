@@ -1022,7 +1022,7 @@ export default {
         },
         onwheel(e){
 
-            if(e.shiftKey){
+            // if(e.shiftKey){
                 e.preventDefault();
                 
                 if(e.deltaY < 0){
@@ -1032,7 +1032,7 @@ export default {
 
                 }
                 this.Refresh();
-            }
+            // }
             
         },
         size_R(){
