@@ -186,7 +186,6 @@ export default new Vuex.Store({
         userCenterUrl:'https://bdms.arctron.cn/bdmsRebuild/#/userLogin',
         BDMSLoginUrl:'https://bdms.arctron.cn/bdmsRebuild/#/login',
 
-
         imgUuid:'',//用户头像
         projectLogo:'',//企业logo
         isUseDefaultLogo:false,
