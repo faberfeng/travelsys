@@ -5166,7 +5166,7 @@ export default {
         singleBatchImportVerifyMake(id,type,item,sheetIndex){
            
             console.log(id,type,item,sheetIndex,'id,type,item','sheetIndex');
-            this.singleData[id]={
+            this.singleData[sheetIndex]={
                 // sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
                 sheetIndex:sheetIndex,
                 acquisitionTimeIndex:this.spilitMethod(this.documentMethod('timeCol',item)), //采集时间下标*
