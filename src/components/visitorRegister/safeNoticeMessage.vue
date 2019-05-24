@@ -23,8 +23,11 @@
             <div class="bottom">
                 <table class="tableList" border="1" cellspacing="0" width="100%">
                     <tbody>
-                        <tr >
-                            <td v-for="(item,index) in people" :key="index">{{item}}</td>
+                        <tr v-for="(item,index) in peoples" :key="index">
+                            <td>{{item.length>=1?item[0]:''}}</td>
+                            <td>{{item.length>=2?item[1]:''}}</td>
+                            <td>{{item.length>=3?item[2]:''}}</td>
+                            <td>{{item.length>=4?item[3]:''}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -47,6 +50,7 @@ export default {
         return{
             getVisitorInfoByIdList:'',
             people:[],
+            peoples:[],
         }
     },
     created(){
@@ -94,8 +98,15 @@ export default {
                 if(response.data.cd==0){
                     this.getVisitorInfoByIdList=response.data.rt;
                     console.log(this.getVisitorInfoByIdList,'this.getVisitorInfoByIdList');
-                    console.log(this.getVisitorInfoByIdList.entourage.split('，'));
-                    this.people=this.getVisitorInfoByIdList.entourage.split('，');
+                    console.log(this.getVisitorInfoByIdList.entourage.split(','));
+                    this.people=this.getVisitorInfoByIdList.entourage.split(',');
+                    console.log(this.people,'this.people');
+                   for(let i=0;i<this.people.length/4;i++){
+                       this.peoples.push(
+                           this.people.slice((5*i),(5*i+4))
+                       )
+                   }
+                   console.log(this.peoples,'this.peoples');
                 }
             })
         }

@@ -20,7 +20,7 @@
             </div>
             <div class="flexLeft">
                 <div class="canlenCard">
-                    <h5>5月</h5>
+                    <h5>{{timeStampMonth}}月</h5>
                     <span>上班天数:21天</span>
                     <span>休息天数：9天</span>
                 </div>
@@ -145,7 +145,12 @@ export default {
             timeValues:'',
             getCheckOnTimeList:[],
             timeList:[],
+            getTimeList:[],
+            differenceList:[],
+            sameList:[],
+            sendList:[],
             getWorkingDayList:[],
+            timeStampMonth:'',
             //日历
              calendar1:{
                  multi:true,
@@ -173,7 +178,7 @@ export default {
                 selectYear(year){
                    
                 },
-                timestamp:Date.now()
+                // timestamp:Date.now()
             },
 
         }
@@ -187,36 +192,81 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl;
         this.getCheckOnTime();
         this.getWorkingDay();
+        this.timeStampMonth=new Date().getMonth()+1
+        console.log(this.timeStamp,'this.timeStamp');
     },
     methods:{
         selectTime(value){
-            console.log(value,'选择了当前时间');
+            // console.log(value,'选择了当前时间');
             this.timeValues=value;
             
         },
         setWorkingDay(){
-            this.timeValues.forEach((item)=>{
-                this.timeList.push({
-                    'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
-                    'isWorkingDay':1
+             this.getWorkingDayList.forEach((item)=>{
+                this.getTimeList.push({
+                    'date':this.time(item.id.checkDate),
+                    'isWorkingDay':item.isWorkingDay
                 })
             })
+            if(this.timeValues){
+               
+                     this.timeValues.forEach((item)=>{
+                        this.timeList.push({
+                            'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
+                            'isWorkingDay':1
+                        })
+                    })
+                if(this.timeList.length<this.getTimeList.length){
+                    
+                }
+                
+            }else{
+                this.timeList=this.getTimeList;
+            }
             // this.calendar1.value.forEach((item)=>{
-            //     this.timeValues.forEach((val)=>{
-            //         if(item==val){
-            //             this.timeList.push({
-            //                 'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
-            //                 'isWorkingDay':1
-            //             })
+            //     this.getTimeList.push({
+            //         'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
+            //         'isWorkingDay':1
+            //     })
+            // })
+           
+            // console.log(this.getWorkingDayList,'this.getWorkingDayList');
+            // console.log(this.calendar1.value,'this.calendar1.value');
+            // this.timeValues.forEach((item)=>{
+
+            // })
+            // for(let i=0;i<this.getTimeList.length;i++){
+            //     if(this.timeList[i]==this.getTimeList[i]){
+            //         this.getTimeList[i].isWorkingDay=1
+            //     }else{
+            //         this.getTimeList[i].isWorkingDay=0
+            //     }
+            // }
+            // for(let i=0;i<this.getTimeList.length;i++){
+            //     for(let j=0;j<this.timeList.length;j++){
+            //         if(this.getTimeList[i].date==this.timeList[j].date){
+            //             this.getTimeList[i].isWorkingDay=1
             //         }else{
-            //             this.timeList.push({
-            //                 'date':item[0]+'-'+this.addZero(item[1])+'-'+this.addZero(item[2]),
-            //                 'isWorkingDay':0
-            //             })
+            //             this.getTimeList[i].isWorkingDay=0
+            //         }
+            //     }
+            // }
+            // this.getTimeList.forEach((item)=>{
+            //     this.timeList.forEach((val)=>{
+            //         if(item.date==val.date){
+            //             item.isWorkingDay=1
+            //         }else{
+            //             item.isWorkingDay=0
             //         }
             //     })
             // })
+            console.log(this.getTimeList,'getTimeList');
             console.log(this.timeList,'this.timeList');
+            // this.differenceList=this.FilterDifferData(this.getTimeList,this.timeList);
+            // this.sameList=this.FilterData(this.timeList,this.getTimeList);
+            // console.log(this.differenceList);
+            // console.log(this.sameList);
+
             axios({
                 url:this.BDMSUrl+'attendancy/setWorkingDay',
                 headers:{
@@ -233,9 +283,73 @@ export default {
                 }
             })
         },
+         FilterDifferData(a,b)
+            {   //循环判断数组a里的元素在b里面有没有，有的话就放入新建立的数组中
+                var result = new Array();
+                var c=b.toString();
+                for(var i=0;i<a.length;i++)
+                {
+                  if(c.indexOf(a[i].toString())==-1)
+                  {
+                  result.push(a[i]);
+                  }      
+                }
+                return result;
+        },
+          arrayRepeat (array1, array2) {
+                var result = []
+                for (var i = 0; i < array2.length; i++) {
+                var obj = array2[i]
+                var num = obj.destId
+                var isExist = false
+                for (var j = 0; j < array1.length; j++) {
+                    var aj = array1[j]
+                    var n = aj.destId
+                    if (n === num) {
+                    isExist = true
+                    break
+                    }
+                }
+                if (!isExist) {
+                    result.push(obj)
+                }
+                }
+                return result
+            },
+        FilterData(a,b){   //循环判断数组a里的元素在b里面有没有，有的话就放入新建立的数组中
+                var result = new Array();
+                var c=b.toString();
+                for(var i=0;i<a.length;i++)
+                {
+                  if(c.indexOf(a[i].toString())>-1)
+                  {
+                  result.push(a[i]);
+                  }      
+                }
+                return result;
+            },
+        // //取出不同之处
+        getArrDifference(arr1, arr2) {
+            return arr1.concat(arr2).filter(function(v, i, arr) {
+                return arr.indexOf(v) === arr.lastIndexOf(v);
+            });
+        
+        },
+        // //取出相同之处
+        // getArrEqual(arr1, arr2) {
+        //     let newArr = [];
+        //     for (let i = 0; i < arr2.length; i++) {
+        //         for (let j = 0; j < arr1.length; j++) {
+        //             if(arr1[j] === arr2[i]){
+        //                 newArr.push(arr1[j]);
+        //             }
+        //         }
+        //     }
+        //     return newArr;
+        // },
         //补零
         addZero(val){
-            console.log(val.toString().length,val);
+            // console.log(val.toString().length,val);
             if(val.toString().length==1){
                 return '0'+val
             }else{
@@ -255,8 +369,11 @@ export default {
                 if(response.data.cd==0){
                     this.getWorkingDayList=response.data.rt;
                     // this.calendar1.value
+                    
                     this.getWorkingDayList.forEach((item)=>{
-                        this.calendar1.value.push([parseInt(this.timesChange(item.id.checkDate).split('-')[0]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[1]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[2])]);
+                        if(item.isWorkingDay==1){
+                                this.calendar1.value.push([parseInt(this.timesChange(item.id.checkDate).split('-')[0]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[1]),this.deleteZero(this.timesChange(item.id.checkDate).split('-')[2])]);
+                        } 
                     })
                     // console.log(this.calendar1.value,'this.calendar1.value');
                 }
@@ -326,9 +443,15 @@ export default {
             })
         },
         timeChange(val){
-            if(val){
+            
                 return moment(val).format('HH:ss')
+            
+        },
+        time(val){
+            if(val){
+                return moment(val).format('YYYY-MM-DD')
             }
+
         },
         timeLength(val){
             return parseInt(val/(1000*60*60))

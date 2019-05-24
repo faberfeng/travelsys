@@ -7,10 +7,10 @@
             <canvas ref="drawCanvas" id="drawCanvas" style="position:absolute;top:0px;left:0px" @dblclick="Select_item" @mousedown="oncanvasmousedown" @mousemove="oncanvasmousemove" @mouseup="oncanvasmouseup"></canvas>
             <canvas ref="drawCanvasSelect" id="drawCanvasSelect" style="position:absolute;top:0px;left:0px;display:none"></canvas>
             <div ref="loading" style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:#ffffff"></div>
-            <div ref="listItem" style="position:absolute;top:0px;left:0px;border: 1px solid #000000;background:#ffffff">
+            <div ref="listItem" style="position:absolute;top:10px;left:10px;border: 1px solid #000000;background:#ffffff">
                 <ul>
-                    <li style="cursor:pointer;text-align:left" v-for="(item,index) in pointGroupDataList" :key="index" @click="itemOnCleck(item)">
-                        <span>{{item.name}} - {{item.data}}</span>
+                    <li style="cursor:pointer;text-align:left;height:20px;line-height:20px;margin:2px;" v-for="(item,index) in pointGroupDataList" :key="index" @click="itemOnCleck(item)">
+                        <span style="font-size:16px;">{{item.name}} - {{item.data}}</span>
                     </li>
                 </ul>
             </div>

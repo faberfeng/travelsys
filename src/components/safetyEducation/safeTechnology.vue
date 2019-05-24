@@ -6,7 +6,7 @@
                 </router-link>
             </div>
         </div>
-        <div class="contentBody" v-if="!buildSafeEducationShow">
+        <div class="contentBody" v-if="!buildSafeEducationShow&&!makeSureMessageShow&&!finishMessageShow">
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
@@ -43,7 +43,7 @@
                     <li class="bodyLi" v-for="(item,index) in getSafetyTechnologyList" :key="index">
                         <span class="liSpanOne">{{index+1}}</span>
                         <span class="liSpanTwo">
-                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span></span></div>
+                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span v-if="!item.joined" style="color:#2e8cb9;font-size:14px;display:inline-block;margin-left:40px;">活动进行中</span><span v-if="item.joined" style="color:rgba(255, 152, 0, 1);font-size:14px;display:inline-block;margin-left:40px;">已结束</span></div>
                             <div style="height:70px;line-height:75px;">
                                 <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起人：{{item.originator}}</span>
                                 <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：{{item.leader}}</span>
@@ -51,24 +51,29 @@
                             </div>
                         </span>
                         <span class="liSpanThree">
-                            <span class="spanButton">查看详细</span>
+                            <span v-if="!item.joined" class="spanButton" @click="viewDetail(item)">查看详细</span>
+                            <span v-if="item.joined" class="spanButton" @click="viewEndDetail(item)">查看详细</span>
                         </span>
                     </li>
                 </ul>
             </div>
         </div>
         <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @back="backHome" @refreshPage="refresh()" :wordType="wordType" :projectName="projectName"></commonMessage>
+        <makeSureMessage v-if="makeSureMessageShow" :submitData="submitData" @back="backHomePage" :endProjectName="endProjectName" @refresh="refreshMakeSureMessage()" ref="makeSureMessage"></makeSureMessage>
+        <finishMessage v-if="finishMessageShow" :submitData="submitFinishData" @back="backFinishHome" :endProjectName="endProjectFinishName"  ref="finishMessage"></finishMessage>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import commonMessage from './commonMessage.vue'
+import makeSureMessage from './makeSureMessage.vue'
+import finishMessage from './finishMessage.vue'
 import moment from 'moment'
 export default {
     name:'safeTechnology',
     components:{
-        commonMessage
+        commonMessage,makeSureMessage,finishMessage
     },
     data(){
         return{
@@ -81,9 +86,16 @@ export default {
             }],
             onePerson:1,
             buildSafeEducationShow:false,
+            makeSureMessageShow:false,
             wordType:2,
             projectName:'安全技术交底',
+            endProjectName:'结束安全技术交底',
             getSafetyTechnologyList:[],
+            submitData:{},
+            finishMessageShow:false,
+            submitFinishData:{},
+            endProjectFinishName:'安全技术交底详情'
+
         }
     },
     created(){
@@ -168,6 +180,10 @@ export default {
             this.getSafetyTechnology();
             this.buildSafeEducationShow=false;
         },
+        refreshMakeSureMessage(){
+            this.getSafetyTechnology();
+            this.makeSureMessageShow=false;
+        },
         getSafetyTechnology(time,title){
             var vm=this;
             axios({
@@ -191,6 +207,20 @@ export default {
             if(val){
                 return moment(val).format('YYYY-MM-DD')
             }
+        },
+        viewDetail(val){
+            this.makeSureMessageShow=true;
+            this.submitData=val;
+        },
+        viewEndDetail(val){
+            this.submitFinishData=val;
+            this.finishMessageShow=true;
+        },
+        backHomePage(){
+            this.makeSureMessageShow=false;
+        },
+        backFinishHome(){
+            this.finishMessageShow=false;
         }
 
     },

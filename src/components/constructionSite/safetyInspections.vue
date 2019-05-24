@@ -12,7 +12,7 @@
                 </router-link>
             </div> -->
             <!-- v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" -->
-            <div id="inspectionBody" v-if="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" >
+            <div id="inspectionBody" v-show="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" >
                 <!-- v-show="exportReportEdit" -->
                 <!-- v-show="searchCheckEdit" -->
                 <!-- <div class="textBtnLeft">
@@ -66,7 +66,7 @@
                         </ul>
                     </div>
                 </div> -->
-                <div class="planeFigure">
+                <div class="planeFigure" id="planeFigure">
                     <div class="planeFigureHead">
                         <div class="planeFigureHeadLeft">
                             <label class="planeFigureHeadLeftBtn"></label>
@@ -77,6 +77,7 @@
                             <i class="drawingIcon smallRotate" @click="smallRotate()"></i>
                             <i class="drawingIcon zuoRotate" @click="zuoRotate()"></i>
                             <i class="drawingIcon youRotate" @click="youRotate()"></i>
+                            <i class="drawingIcon el-icon-rank" @click="fullSrceen()"></i>
                         </div>
                         <div class="block">
                             <span class="demonstration">图例缩放比例</span>
@@ -122,7 +123,7 @@
                             <span :class="[{'clickStyle':isClick8},'inputText1']"  @click="cancleAll()" >取消</span>
                         </div>
                     </div>
-                    <div class="planeFigureBody">
+                    <div class="planeFigureBody" id="planeFigureBody" ref="planeFigureRef">
                         <!-- <div class="operateTool" v-show="editSpotShow">
                             <div class="operateToolLeft" v-show="toolShow">
                                 <span class="move" @click="enableMove"><i class="moveIcon"><label class="moveTxt" >移动</label></i></span>
@@ -1008,7 +1009,7 @@
                         <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                     </div>
             </el-dialog>
-            <el-dialog width="1000px" title="斜度序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+            <el-dialog width="1000px" title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
                 <div>
                     <vue-highcharts id="leftHightchart"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                 </div>
@@ -1043,6 +1044,7 @@ export default {
                 this.callback(evt)},true
         );
         return{
+            fullShow:false,
             spotChangeLineShow1:false,
             pitchLineShow:false,
             singleData:{},
@@ -1872,6 +1874,10 @@ export default {
         this.curTime();
         this.curTime1();
         this.getUserInfo();
+        //  console.log(document.getElementById('planeFigureBody'),'文件10');
+         window.addEventListener('resize',(e)=>{this.resizeHeight();})
+        //  this.fullShow=this.isFullscreen();
+        //  console.log(this.fullShow,'this.fullShow');
         // setTimeout(()=>{
             
         // },200)
@@ -1927,10 +1933,29 @@ export default {
         },
     },
     mounted(){
+         var vm=this;
+        // window.onkeydown = function(e) {
+        //     let key = window.event.keyCode;
+        //     console.log(key,vm.fullShow,'按键code')
+        //     console.log()
+        //     if (key == 27) {
+        //          if(vm.fullShow){
+        //               vm.fullSrceen();
+        //          }
+        //     }
+        // };
+        // console.log(document.getElementById('planeFigureBody'),'文件00');
+        var body=document.getElementById('planeFigureBody');
+        // console.log(window.innerHeight,'高度');
+        body.style.height=(window.innerHeight-450)+'px';
         this.$refs.pic.Max_Select = 8;
         this.$refs.pic.Max_type = 2;
+        
     },
     watch:{
+        // fullShow:function(oldvalue,newvalue){
+        //     this.fullSrceen();
+        // },
         selectUgId:function(val){
             var vm=this;
              this.paramsLists='';
@@ -1957,6 +1982,22 @@ export default {
         }
     },
     methods:{
+        resizeHeight(){           
+            var body=document.getElementById('planeFigureBody');
+            if(window.outerHeight>window.innerHeight){ //  正处于全屏
+                body.style.height=(window.innerHeight-450)+'px';
+            }else{
+                
+                body.style.height=(window.innerHeight - 100)+'px';
+            }
+        },
+        //  resizeHeight1(){
+        //     var body=document.getElementById('planeFigureBody');
+        //     var body1=document.getElementById('planeFigure')
+        //     body.style.height=(window.innerHeight-100)+'px';
+        //     body1.style.marginTop='20px';
+        // },
+
          callback(e){
             // console.log(e.data,'e.data.command');
             switch(e.data.command){
@@ -2498,7 +2539,7 @@ export default {
             }
         },
         picView_status_changed(status,list,move,deleteValue){
-           console.log(status,list,move,deleteValue,'list点中')
+        //    console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
             this.bindMorePoint=status;
             if(this.listLength==1){
@@ -3618,7 +3659,7 @@ export default {
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
-                   
+                   console.log(this.monitorPointInfo,'this.monitorPointInfo000');
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                     this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 }
@@ -3648,6 +3689,7 @@ export default {
         },
         backToH(){
             var vm=this;
+            
             vm.pitchDetailShow=false;
             vm.walkThroughShow=false;
             vm.commonDetailShow=false;
@@ -3657,6 +3699,7 @@ export default {
             // vm.pageNum1=2;
             vm.currentPage1=1;
             // vm.getDetectionSummary();
+            vm.resizeHeight();
             vm.getMonitorMainTable();
             vm.ugCompany();
             vm.getMonitorItem();
@@ -5122,7 +5165,7 @@ export default {
         },
         singleBatchImportVerifyMake(id,type,item,sheetIndex){
            
-            // console.log(id,type,item,'id,type,item');
+            console.log(id,type,item,sheetIndex,'id,type,item','sheetIndex');
             this.singleData[id]={
                 // sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
                 sheetIndex:sheetIndex,
@@ -5141,12 +5184,20 @@ export default {
                 pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
             }
             this.singleBatchImportDataShow=false;
+            console.log(this.sheetList,'this.sheetList0000');
             this.sheetList.forEach((val)=>{
                 if(val.itemId==id){
                     // this.$set(val,'exportTip',val.itemName+'已成功配置')
-                    val.exportTip=val.itemName+'已成功配置'
-                    // this.$set(val,'exportShow',false)
-                    val.exportShow=false;
+                    if(type==5){
+                        if(sheetIndex==val.sheetIndex){
+                            val.exportTip=val.itemName+val.sheetName+'已成功配置'
+                            val.exportShow=false;
+                        }
+                    }else{
+                        val.exportTip=val.itemName+'已成功配置'
+                        // this.$set(val,'exportShow',false)
+                        val.exportShow=false;
+                    }
                 }
             })
             // console.log(this.singleData,'this.singleData11');
@@ -7801,6 +7852,77 @@ export default {
             }
             return m
         },
+    isFullscreen(){
+        return document.fullscreenElement ||document.msFullscreenElement  || document.mozFullScreenElement || document.webkitFullscreenElement || false;
+    },
+    fullSrceen(){
+        // console.log(this.isFullscreen(),'是否全屏');
+        
+        if(this.fullShow==false){
+            var full=document.getElementById("planeFigure");
+            // window.removeEventListener('resize',(e)=>{
+            //     this.resizeHeight();
+            // })
+            // window.addEventListener('resize',(e)=>{
+            //     this.resizeHeight1();
+            // })
+            this.requestFullscreen(full);
+        }else{
+            var full=document.getElementById("planeFigure");
+            // window.removeEventListener('resize',(e)=>{
+            //     this.resizeHeight1();
+            // })
+            // window.addEventListener('resize',(e)=>{
+            //     this.resizeHeight();
+            // })
+            this.exitFullscreen(full);
+        }
+        this.fullShow=!this.fullShow
+    },
+        //全屏封装
+      launchIntoFullscreen(element) {
+                if(element.requestFullscreen){
+                    element.requestFullscreen();
+                }
+                else if(element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                }
+                else if(element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                }
+                else if(element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+        },
+        requestFullscreen( elem ) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            }
+            else if (elem.webkitRequestFullScreen) {
+                // 对 Chrome 特殊处理，
+                // 参数 Element.ALLOW_KEYBOARD_INPUT 使全屏状态中可以键盘输入。
+                if ( window.navigator.userAgent.toUpperCase().indexOf( 'CHROME' ) >= 0 ) {
+                    elem.webkitRequestFullScreen( Element.ALLOW_KEYBOARD_INPUT );
+                }
+                // Safari 浏览器中，如果方法内有参数，则 Fullscreen 功能不可用。
+                else {
+                    elem.webkitRequestFullScreen();
+                }
+            }
+            else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            }
+        },
+        //退出全屏
+        exitFullscreen() {
+                if(document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if(document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if(document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+        },
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfImport')
@@ -7981,7 +8103,7 @@ export default {
             box-sizing: border-box;
             float: left;
             width: 100%;
-            min-height:800px;
+            // min-height:800px;
             overflow: auto;
              #inspectionBody{
                 margin:0 auto;
@@ -8174,6 +8296,7 @@ export default {
                 }
                 .planeFigure{
                     margin-top:15px;
+                    background: white;
                     .planeFigureHead{
                         height: 32px;
                         position: relative;
@@ -8243,6 +8366,17 @@ export default {
                                         &:hover{
                                             background: url('./images/small1.png')no-repeat 0 0;
                                         }
+                                    }
+                                    .el-icon-rank{
+                                        font-size:25px;
+                                        margin-left:20px;
+                                        margin-top:5px;
+                                        transform: rotate(45deg); 
+                                        color:#ccc;
+                                        &:hover{
+                                            color:red;
+                                        }
+
                                     }
 
                         }
@@ -8477,7 +8611,7 @@ export default {
                         margin-top:15px !important;
                         margin:0 auto;
                         border:1px solid #e6e6e6;
-                        height: 600px;
+                        // height: 600px;
                         width: 100%;
                         position: relative;
                         .noDataFigure{
@@ -8658,7 +8792,8 @@ export default {
                         .planeFigureGround{
                             z-index: 8;
                             // height: 590px;
-                            height:580px;
+                            // height:580px;
+                            height: 100%;
                             width: 100%;
                             position:absolute;
                             top:0px;
@@ -8764,6 +8899,7 @@ export default {
                                     font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
+                                    border-bottom: 1px solid #e6e6e6;
                                 }
                             }
                         }
@@ -8787,6 +8923,7 @@ export default {
                                     font-size: 14px;
                                     color: #333333;
                                     font-weight: normal;
+                                    border-bottom: 1px solid #e6e6e6;
                                 }
                             }
                             tbody{
@@ -8805,6 +8942,7 @@ export default {
                                         border-right: 1px solid #e6e6e6;
                                         font-size: 14px;
                                         color: #333333;
+                                        border-bottom: 1px solid #e6e6e6;
                                         .actionBtn{
                                             width: 18px;
                                             height: 18px;

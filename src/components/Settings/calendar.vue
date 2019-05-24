@@ -701,9 +701,9 @@ export default {
         // 选中日期
         select(k1, k2, e) {
             if (e != undefined)e.stopPropagation()
-            console.log(k1,k2,'k1k2');
+            // console.log(k1,k2,'k1k2');
             
-             console.log('是否选择日期111');
+            //  console.log('是否选择日期111');
                 // 日期范围
             if (this.range) {
                 if (this.rangeBegin.length == 0 || this.rangeEndTemp != 0) {

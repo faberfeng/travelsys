@@ -55,7 +55,7 @@
                             <td>{{item.entourage}}</td>
                             <td>{{item.company}}</td>
                             <td>
-                                <span v-show="item.isReturnCard=='0'">{{item.contactInfo}}</span>
+                                <span v-show="item.isReturnCard=='0'">{{item.icCardNo}}</span>
                                 <span v-show="item.isReturnCard=='1'" class="iconBtn">已归还</span>
                             </td>
                             <td>{{item.carInfo}}</td>
@@ -104,8 +104,28 @@
                             </select>
                         </div>
                         <div class="editBodytwo"><label class="editInpText">临时IC卡号 :</label><input class="inp" placeholder="请输入" v-model="icCardNo"/></div>
-                         <div class="editBodytwo"><label class="editInpText">单位名称 :</label><input class="inp" placeholder="请输入单位" v-model="company"/></div>
-                        <div class="editBodytwo"><label class="editInpText">随行人员 :</label><input class="inp" placeholder="姓名以'-'隔开(张三-李四)" v-model="entourage"/></div>
+                         <div class="editBodytwo"><label class="editInpText" >单位名称 :</label>
+                         
+                         <input class="inp" placeholder="请输入单位" v-model="company"/>
+                         </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="vertical-align:top">随行人员 :</label>
+                            <div class="inp" style="display:inline-block;text-align:left;overflow:auto;">
+                                <el-tag style="width:100px;text-align:center;" :key="tag" v-for="tag in  dynamicTags" closable :disable-transitions="false" @close="handleClose(tag)">{{tag}}</el-tag>
+                                        <el-input
+                                        class="input-new-tag"
+                                        v-if="inputVisible"
+                                        v-model="inputValue"
+                                        ref="saveTagInput"
+                                        size="small"
+                                        @keyup.enter.native="handleInputConfirm"
+                                        @blur="handleInputConfirm"
+                                        >
+                                        </el-input>
+                                    <el-button  style="width:80px;" v-else class="button-new-tag" size="small" @click="showInput">+ 新增访客</el-button>
+                            </div>
+                        <!-- <input class="inp" placeholder="姓名以','隔开(张三,李四)" v-model="entourage"/> -->
+                        </div>
                         <!-- <i class="el-icon-circle-plus" style="font-size:18px;cursor:pointer" @click="addPerson"></i> -->
                         <div class="editBodytwo"><label class="editInpText">车辆信息 :</label><input class="inp" placeholder="请输入车辆号牌" v-model="carInfo"/></div>
                         <div class="editBodytwo"><label class="editInpText">联系方式 :</label><input class="inp" placeholder="请输入" v-model="contactInfo"/></div>
@@ -186,6 +206,10 @@ export default {
     },
     data(){
         return{
+            dynamicTags: [],
+            inputVisible: false,
+            inputValue: '',
+
             routerList:"",
             moduleList:'',
             TableListLength:1,//表格长度
@@ -285,13 +309,32 @@ export default {
         addPerson(){
 
         },
+        handleClose(tag) {
+            this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+        },
+
+        showInput() {
+            this.inputVisible = true;
+            this.$nextTick(_ => {
+            this.$refs.saveTagInput.$refs.input.focus();
+            });
+        },
+
+        handleInputConfirm() {
+            let inputValue = this.inputValue;
+            if (inputValue) {
+                this.dynamicTags.push(inputValue);
+            }
+            this.inputVisible = false;
+            this.inputValue = '';
+        },
         addCarRegisterMakeSure(){
             var vm=this;
             var data={
                     "carNumber": vm.carInfo,
                     "carType": 10,
                     "contactInfo":vm.contactInfo,
-                    "contactUser": vm.entourage.split('-')[0],
+                    "contactUser": vm.dynamicTags[0],
                     "projId": vm.projId
             }
             $.ajax({
@@ -311,6 +354,8 @@ export default {
         addvisitorRecord(){
             var data={}
             var vm=this;
+            vm.entourage=vm.dynamicTags.join();
+            console.log(vm.entourage,'vm.entourage');
             // var data=moment(new Date().getTime()).format('YYYY-MM')
             data={
                 "carInfo":vm.carInfo,
@@ -320,7 +365,8 @@ export default {
                 "icCardNo":vm.icCardNo,
                 "mainVisitor": vm.mainVisitor,
                 "projId": vm.projId,
-                "remark": vm.remark
+                "remark": vm.remark,
+                // "entourage":vm.dynamicTags,
             }
             axios({
                 url:this.BDMSUrl+'visitor/addVisitorInfo',
@@ -331,7 +377,6 @@ export default {
                 data:data
             }).then((response)=>{
                 if(response.data.cd==0){
-                    
                     this.addCarRegisterMakeSure();
                     this.addDialog=false;
                     data={};
@@ -509,7 +554,16 @@ export default {
 
         },
         buildVisitorRegister(){
+            var vm=this;
             this.addDialog=true;
+            vm.carInfo='';
+            vm.company='';
+            vm.contactInfo='';
+            vm.entourage='';
+            vm.dynamicTags=[];
+            vm.icCardNo='';
+            vm.remark='';
+
 
         },
         getUserList(){
@@ -868,6 +922,25 @@ li{
                     border: 1px solid #d1d1d1;
                     padding:0px 0px 0px 10px;
                 }
+            .el-tag + .el-tag {
+                margin-left: 10px;
+                margin-top:2px;
+                // width: 100px;
+            }
+            .button-new-tag {
+                margin-left: 10px;
+                margin-top:2px;
+                height: 32px;
+                line-height: 30px;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            .input-new-tag {
+                width: 90px;
+                margin-left: 10px;
+                margin-top:2px;
+                vertical-align: bottom;
+            }
         }
 
 }

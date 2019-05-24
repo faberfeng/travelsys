@@ -6,7 +6,7 @@
                 </router-link>
             </div>
         </div>
-        <div class="contentBody" v-if="!buildSafeEducationShow&&!makeSureMessageShow">
+        <div class="contentBody" v-if="!buildSafeEducationShow&&!makeSureMessageShow&&!finishMessageShow">
             <div class="ForumSelector">
                 <span class="name">筛选条件</span>
                 <ul>
@@ -43,7 +43,7 @@
                     <li class="bodyLi" v-for="(item,index) in getSafetyEducationList" :key="index">
                         <span class="liSpanOne">{{index+1}}</span>
                         <span class="liSpanTwo">
-                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span></span></div>
+                            <div style="height:40px;line-height:40px;text-align:left"><span style="font-size:16px;font-weight:bold;">{{item.title}}</span><span v-if="!item.joined" style="color:#2e8cb9;font-size:14px;display:inline-block;margin-left:40px;">活动进行中</span><span v-if="item.joined" style="color:rgba(255, 152, 0, 1);font-size:14px;display:inline-block;margin-left:40px;">已结束</span></div>
                             <div style="height:70px;line-height:75px;">
                                 <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">活动发起单位：{{item.originator}}</span>
                                 <span style="width:230px;text-align:left;font-size:16px;color:#999999;display:inline-block;">负责人：{{item.leader}}</span>
@@ -51,14 +51,16 @@
                             </div>
                         </span>
                         <span class="liSpanThree">
-                            <span class="spanButton" @click="viewDetail(item)">查看详细</span>
+                            <span v-if="!item.joined" class="spanButton" @click="viewDetail(item)">查看详细</span>
+                            <span v-if="item.joined" class="spanButton" @click="viewEndDetail(item)">查看详细</span>
                         </span>
                     </li>
                 </ul>
             </div>
         </div>
         <commonMessage v-if="buildSafeEducationShow" ref="commonMessage" @refreshPage="refresh()" @back="backHome" :projectName="projectName" :wordType="wordType"></commonMessage>
-        <makeSureMessage v-if="makeSureMessageShow" :submitData="submitData" @back="backHomePage" ref="makeSureMessage"></makeSureMessage>
+        <makeSureMessage v-if="makeSureMessageShow" :submitData="submitData" @back="backHomePage" :endProjectName="endProjectName" @refresh="refreshMakeSureMessage()" ref="makeSureMessage"></makeSureMessage>
+        <finishMessage v-if="finishMessageShow" :submitData="submitFinishData" @back="backFinishHome" :endProjectName="endProjectFinishName"  ref="finishMessage"></finishMessage>
     </div>
 </template>
 
@@ -66,11 +68,12 @@
 import axios from 'axios'
 import commonMessage from './commonMessage.vue'
 import makeSureMessage from './makeSureMessage.vue'
+import finishMessage from './finishMessage.vue'
 import moment from 'moment'
 export default {
     name:'safeEducation',
     components:{
-        commonMessage,makeSureMessage
+        commonMessage,makeSureMessage,finishMessage
     },
     data(){
         return{
@@ -86,9 +89,13 @@ export default {
             makeSureMessageShow:false,
             getSafetyEducationList:[],
             projectName:'安全教育',
+            endProjectName:'结束安全教育',
+            endProjectFinishName:'安全教育详情',
             wordType:1,
             timeStamp:'',
             submitData:{},
+            submitFinishData:{},
+            finishMessageShow:false,
         }
     },
     created(){
@@ -152,6 +159,10 @@ export default {
             this.submitData=val;
             console.log(val,'val00');
         },
+        viewEndDetail(val){
+            this.submitFinishData=val;
+            this.finishMessageShow=true;
+        },
         changeDatePicker(){
             if(this.selectTime){
                 this.getSafetyEducation(this.selectTime,this.selectName);
@@ -177,9 +188,16 @@ export default {
         backHomePage(){
             this.makeSureMessageShow=false;
         },
+        backFinishHome(){
+            this.finishMessageShow=false;
+        },
         refresh(){
             this.getSafetyEducation();
             this.buildSafeEducationShow=false;
+        },
+        refreshMakeSureMessage(){
+            this.getSafetyEducation();
+            this.makeSureMessageShow=false;
         },
         getSafetyEducation(time,title){
             var vm=this;

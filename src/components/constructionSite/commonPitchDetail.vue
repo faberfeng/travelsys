@@ -1445,6 +1445,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.pitchDetailDataListLeft=response.data.rt;
+                        console.log('00000');
                         if(this.pitchDetailDataListLeft.recent2PitchData.length==0){
                             this.$message({
                                 type:'info',
@@ -1590,7 +1591,7 @@ export default Vue.component('commonPitch-detail',{
                             this.rightDisplayListValueXdata=[];
                             this.rightDisplayListValueYdata1=[];
                             this.rightDisplayListValueYdata2=[];
-                            
+                            console.log('1111');
                             if(this.pitchDetailDataListRight){
                                 this.rightDisplayList=this.pitchDetailDataListRight;
                                 this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
