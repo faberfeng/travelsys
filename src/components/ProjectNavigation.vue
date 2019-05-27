@@ -137,12 +137,12 @@ export default {
                             localStorage.setItem('entId',response.data.rt[0].entId)
                             localStorage.setItem('entName',response.data.rt[0].entName)
                             localStorage.setItem('responseAuthInfo',response.data.rt[0].authInfo);
-                            
-                            this.$router.push({
-                                path:'/projectlist',
-                                query:{entId:this.companyList[0].entId}
-                            })
-
+                            if(this.companyList.length==1){
+                                this.$router.push({
+                                    path:'/projectlist',
+                                    query:{entId:this.companyList[0].entId}
+                                })
+                            }
                             this.noprojectShow=false;
                         }else{
                             this.noprojectShow=true;
@@ -193,9 +193,13 @@ export default {
         },
         redirect(key,index){
             var vm = this;
-            localStorage.setItem('projectName',this.companyList[index].companyName);
-            vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+key
-            vm.initCompany();
+            this.$router.push({
+                path:'/projectlist',
+                query:{entId:this.companyList[index].entId}
+            })
+            // localStorage.setItem('projectName',this.companyList[index].companyName);
+            // vm.pathInit = vm.BDMSUrl+'project2/companyInstall/'+key
+            // vm.initCompany();
         }
     }
 }

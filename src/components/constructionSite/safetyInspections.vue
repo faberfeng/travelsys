@@ -3663,7 +3663,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.uploadshow=true;
-                        // this.getTagList();
+                        this.getTagList();
                     }
                 })
             }
@@ -4055,11 +4055,11 @@ export default {
             this.$refs.pic.Max_Select = 1000000;
             this.$refs.pic.Max_type = 1000000;
             this.$refs.pic.setMoveStatus(true);
-            this.getAllMonitorPoint();
-            // this.getMonitorMainTable();
-            if(this.picMark==true){
-                this.getTagList();
-            }
+            // this.getAllMonitorPoint();
+            // // this.getMonitorMainTable();
+            // if(this.picMark==true){
+            //     this.getTagList();
+            // }
             // this.isClick=true;
         },
         returnData(array){
@@ -4260,7 +4260,9 @@ export default {
             this.bindMorePoint=false;
             this.$refs.pic.setMoveStatus(false);
             if(this.picMark==true){
-                this.getTagList();
+                setTimeout(()=>{
+                    this.getTagList();
+                },400)
             }
 
         },
@@ -7018,6 +7020,9 @@ export default {
                         setTimeout(()=>{
                                 this.getTagList();
                         },400)
+                        document.getElementById('fileInfo1').value='';
+                        this.imageName='未选择任何文件';
+                        this.imageName=[];
                         // alert('000000000000000');
                     }else if(response.data.cd=='-1'){
                        
@@ -7217,6 +7222,7 @@ export default {
                         }).then((response)=>{
                             if(response.data.cd=='0'){
                                 // this.uploadshow=true;
+                                this.isClick6=false;
                                 this.$message({
                                     type:'success',
                                     message:'删除点位图片成功'
