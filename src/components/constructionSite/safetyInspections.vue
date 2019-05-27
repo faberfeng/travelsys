@@ -2540,7 +2540,7 @@ export default {
             }
         },
         picView_status_changed(status,list,move,deleteValue){
-        //    console.log(status,list,move,deleteValue,'list点中')
+           console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
             // this.bindMorePoint=status;
             // if(this.listLength==1){
@@ -2563,14 +2563,17 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
+                    
                         this.plotGroup=list[0].pointGroupData;
-                        this.plotGroupOne=list[0].pointGroupData[0].id;
-                        this.plotGroupName=list[0].pointGroupData[0].name;
-                        this.plotGroupType=list[0].pointGroupData[0].itemType;
+                        if(this.plotGroup){
+                                 this.plotGroupOne=list[0].pointGroupData[0].id;
+                                this.plotGroupName=list[0].pointGroupData[0].name;
+                                this.plotGroupType=list[0].pointGroupData[0].itemType;
+                        }
                         list.forEach((item)=>{
                             this.pointIds.push(item.ID_out);
                             this.pointIdName.push(item.pointName);
-                            this.selectpointGroupIds.push(item.pointGroupData[0].id);
+                            // this.selectpointGroupIds.push(item.pointGroupData[0].id);
                         
                         })
                         this.bindMorePoint=status;
@@ -3633,7 +3636,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.uploadshow=true;
-                        this.getTagList();
+                        // this.getTagList();
                     }
                 })
             }
@@ -3643,6 +3646,7 @@ export default {
          getTagList(){
              var vm=this;
               var olist=[];
+              this.spotPicInfoList=[];
             //   this.monitorPointInfo=[];
             //   this.getAllMonitorPoint();
              axios({
@@ -4024,6 +4028,11 @@ export default {
             this.$refs.pic.Max_Select = 1000000;
             this.$refs.pic.Max_type = 1000000;
             this.$refs.pic.setMoveStatus(true);
+            this.getAllMonitorPoint();
+            // this.getMonitorMainTable();
+            if(this.picMark==true){
+                this.getTagList();
+            }
             // this.isClick=true;
         },
         returnData(array){
@@ -4204,6 +4213,7 @@ export default {
             this.editSpotShow=false;
             this.$refs.pic.setDrawCancel();
             this.getAllMonitorPoint();
+            
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
@@ -4221,6 +4231,9 @@ export default {
             this.isBindPoint=false;
             this.bindMorePoint=false;
             this.$refs.pic.setMoveStatus(false);
+            if(this.picMark==true){
+                this.getTagList();
+            }
 
         },
         checkboxChange(data){
@@ -6814,8 +6827,10 @@ export default {
             }).then((response)=>{
                 if(response.data.cd==0){
                     if(response.data.rt){
-                        this.pointNameValue=response.data.rt.split('-')[0];
-                        this.pointNumValue=response.data.rt.split('-')[1];
+                        this.pointNameValue=name;
+                        this.pointNumValue=response.data.rt.replace(this.pointNameValue,'');
+                        // this.pointNameValue=response.data.rt.split('-')[0];
+                        // this.pointNumValue=response.data.rt.split('-')[1];
                     }else{
                         this.pointNameValue=name;
                         this.pointNumValue=num;
