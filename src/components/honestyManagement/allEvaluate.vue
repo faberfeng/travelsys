@@ -24,7 +24,7 @@
                     </li>
                      
                 </ul>
-                <span class="selectItemRight" >
+                <span class="selectItemRight" @click="exportExcel()">
                         导出
                 </span>
                    
@@ -200,6 +200,22 @@ export default {
             // }
 
         },
+        exportExcel(){
+            axios({
+                   url:this.BDMSUrl+'sincerity/exportEvaluateInfo?projId='+this.projId+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectTime==''?'':('&time='+this.selectTime)),
+                    // url:'http://10.252.26.48:8080/bdms_war_exploded/security/exportCheckPoint?checkPointId='+str,
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+                })
+        },
         timeChangeByYears(val){
             if(val){
                 return moment(val).format('YYYY')
@@ -236,7 +252,6 @@ export default {
                 }
             })
         }
-
     },
 
 }

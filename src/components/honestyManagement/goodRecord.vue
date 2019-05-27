@@ -32,6 +32,9 @@
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
+                    <li class="selectItem">
+                            <span class="exportName"  @click="selectNameInfo">导出</span>
+                    </li>
                      
                 </ul>
                 <div class="wrapperHead" @click="buildGoodRecord">
@@ -569,6 +572,13 @@ li{
                                             top: 10px;
                                             cursor: pointer;
                                         }
+                                    }
+                                    .exportName{
+                                        font-size:16px;
+                                        color: #2e8cb9;
+                                        margin-left:12px;
+                                        margin-top:12px;
+                                        display: inline-block;
                                     }
                                 
                                 }

@@ -88,7 +88,7 @@ export default {
         vm.finisUserListValue=JSON.parse(this.submitData.joined);
         console.log(vm.finisUserListValue,'vm.finisUserLists');
         console.log(this.endProjectName,'endProjectName');
-        if(this.endProjectName!='安全教育详情页'){
+        if(this.endProjectName!='返回安全教育'){
              this.getUserList()
         }
     },

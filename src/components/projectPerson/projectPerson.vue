@@ -420,7 +420,7 @@
                                             <th>事件类型</th>
                                             <th>事件</th>
                                             <th>处理结果</th>
-                                            <th>更多</th>
+                                            <!-- <th>更多</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -429,7 +429,7 @@
                                             <td>{{recordType(item.type)}}</td>
                                             <td>{{item.name}}</td>
                                             <td>{{item.remark}}</td>
-                                            <td></td>
+                                            <!-- <td></td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -523,7 +523,7 @@ export default {
             token:'',
             BDMSUrl:'',
             getStaffProfileList:'',
-            endProjectFinishName:'安全教育详情页',
+            endProjectFinishName:'返回安全教育',
             userImg:'',
             sexOptions:[{
                 value:1,
