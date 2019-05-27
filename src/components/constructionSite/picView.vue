@@ -2910,7 +2910,8 @@ export default {
                                 display:true,
                                 typeNum:null,                               //  type
                                 userData:plotInfo.userData,
-                                pointGroupData:list[i].pointGroupData
+                                pointGroupData:list[i].pointGroupData,
+                                photoId:list[i].photoId
                             };
 
                     if(list[i].pointGroupData>0){
@@ -2925,13 +2926,13 @@ export default {
                 if(plotInfo.type=="Select_img_Mark"){
 
                     let item = {
-                                data:list.data,                                  //  data
-                                ItemId:list.itemId,                              //  itemId
-                                ID_out:list.id,                                  //  id
-                                isAlert:list.isAlert,                            //  isAlert
-                                isBroken:list.isBroken,                          //  isBroken
-                                itemName:list.itemName,                          //  itemName
-                                pointName:list.pointName,                        //  pointName
+                                data:list[i].data,                                  //  data
+                                ItemId:list[i].itemId,                              //  itemId
+                                ID_out:list[i].id,                                  //  id
+                                isAlert:list[i].isAlert,                            //  isAlert
+                                isBroken:list[i].isBroken,                          //  isBroken
+                                itemName:list[i].itemName,                          //  itemName
+                                pointName:list[i].pointName,                        //  pointName
                                 status:"normal",
                                 Selected:false,
                                 SID:this.drawID,
@@ -2943,7 +2944,8 @@ export default {
                                 display:true,
                                 typeNum:null,                               //  type
                                 userData:plotInfo.userData,
-                                pointGroupData:list.pointGroupData
+                                pointGroupData:list.pointGroupData,
+                                photoId:list[i].photoId
                             };
                     
                     this.drawList.push(item);
