@@ -1984,11 +1984,12 @@ export default {
     methods:{
         resizeHeight(){           
             var body=document.getElementById('planeFigureBody');
-            if(window.outerHeight>window.innerHeight){ //  正处于全屏
-                body.style.height=(window.innerHeight-450)+'px';
-            }else{
-                
-                body.style.height=(window.innerHeight - 100)+'px';
+            if(body){
+                 if(window.outerHeight>window.innerHeight){ //  正处于全屏
+                    body.style.height=(window.innerHeight-450)+'px';
+                }else{  
+                    body.style.height=(window.innerHeight - 100)+'px';
+                }
             }
         },
         //  resizeHeight1(){
@@ -2539,7 +2540,7 @@ export default {
             }
         },
         picView_status_changed(status,list,move,deleteValue){
-        //    console.log(status,list,move,deleteValue,'list点中')
+           console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
             this.bindMorePoint=status;
             if(this.listLength==1){
@@ -2549,11 +2550,7 @@ export default {
             }
             if(status==true){
 
-                this.plotGroup=list[0].pointGroupData;
-                
-                this.plotGroupOne=list[0].pointGroupData[0].id;
-                this.plotGroupName=list[0].pointGroupData[0].name;
-                this.plotGroupType=list[0].pointGroupData[0].itemType;
+               
             
 
                 this.pointId=list[0].ID_out;
@@ -2566,6 +2563,11 @@ export default {
                 this.picMarkName=list[0].type;
                
                 if(this.picMarkName!="Select_img_Mark"){
+                        this.plotGroup=list[0].pointGroupData;
+                        this.plotGroupOne=list[0].pointGroupData[0].id;
+                        this.plotGroupName=list[0].pointGroupData[0].name;
+                        this.plotGroupType=list[0].pointGroupData[0].itemType;
+
                     list.forEach((item)=>{
                         this.pointIds.push(item.ID_out);
                         this.pointIdName.push(item.pointName);
@@ -2575,7 +2577,7 @@ export default {
                 }
                
                 if(this.picMarkName=="Select_img_Mark"){
-                    this.editSpotShow=status;
+                    // this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
                 }
                 if(this.editSpotShow==false){
