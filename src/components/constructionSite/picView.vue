@@ -802,6 +802,23 @@ export default {
                                         this.$emit('status_changed',false,this.SelectedList);
                                     }
 
+                                     if(this.editStatus == "move" && SID != 0){   //  移动标记
+                                        
+                                        // if(this.SelectedList_last_length > 0 && this.SelectedList_last_length == this.SelectedList.length){
+                                            
+                                            var center={x:X,y:Y};
+
+                                            for(let i = 0; i < this.SelectedList.length;i++){
+                                                this.SelectedList[i].TempPostion.x = this.SelectedList[i].position[0].x - center.x;
+                                                this.SelectedList[i].TempPostion.y = this.SelectedList[i].position[0].y - center.y;
+                                            }
+
+                                            this.startMove = true;
+                                            
+                                            
+                                        // }
+                                    }
+
                                     this.Refresh();
                                     return;
                                 }else{
