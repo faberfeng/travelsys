@@ -2540,7 +2540,7 @@ export default {
             }
         },
         picView_status_changed(status,list,move,deleteValue){
-           console.log(status,list,move,deleteValue,'list点中')
+        //    console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
             // this.bindMorePoint=status;
             // if(this.listLength==1){
@@ -2561,6 +2561,7 @@ export default {
                 this.selectpointGroupIds=[];
                 this.pointIdName=[];
                 this.picMarkName=list[0].type;
+                 
                
                 if(this.picMarkName!="Select_img_Mark"){
                     
@@ -2571,11 +2572,12 @@ export default {
                                 this.plotGroupType=list[0].pointGroupData[0].itemType;
                         }
                         list.forEach((item)=>{
-                            this.pointIds.push(item.ID_out);
-                            this.pointIdName.push(item.pointName);
-                            // this.selectpointGroupIds.push(item.pointGroupData[0].id);
-                        
+                                this.pointIds.push(item.ID_out);
+                                this.pointIdName.push(item.pointName);
+                                    // this.selectpointGroupIds.push(item.pointGroupData[0].id);
                         })
+                        
+                        
                         this.bindMorePoint=status;
                         if(this.listLength==1){
                             this.isBindPoint=true;
@@ -2594,6 +2596,11 @@ export default {
                
                 if(this.picMarkName=="Select_img_Mark"){
                     // this.editSpotShow=status;
+                    //  list.forEach((item)=>{
+                    //     this.pointIds.push(item.photoId);
+                    //     this.pointIdName.push(item.pointName);
+                    //         // this.selectpointGroupIds.push(item.pointGroupData[0].id);
+                    // })
                     this.photoIdList=list[0].ID_out.replace("img","");
                 }
                 // if(this.editSpotShow==false){
@@ -3608,10 +3615,30 @@ export default {
         makeSureData(){
             this.moreSpotLine();
         },
+        // updateTagPosition(){
+        //     var list1 = this.$refs.pic.saveList();
+             
+        //     this.spotPicInfo.push({
+        //         "coordinateInfo":JSON.stringify(list1.pop()),
+        //         "operationType":1,
+        //         "photoId":this.photoId,
+        //     });
+        //     axios({
+        //         url:this.BDMSUrl+'detectionInfo/updateTagPosition',
+        //         headers:{
+        //             'token':this.token
+        //         },
+        //         params:{
+
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd==0){
+
+        //         }
+        //     })
+        // },
         drawFinish(){
             var vm=this;
-       
-        
             if(this.setSpotPicShow==true){
                 // this.uploadshow=true;
                 this.spotPicInfo=[];
@@ -3678,7 +3705,7 @@ export default {
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
-                   console.log(this.monitorPointInfo,'this.monitorPointInfo000');
+                //    console.log(this.monitorPointInfo,'this.monitorPointInfo000');
                    this.isClick6=false;
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                     this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
@@ -4174,11 +4201,12 @@ export default {
                         })
                     }
             }else if(this.moveClick==true){
+                // console.log(this.pointIds,'this.pointIds');
                 this.pointIds.forEach((item)=>{
                     list.forEach((item1)=>{
                          if(item==item1.id){
                              elist.push({
-                                 'id':item1.id,
+                                 'id':parseInt(item1.id),
                                  'plotInfo':item1.plotInfo
                              })
                          }
@@ -5194,7 +5222,7 @@ export default {
         },
         singleBatchImportVerifyMake(id,type,item,sheetIndex){
            
-            console.log(id,type,item,sheetIndex,'id,type,item','sheetIndex');
+            // console.log(id,type,item,sheetIndex,'id,type,item','sheetIndex');
             this.singleData[sheetIndex]={
                 // sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
                 sheetIndex:sheetIndex,
@@ -5213,7 +5241,7 @@ export default {
                 pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
             }
             this.singleBatchImportDataShow=false;
-            console.log(this.sheetList,'this.sheetList0000');
+            // console.log(this.sheetList,'this.sheetList0000');
             this.sheetList.forEach((val)=>{
                 if(val.itemId==id){
                     // this.$set(val,'exportTip',val.itemName+'已成功配置')
