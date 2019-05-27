@@ -32,6 +32,9 @@
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
+                     <li class="selectItem">
+                            <span class="exportName"  @click="exportData">导出</span>
+                    </li>
                      
                 </ul>
                 <div class="wrapperHead" @click="buildGoodRecord">
@@ -284,6 +287,21 @@ export default {
                 this.getGoodRecord()
             }
         },
+        exportData(){
+            axios({
+                   url:this.BDMSUrl+'sincerity/exportSincerityInfo?projId='+this.projId+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectTime==''?'':('&time='+this.selectTime))+'&type='+2,
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+            })
+        },
          buildGoodRecord(){
             this.addDialog=true;
         },
@@ -527,6 +545,14 @@ li{
                                         padding: 0 15px 0 30px;
                                         height: 48px;
                                         line-height: 48px;
+                                    }
+                                    .exportName{
+                                        font-size:16px;
+                                        color: #2e8cb9;
+                                        margin-left:12px;
+                                        margin-top:12px;
+                                        display: inline-block;
+                                        cursor: pointer;
                                     }
                                     .el-select{
                                         margin-top:4px;
