@@ -87,7 +87,10 @@ export default {
         vm.BDMSUrl=this.$store.state.BDMSUrl;
         vm.finisUserListValue=JSON.parse(this.submitData.joined);
         console.log(vm.finisUserListValue,'vm.finisUserLists');
-        this.getUserList()
+        console.log(this.endProjectName,'endProjectName');
+        if(this.endProjectName!='安全教育详情页'){
+             this.getUserList()
+        }
     },
     methods:{
         getUserList(){

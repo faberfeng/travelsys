@@ -43,7 +43,7 @@
                 </ul>
             </div>
         </div>
-        <div class="contentBottom">
+        <div class="contentBottom" v-if="!finishMessageShow">
             <el-tabs type="border-card">
                 <el-tab-pane label="基本信息">
                     <div class="basicInfWrapper">
@@ -447,7 +447,7 @@
                                             <th>序号</th>
                                             <th>日期</th>
                                             <th>安全教育名称</th>
-                                            <th>教育类别</th>
+                                            <th>活动负责人</th>
                                             <th>活动发起单位</th>
                                             <th>更多</th>
                                         </tr>
@@ -457,9 +457,11 @@
                                             <td>{{index+1}}</td>
                                             <td>{{timeChange(item.startTime)}}--{{timeChange(item.endTime)}}</td>
                                             <td>{{item.title}}</td>
-                                            <td>{{item.text}}</td>
+                                            <td>{{item.leader}}</td>
                                             <td>{{item.originator}}</td>
-                                            <td></td>
+                                            <td>
+                                                <span class="moreBtn" @click="moreDetail(item)">详情</span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -470,6 +472,7 @@
                 <!-- <el-tab-pane label="账号安全">定时任务补偿</el-tab-pane> -->
             </el-tabs>
         </div>
+        <finishMessage v-if="finishMessageShow" :submitData="submitFinishData" @back="backFinishHome" :endProjectName="endProjectFinishName"  ref="finishMessage"></finishMessage>
         <div id="edit">
             <el-dialog :visible.sync="workExperienceShow" width="600px" title="添加加工作经验" @close="workExperienceCancle">
                 <div class="editBody">
@@ -506,18 +509,21 @@
 import axios from 'axios'
 import moment from 'moment'
 import calendar from '../Settings/calendar.vue'
+import finishMessage from '../safetyEducation/finishMessage.vue'
 export default {
     name:'projectPerson',
     components: {
-        calendar
+        calendar,finishMessage
     },
     data(){
         return{
+            finishMessageShow:false,
             editShow:false,
             projId:'',
             token:'',
             BDMSUrl:'',
             getStaffProfileList:'',
+            endProjectFinishName:'安全教育详情页',
             userImg:'',
             sexOptions:[{
                 value:1,
@@ -643,6 +649,7 @@ export default {
             thirdLevelSecurityEducationCard:'',
             attendInfo:'',
             queryAttendancyRecordByUserList:'',
+            submitFinishData:{},
         }
     },
     created(){
@@ -672,6 +679,13 @@ export default {
         console.log('jdkfdkj')
     },
     methods:{
+        backFinishHome(){
+            this.finishMessageShow=false;
+        },
+        moreDetail(val){
+            this.finishMessageShow=true;
+            this.submitFinishData=val;
+        },
         timeChange(val){
             if(val){
                 return moment(val).format('YYYY-MM-DD')
@@ -1655,22 +1669,37 @@ ul,li{
                                         text-align: center;
                                         box-sizing: border-box;
                                         border-right: 1px solid #e6e6e6;
+                                        border-bottom: 1px solid #e6e6e6;
                                         font-size: 14px;
                                         color: #333333;
-                                        .actionBtn{
-                                            width: 18px;
-                                            height: 18px;
-                                            border: none;
+                                        .moreBtn{
+                                            width: 70px;
+                                            height: 26px;
+                                            line-height: 24px;
+                                            font-size: 14px;
+                                            border-radius: 4px;
+                                            border:1px solid #ccc;
+                                            display: inline-block;
                                             cursor: pointer;
-                                            margin-left: 10px;
+                                            &:hover{
+                                                color:white;
+                                                background: #ccc;
+                                            }
+                                        }
+                                        // .actionBtn{
+                                        //     width: 18px;
+                                        //     height: 18px;
+                                        //     border: none;
+                                        //     cursor: pointer;
+                                        //     margin-left: 10px;
 
-                                        }
-                                        .deleteBtn{
-                                            background: url('../../assets/delete.png') no-repeat 0 0;
-                                        }
-                                        .editBtn{
-                                            background: url('../../assets/edit.png') no-repeat 0 0;
-                                        }
+                                        // }
+                                        // .deleteBtn{
+                                        //     background: url('../../assets/delete.png') no-repeat 0 0;
+                                        // }
+                                        // .editBtn{
+                                        //     background: url('../../assets/edit.png') no-repeat 0 0;
+                                        // }
 
                                     }
                                 }
