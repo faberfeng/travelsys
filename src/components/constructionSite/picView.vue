@@ -1301,6 +1301,7 @@ export default {
             var Center_div = {x:this.Main_div.offsetWidth/2,y:this.Main_div.offsetHeight/2};
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
 
             var Center_before = {x:this.start_canvas.x + this.start_canvas.w / 2,y:this.start_canvas.y + this.start_canvas.h / 2};
             var Center_now = {x:this.sub_div.offsetLeft + this.sub_div.offsetWidth / 2,y:this.sub_div.offsetTop + this.sub_div.offsetHeight / 2};
@@ -2923,7 +2924,7 @@ export default {
                     this.drawID++;
                 }
 
-                if(plotInfo.type=="Select_img_Mark"){
+                if(plotInfo.type=="Select_img_Mark" || plotInfo.type=="Text"){
 
                     let item = {
                                 data:list[i].data,                                  //  data
