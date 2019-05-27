@@ -2386,13 +2386,13 @@ export default {
                 if(data){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale + 10);
+                    drawcontext.fillText(data,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale + 10* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
 
                 if(pointName){
                     drawcontext.fillStyle=color_;
                     drawcontext.font="12px Georgia";
-                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale,position.y * this.ResolutionScale * this.scale - 4);
+                    drawcontext.fillText(pointName,position.x * this.ResolutionScale * this.scale + radius * 1.6 * scale* this.scale * this.ResolutionScale * this.Koeffzient,position.y * this.ResolutionScale * this.scale - 4* this.scale * this.ResolutionScale * this.Koeffzient);
                 }
             }
         },
