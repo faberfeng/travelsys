@@ -2924,7 +2924,7 @@ export default {
                     this.drawID++;
                 }
 
-                if(plotInfo.type=="Select_img_Mark" || plotInfo.type=="Text"){
+                if(plotInfo.type=="Select_img_Mark" || plotInfo.type=="text"){
 
                     let item = {
                                 data:list[i].data,                                  //  data
@@ -2969,7 +2969,7 @@ export default {
                 let item = {
                             data:listItem.data,                                  //  data
                             ItemId:listItem.itemId,                              //  itemId
-                            ID_out:list[i].id,                                  //  id
+                            ID_out:list[i].id,                                   //  id
                             isAlert:listItem.isAlert,                            //  isAlert
                             isBroken:listItem.isBroken,                          //  isBroken
                             itemName:listItem.itemName,                          //  itemName
