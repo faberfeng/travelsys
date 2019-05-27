@@ -3636,7 +3636,7 @@ export default {
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         this.uploadshow=true;
-                        this.getTagList();
+                        // this.getTagList();
                     }
                 })
             }
@@ -3646,6 +3646,7 @@ export default {
          getTagList(){
              var vm=this;
               var olist=[];
+              this.spotPicInfoList=[];
             //   this.monitorPointInfo=[];
             //   this.getAllMonitorPoint();
              axios({
@@ -4027,6 +4028,11 @@ export default {
             this.$refs.pic.Max_Select = 1000000;
             this.$refs.pic.Max_type = 1000000;
             this.$refs.pic.setMoveStatus(true);
+            this.getAllMonitorPoint();
+            // this.getMonitorMainTable();
+            if(this.picMark==true){
+                this.getTagList();
+            }
             // this.isClick=true;
         },
         returnData(array){
@@ -4207,6 +4213,7 @@ export default {
             this.editSpotShow=false;
             this.$refs.pic.setDrawCancel();
             this.getAllMonitorPoint();
+            
             this.isClick1=false;
             this.isClick2=false;
             this.isClick3=false;
@@ -4224,6 +4231,9 @@ export default {
             this.isBindPoint=false;
             this.bindMorePoint=false;
             this.$refs.pic.setMoveStatus(false);
+            if(this.picMark==true){
+                this.getTagList();
+            }
 
         },
         checkboxChange(data){
