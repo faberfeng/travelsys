@@ -32,6 +32,9 @@
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
                     </li>
+                    <li class="selectItem">
+                            <span class="exportName"  @click="exportData">导出</span>
+                    </li>
                      
                 </ul>
                 <div class="wrapperHead" @click="buildComplain">
@@ -292,6 +295,21 @@ export default {
                 this.selectTime='';
                  this.getComplaintInfo()
             }
+        },
+        exportData(){
+            axios({
+                   url:this.BDMSUrl+'sincerity/exportComplaintInfo?projId='+this.projId+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectTime==''?'':('&time='+this.selectTime)),
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+            })
         },
         clickInp(){
             this.$refs.fileRef.click();
@@ -636,6 +654,14 @@ li{
                                             top: 10px;
                                             cursor: pointer;
                                         }
+                                    }
+                                    .exportName{
+                                        font-size:16px;
+                                        color: #2e8cb9;
+                                        margin-left:12px;
+                                        margin-top:12px;
+                                        display: inline-block;
+                                        cursor: pointer;
                                     }
                                 
                                 }

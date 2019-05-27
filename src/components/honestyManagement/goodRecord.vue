@@ -33,7 +33,7 @@
                         </span>
                     </li>
                     <li class="selectItem">
-                            <span class="exportName"  @click="selectNameInfo">导出</span>
+                            <span class="exportName"  @click="exportData">导出</span>
                     </li>
                      
                 </ul>
@@ -272,6 +272,22 @@ export default {
                 this.getGoodRecord();
             }
            
+        },
+        exportData(){
+             axios({
+                   url:this.BDMSUrl+'sincerity/exportSincerityInfo?projId='+this.projId+(this.selectName==''?'':('&userName='+this.selectName))+(this.selectTime==''?'':('&time='+this.selectTime))+'&type='+1,
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob'
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    window.location.href = objectUrl;   //浏览器打开这个url
+                })
+            
         },
         selectNameInfo(){
             if(this.selectTime){
@@ -579,6 +595,7 @@ li{
                                         margin-left:12px;
                                         margin-top:12px;
                                         display: inline-block;
+                                        cursor: pointer;
                                     }
                                 
                                 }
