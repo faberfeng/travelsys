@@ -2394,7 +2394,7 @@ export default {
             if(this.picMarkName=="Select_img_Mark"){
                 vm.spotPicInfoList.forEach((item)=>{
                         if(item.id+'img'==val.ID_out){
-                            if(item.filePath==null){
+                            if(item.fileGroupId==null){
                                 this.$message({
                                     type:'info',
                                     message:'该点位不存在图片,请删除重新上传'
@@ -2540,14 +2540,14 @@ export default {
             }
         },
         picView_status_changed(status,list,move,deleteValue){
-           console.log(status,list,move,deleteValue,'list点中')
+        //    console.log(status,list,move,deleteValue,'list点中')
             this.listLength=list.length;
-            this.bindMorePoint=status;
-            if(this.listLength==1){
-                this.isBindPoint=true;
-            }else{
-                this.isBindPoint=false;
-            }
+            // this.bindMorePoint=status;
+            // if(this.listLength==1){
+            //     this.isBindPoint=true;
+            // }else{
+            //     this.isBindPoint=false;
+            // }
             if(status==true){
 
                
@@ -2567,26 +2567,39 @@ export default {
                         this.plotGroupOne=list[0].pointGroupData[0].id;
                         this.plotGroupName=list[0].pointGroupData[0].name;
                         this.plotGroupType=list[0].pointGroupData[0].itemType;
+                        list.forEach((item)=>{
+                            this.pointIds.push(item.ID_out);
+                            this.pointIdName.push(item.pointName);
+                            this.selectpointGroupIds.push(item.pointGroupData[0].id);
+                        
+                        })
+                        this.bindMorePoint=status;
+                        if(this.listLength==1){
+                            this.isBindPoint=true;
+                        }else{
+                            this.isBindPoint=false;
+                        }
 
-                    list.forEach((item)=>{
-                        this.pointIds.push(item.ID_out);
-                        this.pointIdName.push(item.pointName);
-                        this.selectpointGroupIds.push(item.pointGroupData[0].id);
-                      
-                    })
+                         if(this.editSpotShow==false){
+                            if(this.plotGroupType==5){
+                                this.getPitchDetailDataBySeqId(this.plotGroupOne);
+                            }else{
+                                this.getAllCurve(this.plotGroupOne)
+                            } 
+                        }
                 }
                
                 if(this.picMarkName=="Select_img_Mark"){
                     // this.editSpotShow=status;
                     this.photoIdList=list[0].ID_out.replace("img","");
                 }
-                if(this.editSpotShow==false){
-                    if(this.plotGroupType==5){
-                        this.getPitchDetailDataBySeqId(this.plotGroupOne);
-                    }else{
-                        this.getAllCurve(this.plotGroupOne)
-                    } 
-                }
+                // if(this.editSpotShow==false){
+                //     if(this.plotGroupType==5){
+                //         this.getPitchDetailDataBySeqId(this.plotGroupOne);
+                //     }else{
+                //         this.getAllCurve(this.plotGroupOne)
+                //     } 
+                // }
                 if(move=='move'){
                     this.moveClick=true;
                 }else{
@@ -3645,6 +3658,7 @@ export default {
                 if(response.data.rt.length!=0){
                     this.spotPicInfoList=response.data.rt;
                      this.photoId=this.spotPicInfoList[this.spotPicInfoList.length-1].id;
+                     
                     this.spotPicInfoList.forEach((item)=>{
                         olist.push(
                             {
@@ -3655,13 +3669,13 @@ export default {
                                 'photoId':item.id,
                             }
                         )
-                     
                     })
                     olist.forEach((item)=>{
                         //  this.$set(item,'')
                         this.monitorPointInfo.push(item)
                     })
                    console.log(this.monitorPointInfo,'this.monitorPointInfo000');
+                   this.isClick6=false;
                     vm.$refs.pic.loadPoints(this.monitorPointInfo);
                     this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 }
@@ -7125,6 +7139,10 @@ export default {
                         if(response.data.cd==0){
                             this.getAllMonitorPoint();
                             this.getMonitorMainTable();
+                            if(this.picMark==true){
+                                this.getTagList();
+                            }
+
                             this.isClick6=false;
                             this.isBindPoint=false;
                             this.bindMorePoint=false;

@@ -576,8 +576,9 @@ li{
                                     .exportName{
                                         font-size:16px;
                                         color: #2e8cb9;
-                                        margin-left:10px;
-                                        margin-top:10px;
+                                        margin-left:12px;
+                                        margin-top:12px;
+                                        display: inline-block;
                                     }
                                 
                                 }
