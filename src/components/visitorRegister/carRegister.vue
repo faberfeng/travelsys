@@ -16,12 +16,12 @@
                             <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                        <span class="title-right">
                             <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
-                    </li>
+                    </li> -->
                 </ul>
                 <!-- <span class="selectItemRight" >
                         导出
@@ -239,6 +239,12 @@ export default {
         },
         //改变时间
         changeDatePicker(){
+             if(this.selectTime){
+                 this.getCarRegister()
+            }else{
+                this.selectTime='';
+                this.getCarRegister()
+            }
         },
         selectNameInfo(){
 
@@ -348,19 +354,19 @@ export default {
                 }
             })
         },
-        getCarRegister(time){
+        getCarRegister(){
             var vm=this;
             this.getCarRegisterLists=[];
             $.ajax({
-                url:this.BDMSUrl+'car/listCarInfo',
+                url:this.BDMSUrl+'car/listCarInfo?projId='+this.projId+(this.selectTime==''?'':'&time='+moment(this.selectTime).format('YYYY-MM-DD')),
                 type:'get',
                 headers:{
                     'token':this.token
                 },
-                data:{
-                    projId:this.projId,
-                    time:time
-                },
+                // data:{
+                //     projId:this.projId,
+                //     time:ti
+                // },
                 success:(response)=>{
                     if(response.cd==0){
                         this.getCarRegisterList=response.rt;

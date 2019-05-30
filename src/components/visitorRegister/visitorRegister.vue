@@ -16,12 +16,12 @@
                             <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
                          </span>
                     </li>
-                    <li class="selectItem">
+                    <!-- <li class="selectItem">
                        <span class="title-right">
                             <input type="text" v-model="selectName" placeholder="请输入名称"  class="title-right-icon" @keyup.enter="selectNameInfo">
                             <span  class="title-right-edit-icon el-icon-search" @click="selectNameInfo"></span>
                         </span>
-                    </li>
+                    </li> -->
                      
                 </ul>
                 <!-- <span class="selectItemRight" @click="exportVisiterWord" >
@@ -30,6 +30,9 @@
                 <div class="wrapperHead" @click="buildVisitorRegister">
                     <span class="el-icon-plus"></span><span class="elName">访客登记</span>
                 </div>
+            </div>
+            <div class="current_text">
+                <span>当前访客:</span><span style="color:red">{{getVisitorNums}}人</span>
             </div>
             <div class="tableBody">
                 <table class="tableList" border="1" cellspacing="0" width="100%">
@@ -239,6 +242,7 @@ export default {
             safeNoticeShow:false,
             visitorId:'',
             leavetime:'',
+            getVisitorNums:'',
         }
     },
     filters:{
@@ -258,10 +262,9 @@ export default {
         vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
         vm.loadingTitle();
         this.getUserList();
-        this.getVisitorInfo();
         this.getSafetyNotification();
-        this.leavetime=new Date().getTime()
-
+        this.leavetime=new Date().getTime();
+        this.getVisitorInfo();
     },
     methods:{
          loadingTitle(){
@@ -348,6 +351,23 @@ export default {
                 contentType:'application/json;charset=utf-8',
                 success:(response)=>{
                         this.getVisitorInfo();
+                }
+            })
+        },
+        getVisitorNum(time){
+            axios({
+                url:this.BDMSUrl+'visitor/getVisitorNum',
+                method:'GET',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projId:this.projId,
+                    time:moment(time).format('YYYY-MM-DD')
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getVisitorNums=response.data.rt;
                 }
             })
         },
@@ -474,21 +494,23 @@ export default {
             })
             
         },
-        getVisitorInfo(time){
+        getVisitorInfo(){
             this.getVisitorInfoLists=[];
             axios({
-                url:this.BDMSUrl+'visitor/getVisitorInfo',
+                url:this.BDMSUrl+'visitor/getVisitorInfo?projId='+this.projId+(this.selectTime==''?'':'&time='+moment(this.selectTime).format('YYYY-MM-DD')),
                 method:'GET',
-                params:{
-                    projId:this.projId,
-                    time:time
-                },
+                // params:{
+                //     projId:this.projId,
+                //     time:this.selectTime,
+                //     name:this.selectName
+                // },
                 headers:{
                     'token':this.token
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
                      this.getVisitorInfoList=response.data.rt;
+                     this.getVisitorNum(this.leavetime);
                      this.getVisitorInfoListLength=this.getVisitorInfoList.length;
                      if(this.getVisitorInfoListLength<11){
                         for(var i=0;i<this.getVisitorInfoListLength;i++){
@@ -544,10 +566,20 @@ export default {
         },
         //改变时间
         changeDatePicker(){
-
+             if(this.selectTime){
+                 this.getVisitorInfo()
+            }else{
+                this.selectTime='';
+                this.getVisitorInfo()
+            }
         },
         selectNameInfo(){
-
+             if(this.selectTime){
+                this.getVisitorInfo()
+            }else{
+                this.selectTime='';
+               this.getVisitorInfo()
+            }
         },
         //导出
         exportVisiterWord(){
@@ -801,6 +833,14 @@ li{
                             }
                         }
                 }
+            .current_text{
+                margin-top:2px;
+                text-align: left;
+                font-size: 18px;
+                
+                height: 32px;
+                line-height: 32px;
+            }
 
             .tableBody{
                   margin-top:30px;

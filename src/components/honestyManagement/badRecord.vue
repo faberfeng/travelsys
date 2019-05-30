@@ -23,7 +23,8 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <!-- <v2-datepicker format="yyyy" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker> -->
+                            <el-date-picker v-model="selectTime" type="year" width="200px" placeholder="选择年" @change="changeDatePicker()"></el-date-picker>
                          </span>
                     </li>
                     <li class="selectItem">
@@ -337,24 +338,33 @@ export default {
                 'projId':this.projId,
                 'users':userData
             }
-            axios({
-                url:this.BDMSUrl+'sincerity/addSincerityInfo',
-                method:"post",
-                headers:{
-                    'token':this.token
-                },
-                data:data
-            }).then((response)=>{
-                this.getGoodRecord();
-                this.addDialog=false;
-                this.selectUserList=[];
-                this.companyName='';
-                this.modeName='';
-                this.eventName='';
-                this.remark='';
-                this.evenTime='';
-                
-            })
+             if(this.companyName==''||this.modeName==''||this.eventName==''||this.remark==''||this.evenTime==''||userData==[]){
+                this.$message({
+                    type:'info',
+                    message:'内容不能为空'
+                })
+            }else{
+                 axios({
+                    url:this.BDMSUrl+'sincerity/addSincerityInfo',
+                    method:"post",
+                    headers:{
+                        'token':this.token
+                    },
+                    data:data
+                }).then((response)=>{
+                    this.getGoodRecord();
+                    this.addDialog=false;
+                    this.selectUserList=[];
+                    this.companyName='';
+                    this.modeName='';
+                    this.eventName='';
+                    this.remark='';
+                    this.evenTime='';
+                    
+                })
+
+            }
+           
         },
 
         getUserList(){
@@ -539,6 +549,10 @@ li{
                                         padding: 8px 15px 0 30px;
                                         height: 48px;
                                         line-height: 48px;
+                                         margin-top:-7px;
+                                        .el-date-editor.el-input{
+                                            width: 200px !important;
+                                        }
                                     }
                                     .title{
                                         display: inline-block;

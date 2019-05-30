@@ -23,7 +23,8 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <!-- <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker> -->
+                            <el-date-picker v-model="selectTime" type="month" width="200px" placeholder="选择月" @change="changeDatePicker()"></el-date-picker>
                          </span>
                     </li>
                     <li class="selectItem">
@@ -362,6 +363,10 @@ li{
                                     padding: 8px 15px 0 30px;
                                     height: 48px;
                                     line-height: 48px;
+                                    margin-top:-7px;
+                                    .el-date-editor.el-input{
+                                        width: 200px !important;
+                                    }
                                 }
                                 .title{
                                     display: inline-block;

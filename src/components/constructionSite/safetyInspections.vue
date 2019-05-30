@@ -1315,7 +1315,7 @@ export default {
                 },
                 {
                     value:5,
-                    label:'斜度'
+                    label:'测斜'
                 }
             ],
             monitorMainTableList:'',//监测内容总表
@@ -1893,7 +1893,7 @@ export default {
             }else if(val==4){
                 return '受力'
             }else if(val==5){
-                return '斜度'
+                return '测斜'
             }
         },
         shifouChange(val){

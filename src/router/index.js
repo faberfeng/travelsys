@@ -13,6 +13,12 @@ const router = new Router({
       name:'pdfPreview',
       component:resolve=>require(['@/components/constructionSite/htmlToPdf'],resolve),
     },
+    //文件预览
+    {
+      path:'/pdfView',
+      name:'pdfView',
+      component:resolve=>require(['@/components/pdfView'],resolve)
+    },
 
     //gantt
     {

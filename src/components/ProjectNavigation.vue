@@ -59,7 +59,7 @@ export default {
             companyList:[],
             companyLists:[],
             userName:'',
-            userImg:'',
+            userImg:null,
             userId:'',
             token:'',
             BDMSUrl:'',
@@ -98,11 +98,12 @@ export default {
                     // vm.userId = response.data.rt.onlineInfo.userId;
                     vm.userName = response.data.rt.user.name;
                     vm.userId = response.data.rt.user.userId;
-                    if(response.data.rt.user.userAvater==null){
-                        vm.userImg='';
+                    if(response.data.rt.user.userAvater==""){
+                        vm.userImg=null;
                     }else{
                         vm.userImg=vm.BDMSUrl+'user/avater?userId='+vm.userId;
                     }
+                    
                     
                     vm.userLevel=response.data.rt.user.userLevel;
                     localStorage.setItem('userName',vm.userName)

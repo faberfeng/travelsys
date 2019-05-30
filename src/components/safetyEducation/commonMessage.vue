@@ -191,27 +191,40 @@ export default {
             }
             var formData=new FormData();
             formData.append('file',this.fileList)
-            axios({
-                url:URl,
-                headers:{
-                    'token':this.token
-                },
-                method:'post',
-                params:{
-                    title:this.workName,
-                    text:this.workText,
-                    originator:this.workOriginator,
-                    leader:this.workLeader,
-                    startTime:moment(this.startTimeValue).format('YYYY-MM-DD HH:mm:ss'),
-                    entTime:moment(this.endTimeValue).format('YYYY-MM-DD HH:mm:ss')
-                },
-                data:formData
-            }).then((response)=>{
-                if(response.data.cd==0){
-                    this.imageName="未选择任何文件"
-                    this.$emit('refreshPage')
-                }
-            })
+            if(this.workName==''||this.workText==''||this.workOriginator==''||this.workLeader==''||this.startTimeValue==''||this.endTimeValue==''){
+                this.$message({
+                    type:'info',
+                    message:'内容不能为空'
+                })
+            }else if(this.fileList==null){
+                this.$message({
+                    type:'info',
+                    message:'请上传文件'
+                })
+            }
+            else{
+                axios({
+                    url:URl,
+                    headers:{
+                        'token':this.token
+                    },
+                    method:'post',
+                    params:{
+                        title:this.workName,
+                        text:this.workText,
+                        originator:this.workOriginator,
+                        leader:this.workLeader,
+                        startTime:moment(this.startTimeValue).format('YYYY-MM-DD HH:mm:ss'),
+                        entTime:moment(this.endTimeValue).format('YYYY-MM-DD HH:mm:ss')
+                    },
+                    data:formData
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.imageName="未选择任何文件"
+                        this.$emit('refreshPage')
+                    }
+                })
+            }
         },
 
         changeFile(){

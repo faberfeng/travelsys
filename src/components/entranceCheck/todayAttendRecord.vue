@@ -226,7 +226,14 @@ export default {
             this.getTodayAttendancy(this.selectName,this.selectTime);
         },
         getTodayAttendancy(name,date){
+            var vm=this;
             this.getTodayAttendancyLists=[];
+            let data='';
+            if(date){
+                data=moment(date).format('YYYY-MM-DD');
+            }else{
+                data=moment(vm.timeStamp).format('YYYY-MM-DD');
+            }
             axios({
                 url:this.BDMSUrl+'attendancy/getAttendancy',
                 headers:{
@@ -235,7 +242,7 @@ export default {
                 params:{
                     userName:name,
                     projectId:this.projId,
-                    date:moment(date).format('YYYY-MM-DD')
+                    date:data
                 }
             }).then((response)=>{
                 if(response.data.cd==0){

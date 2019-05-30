@@ -23,7 +23,8 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <!-- <v2-datepicker format="yyyy-MM-DD" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker> -->
+                            <el-date-picker v-model="selectTime" type="year" width="200px" placeholder="选择年" @change="changeDatePicker()"></el-date-picker>
                          </span>
                     </li>
                     <li class="selectItem">
@@ -119,8 +120,9 @@
                         </div>
                         <div class="editBodytwo"><label class="editInpText">投诉单 :</label>
                             <div @click="clickInp" class="tagLable" style="display:inline-block;width:415px;height:38px;border:1px solid #d1d1d1;border-radius:4px;position:relative;vertical-align: middle;overflow:auto;">
+                                 <span style="line-height:36px;cursor:pointer">{{fileName}}</span>
                                 <input style="opacity:0" type="file" id="fileInput" @change="changeIndex($event)" ref="fileRef"/>
-                                <span></span>
+                               
                             </div>
                             <span @click="clickInp" class="el-icon-upload"></span>
                          </div>
@@ -195,7 +197,7 @@ export default {
             userLists:[],
             selectUserList:[],
             fileList:null,
-            fileName:'',
+            fileName:'请点击上传投诉单',
             complaintFile:{},
             complaintTarget:'',
             // beComplaintTarget:'',
@@ -372,24 +374,32 @@ export default {
                     "time": moment(this.complainTime).format('YYYY-MM-DD HH:ss:mm'),
                     "users":userData
                 }
-            axios({
-                url:this.BDMSUrl+'sincerity/addComplaintInfo',
-                method:"post",
-                headers:{
-                    'token':this.token
-                },
-                data:data
-            }).then((response)=>{
-              this.getComplaintInfo();
-            this.addDialog=false;
-                this.selectUserList=[];
-                this.companyName='';
-            //    this.beComplaintTarget='';
-               this.complaintFile='';
-               this.complaintTarget='';
-               this.complaintEvent='';
-                this.complainTime='';
-            })
+            if(this.companyName==''||this.complaintFile=={}||this.complaintTarget==''||this.complaintEvent==''||this.complainTime==''||userData==[]){
+                this.$message({
+                    type:"info",
+                    message:'内容不能为空'
+                })
+            }else{
+                axios({
+                    url:this.BDMSUrl+'sincerity/addComplaintInfo',
+                    method:"post",
+                    headers:{
+                        'token':this.token
+                    },
+                    data:data
+                }).then((response)=>{
+                    this.getComplaintInfo();
+                    this.addDialog=false;
+                    this.selectUserList=[];
+                    this.companyName='';
+                //    this.beComplaintTarget='';
+                    this.complaintFile='';
+                    this.complaintTarget='';
+                    this.complaintEvent='';
+                    this.complainTime='';
+                })
+            }
+            
         },
         getComplaintInfo(){
             this.getComplaintInfoLists=[];
@@ -608,6 +618,10 @@ li{
                                         padding: 8px 15px 0 30px;
                                         height: 48px;
                                         line-height: 48px;
+                                        margin-top:-7px;
+                                        .el-date-editor.el-input{
+                                            width: 200px !important;
+                                        }
                                     }
                                     .title{
                                         display: inline-block;

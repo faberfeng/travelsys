@@ -100,7 +100,7 @@
                                                     <span  class="item-file-detial">
                                                         <h3 v-text="val.name"></h3>
                                                         <p class="operation">
-                                                            <i class="icon-goujian icon-search" @click="preview(val.path)"></i>
+                                                            <i class="icon-goujian icon-search" @click="preview(val.path,val.name)"></i>
                                                             <i class="icon-goujian icon-download" @click="downLoad(val.path)"></i>
                                                         </p>
                                                     </span>
@@ -111,7 +111,7 @@
                                                 <div class="actionbox clearfix">
                                                     <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
                                                      <i class="line"></i>
-                                                    <i class="button-search"   @click="preview(val.path)"></i>
+                                                    <i class="button-search"   @click="downLoad(val.path,val.name)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.path)"></i>
                                                 </div>
@@ -121,7 +121,7 @@
                                                 <div class="actionbox clearfix">
                                                     <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
                                                      <i class="line"></i>
-                                                    <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                                    <i class="button-search"   @click="downLoad(val.relativePath,val.name)"></i>
                                                     <i class="line"></i>
                                                     <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                 </div>
@@ -167,7 +167,7 @@
                                                                                 <h3 v-text="left.name"></h3>
                                                                                
                                                                                 <p class="operation">
-                                                                                    <i class="icon-goujian icon-search" @click="preview(left.path)"></i>
+                                                                                    <i class="icon-goujian icon-search" @click="preview(left.path,left.name)"></i>
                                                                                     <i class="icon-goujian icon-download" @click="downLoad(left.path)"></i>
                                                                                 </p>
                                                                             </span>
@@ -178,7 +178,7 @@
                                                                         <div class="actionbox clearfix">
                                                                              <i class="button-relocation" v-show="left.locationInfo"  @click="relocation(left.locationInfo)"></i>
                                                                             <i class="line"></i>
-                                                                            <i class="button-search"  @click="preview(left.path)"></i>
+                                                                            <i class="button-search"  @click="downLoad(left.path,left.name)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(left.path)"></i>
                                                                         </div>
@@ -188,7 +188,7 @@
                                                                         <div class="actionbox clearfix">
                                                                             <i class="button-relocation" v-show="val.locationInfo"  @click="relocation(val.locationInfo)"></i>
                                                                             <i class="line"></i>
-                                                                            <i class="button-search"   @click="preview(val.relativePath)"></i>
+                                                                            <i class="button-search"   @click="downLoad(val.relativePath,val.fileName)"></i>
                                                                             <i class="line"></i>
                                                                             <i class="button-download" @click="downLoad(val.relativePath)"></i>
                                                                         </div>
@@ -4421,16 +4421,30 @@ export default {
          * 预览文件集文件
          * @param fileUuid
          */
-    preview(val){
+    preview(val,fileName){
         var vm = this
-        this.$message({
-            type:'info',
-            message:'该功能正在开发'
-        });
-        if(val){
-            //  window.open(vm.QJFileManageSystemURL+val+"/preview");
+        // this.$message({
+        //     type:'info',
+        //     message:'该功能正在开发'
+        // });
+        console.log(fileName,'fileName');
+        // console.log(fileName.substr(fileName.length-4,fileName.length));
+        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'||fileName.split('.')[1]=='txt'){
+            var data=val.replace('/doc/dl/','');
+            console.log(data,'加载数据')
+            axios({
+               url:this.BDMSUrl+'doc/preview?key='+data,
+               responseType:'blob'
+           }).then((response)=>{
+               let blob = new Blob([response.data],{
+                   type:'application/pdf'
+               })
+               let objUrl=URL.createObjectURL(blob);
+               window.open(objUrl);
+           })
+
         }else{
-            //   window.open(vm.QJFileManageSystemURL+vm.checkFileDir.dpath+"/preview");
+            window.open(this.BDMSUrl+val)
         }
     },
     view(filePath,fileName){

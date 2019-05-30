@@ -140,7 +140,6 @@ export default new Vuex.Store({
         loginUrl:"http://42.159.153.210:8080/BDWorks/#/registerIndex",
         userCenterUrl:'http://42.159.153.210:8080/BDWorks/#/userLogin',
         BDMSLoginUrl:'http://42.159.153.210:8080/BDWorks/#/login',
-
         //无锡市政院（最新版本）
 
         // BIMServerPort:'443',

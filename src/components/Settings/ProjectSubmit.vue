@@ -8,7 +8,7 @@
                 <div class="worktable">
                     <zk-table 
                     index-text="序号"
-                    :data="projectSubmitData" :columns="columns" :tree-type="props.treeType" 
+                    :data="projectSubmitData" :columns="columnes" :tree-type="props.treeType" 
                     :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType" 
                     :border="props.border" empty-text="正在加载...">
                         <template slot="other" slot-scope="scope">
@@ -17,16 +17,9 @@
                             </div>
                         </template>
                         <template slot="action" slot-scope="scope">
-                            
                             <div v-if="scope.row.children.length==0">
                                 <button class="actionBtn projectYingShe" title="构件映射"  @click="setMeterial(scope)"></button>
-                                <!-- <button class="actionBtn expandProperty" title="编辑特性"  @click="editProperty(scope)"></button> -->
                             </div>
-                            <!-- <button class="actionBtn tiqingBtn" title="提请"   v-if="scope.row.status == 0" @click="confirm(scope)"></button>
-                            <button class="passBtn actionBtn" title="通过"   v-if="scope.row.status == 1" @click="pass(scope)"></button>
-                            <button class="backBtn actionBtn" title="退回"   v-if="scope.row.status == 1" @click="reject(scope)"></button>
-                            <button class="editBtn actionBtn" title="编辑" @click="editList(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button>
-                            <button class="deleteBtn actionBtn" title="删除" @click="deleteItem(scope)" v-if="scope.row.status == 2 || scope.row.status == 0"></button> -->
                         </template> 
                     </zk-table>
                 </div>
@@ -472,7 +465,7 @@ export default {
                 expandType: false,
                 selectionType: false,
             }, 
-            columns: [
+            columnes: [
                 {
                     label: '编码',
                     prop: 'classifyCode',
@@ -663,7 +656,7 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
-        this.getProjectGenieClassByProject();
+        // this.getProjectGenieClassByProject();
         this.getProjectGenieClass();
     },
     methods:{
@@ -685,6 +678,7 @@ export default {
                 data:{
                     projectId:this.projId
                 },
+                async:false,
                 success:(response)=>{
                     if(response.cd==0){
                             this.projectSubmitData = response.rt;

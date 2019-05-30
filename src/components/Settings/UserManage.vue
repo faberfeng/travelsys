@@ -4,21 +4,22 @@
       <div class="usermanage">
           <h5 class="subtitle">用户列表
               <span class="subSpan clearfix">
-                  <span v-show="!applyShow" class="title-right">
+                  <span  class="title-right">
                      <input type="text" v-model="userSearchInfo" placeholder="输入姓名"  class="title-right-icon" @keyup.enter="getInfo">
                      <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
                   </span>
-                   <span v-show="applyShow" class="title-right">
+                   <!-- <span v-show="applyShow" class="title-right">
                      <input type="text" v-model="userApplySearchInfo" placeholder="输入姓名"  class="title-right-icon" @keyup.enter="getApplyList">
                      <span  class="title-right-edit-icon el-icon-search" @click="getApplyList"></span>
-                  </span>
+                  </span> -->
                   <span v-show="!applyShow"  class="btn" @click="addUser()">添加</span>
                   <span v-show="applyShow" class="btn2" @click="checkApplyCancle()">返回</span>
                   <!-- <span v-show="!applyShow"  class="btn1" @click="checkApply()">查看申请</span> -->
              </span>
           </h5>
-
-          <div v-show="!applyShow" style="padding:0 20px;box-sizing: border-box;">
+    <div class="brove">
+        <!-- style="padding:0 20px;box-sizing: border-box;" -->
+        <div >
             <table class="UserList" border="1" width='100%'>
                 <thead>
                     <tr  class="userList-thead">
@@ -32,10 +33,10 @@
                          <th width="10%">操作</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr v-for="(val,index) in userList" :key="index">
-                        <td v-text="val.name"></td>
-                        <td v-text="val.name2"></td>
+                <tbody v-if="applyShows">
+                    <tr v-for="(val,index) in userLists" :key="index">
+                        <td>{{val.name}}</td>
+                        <td>{{val.name2}}</td>
                         <td v-text="val.isAdmin ==1?'是':'不是'"></td>
                         <td>
                             <span v-for="(item,key) in val.posNames" :key="key" v-text="item+(key<val.posNames.length-1?'、':'')"></span>
@@ -44,14 +45,30 @@
                         <td v-text="val.addUser"></td> -->
                         <td v-text="val.remark"></td>
                         <td>
-                            <span class="editIcon" @click="addUser(val.name2,val.userId,val.remark)"></span>
-                            <span v-if="!(val.userType == 2  || val.deleted == false) && projAuth.deleteUser" class="deleteIcon" @click="deleteUser(val.userId)"></span>
+                            <span class="editIcon" @click="addUser(val.name2,val.userId,val.remark,val.isAdmin)"></span>
+                            <span v-if="val.isAdmin==1"  class="deleteIcon" @click="deleteUser(val.userId)"></span>
+                            <!-- v-if="!(val.userType == 2  || val.deleted == false)" -->
                         </td>
                     </tr>
                 </tbody>
             </table>
            </div>
-           <div v-show="!applyShow" class="datagrid-pager pagination">
+           <div class="tableBodyPagination">
+                <div class="tableBodyPaginationRight">
+                    <el-pagination class="elPagination"
+                        background
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[10,20,30]"
+                        :page-size="1"
+                        layout="sizes,prev, pager, next"
+                        :total="getUsersListLength">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+           <!-- <div v-show="!applyShow" class="datagrid-pager pagination">
                <table cellspacing="0" cellpadding="0" border="0">
                    <tbody>
                        <tr>
@@ -105,7 +122,7 @@
                 </table>
                 <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
                 <div style="clear:both;"></div>
-            </div>
+            </div> -->
         <div v-show="applyShow" style="padding:0 20px;box-sizing: border-box;">
                 <table class="UserList" border="1" width='100%'>
                     <thead>
@@ -381,24 +398,15 @@
                 cursor: pointer;
                 margin-right: 20px;
             }
-            .UserList{
-                border-collapse: collapse;
-                border: 1px solid #e6e6e6;
-                thead{
-                    background: #f2f2f2;
-                    th{
-                        padding-left: 10px;
-                        height: 36px;
-                        text-align: left;
-                        box-sizing: border-box;
-                        border-right: 1px solid #e6e6e6;
-                        font-size: 12px;
-                        color: #333333;
-                    }
-                }
-                tbody{
-                    tr{
-                        td{
+            .brove{
+                padding:0 20px;
+                box-sizing: border-box;
+                .UserList{
+                    border-collapse: collapse;
+                    border: 1px solid #e6e6e6;
+                    thead{
+                        background: #f2f2f2;
+                        th{
                             padding-left: 10px;
                             height: 36px;
                             text-align: left;
@@ -407,12 +415,47 @@
                             font-size: 12px;
                             color: #333333;
                         }
-                        &:hover{
-                            background: #fafafa;
+                    }
+                    tbody{
+                        tr{
+                            td{
+                                padding-left: 10px;
+                                height: 36px;
+                                text-align: left;
+                                box-sizing: border-box;
+                                border-right: 1px solid #e6e6e6;
+                                font-size: 12px;
+                                color: #333333;
+                            }
+                            &:hover{
+                                background: #fafafa;
+                            }
                         }
                     }
                 }
+                .tableBodyPagination{
+                    display: block;
+                    height: 46px;
+                    width: auto;
+                    border-left: 1px solid #d4d4d4;
+                    border-right: 1px solid #d4d4d4;
+                    border-bottom: 1px solid #d4d4d4;
+                    box-sizing: border-box;
+                    background: #fafafa;
+                    position: relative;
+                    margin: 0 auto;
+                    .tableBodyPaginationRight{
+                        position: absolute;
+                        right: 2px;
+                        bottom: 8px;
+                        .el-pagination .el-select .el-input .el-input__inner{
+                                height: 28px !important;
+                        }
+                    }
+                }
+
             }
+            
             .pagination{
                 width: 100%;
                 text-align: right;
@@ -716,12 +759,15 @@ export default {
   name:'',
   data(){
       return {
+          currentPage:1,
+            getUsersListLength:1,
           loading:false,
           projAuth:{
               deleteUser:false
           },
           title:'添加用户',
           userList:[],//用户列表
+          userLists:[],//用户列表
           userApplyList:[],//申请用户列表
           userSearchInfo:'',//岗位类型
           userApplySearchInfo:'',//查找名称
@@ -768,8 +814,11 @@ export default {
           QJFileManageSystemURL:'',
           commomHeadPictureFile:'',
           applyShow:false,//是否申请
+          applyShows:false,
           remarkIfo:'',//备注信息
           applyMessage:'',//申请留言
+          pageNum:1,
+          pageSize:10
       }
   },
   watch:{
@@ -1148,42 +1197,86 @@ export default {
             var vm = this;
             console.log(this.pageDetial);
             console.log(this.userSearchInfo)
-            axios({
-                method:'GET',
-                // url:vm.BDMSUrl+'project2/Config/searchProjectUserList/'+vm.projId,
-                url:vm.BDMSUrl+'user/getUserList',
+            this.userLists=[];
+            // this.getUsersListLength=1;
+            vm.userList=[];
+            $.ajax({
+                url:this.BDMSUrl+'user/getUserList?projectId='+this.projId+(this.userSearchInfo==''?'':('&name='+this.userSearchInfo)),
+                type:'get',
                 headers:{
                     'token':vm.token
                 },
-                params:{
-                    // page: vm.pageDetial.currentPage,
-                    // rows: vm.pageDetial.pagePerNum,
-                    // userName: vm.userSearchInfo,
-                    projectId:vm.projId
+                async:false,
+                success:(response)=>{
+                    if(response.cd=='0'){
+                        this.userList = response.rt;
+                        this.getUsersListLength=vm.userList.length;
+                        if(this.getUsersListLength<11){
+                            for(var i=0;i<this.getUsersListLength;i++){
+                                this.userLists.push(this.userList[i])
+                            }
+                        }else{
+                            for(var i=0;i<10;i++){
+                                this.userLists.push(this.userList[i])
+                            }
+                        }
+                        if(this.userLists.length>0){
+                            this.applyShows=true;
+                        }else{
+                            this.applyShows=false;
+                        }
+                    }
                 }
-            }).then((response)=>{
-                if(response.data.cd == '0'){
-                    vm.userSearchInfo ='';//搜索完清空
-                    vm.userList = response.data.rt;
-                    // vm.pageDetial.total = response.data.rt.total;
-                    // vm.pageDetial.pageNum =  Math.ceil(vm.pageDetial.total/vm.pageDetial.pagePerNum);
-                }else if(response.data.cd == '-1'){
-                    alert(response.data.msg);
-                }else{
-                    this.$router.push({
-                        path:'/login'
-                    })
-                }
-                
-            }).catch((err)=>{
-                console.log(err)
             })
+            // axios({
+            //     method:'GET',
+            //     url:vm.BDMSUrl+'user/getUserList?projectId='+this.projId+(this.userSearchInfo==''?'':('&name='+this.userSearchInfo)),
+            //     headers:{
+            //         'token':vm.token
+            //     },
+            // }).then((response)=>{
+            //     if(response.data.rt){
+            //         this.userList = response.data.rt;
+            //         // console.log(vm.userLists,'vm.userList');
+            //         console.log(this.pageNum,'this.pageNum');
+            //         // if(this.pageNum!=1){
+            //         //          this.handleCurrentChange(this.pageNum);
+            //         // }else{
+            //         //     this.handleCurrentChange(1);
+            //         // }
+            //         // vm.userSearchInfo ='';//搜索完清空
+            //         this.getUsersListLength=vm.userList.length;
+            //         if(this.getUsersListLength<11){
+            //             for(var i=0;i<this.getUsersListLength;i++){
+            //                 this.userLists.push(this.userList[i])
+            //             }
+            //         }else{
+            //             for(var i=0;i<10;i++){
+            //                 this.userLists.push(this.userList[i])
+            //             }
+            //         }
+            //         if(this.userLists.length>0){
+            //             this.applyShows=false;
+            //         }else{
+            //             this.applyShows=true;
+            //         }
+            //     }else if(response.data.cd == '-1'){
+            //         alert(response.data.msg);
+            //     }else{
+            //         this.$router.push({
+            //             path:'/login'
+            //         })
+            //     }
+                
+            // }).catch((err)=>{
+            //     console.log(err)
+            // })
         },
         deleteRow(index, rows) {
             rows.splice(index, 1);
         },
         //获取所有岗位
-        getInfoList(posId){
+        getInfoList(posId,isAdmin){
             var vm=this;
             axios({
                 method:'GET',
@@ -1204,6 +1297,15 @@ export default {
                     })
                     vm.position_default = vm.position_list[0]//工程管理员岗位
                     vm.position_list = vm.position_list.slice(1)//可选其他岗位
+                    // console.log(posId,isAdmin,'posId[0].isAdmin');
+                    if(isAdmin==1){
+                        vm.position_default.checkFlg=true;
+                    }else{
+                        vm.position_default.checkFlg=false;
+                    }
+                    // if(posId[0].isAdmin==1){
+                    //     vm.position_default.checkFlg=true;
+                    // }
                     if(posId){
                          posId.forEach((item)=>{
                              vm.position_list.forEach((item1)=>{
@@ -1232,7 +1334,7 @@ export default {
             })
         },
 
-        addUser(name,id,remark){
+        addUser(name,id,remark,isAdmin){
             var vm = this
             vm.adduser = true;
             if(id){//编辑用户
@@ -1240,6 +1342,8 @@ export default {
                 vm.title = '编辑用户'
                  vm.userDetial.show = false
                  vm.remarkIfo=remark
+                
+                 
                 axios({
                     method:'GET',
                     // url:vm.BDMSUrl+'project2/Config/editProjectUser',
@@ -1263,7 +1367,12 @@ export default {
                     // // })
                     // vm.position_list[0].checkFlg=true;
                     // vm.projUserId = response.data.rt;
-                    vm.getInfoList(response.data.rt);
+                    vm.getInfoList(response.data.rt,isAdmin);
+                    // if(isAdmin==1){
+                    //     vm.position_default.checkFlg=true;
+                    // }else{
+                    //     vm.position_default.checkFlg=false;
+                    // }
                     // vm.remarkIfo=response.data.rt.remark
                 }).catch((err)=>{
                     console.log(err)
@@ -1511,6 +1620,32 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
+        },
+        handleSizeChange(val){
+            this.userLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getUsersListLength-1>=NumB&&this.getUsersListLength-1<=NumE){
+                NumE=this.getUsersListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.userLists.push(this.userList[i])
+            }
+            this.applyShows=false;
+
+        },
+        handleCurrentChange(val){
+            this.userLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getUsersListLength-1>=NumB&&this.getUsersListLength-1<=NumE){
+                NumE=this.getUsersListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.userLists.push(this.userList[i])
+            }
         },
         deleteUser(key){
             var vm = this

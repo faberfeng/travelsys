@@ -13,7 +13,8 @@
                     <li class="selectItem">
                         <!-- <span class="title">时间</span> -->
                         <span class="itemContent">
-                            <v2-datepicker format="yyyy-MM" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <el-date-picker v-model="selectTime" type="month" width="200px" placeholder="选择月" @change="changeDatePicker()"></el-date-picker>
+                            <!-- <v2-datepicker format="yyyy-MM" v-model="selectTime" type="month"  @change="changeDatePicker()" ></v2-datepicker> -->
                          </span>
                     </li>
                     <li class="selectItem">
@@ -194,7 +195,14 @@ export default {
             this.getAttendancyByMonth(this.selectName,this.selectTime)
         },
         getAttendancyByMonth(name,date){
+            var vm=this;
             this.getAttendancyByMonthLists=[];
+            let data='';
+            if(date){
+                data=moment(date).format('YYYY-MM')+'-01';
+            }else{
+                data=moment(vm.timeStamp).format('YYYY-MM')+'-01'
+            }
             axios({
                 url:this.BDMSUrl+'attendancy/getAttendancyByMonth',
                 headers:{
@@ -203,7 +211,7 @@ export default {
                 params:{
                     name:name,
                     projectId:this.projId,
-                    date:moment(date).format('YYYY-MM')+'-01'
+                    date:data
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
@@ -319,6 +327,10 @@ li{
                                     padding: 8px 15px 0 30px;
                                     height: 48px;
                                     line-height: 48px;
+                                    margin-top:-7px;
+                                    .el-date-editor.el-input{
+                                        width: 200px !important;
+                                    }
                                 }
                                 .title{
                                     display: inline-block;

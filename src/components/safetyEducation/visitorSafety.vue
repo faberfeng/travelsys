@@ -11,7 +11,8 @@
                 <ul>
                     <li class="selectItem">
                         <span class="itemContent">
-                            <v2-datepicker format="YYYY-MM" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker>
+                            <!-- <v2-datepicker format="YYYY-MM" v-model="selectTime"  @change="changeDatePicker()" ></v2-datepicker> -->
+                            <el-date-picker v-model="selectTime" type="month" width="200px" placeholder="选择月" @change="changeDatePicker()"></el-date-picker>
                          </span>
                     </li>
                     <!-- <li class="selectItem">
@@ -53,7 +54,7 @@
             </div>
         </div>
         <div id="edit">
-            <el-dialog title="增加访客安全告知" :visible.sync="safeMessageShow" @click="safeMessageClose">
+            <el-dialog title="增加访客安全告知" v-loading="loadingShow" element-loading-background="rgba(0, 0, 0, 0.4)"  :visible.sync="safeMessageShow" @click="safeMessageClose">
                 <div class="editBody">
                     
                     <div class="title" style="height: 40px;line-height: 40px;font-size: 20px;font-weight: bold;padding: 5px;margin:5px;">
@@ -130,7 +131,8 @@ export default {
             titleName:'',
             textName:'',
             getSafetyNotificationList:[],
-            activeName:0
+            activeName:0,
+            loadingShow:false,
         }
     },
     created(){
@@ -241,33 +243,49 @@ export default {
             if(this.fileList){
                 formData.append('file',this.fileList)
             }
+            if(this.companyName==''||this.textName==''||this.titleName==''){
+                this.$message({
+                    type:'info',
+                    message:'内容不能为空'
+                })
+            }else if(this.fileList==null){
+                this.$message({
+                    type:'info',
+                    message:'请上传文件'
+                })
+            }else{
+                this.loadingShow=true;
+                axios({
+                    url:this.BDMSUrl+'safety/addSafetyNotification',
+                    headers:{
+                        'token':this.token
+                    },
+                    method:'post',
+                    params:{
+                        projId:this.projId,
+                        company:this.companyName,
+                        text:this.textName,
+                        title:this.titleName
+                    },
+                    data:formData
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        // this.safeMessageList=response.data.rt;
+                        this.getSafetyNotification();
+                        this.safeMessageShow=false;
+                        this.companyName='';
+                        this.textName='';
+                        this.titleName='';
+                        this.fileName="未选择任何文件";
+                        document.getElementById('fileInfos').value='';
+                        this.fileList='';
+                        this.loadingShow=false;
+                    }else{
+                        this.loadingShow=false;
+                    }
+                })
+            }
             
-            axios({
-                url:this.BDMSUrl+'safety/addSafetyNotification',
-                headers:{
-                    'token':this.token
-                },
-                method:'post',
-                params:{
-                    projId:this.projId,
-                    company:this.companyName,
-                    text:this.textName,
-                    title:this.titleName
-                },
-                data:formData
-            }).then((response)=>{
-                if(response.data.cd==0){
-                    // this.safeMessageList=response.data.rt;
-                    this.getSafetyNotification();
-                    this.safeMessageShow=false;
-                    this.companyName='';
-                    this.textName='';
-                    this.titleName='';
-                    this.fileName="未选择任何文件";
-                    document.getElementById('fileInfos').value='';
-                    this.fileList='';
-                }
-            })
         },
         getSafetyNotification(){
             axios({
@@ -423,6 +441,10 @@ li{
                                     padding: 8px 15px 0 30px;
                                     height: 48px;
                                     line-height: 48px;
+                                    margin-top:-7px;
+                                    .el-date-editor.el-input{
+                                        width: 200px !important;
+                                    }
                                 }
                                 .title{
                                     display: inline-block;

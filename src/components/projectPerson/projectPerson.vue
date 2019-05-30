@@ -2,7 +2,7 @@
     <div id="personContent">
         <div class="contentHead">
             <div class="contentHeadLeft">
-                <img class="imgCenter" :src="userImg?userImg:require('../../assets/people.png')">
+                <img class="imgCenter" :src="userImg!=null?userImg:require('../../assets/people.png')">
             </div>
             <div class="contentHeadRight">
                 <ul style="width:50%;height:inherit;float:left;">
@@ -691,6 +691,24 @@ export default {
                 return moment(val).format('YYYY-MM-DD')
             }
         },
+        entOutCheckType(val){
+            if(val==1){
+                return '正常'
+            }else if(val==2){
+                return '早退'
+            }else if(val==3){
+                return '加班'
+            }
+        },
+        doorType(val){
+            if(val==1){
+                return 'IC卡'
+            }else if(val==2){
+                return '人脸识别'
+            }else if(val==3){
+                return '指纹'
+            }
+        },
         recordType(val){
             if(val==1){
                 return '良好记录'
@@ -752,8 +770,12 @@ export default {
                         this.registeredAddress=this.getStaffProfileList.registeredAddress;
                         this.sex=this.getStaffProfileList.sex;
                         this.technicalTitle=this.getStaffProfileList.technicalTitle;
-                        this.certificationPhoto=this.BDMSUrl+this.getStaffProfileList.certificationPhoto;
-                        this.stationCertiyPhoto=this.BDMSUrl+this.getStaffProfileList.stationCertificate;
+                        if(this.getStaffProfileList.certificationPhoto){
+                             this.certificationPhoto=this.BDMSUrl+this.getStaffProfileList.certificationPhoto;
+                        }
+                        if(this.getStaffProfileList.stationCertificate){
+                             this.stationCertiyPhoto=this.BDMSUrl+this.getStaffProfileList.stationCertificate;
+                        }
                         console.log(vm.getStaffProfileList,'vm.getStaffProfileList');
                     }
                 })

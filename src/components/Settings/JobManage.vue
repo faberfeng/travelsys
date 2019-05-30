@@ -14,32 +14,48 @@
                   <span @click="addUser()" class="btn">添加</span>
              </span>
           </h5>
-          <div style="padding:0 20px;box-sizing: border-box;">
-            <table class="UserList" border="1" width='100%'>
-                <thead>
-                    <tr  class="userList-thead">
-                        <th width="18%">岗位名称</th>
-                        <th width="18%">岗位类型</th>
-                        <!-- <th width="50%">授权的功能模块</th> -->
-                        <th width="14%;">操作 </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(val,index) in jobList" :key="index">
-                            <td v-text="val.posName"></td>
-                            <td v-text="typePosType(val.posType)"></td>
-                            <!-- <td v-text="val.posAuthNameList"></td> -->
-                            <td>
-                                <span v-if="!((val.posName == '工程管理员' && val.posType == 3))"
-                                 class="editIcon" @click="addUser(val.posType,val.posName,val.id,val.auths)"></span>
-                                <span v-if="!(val.posType == 4 || (val.posName == '工程管理员' && val.posType == 3)) && !(val.posType == 2 && val.posType == 1)" 
-                                class="deleteIcon" @click="deleteJob(val.id)"></span>
-                            </td>
+          <div class="brove">
+            <div>
+                <table class="UserList" border="1" width='100%'>
+                    <thead>
+                        <tr  class="userList-thead">
+                            <th width="18%">岗位名称</th>
+                            <th width="18%">岗位类型</th>
+                            <!-- <th width="50%">授权的功能模块</th> -->
+                            <th width="14%;">操作 </th>
                         </tr>
-                </tbody>
-            </table>
-           </div>
-           <div class="datagrid-pager pagination">
+                    </thead>
+                    <tbody>
+                        <tr v-for="(val,index) in jobLists" :key="index">
+                                <td v-text="val.posName"></td>
+                                <td v-text="typePosType(val.posType)"></td>
+                                <!-- <td v-text="val.posAuthNameList"></td> -->
+                                <td>
+                                    <span v-if="!((val.posName == '工程管理员' && val.posType == 3))"
+                                    class="editIcon" @click="addUser(val.posType,val.posName,val.id,val.auths)"></span>
+                                    <span v-if="!(val.posType == 4 || (val.posName == '工程管理员' && val.posType == 3)) && !(val.posType == 2 && val.posType == 1)" 
+                                    class="deleteIcon" @click="deleteJob(val.id)"></span>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tableBodyPagination">
+                    <div class="tableBodyPaginationRight">
+                        <el-pagination class="elPagination"
+                            background
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page.sync="currentPage"
+                            :page-sizes="[10,20,30]"
+                            :page-size="1"
+                            layout="sizes,prev, pager, next"
+                            :total="getJobListLength">
+                        </el-pagination>
+                    </div>
+                </div>
+          </div>
+           <!-- <div class="datagrid-pager pagination">
                <table cellspacing="0" cellpadding="0" border="0">
                    <tbody>
                        <tr>
@@ -93,7 +109,7 @@
                 </table>
                 <div class="pagination-info pagination-title" v-text="'显示1到'+pageDetial.pagePerNum+',共'+pageDetial.total+'记录'"></div>
                 <div style="clear:both;"></div>
-            </div>
+            </div> -->
       </div>
         <el-dialog class="openDialog" :title="title" :visible.sync="adduser" :before-close="userClose">
             <div class="log-head clearfix" v-if="idDefault">
@@ -145,7 +161,8 @@ export default {
         return {
             title:'增加岗位',
             jobList:[],//岗位列表
-            jobList:[],//总体的岗位列表
+            jobLists:[],//总体的岗位列表
+            getJobListLength:1,
             posType:'',//岗位类型
             jobTree:[],
             jobTree_checked:[],
@@ -177,6 +194,11 @@ export default {
             idDefault:false,
             defaultCode:'1',
             isD:false,
+            currentPage:1,
+            getUsersListLength:1,
+            pageNum:1,
+            pageSize:10
+
         }
     },
     watch:{
@@ -313,6 +335,7 @@ export default {
         },
         getInfoList(){
             var vm=this;
+            this.jobLists=[];
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'/position/getAllPosition',
@@ -325,6 +348,17 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == '0'){
                     vm.jobList = response.data.rt;
+                    this.getJobListLength=vm.jobList.length;
+                    if(this.getJobListLength<11){
+                        for(var i=0;i<this.getUsersListLength;i++){
+                            this.jobLists.push(this.jobList[i])
+                        }
+                    }else{
+                        for(var i=0;i<10;i++){
+                            this.jobLists.push(this.jobList[i])
+                        }
+                    }
+                    this.handleCurrentChange(this.pageNum);
                 }
             })
         },
@@ -514,6 +548,30 @@ export default {
 
             
             
+        },
+        handleSizeChange(val){
+            this.jobLists=[];
+            this.pageSize=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getJobListLength-1>=NumB&&this.getJobListLength-1<=NumE){
+                NumE=this.getJobListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.jobLists.push(this.jobList[i])
+            }
+        },
+        handleCurrentChange(val){
+            this.jobLists=[];
+            this.pageNum=val;
+            var NumB=this.pageSize*(this.pageNum-1)
+            var NumE=this.pageSize*this.pageNum-1
+            if(this.getJobListLength-1>=NumB&&this.getJobListLength-1<=NumE){
+                NumE=this.getJobListLength-1;
+            }
+            for(var i=NumB;i<NumE+1;i++){
+                this.jobLists.push(this.jobList[i])
+            }
         },
         deleteJob(key){
             var vm = this;
@@ -778,24 +836,15 @@ export default {
         background: url('../../assets/delete.png')no-repeat 0 0;
         cursor: pointer;
     }
-    .UserList{
-        border-collapse: collapse;
-        border: 1px solid #e6e6e6;
-        thead{
-            background: #f2f2f2;
-            th{
-                padding-left: 10px;
-                height: 36px;
-                text-align: left;
-                box-sizing: border-box;
-                border-right: 1px solid #e6e6e6;
-                font-size: 12px;
-                color: #333333;
-            }
-        }
-        tbody{
-            tr{
-                td{
+    .brove{
+        padding:0 20px;
+        box-sizing: border-box;
+        .UserList{
+            border-collapse: collapse;
+            border: 1px solid #e6e6e6;
+            thead{
+                background: #f2f2f2;
+                th{
                     padding-left: 10px;
                     height: 36px;
                     text-align: left;
@@ -804,12 +853,47 @@ export default {
                     font-size: 12px;
                     color: #333333;
                 }
-                &:hover{
-                    background: #fafafa;
+            }
+            tbody{
+                tr{
+                    td{
+                        padding-left: 10px;
+                        height: 36px;
+                        text-align: left;
+                        box-sizing: border-box;
+                        border-right: 1px solid #e6e6e6;
+                        font-size: 12px;
+                        color: #333333;
+                    }
+                    &:hover{
+                        background: #fafafa;
+                    }
                 }
             }
         }
+        .tableBodyPagination{
+                display: block;
+                height: 46px;
+                width: auto;
+                border-left: 1px solid #d4d4d4;
+                border-right: 1px solid #d4d4d4;
+                border-bottom: 1px solid #d4d4d4;
+                box-sizing: border-box;
+                background: #fafafa;
+                position: relative;
+                margin: 0 auto;
+                .tableBodyPaginationRight{
+                    position: absolute;
+                    right: 2px;
+                    bottom: 8px;
+                    .el-pagination .el-select .el-input .el-input__inner{
+                            height: 28px !important;
+                    }
+                }
+        }
+
     }
+    
     .pagination{
         width: 100%;
         text-align: right;

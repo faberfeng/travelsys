@@ -117,7 +117,7 @@
                                         <p v-text="initData(item.uploadTime)"></p>
                                         <p class="operation">
                                             <!-- <span v-text="'版本'+item.fgVersion"></span> -->
-                                            <!-- <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i> -->
+                                            <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
                                             <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
                                         </p>
                                     </span>
@@ -166,7 +166,7 @@
                                     </td>
                                     <td>
                                         <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
-                                        <!-- <i class="icon-goujian icon-search" @click="view(item.fileId,item.fileName)"></i> -->
+                                        <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
                                     </td>
                                     <!-- <td v-text="item.fgVersion"></td> -->
                                     <td>{{item.fileSize|fileSizeChange()}}</td>
@@ -4766,34 +4766,45 @@ export default {
          * 预览文件集文件
          * @param fileUuid
          */
-    view(filePath,fileId,fileName){
+    view(fileId,fileName){
         var vm = this
-        if(!filePath){
-            if(vm.checkedItem || vm.checkedRound){
-                vm.versionItem.forEach((item)=>{
-                    if(item.checked){
-                        filePath =  item.filePath
-                        fileId = item.fileId
-                        fileName = item.fileName
-                    }
-                })
-            }
-        }
-        if(!filePath){
-            vm.$message({
-            type:'info',
-            message:'请勾选要预览的文件的版本'
-        })
-            return false
-        }
-        // vm.latestFile(fileId,"下载了文件"+fileName);
-        // fileName.split('.')[1] == 'GMD'
-        
-        if(fileName.substr(fileName.length-3)=='gmd'||fileName.substr(fileName.length-3)=='GMD'){
-            window.open(this.GMDUrl+"/gmdModel/index.html?url="+encodeURIComponent(this.QJFileManageSystemURL+filePath));
+        // if(!filePath){
+        //     if(vm.checkedItem || vm.checkedRound){
+        //         vm.versionItem.forEach((item)=>{
+        //             if(item.checked){
+        //                 filePath =  item.filePath
+        //                 fileId = item.fileId
+        //                 fileName = item.fileName
+        //             }
+        //         })
+        //     }
+        // }
+        // if(!filePath){
+        //     vm.$message({
+        //     type:'info',
+        //     message:'请勾选要预览的文件的版本'
+        // })
+        //     return false
+        // }
+        console.log(fileId,fileName,'fileId,fileName');
+
+        // console.log(fileName.split('.')[1]=='doc'||'docx'||'odt'||'ott'||'rtf'||'text'||'csv'||'ods'||'ots'||'tsv'||'xls'||'xlsx'||'odg'||'otg'||'html','1111');
+        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'||fileName.split('.')[1]=='txt'){
+            axios({
+                    url:this.BDMSUrl+'doc/preview?fgId='+fileId,
+                    responseType:'blob'
+            }).then((response)=>{
+                let blob=new Blob([response.data],{
+                    type:'application/pdf'      //将会被放入到blob中的数组内容的MIME类型 
+                });
+                let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                console.log(objectUrl,'objectUrl');
+                window.open(objectUrl)
+                // window.location.href = objectUrl;   //浏览器打开这个url
+            })
         }else{
-            window.open(vm.QJFileManageSystemURL+filePath+"/preview");
-        }
+            window.open(vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId);
+        } 
     },
     /**
      * 下载文件 参数:index
