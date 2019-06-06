@@ -642,8 +642,11 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getSafetyNotificationList=response.data.rt;
-                    this.selectValue=this.getSafetyNotificationList[0].id;
+                    if(response.data.rt.length>0){
+                        this.getSafetyNotificationList=response.data.rt;
+                        this.selectValue=this.getSafetyNotificationList[0].id;
+                    }
+                    
                 }
             })
         },

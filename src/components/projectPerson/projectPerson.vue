@@ -13,7 +13,7 @@
                         <label class="nameLabel">账号：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">工种：</label><label class="itemLabel" v-if="queryAttendancyRecordByUserList.positions">{{returnPosition(queryAttendancyRecordByUserList.positions[0].posName)}}</label>
+                        <label class="nameLabel">工种：</label><label class="itemLabel">{{returnPosition(queryAttendancyRecordByUserList.positions)}}</label>
                     </li>
                     <li class="rightLi">
                         <label class="nameLabel">单位：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.groupName}}</label>
@@ -720,10 +720,10 @@ export default {
 
         },
         returnPosition(val){
-            if(val.length==0){
-                return ''
+            if(val){
+                return val[0].posName
             }else{
-                return val
+                return ''
             }
         },
         getPersonEnterInfo(){

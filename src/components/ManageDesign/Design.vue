@@ -3652,7 +3652,7 @@ export default {
                 })
                 return false
             }
-            window.open(vm.BDMSUrl + filePath);
+            window.open(vm.BDMSUrl + filePath,"_blank");
         },
         checkStatus(val){
             var status = "正在处理"
@@ -4444,7 +4444,7 @@ export default {
            })
 
         }else{
-            window.open(this.BDMSUrl+val)
+            window.open(this.BDMSUrl+val,"_blank")
         }
     },
     view(filePath,fileName){

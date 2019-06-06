@@ -25,9 +25,9 @@
                     </li>
                      
                 </ul>
-                <span class="selectItemRight" >
+                <!-- <span class="selectItemRight" >
                         导出
-                </span>
+                </span> -->
                    
             </div>
             <div class="tableBody">
@@ -51,7 +51,11 @@
                             <td>{{index+1}}</td>
                             <td>{{item.name}}</td>
                             <td>{{item.department}}</td>
-                            <td>{{item.kind.length==0?'/':item.kind}}</td>
+                            <td>
+                                <span v-for="(val,index) in item.kind" :key="index">
+                                    {{val.posName+','}}
+                                </span>
+                            </td>
                             <td>{{item.workingDay}}</td>
                             <td>{{item.restDay}}</td>
                             <td>{{item.lateDay}}</td>

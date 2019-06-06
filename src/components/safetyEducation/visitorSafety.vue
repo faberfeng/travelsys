@@ -26,6 +26,10 @@
             <div class="wrapper_left">
                 <div class="wrapper_left_content">
                     <ul class="wrapper_left_contentUl">
+                        <span v-show="getVisitorInfoLists.length==0">
+                            <img src="../../assets/nodata.png">
+                            <label style="display:block;color:#999;font-size:14px;line-height:14px;">当前无数据</label>
+                        </span>
                         <li v-for="(item,index) in getVisitorInfoLists" :key="index">
                             <span class="one_Span"><i class="el-icon-success"></i>{{item.name}}</span>
                             <span class="two_Span"><label>告知人数：{{item.people}}</label></span>

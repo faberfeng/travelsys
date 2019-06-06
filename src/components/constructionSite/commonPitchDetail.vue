@@ -161,7 +161,7 @@
                         </div>
                         <div class="twoGraph" ref="twoGraphRef">
                             <!-- style="min-height:1900px" -->
-                            <vue-highcharts id="leftHightchart" style="min-height:1900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                            <vue-highcharts id="leftHightchart" style="min-height:1900px"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                             <canvas style="position:absolute;top:48px;left:15px"  ref="canvasLeftRef" id="canvasLeft"></canvas>
                         </div>
                     </div>
@@ -214,6 +214,7 @@
                             <label class="editSpot" @click="editRightMarkSpot()">编辑标记</label>
                         </div>
                         <div class="fourGraph">
+                            <!-- min-height:1900px -->
                             <vue-highcharts style="min-height:1900px" :options="optionOnesRight" ref="lineRightChartOne"></vue-highcharts>
                             <canvas style="position:absolute;top:48px;left:15px"  ref="canvasRightRef" id="canvasRight"></canvas>
                         </div>
@@ -1468,10 +1469,10 @@ export default Vue.component('commonPitch-detail',{
                                 // console.log(document.getElementById('tableListid'),'style');
                                 //  str=document.getElementById('tableListid').clientHeight-50;
                                 //  setTimeout(()=>{
-                                //         console.log(document.getElementById('tableListid').clientHeight);
+                                //        console.log(document.getElementById('tableListid').offsetHeight,'clientHeight000');
                                        
-
-                                // },20)
+                                // },1000)
+                                
                                 if(this.leftDisplayListValue.length==recentVariationLength){
                                     this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
                                     this.time1=null;
@@ -1488,6 +1489,9 @@ export default Vue.component('commonPitch-detail',{
                                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
                                         lineLeftChart.hideLoading();
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                        console.log(document.getElementById('tableListid').offsetHeight,'clientHeight000');
+                                        // console.log(lineLeftChart,'lineLeftChart.style');
+                                        // lineLeftChart.$el.style.minHeight=document.getElementById('tableListid').offsetHeight+'px';
                                     },20)
                                 }else if(this.leftDisplayListValue.length!=recentVariationLength){
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
@@ -1505,13 +1509,18 @@ export default Vue.component('commonPitch-detail',{
                                     })
                                     
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
+                                    console.log(lineLeftChart,'lineLeftChart00');
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                     setTimeout(()=>{
+                                        // lineLeftChart.$el.style.minHeight=document.getElementById('tableListid').offsetHeight-70+'px';
+                                        // lineLeftChart.$el.childNodes[0].style.height=document.getElementById('tableListid').offsetHeight-70+'px';
                                         lineLeftChart.removeSeries();
                                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
                                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.leftDisplayListValueYdata2});
                                         lineLeftChart.hideLoading();
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                        console.log(document.getElementById('tableListid').offsetHeight,'clientHeight001');
+                                        
                                     },20)
                                 }
                                 this.leftDisplayShow==false;

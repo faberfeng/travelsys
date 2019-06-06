@@ -192,18 +192,7 @@
                           <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
                          
                         </template>
-                        <!-- <template slot="taskName" slot-scope="scope">
-                          {{splitName(scope.row.taskName)}}
-                        </template> -->
-                        <!-- <template slot="verifyTime" slot-scope="scope">
-                          <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
-                        </template>
-                        <template slot="verifyNum" slot-scope="scope">
-                            <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="scope.row.realTaskStart==null?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider>
-                        </template>
-                        <template slot="milepost" slot-scope="scope">
-                            {{scope.row.taskType==1?'是':'否'}}
-                        </template> -->
+                      
                         <template slot="task" slot-scope="scope">
                             <el-tooltip :content="scope.row.taskName" placement="top">
                               <span style="cursor:pointer" >{{scope.row.taskName | splitRemark()}}</span>
@@ -215,27 +204,18 @@
                         <template slot="taskEnd" slot-scope="scope">
                           {{scope.row.taskEnd | timeChange()}}
                         </template>
-                        <!-- <template slot="realTaskStart" slot-scope="scope">
-                          {{scope.row.realTaskStart | timeChange()}}
-                        </template>
-                        <template slot="realTaskEnd" slot-scope="scope">
-                          {{scope.row.realTaskEnd | timeChange()}}
-                        </template>
-                        <template slot="taskDuration" slot-scope="scope">
-                          {{scope.row.taskDuration + '天'}}
-                        </template> -->
                     </zk-table>
                 </div>
-                <!-- <div style="float:right;width:0.04%;height:680px;color:#000"></div> -->
                 <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:auto;">
                     <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
                       <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
                     </div>
                     <div id='ganttRightBg' style="width:100%;position:relative;">
                         <div id='ganttRight' style="width:100%;position:relative;position:absolute;top:0px;left:0px;">
-                    </div>
+                        </div>
                     </div>
                 </div>
+                <!-- <ganttView ref="ganttRef" id="ganttViewId" :taskIndexData="taskIndexData" :columnsSetting="columnsSetting" :props="props"></ganttView> -->
               </div>
             </div>
           </div>
@@ -1369,6 +1349,7 @@
   import {GanttMaster} from './Gantt/ganttMaster.js'
   // import commonList from './qingdan.vue'
   import commonList from '../planCost/qingDan.vue'
+  // import ganttView from './gantt.vue'
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
   import {method5} from '../constructionSite/js/method.js'
@@ -1378,6 +1359,9 @@
   var return4DImages='';
   export default {
     name: 'taskIndex',
+    // components:{
+    //   ganttView
+    // },
     data() {
       // window.addEventListener("message", (evt)=>{
       //   this.callback(evt),
@@ -2236,8 +2220,15 @@
             canDelete:true, 
             canWriteOnParent: true,
             canAdd:true
-            },
-
+        },
+        start:{
+          x:'',
+          y:''
+        },
+        itemStart:'',
+        upShow:false,
+        leftItemShow:false,
+        rightItemShow:false,
       }
     },
    
@@ -2798,7 +2789,7 @@
       //缩小
       smallLength(){
         // console.log(this.ganttScale,'this.ganttScale');
-        if(this.ganttScale>0.5){
+        if(this.ganttScale>0.4){
            this.ganttScale /= 2;
         //  this.drawingDateBar();
           console.log(this.selectRowList,'this.selectRowList');
@@ -2853,13 +2844,14 @@
             //   this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
             // })
             // this.drawingDateBar_reset();
+
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 0;
             this.setValueDiGui(response.data.rt);
             this.productGantt(this.taskIndexData);
           
-            
+            //实现靠名称的升降排序
             {
                 
                 document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.cursor="pointer";
@@ -2877,6 +2869,7 @@
                   }     
                 })  
             }
+            //实现靠数量的升降排序
             {
               
               document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.cursor="pointer";
@@ -2894,7 +2887,7 @@
                     }
               })
             }
-           
+            //实现靠优先级的升降排序
             {
                 
                 document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.cursor="pointer";
@@ -2919,7 +2912,7 @@
            
 
             this.taskIndexDataList.forEach((item)=>{
-              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+              this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
               this.$set(item,'currentDate',Date.parse(new Date()))
               // if(item.statusNum==NaN){
               //   item.statusNum=100
@@ -2927,7 +2920,7 @@
             })
             console.log(this.taskIndexDataList,'this.taskIndexDataList00');
             this.taskIndexSelectDataList.forEach((item)=>{
-              this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
+              this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
             })
             this.selectRowList=this.taskIndexSelectDataList;
 
@@ -2951,6 +2944,7 @@
           }
         })
       },
+    
       productGantt(taskIndexData){
 
         var min_Day_count = 10000000000000000000;
@@ -2981,9 +2975,6 @@
             if(max_Day_count < taskIndexData[i].taskEndDay){
               max_Day_count = taskIndexData[i].taskEndDay;
             }
-
-     
-
         }
 
         this.min_Day_count_g = min_Day_count;
@@ -3002,11 +2993,14 @@
         
         for(let i = 0;i < taskIndexData.length;i++){
           this.productGantt_loop(taskIndexData[i],min_Day_count);
+          // console.log(document.getElementById('item'+taskIndexData[i].taskId),'55555');
+          // document.getElementById('item'+taskIndexData[i].taskId).addEventListener('click',this.clickItem());
         }
 
         // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
 
       },
+
       productGantt_loop(root,min_Day_count){
 
           this.ganttItem(root,min_Day_count);
@@ -3016,7 +3010,6 @@
               this.productGantt_loop(root.children[i],min_Day_count);
             }
           }
-        
       },
       drawingDateBar_reset(){
         this.productGannttHead.style.width=(this.max_Day_count_g - this.min_Day_count_g + 1)*10 * this.ganttScale +"px";
@@ -3159,7 +3152,11 @@
 
         
       },
+      clickItem(){
+        console.log('000');
+      },
       ganttItem(root,min_Day_count){
+        // console.log(root,'root111');
           root.taskStartDay = root.taskStart / (1000 * 3600 * 24);
           root.taskStartDay = parseInt(root.taskStartDay + 0.5);
 
@@ -3172,16 +3169,117 @@
           this.productGanttNodeBg.style.height = (this.Gantt_item_top+37) + "px";
 
           var item = document.createElement("div");
+          //拉伸gantt图
+          // {
+          //   var leftItem = document.createElement("div");
+          //   var rightItem = document.createElement("div");
+          //   leftItem.style.position = 'absolute';
+          //   leftItem.style.width='10px';
+          //   leftItem.style.height = 26 + "px";
+          //   leftItem.style.cursor = 'w-resize'
+          //   leftItem.style.left='-5px';
+          //   leftItem.style.zIndex=10;
+          //   item.appendChild(leftItem);
+          //   leftItem.addEventListener('mousedown',(e)=>{
+          //     e.stopPropagation()
+          //     this.leftStartX=e.pageX;
+          //     // this.itemWidth=item.style.width;
+          //     this.leftItemShow=true;
+          //     console.log(this.leftStartX,this.itemWidth,'左边开始');
+          //     // item.removeEventListener('mousedown',(e)=>{
+          //     //   this.start.x=e.pageX;
+          //     //   this.itemStart=item.offsetLeft;
+          //     //   // console.log(this.itemStart,'this.itemStart');
+          //     //   this.upShow=true;
+          //     // })
+          //   })
+          //   leftItem.addEventListener('mousemove',(e)=>{
+          //     if(this.leftItemShow){
+          //         e.stopPropagation()
+          //         let leftEndX=e.pageX-this.leftStartX;
+          //         console.log(leftEndX,'移动开始');
+          //         console.log(item.offsetWidth+leftEndX)
+          //         item.style.width=item.offsetWidth+leftEndX+'px';
+          //         // item.style.left=item.offsetLeft+leftEndX+'px';
+          //     }
+          //   })
+          //   leftItem.addEventListener('mouseup',(e)=>{
+          //      e.stopPropagation()
+          //     this.leftItemShow=false;
+          //   })
+          //   rightItem.style.position = 'absolute';
+          //   rightItem.style.width='30px';
+          //   rightItem.style.height = 26 + "px";
+          //   rightItem.style.cursor = 'w-resize'
+          //   rightItem.style.right='-15px';
+          //   rightItem.style.zIndex=10;
+          //   item.appendChild(rightItem);
+          //    rightItem.addEventListener('mousedown',(e)=>{
+          //     e.stopPropagation()
+          //     this.rightStartX=e.screenX;
+          //     // this.itemWidth=item.style.width;
+          //     this.rightItemShow=true
+
+          //   })
+          //   rightItem.addEventListener('mousemove',(e)=>{
+          //     if(this.rightItemShow){
+          //         e.stopPropagation()
+          //         let rightEndX=e.screenX-this.rightStartX;
+          //         console.log(e.screenX,rightEndX,this.rightStartX,'rightEndX');
+          //         item.style.width=item.offsetWidth+rightEndX+'px';
+                  
+          //         // rightItem.style.right=rightItem.offsetLeft+rightEndX+'px';
+          //     }
+          //   })
+          //   rightItem.addEventListener('mouseup',(e)=>{
+          //      e.stopPropagation()
+          //     this.rightItemShow=false;
+          //     // rightItem.style.right=rightItem.style.right;
+          //   })
+          // }
+
+
+          item.setAttribute('id','item'+root.taskId)
+         
+          
           item.style.background = "#6eb7ff";
           item.style.position = "absolute";
-          item.style.border = "1px solid #000";
+          // item.style.border = "1px solid #000";
           item.style.top = this.Gantt_item_top + "px";
           item.style.left = ((root.taskStartDay - min_Day_count) * 10) * this.ganttScale + "px";
           // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
           item.style.marginTop=5+'px';
           item.style.height = 26 + "px";
           item.style.width = 10 * Day_count  * this.ganttScale + "px";
+          //拖拽gantt图
+          // {
 
+          //   item.addEventListener('click',(e)=>{
+          //     console.log(e);
+          //     item.style.border = "2px solid #000";
+          //   })
+          //   item.addEventListener('mousedown',(e)=>{
+          //     e.stopPropagation();
+          //     // console.log(e,'e000');
+          //     this.start.x=e.pageX;
+          //     this.itemStart=item.offsetLeft;
+          //     console.log(this.itemStart,'this.itemStart');
+          //     this.upShow=true;
+          //   })
+          //   item.addEventListener('mouseup',(e)=>{
+          //     e.stopPropagation()
+          //     this.upShow=false;
+          //   })
+          //   item.addEventListener('mousemove',(e)=>{
+          //     if(this.upShow){
+          //       e.stopPropagation()
+          //       let endX=e.pageX-this.start.x;
+          //       item.style.left=endX+this.itemStart+'px';
+          //     }
+          //   })
+          //   item.style.cursor='move';
+          // }
+          
           var line = document.createElement("div");
           var line1 =document.createElement("div");
           line.style.position = "absolute";
@@ -3205,15 +3303,13 @@
           item_sub.style.background = "#68da68";
 
           item_sub.style.position = "absolute";
-          item_sub.style.border = "1px solid #000";
+          // item_sub.style.border = "1px solid #000";
           item_sub.style.top = "0px";
           item_sub.style.left ="0px";
           // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
           item_sub.style.height = "100%";
           item_sub.style.width = 10 * Day_count  * this.ganttScale * root.statusNum / 100 + "px";
-
           item.appendChild(item_sub);
-
       },
       dataDigui(root){
         // this.taskIndexDataList=[];
@@ -3228,7 +3324,7 @@
       },
       setValueDiGui(root){
         for(let i =0;i<root.length;i++){
-            this.$set(root[i],'statusNum',root[i].actualStatusStr=='未开始'?0:parseInt(root[i].actualStatusStr.substring(2).split('%')[0]));
+            this.$set(root[i],'statusNum',root[i].actualStatusStr.indexOf('全部完成')>-1?100:(root[i].actualStatusStr=='未开始'?0:parseInt(root[i].actualStatusStr.substring(2).split('%')[0])));
             if(root[i].children){
               this.setValueDiGui(root[i].children)
             }
@@ -3253,6 +3349,7 @@
           //   }
         }
       },
+    
 
       search(item){
         item.forEach((val)=>{

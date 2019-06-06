@@ -17,69 +17,71 @@
                 <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
                 </router-link>
             </div>
-            <div class="ForumSelector">
-                <span class="name">筛选条件</span>
-                <ul>
-                        <!-- options_monomer:[],//单体选项
-                        options_status:[],//状态选项
-                        options_about:[],//相关选项 -->
-                    <li class="selectItem">
-                        <span class="title">群组</span>
-                        <el-select v-model="selectUgId" placeholder="请选择">
-                            <el-option
-                            v-for="item in ugList"
-                            :key="item.groupId"
-                            :label="item.groupName"
-                            :value="item.groupId">
-                            </el-option>
-                        </el-select>
-                    </li>
-                    <li class="selectItem">
-                        <span class="title">层级</span>
-                        <el-select v-model="value_monomer" placeholder="请选择">
-                            <el-option
-                            v-for="(item,index) in options_monomer"
-                            :key="index"
-                            :label="item.Name"
-                            :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </li>
-                    
-                    <!-- <li class="selectItem">
-                        <el-button class="buttonPrimary" type="primary" @click="makeSure">算量生成</el-button>
-                        <span class="title">相关</span>
-                        <el-select v-model="value_about" placeholder="请选择">
-                            <el-option
-                            v-for="item in options_about"
-                            :key="item.id"
-                            :label="item.Name"
-                            :value="item.id">
-                            </el-option>
-                        </el-select>
-                        <el-button></el-button>
-                    </li> -->
-                </ul>
-            </div>
-            <div style="margin-top:20px;padding:0px;box-sizing: border-box;margin-left:6px; ">
-                <table class="UserList" border="1" width='98%' style="margin:0 auto;">
-                    <thead>
-                        <tr  class="userList-thead">
-                            <th width="18%">层级名称</th>
-                            <th width="18%">材料名称</th>
-                            <th width="14%;">数量</th>
-                            <th width="14%;">单位</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(val,index) in getWorkAmountDataList" :key="index">
-                                <td>{{val.leveName}}</td>
-                                <td>{{val.classifyName}}</td>
-                                <td>{{val.value}}</td>
-                                <td>{{val.unit}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div style="margin:0 auto;width:98%;"> 
+                <div class="ForumSelector">
+                    <span class="name">筛选条件</span>
+                    <ul>
+                            <!-- options_monomer:[],//单体选项
+                            options_status:[],//状态选项
+                            options_about:[],//相关选项 -->
+                        <li class="selectItem">
+                            <span class="title">群组</span>
+                            <el-select v-model="selectUgId" placeholder="请选择">
+                                <el-option
+                                v-for="item in ugList"
+                                :key="item.groupId"
+                                :label="item.groupName"
+                                :value="item.groupId">
+                                </el-option>
+                            </el-select>
+                        </li>
+                        <li class="selectItem">
+                            <span class="title">层级</span>
+                            <el-select v-model="value_monomer" placeholder="请选择">
+                                <el-option
+                                v-for="(item,index) in options_monomer"
+                                :key="index"
+                                :label="item.Name"
+                                :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </li>
+                        
+                        <!-- <li class="selectItem">
+                            <el-button class="buttonPrimary" type="primary" @click="makeSure">算量生成</el-button>
+                            <span class="title">相关</span>
+                            <el-select v-model="value_about" placeholder="请选择">
+                                <el-option
+                                v-for="item in options_about"
+                                :key="item.id"
+                                :label="item.Name"
+                                :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <el-button></el-button>
+                        </li> -->
+                    </ul>
+                </div>
+                <div style="margin-top:20px;padding:0px;box-sizing: border-box;">
+                    <table class="UserList" border="1" width="100%" style="margin:0 auto;">
+                        <thead>
+                            <tr  class="userList-thead">
+                                <th width="18%">层级名称</th>
+                                <th width="18%">材料名称</th>
+                                <th width="14%;">数量</th>
+                                <th width="14%;">单位</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(val,index) in getWorkAmountDataList" :key="index">
+                                    <td>{{val.leveName}}</td>
+                                    <td>{{val.classifyName}}</td>
+                                    <td>{{val.value}}</td>
+                                    <td>{{val.unit}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -111,12 +113,13 @@ export default {
         },
         value_monomer:function(val){
             var vm=this;
-            vm.getWorkAmountData();
+           
             vm.options_monomer.forEach((item)=>{
                 if(item.id==this.value_monomer){
                     this.value_monomerName=item.Name
                 }
             })
+            vm.getWorkAmountData();
         }
     },
     created(){
@@ -238,7 +241,11 @@ export default {
                             })
                             if(vm.options_monomer.length>0){
                                 vm.value_monomer = vm.options_monomer[1].id;
-                                vm.value_monomerName = vm.options_monomer[1].Name
+                                vm.value_monomerName = vm.options_monomer[1].Name;
+                                // if(vm.value_monomer){
+                                //      vm.getWorkAmountData()
+                                // }
+                                
                             }
                     }
                 })
@@ -262,20 +269,31 @@ export default {
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    response.data.rt.forEach((item)=>{
+                    if(response.data.rt.errorInfos.length>0){
+                        let data=response.data.rt.errorInfos.join('<br>')
+                        // alert(data)
+                        this.$message({
+                            type:'warning',
+                            dangerouslyUseHTMLString: true,
+                            message:data,
+                            duration:10000,
+                            showClose: true
+                        })
+                    }
+                    response.data.rt.workAmountDatas.forEach((item)=>{
                             // console.log(item,'item00');
                             this.projectSubmitData.forEach((val)=>{
                                 if(val.classifyCode==item.code){
                                     this.getWorkAmountDataList.push({
                                         'leveName':vm.value_monomerName,
-                                        'classifyName':val.classifyName,
+                                        'classifyName':val.classifyName+'('+item.code+')',
                                         'value':item.value,
                                         'unit':item.unit
                                     })
                                 }
                             })
                     })
-                    console.log(this.getWorkAmountDataList,'this.getWorkAmountDataList');
+                    // console.log(this.getWorkAmountDataList,'this.getWorkAmountDataList');
                 }
             })
         },
@@ -292,7 +310,7 @@ export default {
                     success:(response)=>{
                         if(response.cd==0){
                             this.typeDigui(response.rt)
-                            console.log(this.projectSubmitData,'this.projectSubmitData');
+                            // console.log(this.projectSubmitData,'this.projectSubmitData');
                             // this.projectSubmitData = response.rt;
                         }
                     }
@@ -380,14 +398,14 @@ ul li{
                 }
         }
      .ForumSelector{
-         width: 98%;
-         margin:0 auto;
+        //  width: 98%;
+            margin:0 auto;
             border: 1px solid #d9d9d9;
             height: 40px;
             color: #999999;
             font-size: 12px;
             margin-top: 30px;
-            margin-right: 5px;
+            // margin-right: 5px;
             .name{
                 float: left;
                 width: 96px;

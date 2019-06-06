@@ -113,7 +113,8 @@
                             <td align="right" width="135px">验证码 : </td>
                             <td width="265px">
                                 <input class="tdInput1" v-model="validateCode" @focus="focusCode()" @blur="blurCode()" placeholder="验证码"/>
-                                <button @click="sendMobileCode()">发送验证码</button>
+                                <input id="getCode" type="button" value="获取验证码" @click="sendMobileCode()"/>
+                                <!-- <button @click="sendMobileCode()">发送验证码</button> -->
                             </td>
                             <!-- <td width="65px">
                                 <button>发送验证码</button>
@@ -173,6 +174,10 @@ export default {
             inputPassWord2Show:false,
             inputPassWord2NoShow:false,
             inputCodeShow:false,
+            count:60,//间隔函数，1秒执行
+            curCount:'', //当前剩余秒数
+            InterValObj:'',
+            code:'',
         }
     },
     created(){
@@ -264,12 +269,18 @@ export default {
         //发送验证码
         sendMobileCode(){
             var vm=this;
+            
+
             if(this.phone==''){
                 this.$message({
                     type:'success',
                     message:'请输入手机号'
                 })
             }else{
+                // this.curCount = this.count;
+                // $('#getCode').attr("disabled", "true");
+                // $('#getCode').val("请在"+this.curCount+"秒内输入");
+                // this.InterValObj =window.setInterval(this.SetRemainTimes(),1000);
                 axios({
                     url:vm.BDMSUrl+'register/sendValidateCode',
                     method:'get',
@@ -290,9 +301,19 @@ export default {
                         })
                     }
                 })
-
             }
             
+        },
+        SetRemainTimes(){
+            if(this.curCount == 0) {
+               window.clearInterval(this.InterValObj); //停止计时器 
+               $("#getCode").removeAttr("disabled"); //启用按钮 
+               $("#getCode").val("重新发送验证码");
+               this.code = ""; //清除验证码。如果不清除，过时间后，输入收到的验证码依然有效   
+            } else {
+               this.curCount--;
+               $("#getCode").val("请在" + this.curCount + "秒内输入");
+            }
         },
         addImg(file){
             var vm=this;

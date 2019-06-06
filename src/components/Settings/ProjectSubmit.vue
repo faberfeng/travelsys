@@ -4,7 +4,7 @@
             <h4 class="title"><span>工程招标分类编码</span></h4>
             <div class="manageWorktool" >
                 <span class="worktooltitle">分类编码</span>
-                <!-- <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button> -->
+                <button class="btn" @click="addConstructor"><i class="el-icon-plus"></i>添加</button>
                 <div class="worktable">
                     <zk-table 
                     index-text="序号"
@@ -105,7 +105,7 @@
                             <span v-text="totalTitle" class="editInpTextInp"></span>
                         </div>
                         <div class="editBodytwo edit-item clearfix"><label class="editInpText">计量单位 :</label><input class="inp"  placeholder="请输入" v-model="jiliang"/></div>
-                        <div class="editBodytwo edit-item clearfix"><label class="editInpText">规则注释 :</label><input class="inp" placeholder="请输入" v-model="guize"/></div>
+                        <!-- <div class="editBodytwo edit-item clearfix"><label class="editInpText">规则注释 :</label><input class="inp" placeholder="请输入" v-model="guize"/></div> -->
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="addListSure">保存</button>
@@ -177,7 +177,7 @@
                     <div class="editBody" style="margin:0 30px">
                         <div class="yingsheProject">
                             <label class="yingsheProjectText">已添加的映射信息 : </label>
-                            <button class="editBtnS yingsheProjectBtn" @click="projectMappedSure" style="margin-right:0;">添加</button>
+                            <button class="editBtnS yingsheProjectBtn" v-show="projectMappingData.length==0" @click="projectMappedSure" style="margin-right:0;">添加</button>
                         </div>
                         <zk-table 
                         index-text="序号"
@@ -185,7 +185,7 @@
                         :expand-type="props.expandType" :selection-type="props.selectionType" 
                         :border="props.border" style="width:525px;margin-top:10px;">
                             <template slot="action" slot-scope="scope">
-                                <button class="editBtn actionBtn" style="margin-right:10px" @click="editProjectProperty(scope)"></button>
+                                <!-- <button class="editBtn actionBtn" style="margin-right:10px" @click="editProjectProperty(scope)"></button> -->
                                 <button class="deleteBtn actionBtn" style="margin-right:10px" @click="deleteProjectProperty(scope)"></button>
                             </template> 
                         </zk-table>
@@ -230,7 +230,9 @@
                                 </div>
                             </div> -->
                             <div class="calculateRight" style="overflow:hidden">
-                                <span class="calculateResult">计量公式 : 结果为 <label>{{inputGouJianFunctionValue}}</label></span>
+                                <span class="calculateResult">计量公式 : 单位为
+                                     <!-- <label>{{inputGouJianFunctionValue}}</label> -->
+                                     <input style="width:100px;" v-model="inputGouJianFunctionValue"/></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
                                     <button class="calculateBtn" @click="showConvenience(20000)">...</button>
@@ -299,7 +301,9 @@
                                 </div>
                             </div> -->
                             <div class="calculateRight" style="overflow:hidden">
-                                <span class="calculateResult">计量公式 : 结果为 <label>{{inputGouJianFunctionValue}}</label></span>
+                                <span class="calculateResult">计量公式 : 结果为 
+                                    <!-- <label>{{inputGouJianFunctionValue}}</label> -->
+                                     <input style="width:100px;" v-model="inputGouJianFunctionValue"/></span>
                                 <div>
                                     <input class="calculateInp" placeholder="请输入" v-model="jiLiangResult"/>
                                     <button class="calculateBtn" @click="showConvenience(20000)">...</button>
@@ -340,7 +344,7 @@
                 </el-dialog>
             </div>
             <div id="CInput" ref="convenienceInp">
-                <el-dialog  title="表达式快捷输入面板" v-dialogDrag :visible.sync="convenientInput" :before-close="cancelConveient"  :key="0">
+                <el-dialog  title="表达式快捷输入面板"  v-dialogDrag  :visible.sync="convenientInput" :before-close="cancelConveient"  :key="0">
                     <div class="editBody">
                         <div class="InputBody">
                             <div class="InputBodyLeft">
@@ -349,6 +353,23 @@
                                 </div>
                                 <select class="multipleSelectA" multiple="multiple" v-model="inputGouJianType">
                                     <option v-for="(item,index) in goujianProperty" :key="index">{{item.propertyName}}</option>
+                                </select>
+                            </div>
+                            <!-- <div class="InputBodyLeft">
+                                <div class="InputBodyTitle">
+                                    <span>构件属性</span>
+                                </div>
+                                <select class="multipleSelectA" multiple="multiple" >
+                                    <option v-for="(item,index) in goujianProperty" :key="index">{{item.unit}}</option>
+                                </select>
+                            </div> -->
+                             <div class="InputBodyRight">
+                                <div class="InputBodyTitle">
+                                    <span>单位</span>
+                                </div>
+                                <!-- <input class="multipleSelectC" v-model="inputGouJianFunctionValue"/> -->
+                                <select class="multipleSelectC" multiple="multiple" :disabled="true">
+                                        <option v-for="(item,index) in goujianProperty" :key="index">{{item.unit}}</option>
                                 </select>
                             </div>
                             <div class="InputBodyMiddle">
@@ -371,17 +392,7 @@
                                     <option>!(非)</option> -->
                                 </select>
                             </div>
-                            <div class="InputBodyRight">
-                                <div class="InputBodyTitle">
-                                    <span>单位</span>
-                                </div>
-                                <input class="multipleSelectC" v-model="inputGouJianFunctionValue"/>
-                                <!-- <select class="multipleSelectC" multiple="multiple" v-model="inputGouJianFunction">
-                                    <option>mm</option>
-                                    <option>IF(A,B,C)</option>
-                                    <option>SUB(A,B)</option>
-                                </select> -->
-                            </div>
+                           
                             <div class="InputBodyLast">
                                 <div class="InputBodyTitle">
                                     <span>可取值</span>
@@ -656,7 +667,8 @@ export default {
         vm.BDMSUrl = vm.$store.state.BDMSUrl
         this.token = localStorage.getItem('token');
         this.projId = localStorage.getItem('projId');
-        // this.getProjectGenieClassByProject();
+        vm.entId = localStorage.getItem('entId');
+        this.getProjectGenieClassByProject();
         this.getProjectGenieClass();
     },
     methods:{
@@ -777,8 +789,10 @@ export default {
                     projectId:this.projId
                 }
             }).then(response=>{
-                if(response.data.cd == '0'){
-                    this.projectMappingData = response.data.rt;
+                if(response.data.cd=='0'){
+                    if(response.data.rt){
+                         this.projectMappingData = response.data.rt;
+                    }
                 }else if(response.data.cd =='-1'){
                     alert(response.data.msg)
                 }else{
@@ -790,9 +804,14 @@ export default {
         },
         //构件映射
         setMeterial(scope){
-            this.gouJianMapShow = true;
-            this.setMaterialObject = scope;
-            this.getEntityMapping();
+            if(scope){
+                this.gouJianMapShow = true;
+                this.setMaterialObject = scope;
+                console.log(scope,'scope000');
+                this.inputGouJianFunctionValue=scope.row.other;
+                this.getEntityMapping();
+            }
+            
         },
         //添加构件映射信息
         projectMappedSure(){
@@ -855,12 +874,13 @@ export default {
             //         })
             //     }
             // }) 
+            console.log(this.constructorData,'this.constructorData');
              this.constructorData.forEach((item)=>{
                 if(item.classifyCode.substr(2,4)=='0000'){
                     this.firstSelectData.push(item)
                 }
             })
-            console.log(this.firstSelectData,'this.firstSelectData');
+          
             this.firstSelectTitle = this.firstSelectData[0].classifyCode;
              this.firstSelectName = this.firstSelectData[0].classifyName;
             this.loadSecondSelectData(this.firstSelectTitle)
@@ -1458,28 +1478,32 @@ export default {
         },
         //添加确定
         addListSure(){
-            if(this.codeType == '' || this.totalCode == '' || this.guize == '' || this.newTitle=='' ||this.jiliang == ''){
+            if(this.codeType == '' || this.totalCode == '' || this.newTitle=='' ||this.jiliang == ''){
                 alert('请检查表单是否输入完整');
             }else{
                 axios({
-                    method:'post',
-                    url:this.BDMSUrl+'config2/component/addAttributeCodeGenieClass',
+                    method:'get',
+                    // url:this.BDMSUrl+'config2/component/addAttributeCodeGenieClass',
+                    url:this.BDMSUrl+'projectInfo/addBiddingCode',
                     headers:{
                         token:this.token
                     },
                     params:{
-                        projId:this.projId,
-                        type:2
+                        projectId:this.projId,
+                        entId:this.entId,
+                        name:this.newTitle,
+                        code:this.totalCode,
+                        other:this.jiliang
                     },
-                    data:{
-                        level:this.codeType,
-                        number:this.totalCode,
-                        regular:this.guize,
-                        status:0,
-                        table:'t32',
-                        title:this.newTitle,
-                        unit:this.jiliang
-                    }
+                    // data:{
+                    //     level:this.codeType,
+                    //     number:this.totalCode,
+                    //     regular:this.guize,
+                    //     status:0,
+                    //     table:'t32',
+                    //     title:this.newTitle,
+                    //     unit:this.jiliang
+                    // }
                 }).then(response=>{
                     if(response.data.cd == 0){
                         this.getProjectGenieClass();
@@ -1533,7 +1557,8 @@ export default {
                 this.showThird = true;
             }
             this.projectSubmitData.forEach(item=>{
-                this.firstCodeData.push(item.number.substr(0,2));
+                // this.firstCodeData.push(item.number.substr(0,2));
+                this.firstCodeData.push(item.classifyCode.substr(0,2));
             })
         },
         //一级编码改变
@@ -1541,13 +1566,13 @@ export default {
             this.secondCodeData = [];
             var firstTitleDataObject = [];
             this.projectSubmitData.forEach(item=>{
-                if(item.number.substr(0,2) == this.firstTitleText){
+                if(item.classifyCode.substr(0,2) == this.firstTitleText){
                     firstTitleDataObject = item.children;
-                    this.fTitle = item.title;
+                    this.fTitle = item.classifyName;
                 }
             });
             firstTitleDataObject.forEach(item=>{
-                this.secondCodeData.push(item.number.substr(2,2));
+                this.secondCodeData.push(item.classifyCode.substr(2,2));
             })
         },
         //二级编码改变
@@ -1556,20 +1581,20 @@ export default {
             var firstTitleDataObject = {};
             var twoTitleDataObject = {};
             this.projectSubmitData.forEach(item=>{
-                if(item.number.substr(0,2) == this.firstTitleText){
+                if(item.classifyCode.substr(0,2) == this.firstTitleText){
                     firstTitleDataObject = item.children;
-                    this.fTitle = item.title;
+                    this.fTitle = item.classifyName;
                 }
             });
             firstTitleDataObject.forEach(item=>{
                 
-                if(item.number.substr(2,2) == this.secondTitleText){
-                    this.twoTitle = item.title;
+                if(item.classifyCode.substr(2,2) == this.secondTitleText){
+                    this.twoTitle = item.classifyName;
                     twoTitleDataObject = item.children;
                 }
             });
             twoTitleDataObject.forEach(item=>{
-                this.thirdCodeData.push(item.number.substr(4,2));
+                this.thirdCodeData.push(item.classifyCode.substr(4,2));
             })
         },
         //三级编码改变
@@ -1578,21 +1603,21 @@ export default {
             this.thirdCodeData = [];
             var twoTitleDataObject = {};
             this.projectSubmitData.forEach(item=>{
-                if(item.number.substr(0,2) == this.firstTitleText){
+                if(item.classifyCode.substr(0,2) == this.firstTitleText){
                     firstTitleDataObject = item.children;
-                    this.fTitle = item.title;
+                    this.fTitle = item.classifyName;
                 }
             });
             firstTitleDataObject.forEach(item=>{
-                if(item.number.substr(2,2) == this.secondTitleText){
-                    this.twoTitle = item.title;
+                if(item.classifyCode.substr(2,2) == this.secondTitleText){
+                    this.twoTitle = item.classifyName;
                     twoTitleDataObject = item.children;
                 }
             })
             twoTitleDataObject.forEach(item=>{
-                this.thirdCodeData.push(item.number.substr(4,2));
-                if(item.number.substr(4,2) == this.thirdTitleText){
-                    this.thTitle = item.title;
+                this.thirdCodeData.push(item.classifyCode.substr(4,2));
+                if(item.classifyCode.substr(4,2) == this.thirdTitleText){
+                    this.thTitle = item.classifyName;
                 }
             })
         },
@@ -2173,7 +2198,7 @@ export default {
             } 
             .multipleSelectA{
                 border: none;
-                width: 159px;
+                width: 169px;
                 height: 336px;
                 // overflow: hidden;
                 overflow: auto;
@@ -2188,7 +2213,7 @@ export default {
             }
             .multipleSelectB{
                 border: none;
-                width: 121px;
+                width: 101px;
                 height: 336px;
                 overflow: hidden;
             }
@@ -2202,7 +2227,7 @@ export default {
             }
             .multipleSelectC{
                 border: none;
-                width: 118px;
+                width: 108px;
                 height: 336px;
                 overflow: hidden;
             }
@@ -2216,7 +2241,7 @@ export default {
             }
             .multipleSelectD{
                 border: none;
-                width: 122px;
+                width: 137px;
                 height: 336px;
             }
             .multipleSelectD:focus{
@@ -2274,31 +2299,32 @@ export default {
             }
             .InputBody{
                 width: 525px;
+                // width:407px;
                 margin: 0 30px 0 30px;
                 border: 1px solid #ccc;
                 height: 380px;
             }
             .InputBodyLeft{
-                width: 160px;
+                width: 170px;
                 height: 380px;
                 border-right: 1px solid #ccc;
                 float: left;
             }
             .InputBodyMiddle{
-                width: 122px;
+                width: 104px;
                 height: 380px;
                 border-right: 1px solid #ccc;
                 float: left;
             }
             .InputBodyRight{
-                width: 119px;
+                width: 109px;
                 height: 380px;
                 border-right: 1px solid #ccc;
                 float: left;
             }
             .InputBodyLast{
                 height: 380px;
-                width: 122px;
+                width: 140px;
                 float: left;
             }
             .InputBodyTitle{

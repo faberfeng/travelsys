@@ -1,6 +1,8 @@
 <template>
 <div class="box">
-      <div id="panoramicView"></div>
+      <div id="panoramicView">
+
+      </div>
       <div id="info_panoramicView">
          <p class="headTitle">点位位置</p>
           <div  id="planeDIV">
@@ -226,9 +228,10 @@ export default {
         window.open(vm.QJFileManageSystemURL + filePath+'');
       },
       getImg(){
-        var vm = this
+        var vm = this;
+        console.log(vm.BDMSUrl+'doc/download/'+vm.fgId,'111111111');
         setTimeout(()=>{
-            vm.init(vm.BDMSUrl+'/doc/download/'+vm.fgId);
+            vm.init(vm.BDMSUrl+'doc/download/'+vm.fgId);
         },1000)
          
         //  axios({
@@ -362,7 +365,6 @@ export default {
 
             lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
             lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
-
         }
 
     },
@@ -372,6 +374,17 @@ export default {
 
     },
     onDocumentMouseWheel( event ) {
+        var explorer =navigator.userAgent ;
+        if (explorer.indexOf("Firefox") >= 0){
+            camera.fov += event.deltaY * 1;
+        } else if (explorer.indexOf("Chrome") >= 0){
+            camera.fov += event.deltaY * 0.05;
+        } else if (explorer.indexOf("Ie") >= 0){
+            camera.fov += event.deltaY * 0.05;
+        }
+        if(camera.fov<10) camera.fov=10;
+        if(camera.fov>130) camera.fov=130;
+        camera.updateProjectionMatrix();
 
     },
     animate() {

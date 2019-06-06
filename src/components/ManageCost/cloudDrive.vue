@@ -3562,7 +3562,8 @@ export default {
                             message:'文件夹删除成功'
                         })
                         // vm.getFileTree(true,null)
-                        vm.initPanoramaFolder(null,null)
+                        vm.getIntoCloudD();
+                        // vm.initPanoramaFolder(null,null)
                         vm.firstTime = 0
                     }else if(response.data.cd == -1){
                         vm.$message({

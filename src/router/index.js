@@ -21,11 +21,11 @@ const router = new Router({
     },
 
     //gantt
-    {
-      path:'/gantt',
-      name:'gantt',
-      component:resolve=>require(['@/components/SchedulePlan/gantt'],resolve),
-    },
+    // {
+    //   path:'/gantt',
+    //   name:'gantt',
+    //   component:resolve=>require(['@/components/SchedulePlan/gantt'],resolve),
+    // },
     //二维码扫描
     //开始进入当前页面
     {

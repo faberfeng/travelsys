@@ -257,6 +257,7 @@ export default {
         this.token = localStorage.getItem('token');
         this.userId = localStorage.getItem('userid');
         this.projId = localStorage.getItem('projId');
+        this.userName = localStorage.getItem('userName')
         // this.projectName = localStorage.getItem('projectName');
         this.getMenusInfo();//获取自定义菜单信息
         this.getBasicSituation();//获取工程概况
@@ -335,6 +336,7 @@ export default {
         },
         //增加自定义菜单确认
         addMenusMakeSure(){
+           
             if(this.menusTitle ==''|| this.menusUrl ==''){
                 alert('请输入标题或URL地址');
             }else{
@@ -481,13 +483,13 @@ export default {
         changeStatusMenusMakeSure(){
              axios({
                     method:'get',
-                    url:this.BDMSUrlQRCode+'config2/component/editCustomMenu',
+                    url:this.BDMSUrlQRCode+'api/v1/main/editCustomMenu',
                     headers:{
                         'token':this.token,
                         "Content-Type": "application/json"
                     },
                     params:{
-                        projectId:localStorage.getItem('projId'),
+                        // projectId:localStorage.getItem('projId'),
                         id:this.menusInfoData[this.statusIndex].id,
                         url:this.menusInfoData[this.statusIndex].url,
                         title:this.menusInfoData[this.statusIndex].title,

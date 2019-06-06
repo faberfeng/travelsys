@@ -162,8 +162,6 @@ export default new Vuex.Store({
         // userCenterUrl:'http://58.214.36.222:18080/bdmsRebuild/#/userLogin',
         // BDMSLoginUrl:'http://58.214.36.222:18080/bdmsRebuild/#/login',
 
-
-
         //最新bdms外网地址
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，

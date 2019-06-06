@@ -41,6 +41,10 @@
             </div>
             <div class="bodyList">
                 <ul style="width:100%">
+                    <span v-show="!getSafetyEducationList">
+                            <img src="../../assets/nodata.png">
+                            <label style="display:block;color:#999;font-size:14px;line-height:14px;">当前无数据</label>
+                    </span>
                     <li class="bodyLi" v-for="(item,index) in getSafetyEducationList" :key="index">
                         <span class="liSpanOne">{{index+1}}</span>
                         <span class="liSpanTwo">

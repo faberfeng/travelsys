@@ -54,7 +54,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div v-if="getCheckOnTimeList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;" >
+                <div v-if="getCheckOnTimeList.length==0" style="height: 250px;text-align: center;font-size: 18px;line-height: 250px;border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc" >
                     当前列表无数据
                 </div>
 

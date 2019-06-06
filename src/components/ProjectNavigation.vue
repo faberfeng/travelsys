@@ -97,6 +97,7 @@ export default {
                     // vm.userName = response.data.rt.onlineInfo.realName;
                     // vm.userId = response.data.rt.onlineInfo.userId;
                     vm.userName = response.data.rt.user.name;
+                    vm.userName2 = response.data.rt.user.name2;
                     vm.userId = response.data.rt.user.userId;
                     if(response.data.rt.user.userAvater==""){
                         vm.userImg=null;
@@ -109,6 +110,7 @@ export default {
                     localStorage.setItem('userName',vm.userName)
                     localStorage.setItem('userId',vm.userId)
                     localStorage.setItem('userImg',vm.userImg)
+                    localStorage.setItem('userName2',vm.userName2)
                     if(vm.userLevel==1){
                         vm.getProjectList();
                     }else if(vm.userLevel==0){

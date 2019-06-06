@@ -255,6 +255,7 @@ export default {
         vm.token  = localStorage.getItem('token');
         vm.header.userImg=localStorage.getItem('userImg');
          vm.header.userName = localStorage.getItem('userName');
+         vm.userNames = localStorage.getItem('userName')
          vm.header.userId = localStorage.getItem('userId');
          vm.responseStr=localStorage.getItem('responseAuthInfo');
         //  response.data.rt.user.name
@@ -1392,7 +1393,13 @@ export default {
                 this.menusInfoData.forEach((item)=>{
                     if(tab.name==='000'){
                         this.navigationPath=tab.name;
-                        window.open(item.url,'_blank');
+                        let menusUrl=item.url;
+                        if(menusUrl.indexOf('?')>-1){
+                            menusUrl=menusUrl+'&userName='+localStorage.getItem('userName2')+'&userName2='+this.userNames
+                        }else{
+                            menusUrl=menusUrl+'?userName='+localStorage.getItem('userName2')+'&userName2='+this.userNames
+                        }
+                        window.open(menusUrl,'_blank');
                         window.location.reload(true);
                     }
                 })

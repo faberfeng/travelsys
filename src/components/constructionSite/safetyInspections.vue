@@ -170,7 +170,29 @@
                             <el-checkbox v-model="displaySpotNum" @change="displaySpot()" style="display:block;width:100px;text-align:left;margin-left:0px;margin-top:5px;">显示点位读数</el-checkbox>
                         </div>
                     </div>
-                    
+                    <div id="edit">
+                        <el-dialog width="1000px" v-dialogDrag title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
+                                <div style="margin-bottom:20px;">
+                                    <el-date-picker
+                                        v-model="selectValue1"
+                                        type="datetimerange"
+                                        range-separator="至"
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期"
+                                        value-format="yyyy-MM-dd">                         
+                                    </el-date-picker>
+                                    <span class="searchBtn" @click="makeSureData1()">确认</span>
+                                </div>
+                                <div v-if="spotChangeLineShow1">
+                                    <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
+                                </div>
+                        </el-dialog>
+                        <el-dialog width="400px"  v-dialogDrag title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+                            <div>
+                                <vue-highcharts id="leftHightchart" style="min-height:900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                            </div>
+                        </el-dialog>
+                    </div>
                 </div>
                 <div class="inspectTable" > 
                     <div class="inspectTableHead">
@@ -993,7 +1015,7 @@
                         <vue-highcharts v-show="!typeSpotShow"  id="spotTypeChange" style="max-height:800px"  :options="optionMoreSpotChangeLineType" ref="spotTypeChange"></vue-highcharts>
                     </div>
             </el-dialog>
-            <el-dialog width="1000px" title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
+            <!-- <el-dialog width="1000px" title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
                     <div style="margin-bottom:20px;">
                         <el-date-picker
                             v-model="selectValue1"
@@ -1008,12 +1030,12 @@
                     <div v-if="spotChangeLineShow1">
                         <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                     </div>
-            </el-dialog>
-            <el-dialog width="1000px" title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+            </el-dialog> -->
+            <!-- <el-dialog width="1000px" title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
                 <div>
                     <vue-highcharts id="leftHightchart"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                 </div>
-            </el-dialog>
+            </el-dialog> -->
         </div>
         <!-- <button @click="getPdf()">按钮</button> -->
     </div>
@@ -1418,13 +1440,15 @@ export default {
             optionOnesLeft:{
                         chart: {
                             type: 'spline',
-                            inverted: false
+                            inverted: true
                         },
                         title: {
                             text: ''
                         },
                         xAxis: {
                             categories:[],
+                            // angle:180
+                            opposite: true
                         },
                         yAxis: {
                                 title: {
@@ -1433,6 +1457,8 @@ export default {
                                 labels:{
                                     enabled: true
                                 },
+                                opposite: true
+                                // angle:180
                                
                             
                                 },
@@ -1442,9 +1468,9 @@ export default {
                         legend: {
                             align: 'right',
                             verticalAlign: 'top',
-                            
                             floating: true,
-                            borderWidth: 0
+                            borderWidth: 0,
+                            y:-10
                         },
                         plotOptions: {
                             spline: {
@@ -2208,25 +2234,25 @@ export default {
                  this.startValue1=this.selectValue1[0];
                 this.endValue1=this.selectValue1[1];
             }
-            axios({
-                method:'post',
+            $.ajax({
                 url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
                 headers:{
                     'token':this.token
                 },
-                params:{
+                data:{
                     pointId:id,
                     startDate:this.startValue1,
                     endDate:this.endValue1
-                }
-            }).then((response)=>{
-                if(response.data.cd==0){
-                    this.getAllCurveList=response.data.rt;
-                    // console.log(this.getAllCurveList,'this.getAllCurveList');
-                    if(this.getAllCurveList.length>0){
-                            this.getAllCurveName=this.getAllCurveList[0].pointName;
-                    }
-                    
+                },
+                async:false,
+                success:(response)=>{
+                    if(response.cd==0){
+                        this.getAllCurveList=response.rt;
+                        // console.log(this.getAllCurveList,'this.getAllCurveList');
+                        if(this.getAllCurveList.length>0){
+                                this.getAllCurveName=this.getAllCurveList[0].pointName;
+                        }
+                        
                         this.getAllCurveList.forEach((item)=>{
                             this.acquisitionTimeXlist1.push(this.timeChangeMethod(item.collectTime))
                             this.elevationYlist1.push(item.data)
@@ -2245,11 +2271,54 @@ export default {
                             spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
                             spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
-                    
-                    this.startValue1='';
-                    this.endValue1='';
+                        this.startValue1='';
+                        this.endValue1='';
+
+                    }
                 }
             })
+            // axios({
+            //     method:'post',
+            //     url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
+            //     headers:{
+            //         'token':this.token
+            //     },
+            //     params:{
+            //         pointId:id,
+            //         startDate:this.startValue1,
+            //         endDate:this.endValue1
+            //     }
+            // }).then((response)=>{
+            //     if(response.data.cd==0){
+            //         this.getAllCurveList=response.data.rt;
+            //         // console.log(this.getAllCurveList,'this.getAllCurveList');
+            //         if(this.getAllCurveList.length>0){
+            //                 this.getAllCurveName=this.getAllCurveList[0].pointName;
+            //         }
+                    
+            //             this.getAllCurveList.forEach((item)=>{
+            //                 this.acquisitionTimeXlist1.push(this.timeChangeMethod(item.collectTime))
+            //                 this.elevationYlist1.push(item.data)
+            //             })
+            //             var min=this.getMinValue(this.elevationYlist1)?this.getMinValue(this.elevationYlist1):0;
+            //             var max=this.getMaxValue(this.elevationYlist1)?this.getMaxValue(this.elevationYlist1):0;
+            //             var middle=(min+max)/2;
+            //             this.spotChangeLineShow1=true;
+            //             setTimeout(()=>{
+            //                 let spotChangeLineChart=this.$refs.spotChangeLine1;
+            //                 spotChangeLineChart.delegateMethod('showLoading', 'Loading...');
+            //                 spotChangeLineChart.removeSeries();
+            //                 spotChangeLineChart.addSeries({name:this.getAllCurveName,data:this.elevationYlist1});
+            //                 spotChangeLineChart.hideLoading();
+            //                 spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist1});
+            //                 spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+            //                 spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
+            //             },200)
+                    
+            //         this.startValue1='';
+            //         this.endValue1='';
+            //     }
+            // })
         },
          esChange(val){
              this.esList.forEach((item)=>{
@@ -7948,50 +8017,33 @@ export default {
         }
         this.fullShow=!this.fullShow
     },
-        //全屏封装
-      launchIntoFullscreen(element) {
-                if(element.requestFullscreen){
-                    element.requestFullscreen();
-                }
-                else if(element.mozRequestFullScreen) {
-                    element.mozRequestFullScreen();
-                }
-                else if(element.webkitRequestFullscreen) {
-                    element.webkitRequestFullscreen();
-                }
-                else if(element.msRequestFullscreen) {
-                    element.msRequestFullscreen();
-                }
-        },
-        requestFullscreen( elem ) {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
+    requestFullscreen( elem ) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        }else if (elem.webkitRequestFullScreen) {
+            // 对 Chrome 特殊处理，
+            // 参数 Element.ALLOW_KEYBOARD_INPUT 使全屏状态中可以键盘输入。
+            if ( window.navigator.userAgent.toUpperCase().indexOf( 'CHROME' ) >= 0 ) {
+                elem.webkitRequestFullScreen( Element.ALLOW_KEYBOARD_INPUT );
             }
-            else if (elem.webkitRequestFullScreen) {
-                // 对 Chrome 特殊处理，
-                // 参数 Element.ALLOW_KEYBOARD_INPUT 使全屏状态中可以键盘输入。
-                if ( window.navigator.userAgent.toUpperCase().indexOf( 'CHROME' ) >= 0 ) {
-                    elem.webkitRequestFullScreen( Element.ALLOW_KEYBOARD_INPUT );
-                }
-                // Safari 浏览器中，如果方法内有参数，则 Fullscreen 功能不可用。
-                else {
-                    elem.webkitRequestFullScreen();
-                }
+            // Safari 浏览器中，如果方法内有参数，则 Fullscreen 功能不可用。
+            else {
+                elem.webkitRequestFullScreen();
             }
-            else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
+        }else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        }
+    },
+    //退出全屏
+    exitFullscreen() {
+            if(document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if(document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if(document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
             }
-        },
-        //退出全屏
-        exitFullscreen() {
-                if(document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if(document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if(document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                }
-        },
+    },
         //html转PDF
         getPdf(){
                 let pdfDom = document.querySelector('#pdfImport')
@@ -8904,6 +8956,9 @@ export default {
                             left:30px;
                             z-index:11;
                         }
+                    }
+                    .planeFigureDialog{
+
                     }
                     
                 }
