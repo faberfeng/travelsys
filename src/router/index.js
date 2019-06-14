@@ -309,6 +309,11 @@ const router = new Router({
           path:'/SchedulePlan/calendarConfig',
           name:'calendarConfig',
           component:resolve=>require(['@/components/SchedulePlan/calendarConfig'],resolve)
+        },
+        {
+          path:'/SchedulePlan/simulation',
+          name:'simulation',
+          component:resolve=>require(['@/components/SchedulePlan/scheduleSimulation'],resolve)
         }
       ]
     },

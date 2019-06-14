@@ -434,13 +434,14 @@
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
+
                     <div class="editBodytwo" v-show="manufacturerValue=='华桓'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input v-model="nodeId" class="gatherTimeNameInp"/>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
+                    <div class="editBodytwo" v-show="manufacturerValue!='华桓2'"><label class="editInpText" style="width:18% !important;">采集频率：</label>
                         <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
                         <el-radio v-model="collectRateRadio" label="2">1天</el-radio>
                     </div>
-                    <div class="editBodytwo" v-show="collectRateRadio=='2'"><label class="editInpText" style="width:18% !important;">采集时间：</label>
+                    <div class="editBodytwo" v-show="collectRateRadio=='2'||manufacturerValue!='华桓2'"><label class="editInpText" style="width:18% !important;">采集时间：</label>
                         <select class="gatherTimeName" v-model="collectHour" placeholder="请选择"><option v-for="(item,index) in timeList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
                      <div class="editBodytwo" v-show="manufacturerValue=='基康'">
@@ -493,10 +494,78 @@
                             </table>
                         </div>
                     </div>
+                    <div class="editBodytwo" v-show="manufacturerValue=='华桓2'">
+                        <label class="editInpText" style="width:13% !important;">测斜自动采集</label>
+                         <div class="tool">
+                             <span class="export" @click="addAutoVerify()"><label class="el-icon-circle-plus"></label><label class="exportTxt" >添加</label></span>
+                             <!-- <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
+                             <span class="export" @click="textDeviceMonitorPointRelation()"><label class="export3"></label><label class="exportTxt">测试</label></span> -->
+                        </div>
+                        <!-- style="height:300px" -->
+                        <div id="toolTbale" >
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">斜度序列ID</th>
+                                        <th width="100px">设备ID</th>
+                                        <th width="100px">通道编号</th>
+                                        <!-- <th width="100px">卡槽序号</th> -->
+                                        <th width="100px">传感器地址</th>
+                                        <th width="100px">操作</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getAutoPitchList" :key="index">
+                                        <td width="100px">{{item.seqId}}</td>
+                                        <td width="100px">{{item.systemId}}</td>
+                                        <td width="100px">{{item.channelNo}}</td>
+                                        <!-- <td width="100px">{{item.slotNo}}</td> -->
+                                        <td width="100px">{{item.sensorAddress}}</td>
+                                        <td width="100px">
+                                            <i class="el-icon-delete" style="cursor:pointer" title="删除" @click="deleteAutoPitch(item.id)"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog width="600px" title="添加采集传感器" :visible="autoPitchShow" @close="autoPitchCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editTxt1">绑定测斜序列</label>
+                        <select v-model="pitchSeqId" class="gatherTimeName">
+                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">通道编号:</label>
+                        <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">设备ID:</label>
+                        <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    
+                    <div class="editBodytwo">
+                        <label class="editTxt1">传感器地址:</label>
+                        <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">卡槽序号:</label>
+                        <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div> -->
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeAutoPitch()">确定</button>
+                    <button class="editBtnC" @click="autoPitchCancle()" >取消</button>
                 </div>
             </el-dialog>
             <el-dialog title="采集测试" :visible="textShow" @close="textShowCancle()" >
@@ -667,6 +736,12 @@ export default Vue.component('commonPitch-detail',{
                 getPitchBaseInfoList:'',//获取斜度基本信息
                 getPitchBaseInfoList1:[],
                 getPitchBaseInfoListLength:0,
+                pitchItemId:'',//自动采集斜度项目id
+                pitchSeqId:'',//序列id
+                channelNo:'',
+                sensorAddress:'',
+                slotNo:'',
+                systemId:'',
                 pageSize:5,
                 pageNum:1,
                 pitchDetailDataList:'',//获取数据详情（下面的图）
@@ -859,6 +934,8 @@ export default Vue.component('commonPitch-detail',{
                 collectRateRadio:'1',
                 collectHour:0,
                 getDeviceMonitorPointRelationList:'',
+                getAutoPitchList:'',
+                autoPitchShow:false,
                 timeList:[
                     {
                         value:0,
@@ -964,9 +1041,14 @@ export default Vue.component('commonPitch-detail',{
                         label:'华桓'
                     },
                     {
+                        value:'华桓2',
+                        label:'华桓(测斜传感器推送)'
+                    },
+                    {
                         value:'基康',
                         label:'基康'
-                    }
+                    },
+                    
                 ],
                 testShow:false,
                 getPitchSeqMarkList:'',
@@ -1081,7 +1163,14 @@ export default Vue.component('commonPitch-detail',{
         watch:{
             manufacturerValue:function(val){
                 this.getDeviceMonitorPointRelation()
-            }
+            },
+            // pitchSeqId:function(val){
+            //     this.getPitchBaseInfoList.forEach((item)=>{
+            //         if(item.id==val){
+            //             this.pitchItemId=item.itemId
+            //         }
+            //     })
+            // },
 
         },
         methods:{
@@ -1404,6 +1493,8 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
+                        vm.pitchSeqId=vm.getPitchBaseInfoList[0].id;
+                        vm.pitchItemId=vm.getPitchBaseInfoList[0].itemId;
                         this.getPitchBaseInfoListLength=response.data.rt.length;
                         vm.getPitchBaseInfoList.forEach((item)=>{
                             this.itemSubmitCount+=item.pointAmount
@@ -2391,6 +2482,8 @@ export default Vue.component('commonPitch-detail',{
             manufacturerChange(){
                 if(this.manufacturerValue=='基康'){
                     this.getDeviceMonitorPointRelation();
+                }else if(this.manufacturerValue=='华桓2'){
+                    this.getPitchBindInfo()
                 }
             },
             //自动采集配置确认
@@ -2413,6 +2506,84 @@ export default Vue.component('commonPitch-detail',{
             //导入
             autoExport(){
                 this.uploadshow=true;
+            },
+            //添加斜度自动采集
+            addAutoVerify(){
+                this.autoPitchShow=true;
+
+            },
+            makeAutoPitch(){
+                var vm=this;
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/addPitchBind',
+                    headers:{
+                        'token':vm.token
+                    },
+                    method:"post",
+                    data:[{
+                        channelNo:parseInt(this.channelNo),
+                        // itemId:this.pitchItemId,
+                        itemId:this.itemMonitorId,
+                        sensorAddress:parseInt(this.sensorAddress),
+                        seqId:parseInt(this.pitchSeqId),
+                        systemId:parseInt(this.systemId)
+                    }]
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getPitchBindInfo();
+                        this.channelNo='';
+                        this.sensorAddress='';
+                        // this.slotNo='';
+                        this.systemId='';
+                        this.autoPitchShow=false;
+                    }
+                })
+            },
+           getPitchBindInfo(){
+               var vm=this;
+               axios({
+                   url:this.BDMSUrl+'detectionInfo/getPitchBindInfo',
+                   headers:{
+                       'token':this.token
+                   },
+                   params:{
+                       groupId:this.userGroupId
+                   }
+               }).then((response)=>{
+                   if(response.data.cd==0){
+                       this.getAutoPitchList=response.data.rt;
+                   }else{
+                       this.$message({
+                           type:"error",
+                           message:response.data.msg
+                       })
+                   }
+               })
+           },
+           deleteAutoPitch(id){
+               this.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                let data=[];
+                data.push(id);
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/deletePitchBind',
+                    headers:{
+                        'token':this.token
+                    },
+                    method:'post',
+                    data:data
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getPitchBindInfo();
+                    }
+                })
+            })
+           },
+            autoPitchCancle(){
+                this.autoPitchShow=false;
             },
             upImgCancle(){
                 this.uploadshow=false;
@@ -3262,6 +3433,18 @@ select.autoImport{
             display: inline-block;
             margin-left: 40px;
         }
+        .editTxt1{
+            color: #666;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            display: inline-block;
+            margin-right: 20px;
+            width: 20%;
+            text-align: right;
+            display: inline-block;
+            margin-left: 40px;
+        }
         .editPersonInput{
                 width: 200px;
                 border-radius: 2px;
@@ -3433,6 +3616,17 @@ select.autoImport{
                 position: relative;
                 width:60px;
                 display: inline-block;
+                .el-icon-circle-plus{
+                    font-size:18px;
+                     display: inline-block;
+                     margin-right:4px;
+                     cursor: pointer;
+                    // width: 18px;
+                    // height: 18px;
+                    // border: none;
+                    // cursor: pointer;
+                    // margin-right:10px;
+                }
                 .export1{
                         display: inline-block;
                     width: 18px;

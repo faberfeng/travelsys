@@ -912,7 +912,7 @@ export default {
                         //     path:'/SchedulePlan/personalCalendar'//进度计划；
                         // })
                          this.$router.push({
-                            path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig')
+                            path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig','00505','/SchedulePlan/simulation')
                         })
                     }else if(vm.navigationPath==='004'){
                         // vm.$router.push({
@@ -1191,7 +1191,7 @@ export default {
             return secondList
         },
          //第一次加载二级标题生成函数
-        firstGetSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4){
+        firstGetSecondGradeList(itemList,oneGradeCode,Code1,routerLink1,Code2,routerLink2,Code3,routerLink3,Code4,routerLink4,Code5,routerLink5){
             var vm=this;
             //   console.log(vm.moduleList,'获取的东西');
             var secondList=[];
@@ -1213,6 +1213,10 @@ export default {
                     if(item.moduleCode==Code4){
                         vm.$set(item,'isShow',false);
                             vm.$set(item,'routerLink',routerLink4);
+                    }
+                    if(item.moduleCode==Code5){
+                        vm.$set(item,'isShow',false);
+                            vm.$set(item,'routerLink',routerLink5);
                     }
                 }
             })
@@ -1255,7 +1259,7 @@ export default {
                 //     path:'/SchedulePlan/personalCalendar'
                 // });
                 this.$router.push({
-                    path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig')
+                    path:this.firstGetSecondGradeList(this.moduleLists,'005','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00503','/SchedulePlan/taskIndex','00504','/SchedulePlan/calendarConfig','00505','/SchedulePlan/simulation')
                 })
                 this.navigationPath = tab.name;
                 sessionStorage.setItem('navigationPath',this.navigationPath);

@@ -4261,17 +4261,38 @@ export default {
       //获得元素
     getElement(level,id){
             var vm=this;
+            // $.ajax({
+            //     url:vm.BDMSUrl+'api/v1/getElement',
+            //     data:{
+            //         fileId:level,
+            //         selectId:id,
+            //     },
+            //     async:false,
+            //     success:(response)=>{
+            //         if(response.cd==0){
+            //             if(response.rt[response.rt.length-1].para2=='structure'){
+            //             this.elementTracId.push(response.rt[response.rt.length-1].traceId)
+            //             }   
+            //         }
+            //     }
+            // })
             axios({
                 url:vm.BDMSUrl+'api/v1/getElement',
-                params:{
-                    fileId:level,
-                    selectId:id,
+                method:'post',
+                data:{
+                    fileIds:level,
+                    selectIds:id,
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    if(response.data.rt[response.data.rt.length-1].para2=='structure'){
-                        this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
-                    }
+                    // if(response.data.rt[response.data.rt.length-1].para2=='structure'){
+                    //     this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
+                    // }
+                    response.data.rt.forEach((item)=>{
+                        if(item.para2=='structure'){
+                            this.elementTracId.push(item.traceId)
+                        }
+                    })
                 }
             })
         },
@@ -4291,10 +4312,16 @@ export default {
                 var mb={};
                 var fgIdList = []
                 this.elementTracId=[];
+                var files=[];
+                var selectIds=[];
                 console.log(CurrentSelectedEntList,'CurrentSelectedEntList000');
                 CurrentSelectedEntList.ID.forEach((item)=>{
-                    vm.getElement(item.level,item.id)
+                    files.push(item.level);
+                    selectIds.push(item.id);
+                    
                 })
+                console.log(files,selectIds,'selectIds');
+                vm.getElement(files,selectIds);
                 var msg = ''
                 if(vm.showQuanJing){
                     if(vm.checkedRound.ID !=''){

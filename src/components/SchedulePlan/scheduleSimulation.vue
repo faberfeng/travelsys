@@ -1,5 +1,5 @@
 <template>
-  <div id="taskIndex">
+  <div id="taskIndexGantt">
     <!-- 打印标签提交表单 -->
     <form id="taskIndedxPrint-qrcode" action="http://127.0.0.1:54321/qblabel/general" method="post" enctype="multipart/form-data" target="printLabel">
             <input type="hidden" name="p" ref="taskIndedxLabelContent">
@@ -41,43 +41,36 @@
                   </select>
                   <i class="icon-sanjiao"></i>
                 </div>
-                <!-- <span class="title-right">
-                    <input type="text" placeholder="请输入任务标签" v-model="searchTaskTag"
-                            class="title-right-icon" @keyup.enter="searchByTag()">
-                    <span class="title-right-edit-icon el-icon-search" @click="searchByTag()"></span>
-                </span> -->
-            <!-- <span class="icon-type"  @click="getGanttList"></span> -->
-            <!-- 以上是甘特图按钮 -->
-            <!-- @click="getGanttList" -->
           </div>
         </div>
         <div v-if="!showCommonList">
           <div v-show="hiddenGanttList" class="taskWarp">
+               <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showColumnConfig()">显示列</span> -->
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span> -->
             <div class="taskHead">
-              <div class="taskHeadLeft" @click="addTask">
+              <!-- <div class="taskHeadLeft" @click="addTask">
                 <i class="el-icon-plus" style="width:20px;"></i>新增任务
-              </div>
+              </div> -->
               <div class="taskHeadRight">
-                <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
+                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showGantt()">显示甘特图</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
-                <span class="btn-operate" v-show="projectWorkShow" @click="fDplay()">4D播放</span>
-                <span class="btn-operate"  v-show="projectGanntShow"><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
-                <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
-
+                <span class="btn-operate" v-show="projectWorkShow" @click="fDplay()">4D播放</span> -->
+                <!-- v-show="projectGanntShow" -->
+                <span class="btn-operate"  ><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
+                <!-- <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
-                
                 <span class="btn-operate" v-show="projectWorkShow" @click="userGroupTask()">群组权限</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="exportProject()">导入MPP文件</span>
                 <span class="btn-operate" v-show="projectWorkShow"  @click="cancleSelect()">取消选择</span>
-
-                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="showColumnConfig()">显示列</span> -->
-                <span class="btn-operate" v-show="projectWorkShow" @click="exportExcel()">导出excel</span>
-                <!-- <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span> -->
+                <span class="btn-operate" v-show="projectWorkShow" @click="exportExcel()">导出excel</span> -->
+               
               </div>
             </div>
             <div style="height:600px;">
-              <div v-show="projectWorkShow" style="overflow: auto;" class="taskBody">
+                <!-- <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button> -->
+                <!-- <button class="remarkBtn actionBtn" title="备注" @click="mark(scope)"></button> -->
+              <!-- <div v-show="projectWorkShow" style="overflow: auto;" class="taskBody">
                 <zk-table
                   index-text="序号"
                   :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
@@ -87,8 +80,7 @@
                   <template slot="action" slot-scope="scope">
                     <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
                     <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                    <!-- <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button> -->
-                    <!-- <button class="remarkBtn actionBtn" title="备注" @click="mark(scope)"></button> -->
+                   
                     <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
                     <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
                     <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
@@ -98,22 +90,7 @@
                     <el-tooltip :content="scope.row.remark" placement="top">
                           <span style="cursor:pointer" >{{scope.row.remark | splitRemark()}}</span>
                     </el-tooltip>
-                    <!-- <el-popover
-                        ref="popover1"
-                        placement="bottom"
-                        title="标题"
-                        width="200"
-                        trigger="hover"
-                        :content="scope.row.remark">
-                       
-                    </el-popover> -->
-                    <!-- <el-tooltip class="item" effect="dark" :content="scope.row.remark" placement="bottom">
-                        <el-button>右下</el-button>
-                    </el-tooltip> -->
                   </template>
-                    <!-- <template slot="taskName" slot-scope="scope">
-                            {{scope.row.taskName | splitRemark()}}
-                    </template> -->
                    <template slot="taskPriority" slot-scope="scope">
                       {{scope.row.taskPriority | status()}}
                   </template>
@@ -148,14 +125,14 @@
                         <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
                         <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
                         <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
-                        <!-- <el-slider v-model="value9" ></el-slider> -->
+                        
                       </template>
                       <template slot="verifyTime" slot-scope="scope">
                          <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
                       </template>
                       <template slot="verifyNum" slot-scope="scope">
                           <el-input  v-model="scope.row.statusNum" placeholder="请输入内容" :disabled="(scope.row.realTaskStart==null||scope.row.actualStatusStr=='全部完成')?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"></el-input>
-                          <!-- <el-slider v-model="scope.row.statusNum" ref="slider" v-on:click.native.stop :disabled="(scope.row.realTaskStart==null||scope.row.actualStatusStr=='全部完成')?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"  height="120px;"></el-slider> -->
+                         
                       </template>
                       <template slot="milepost" slot-scope="scope">
                           {{scope.row.taskType==1?'是':'否'}}
@@ -176,9 +153,9 @@
                         {{scope.row.taskDuration + '天'}}
                       </template>
                     </zk-table>
-              </div>
-
-              <div v-show="projectGanntShow" style="overflow-y: auto;overflow-x:hidden" class="taskBody">
+              </div> -->
+                <!-- v-show="projectGanntShow" -->
+              <div  style="overflow-y: auto;overflow-x:hidden" class="taskBodyGantt">
                 <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;white-space: nowrap;">
                      <zk-table
                         index-text="序号"
@@ -222,21 +199,6 @@
           </div>
           <!-- 以下是以前的gantt图 -->
           <div v-show="!hiddenGanttList" class="taskWarp1">
-            <!-- <div class="taskHead">
-              <div class="taskHeadLeft" @click="addGanttTask">
-                <i class="el-icon-plus" style="width:20px;"></i>新增任务
-              </div>
-              <div class="taskHeadRight">
-                <span class="btn-operate" @click="upgrade()">升级</span>
-                <span class="btn-operate" @click="degrade()">降级</span>
-                <span class="btn-operate" @click="swap()">上移</span>
-                <span class="btn-operate" @click="swap()">下移</span>
-                <span class="btn-operate">移动</span>
-                <span class="btn-operate" @click="deleteGanttTab">删除</span>
-                <span class="btn-operate" @click="userGroupTask()">群组权限</span>
-                <span class="btn-operate" @click="exportProject()">导入MPP文件</span>
-              </div>
-            </div> -->
             <div class="taskBody1">
               <div id="workSpace"
                    style="padding:0px; overflow-y:auto; overflow-x:hidden;border:1px solid #e5e5e5;position:relative;margin:0 5px">
@@ -245,18 +207,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div id="gantEditorTemplates" style="display:none" >
-      <div class="__template__" type="GANTBUTTONS"></div>
-      <div class="__template__" type="TASKSEDITHEAD"></div>
-      <div class="__template__" type="TASKROW"></div>
-      <div class="__template__" type="TASKEMPTYROW"></div>
-      <div class="__template__" type="TASKBAR"></div>
-      <div class="__template__" type="CHANGE_STATUS"></div>
-      <div class="__template__" type="TASK_EDITOR"></div>
-      <div class="__template__" type="ASSIGNMENT_ROW"></div>
-      <div class="__template__" type="RESOURCE_EDITOR"></div>
-      <div class="__template__" type="RESOURCE_ROW"></div>
     </div>
 <!-- v-show="projectWorkShow" -->
     <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']"  v-if="!showCommonList">
@@ -2366,7 +2316,7 @@
               case "Return_4D_images":
                 var files=[];
                 return4DImages=e.data.parameter;
-                console.log(return4DImages,'return4DImages');
+                
                 return4DImages.forEach((item,index)=>{
                   files.push({
                     'fileName':'播放图片-'+(index+1)+'.png',
@@ -2374,7 +2324,7 @@
                   })
                 })
                 
-                console.log(files,'返回文件');
+                
            
                 if(files){
                   this.uploadImg(files);
@@ -2466,7 +2416,7 @@
       },
       loadingTitle(){
           var vn=this;
-          vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00503','/SchedulePlan/taskIndex','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00504','/SchedulePlan/calendarConfig','00505','/SchedulePlan/simulation');
+          vn.routerList=vn.getSecondGradeList(vn.moduleList,'005','00505','/SchedulePlan/simulation','00503','/SchedulePlan/taskIndex','00501','/SchedulePlan/personalCalendar','00502','/SchedulePlan/resourcePlan','00504','/SchedulePlan/calendarConfig');
           // console.log(vn.routerList,'vn.routerList')
         },
         //二级标题生成函数
@@ -2781,10 +2731,12 @@
       bigLength(){
           this.ganttScale *= 2;
           // this.drawingDateBar();
-          this.drawingDateBar_reset();
+         
           this.productGanttNode=document.getElementById('ganttRight');
           this.productGanttNode.innerHTML = "";
-          this.Gantt_item_top = 0;
+          this.Gantt_item_top = 3;
+            this.drawingDateBar_reset();
+            
           for(var i = 0; i < this.selectRowList.length;i++){
             if(this.selectRowList[i]._isHide == false){
               this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
@@ -2799,16 +2751,16 @@
            this.ganttScale /= 2;
         //  this.drawingDateBar();
           // console.log(this.selectRowList,'this.selectRowList');
-            this.drawingDateBar_reset();
+            
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
-            this.Gantt_item_top = 0;
+            this.Gantt_item_top = 3;
+            this.drawingDateBar_reset();
             for(var i = 0; i < this.selectRowList.length;i++){
               if(this.selectRowList[i]._isHide == false){
                 this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
               }
             }
-
         }else{
           this.$message({
             type:'info',
@@ -2838,9 +2790,11 @@
             // this.drawingDateBar_reset();
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
-            this.Gantt_item_top = 0;
+            this.Gantt_item_top = 3;
+            // console.log(this.ganttScale,'this.ganttScale0000');
+            // this.ganttScale=0.5;
             this.getTaskList();
-           
+        //    this.drawingDateBar_reset();
             for(var i = 0; i < this.selectRowList.length;i++){
               if(this.selectRowList[i]._isHide == false){
                 this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
@@ -2859,6 +2813,7 @@
         //  document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';
         // this.taskIndexData=[];
         this.taskIndexDataList=[];
+        this.selectRowList=[];
         // this.selectRowList=[];
         axios({
           method: 'post',
@@ -2982,8 +2937,7 @@
       },
     
       productGantt(taskIndexData){
-        // console.log('进来了吗')
-
+        //   console.log('1111');
         var min_Day_count = 10000000000000000000;
         var max_Day_count = -1;
         
@@ -3020,13 +2974,14 @@
         ////////////////////// 画日 ////////////////////////////
 
         this.drawingDateBar();
+        console.log('222');
 
         //////////////////////////////////////////////////////
 
         //////////////
 
         min_Day_count = parseInt(min_Day_count + 0.5);
-        console.log(min_Day_count,'min_Day_count');
+        console.log(min_Day_count,'min_Day_count')
 
         
         for(let i = 0;i < taskIndexData.length;i++){
@@ -3040,9 +2995,7 @@
       },
 
       productGantt_loop(root,min_Day_count){
-
           this.ganttItem(root,min_Day_count);
-
           if(root.children){
             for(var i = 0; i < root.children.length;i++){
               this.productGantt_loop(root.children[i],min_Day_count);
@@ -3191,7 +3144,7 @@
         
       },
       clickItem(){
-        console.log('000');
+        
       },
       //拉伸gantt图
       stretchingGantt(item){
@@ -3231,7 +3184,7 @@
                   startTime=this.days_bar[x-1].date_str;
                   endTime=this.days_bar[y-1].date_str;
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
-                  console.log(startTime,endTime,'左边拉日,左边拉月');
+                //   console.log(startTime,endTime,'左边拉日,左边拉月');
                 }
                 leftItem.show=false;
               },true)
@@ -3267,7 +3220,7 @@
                   y=Math.ceil((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
                   startTime=this.days_bar[x-1].date_str;
                   endTime=this.days_bar[y-1].date_str;
-                  console.log(startTime,endTime,'右边拉日,右边拉月');
+                //   console.log(startTime,endTime,'右边拉日,右边拉月');
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
                 }
                 rightItem.show=false;
@@ -3284,7 +3237,7 @@
               e.stopPropagation();
               this.start.x=e.pageX;
               this.itemStart=item.offsetLeft;
-              console.log(this.itemStart,'this.itemStart');
+             
               item.upShow=true;
             })
             windowData1.addEventListener('mouseup',(e)=>{
@@ -3343,13 +3296,12 @@
 
           root.taskEndDay = root.taskEnd / (1000 * 3600 * 24);
           root.taskEndDay = parseInt(root.taskEndDay + 0.5);
-          
+        //   console.log(root.taskStartDay,root.taskEndDay,'root.taskEndDay');
 
           let Day_count = root.taskEndDay - root.taskStartDay-1;
-          console.log(Day_count,'Day_count0000');
           Day_count++;
-          this.productGanttNode.style.height = (this.Gantt_item_top+37) + "px";
-          this.productGanttNodeBg.style.height = (this.Gantt_item_top+37) + "px";
+          this.productGanttNode.style.height = (this.Gantt_item_top+31) + "px";
+          this.productGanttNodeBg.style.height = (this.Gantt_item_top+31) + "px";
 
           var item = document.createElement("div");
           //点击gantt图
@@ -3365,7 +3317,7 @@
           item.style.left = ((root.taskStartDay - min_Day_count) * 10) * this.ganttScale + "px";
           // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
           item.style.marginTop=5+'px';
-          item.style.height = 26 + "px";
+          item.style.height = 22 + "px";
           item.style.boxSizing='border-box';
           item.style.width = 10 * Day_count  * this.ganttScale + "px";
           //进度条
@@ -3381,26 +3333,25 @@
           item_sub.style.height = "100%";
           item_sub.style.width = 10 * Day_count  * this.ganttScale * root.statusNum / 100 + "px";
           item.appendChild(item_sub);
-
-          
           var line = document.createElement("div");
           var line1 =document.createElement("div");
           line.style.position = "absolute";
-          line.style.top = (this.Gantt_item_top + 37) + "px";
+          line.style.top = (this.Gantt_item_top + 30) + "px";
           line.style.height = "1px";
           // line.style.width = '100%';
           line.style.width =this.productGannttHead.style.width;
-          line.style.background = "rgba(0,0,0,0.1)";
+          line.style.background = '#e9eaec';
+        //   "rgba(0,0,0,0.1)"
 
           line1.style.position = "absolute";
-          line1.style.top = (this.Gantt_item_top + 37) + "px";
+          line1.style.top = (this.Gantt_item_top + 30) + "px";
           line1.style.height = "1px";
           line1.style.width = '100%';
-          line1.style.background = "rgba(0,0,0,0.1)";
+          line1.style.background = '#e9eaec';
           this.productGanttNode.appendChild(line);
           this.productGanttNode.appendChild(line1);
           this.productGanttNode.appendChild(item);
-          this.Gantt_item_top += 37.16;
+          this.Gantt_item_top += 32;
 
           // var item_sub = document.createElement("div");
           // item_sub.style.background = "#68da68";
@@ -4061,7 +4012,7 @@
 
         this.productGanttNode=document.getElementById('ganttRight');
         this.productGanttNode.innerHTML = "";
-        this.Gantt_item_top = 0;
+        this.Gantt_item_top = 3;
 
         for(var i = 0; i < this.selectRowList.length;i++){
           if(this.selectRowList[i]._isHide == false){
@@ -4461,7 +4412,6 @@
             if (i < vm.relaList1.length - 1) datas += ','
         })
         datas += ']'
-        console.log(datas,'data11110000');
         vm.$refs.taskIndedxLabelContent.value = datas
 
         $('#taskIndedxPrint-qrcode').submit()
@@ -4680,7 +4630,7 @@
                     
                   } 
                 })
-                console.log(this.dirIds,'this.dirIds');
+               
                 // if(!this.dirIds){
                 //     this.createdDetory();
                 // }
@@ -4717,16 +4667,16 @@
         // this.fdPlayDialog=false;
         var date=1;
         var datas=[];
-        console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
+        // console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
         if(this.fdNum){
           date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
           date/=(1000 * 3600 * 24)
           date=parseInt(date+ 0.5)
         }
        
-       console.log(date,'date00');
+    //    console.log(date,'date00');
        for(let i=0;i<date;i++){
-         console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
+        //  console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
           datas.push({
             'id':i+1,
             'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
@@ -4749,14 +4699,14 @@
                         this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
                 })
              
-               console.log(date,'date00');
+             
                 this.fdPlayData=[];
               
                 
                
                 this.fdPlayDialog=false;
                 this.fdNum='';
-                console.log(this.returnTraceIdsData,'返回的数据');
+            
                  setTimeout(()=>{
                      app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
                 },0);
@@ -5180,7 +5130,7 @@
         // }
       },
       mark(scope){
-        console.log()
+        
         this.$confirm(scope.row.remark?scope.row.remark:'无任务备注','提示');
       },
       removeTaskCancle() {
@@ -6391,7 +6341,7 @@
     display: block !important;
   }
 
-  #taskIndex {
+  #taskIndexGantt {
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
         width:15px;
@@ -6721,7 +6671,7 @@
       box-sizing: border-box;
       height: 750px; 
       .taskHead {
-        margin-top: 20px;
+        // margin-bottom: 10px;
         .taskHeadLeft {
           float: left;
           width: 105px;
@@ -6758,10 +6708,15 @@
         }
 
       }
-      .taskBody {
-        margin-top: 60px;
+      .taskBodyGantt {
+        margin-top: 10px;
         width: 100%;
         overflow-y: auto;
+        height: 500px;
+        border-right:1px solid #e9eaec;
+        border-bottom: 1px solid #e9eaec;
+        border-left: 1px solid #e9eaec;
+
       }
     }
     .taskWarp1{
@@ -8327,11 +8282,11 @@
         color: #333333;
       }
       .zk-table__body-row{
-        height: 36px;
+        height: 32px;
         box-sizing:border-box
       }
       .zk-table__cell-inner{
-        padding:5px 12px;
+        padding:0px 12px;
       }
       .zk-table--tree-icon {
         position: relative;
