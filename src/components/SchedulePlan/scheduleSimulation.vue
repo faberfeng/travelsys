@@ -2228,7 +2228,7 @@
         let endTime;
         let currentStamp;
         let x;
-        x=Math.round(this.ganttPlayLines.offsetLeft/(this.ganttScale*10));
+        x=Math.floor(this.ganttPlayLines.offsetLeft/(this.ganttScale*10));
         let apps = document.getElementById('webIframeByGantt').contentWindow;
         let a=3600*24*1000;
         startTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
