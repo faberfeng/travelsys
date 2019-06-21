@@ -6,6 +6,7 @@ import App from './App'
 import router from './router'
 import store from '@/utils/store.js';
 import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css';
 import '../theme/index.css'
 import ZkTable from 'vue-table-with-tree-grid'
 import vuescroll from 'vue-scroll'

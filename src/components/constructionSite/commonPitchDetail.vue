@@ -134,7 +134,9 @@
                                         <!-- {{leftDisplayListValue1[index].depth}} -->
                                         <td>{{(leftDisplayList.recentVariation)[index].otherParam|addSprit}}</td>
                                         <td >{{leftDisplayListValue1[index].shift|addSpritNum}}</td>
+                                        <!-- {{leftDisplayListValue1[index].shift|addSpritNum}} -->
                                         <td >{{leftDisplayListValue2[index].shift|addSpritNum}}</td>
+                                        <!-- {{leftDisplayListValue2[index].shift|addSpritNum}} -->
                                         <td>{{(leftDisplayList.recentVariation)[index].recentVariation|addSpritNum}}</td>
                                     </tr>
                                     <tr>
@@ -510,7 +512,7 @@
                                         <th width="100px">设备ID</th>
                                         <th width="100px">通道编号</th>
                                         <!-- <th width="100px">卡槽序号</th> -->
-                                        <th width="100px">传感器地址</th>
+                                        <!-- <th width="100px">传感器地址</th> -->
                                         <th width="100px">操作</th>
                                     </tr>
                                 </thead>
@@ -520,7 +522,7 @@
                                         <td width="100px">{{item.systemId}}</td>
                                         <td width="100px">{{item.channelNo}}</td>
                                         <!-- <td width="100px">{{item.slotNo}}</td> -->
-                                        <td width="100px">{{item.sensorAddress}}</td>
+                                        <!-- <td width="100px">{{item.sensorAddress}}</td> -->
                                         <td width="100px">
                                             <i class="el-icon-delete" style="cursor:pointer" title="删除" @click="deleteAutoPitch(item.id)"></i>
                                         </td>
@@ -554,10 +556,10 @@
                         <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
                     
-                    <div class="editBodytwo">
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">传感器地址:</label>
                         <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div>
+                    </div> -->
                     <!-- <div class="editBodytwo">
                         <label class="editTxt1">卡槽序号:</label>
                         <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
@@ -1633,6 +1635,8 @@ export default Vue.component('commonPitch-detail',{
                                 })
                                 this.leftMaxVariation=this.getMaxValue(maxVariation)
                                 this.leftMaxHeight=this.getMaxValue(maxHeight)
+                                console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
+                                console.log(this.leftDisplayListValue2,'this.leftDisplayListValue2');
                             }
                            
                             
@@ -2524,7 +2528,7 @@ export default Vue.component('commonPitch-detail',{
                         channelNo:parseInt(this.channelNo),
                         // itemId:this.pitchItemId,
                         itemId:this.itemMonitorId,
-                        sensorAddress:parseInt(this.sensorAddress),
+                        // sensorAddress:parseInt(this.sensorAddress),
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId)
                     }]
@@ -2532,7 +2536,7 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd==0){
                         this.getPitchBindInfo();
                         this.channelNo='';
-                        this.sensorAddress='';
+                        // this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
                         this.autoPitchShow=false;

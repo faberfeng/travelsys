@@ -346,11 +346,8 @@ export default {
 				{
                     let Horder='';
                     let para='';
-					//  Horder = {"ID":this.WebGlId,"Type":this.WebGlType,"Name":this.WebGlName,"ParentID":""};
-                    //  para = {User:"",TokenID:"",Setting:{BIMServerIP:this.WebGlUrl,BIMServerPort:this.BIMServerPort,MidURL:"qjbim-mongo-instance",RootHolder:Horder}}
                     para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
                     this.strJson=para;
-                    // console.log(this.strJson,'加载中');
                     app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
 				break;
@@ -374,16 +371,33 @@ export default {
         //获得元素
         getElement(level,id){
             var vm=this;
-            $.ajax({
-                url:vm.BDMSUrl+'api/v1/getElement?fileId='+level+'&selectId='+id,
-                type:'get',
-                async:false,
-                success:(response)=>{
-                    if(response.cd==0){
-                        this.elementTracId.push(response.rt[response.rt.length-1].traceId)
-                    }
+            axios({
+                url:this.BDMSUrl+'api/v1/getElement',
+                method:'POST',
+                data:{
+                    fileIds:level,
+                    selectIds:id
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                     response.data.rt.forEach((item)=>{
+                        if(item.para2=='structure'){
+                            this.elementTracId.push(item.traceId)
+                        }
+                    })
+                    // this.elementTracId=response.data.rt.
                 }
             })
+            // $.ajax({
+            //     url:vm.BDMSUrl+'api/v1/getElement?fileId='+level+'&selectId='+id,
+            //     type:'post',
+            //     async:false,
+            //     success:(response)=>{
+            //         if(response.cd==0){
+            //             this.elementTracId.push(response.rt[response.rt.length-1].traceId)
+            //         }
+            //     }
+            // })
             // axios({
             //     url:vm.BDMSUrl+'api/v1/getElement',
             //     params:{
@@ -402,9 +416,13 @@ export default {
         createdMid(){
             var vm=this;
             this.elementTracId=[];
+            var fileIds=[];
+            var selectIds=[];
             CurrentSelectedEntLists.ID.forEach((item)=>{
-                vm.getElement(item.level,item.id)
+                fileIds.push(item.level);
+                selectIds.push(item.id);
             })
+             vm.getElement(fileIds,selectIds)
             vm.midShow=true;
            
             // vm.$confirm('此操作将你选择构件生成清单, 是否继续?', '提示', {

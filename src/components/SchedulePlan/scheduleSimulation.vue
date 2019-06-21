@@ -14,18 +14,6 @@
     <div :class="[{'box-left-active':!screenLeft.show},'box-left-container',{'goujian':showCommonList},{'gantt_left':!hiddenGanttList}]">
       <div style="min-width: 950px;overflow-y: auto;">
         <div id="item-box-file">
-          <!-- <router-link :to="'/SchedulePlan/personalCalendar'" class="label-item">
-            个人日历
-          </router-link>
-          <router-link :to="'/SchedulePlan/resourcePlan'" class="label-item">
-            资源计划
-          </router-link>
-          <router-link :to="'/SchedulePlan/taskIndex'" class="label-item label-item-active">
-            工程任务
-          </router-link>
-          <router-link :to="'/SchedulePlan/calendarConfig'" class="label-item">
-            更多配置
-          </router-link> -->
           <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
           </router-link>
           <div v-if="!showCommonList" class="item-search">
@@ -56,7 +44,16 @@
                 <span class="btn-operate" v-show="projectWorkShow" @click="batchVerification()">批量核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="fDplay()">4D播放</span> -->
                 <!-- v-show="projectGanntShow" -->
-                <span class="btn-operate"  ><i @click="bigLength()" class="el-icon-plus" style="margin-right:15px;"></i><i @click="smallLength()" class="el-icon-minus"></i><span></span></span>
+                <!-- <span class="btn-operate1"><img src="./images/start.png" style="width:14px;height:14px;position:absolute;top:1px;left:1px;"></span> -->
+                <span v-show="ganttPlayShow" class="btn-operate" @click="ganttPlayStart"> 
+                  <img src="./images/start.png" style="width:14px;height:14px;position:absolute;top:5px;left:7px;">
+                </span>
+                <span v-show="!ganttPlayShow" class="btn-operate" @click="ganttPlayEnd"> 
+                  <img src="./images/stop.png" style="width:14px;height:14px;position:absolute;top:5px;left:6px;">
+                </span>
+                <span> <input v-model="playRate" placeholder="ms" style="display:inline-block;position:absolute;top:2px;right:30px;width:120px;height:20px;"/></span>
+                <span><i class="el-icon-caret-left" style="display:inline-block;position:absolute;top:-3px;right:150px;" @click="resetZero" title="重置"></i></span>
+                
                 <!-- <span class="btn-operate" v-show="batchVerificationShow||projectGanntShow" @click="projectWork()">返回工程任务</span>
                 <span class="btn-operate" v-show="batchVerificationShow" @click="startVerify()">开始核实</span>
                 <span class="btn-operate" v-show="projectWorkShow" @click="progressSearch()">进度查询</span>
@@ -67,95 +64,8 @@
                
               </div>
             </div>
-            <div style="height:600px;">
-                <!-- <button class="sortBtn actionBtn" title="移动" @click="sort(scope)"></button> -->
-                <!-- <button class="remarkBtn actionBtn" title="备注" @click="mark(scope)"></button> -->
-              <!-- <div v-show="projectWorkShow" style="overflow: auto;" class="taskBody">
-                <zk-table
-                  index-text="序号"
-                  :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
-                  :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                  :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick"
-                  @row-key="rowKey" @cell-click="cellClick" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
-                  <template slot="action" slot-scope="scope">
-                    <button class="editBtn actionBtn" title="编辑" @click="edit(scope)"></button>
-                    <button class="deleteBtnIcon actionBtn" title="删除" @click="deleteTab(scope)"></button>
-                   
-                    <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
-                    <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
-                    <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
-                  </template>
-                  
-                  <template slot="remark"  slot-scope="scope">
-                    <el-tooltip :content="scope.row.remark" placement="top">
-                          <span style="cursor:pointer" >{{scope.row.remark | splitRemark()}}</span>
-                    </el-tooltip>
-                  </template>
-                   <template slot="taskPriority" slot-scope="scope">
-                      {{scope.row.taskPriority | status()}}
-                  </template>
-                  <template slot="milepost" slot-scope="scope">
-                      {{scope.row.taskType==1?'是':'否'}}
-                  </template>
-                  <template slot="taskStart" slot-scope="scope">
-                    {{scope.row.taskStart | timeChange()}}
-                  </template>
-                  <template slot="taskEnd" slot-scope="scope">
-                    {{scope.row.taskEnd | timeChange()}}
-                  </template>
-                  <template slot="realTaskStart" slot-scope="scope">
-                    {{scope.row.realTaskStart | timeChange()}}
-                  </template>
-                  <template slot="realTaskEnd" slot-scope="scope">
-                    {{scope.row.realTaskEnd | timeChange()}}
-                  </template>
-                  <template slot="taskDuration" slot-scope="scope">
-                    {{scope.row.taskDuration + '天'}}
-                  </template>
-                </zk-table>
-              </div>
-              <div v-show="batchVerificationShow" style="overflow: auto;" class="taskBody">
-                     <zk-table
-                      index-text="序号"
-                      :data="taskIndexDataList" :columns="columnsBatich" :max-height="props.height" :tree-type="props.treeType"
-                      :expand-type="props.expandType" :show-index="props.showIndex" :selection-type="props.selectionType"
-                      :border="props.border" :is-fold="props.isFold" empty-text="暂无数据..." @row-click="rowClick1"
-                      @row-key="rowKey" :row-style="rowStyle" :row-class-name="rowClassName" @tree-icon-click="treeIconClick" v-loading="loading">
-                      <template slot="action" slot-scope="scope">
-                        <button class="el-icon-circle-plus actionBtnA" style="width:0px;height:18px;" title="关联清单" @click="associationList()"></button>
-                        <button class="el-icon-upload actionBtnA" style="width:0px;height:18px;" title="上传文件" @click="uploadFile()"></button>
-                        <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
-                        
-                      </template>
-                      <template slot="verifyTime" slot-scope="scope">
-                         <v2-datepicker format="yyyy-MM-DD" v-model="scope.row.currentDate" :ref="'datepicker'+scope.row.taskId" @change="changeDatePicker(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))" ></v2-datepicker>
-                      </template>
-                      <template slot="verifyNum" slot-scope="scope">
-                          <el-input  v-model="scope.row.statusNum" placeholder="请输入内容" :disabled="(scope.row.realTaskStart==null||scope.row.actualStatusStr=='全部完成')?true:false" @change="changeSlider(scope.row.taskId,scope.row.statusNum,new Date(scope.row.currentDate))"></el-input>
-                         
-                      </template>
-                      <template slot="milepost" slot-scope="scope">
-                          {{scope.row.taskType==1?'是':'否'}}
-                      </template>
-                      <template slot="taskStart" slot-scope="scope">
-                        {{scope.row.taskStart | timeChange()}}
-                      </template>
-                      <template slot="taskEnd" slot-scope="scope">
-                        {{scope.row.taskEnd | timeChange()}}
-                      </template>
-                      <template slot="realTaskStart" slot-scope="scope">
-                        {{scope.row.realTaskStart | timeChange()}}
-                      </template>
-                      <template slot="realTaskEnd" slot-scope="scope">
-                        {{scope.row.realTaskEnd | timeChange()}}
-                      </template>
-                      <template slot="taskDuration" slot-scope="scope">
-                        {{scope.row.taskDuration + '天'}}
-                      </template>
-                    </zk-table>
-              </div> -->
-                <!-- v-show="projectGanntShow" -->
-              <div  style="overflow-y: auto;overflow-x:hidden" class="taskBodyGantt">
+            <div style="height:310px;position:relative;">
+              <div  style="overflow-y: auto;overflow-x:hidden;position:relative;" class="taskBodyGantt" id="taskBodyGantts">
                 <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;white-space: nowrap;">
                      <zk-table
                         index-text="序号"
@@ -184,34 +94,55 @@
                         </template>
                     </zk-table>
                 </div>
-                <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:auto;">
-                    <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
-                      <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
-                    </div>
-                    <div id='ganttRightBg' style="width:100%;position:relative;">
-                        <div id='ganttRight' style="width:100%;position:relative;position:absolute;top:0px;left:0px;">
-                        </div>
-                    </div>
+                <!-- <div id="leftAndRightResize" style="width:5px;background:red;height:500px;float:right;position:absolute;right:49.8%;top:0px;cursor:w-resize;z-index:6"></div> -->
+                <div>
+                  <!-- overflow-x:auto; -->
+                  <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:hidden;border-left:1px solid #e9eaec;">
+                      <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
+                        <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
+                      </div>
+                      <div id='ganttRightBg' style="width:100%;position:relative;">
+                          <div id='ganttRight' style="width:100%;position:relative;position:absolute;top:0px;left:0px;">
+                          </div>
+                      </div>
+                      <div id="ganttPlayLine" style="width:2px;height:100%;position:absolute;top:0px;left:2px;cursor:pointer;border:1px dashed red;">
+                        <i class="el-icon-caret-bottom" style="position:absolute;top:-5px;left:-6px;color:red"></i>
+                        <i class="el-icon-caret-top" style="position:absolute;bottom:-5px;left:-6px;color:red"></i>
+                      </div>
+                      <!-- 播放条的蒙板 -->
+                      <div id="ganttPlayLinePale" style="position:absolute;top:0px;left:0px;width:100%;height:100%;z-index:12;display:none">
+                      </div>
+                  </div>
                 </div>
-                <!-- <ganttView ref="ganttRef" id="ganttViewId" :taskIndexData="taskIndexData" :columnsSetting="columnsSetting" :props="props"></ganttView> -->
+                <div @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:40.2%;position:fixed;top:478px;left:42.2%;overflow:auto;">
+                  <div  id="ganttByScroll" style="height:30px;overflow:auto;">
+                  </div>
+                </div>
+                <!-- 缩放按钮 -->
+                <div id="ganttScale" style="position:absolute;right:0px;top:0px;z-index:10">
+                    <i @click="bigLength()" class="el-icon-plus" style="margin-right:1px;padding:4px;border:1px solid #ccc;cursor:pointer;background:#fff;"></i>
+                    <i @click="smallLength()" class="el-icon-minus" style="margin-right:1px;padding:4px;border:1px solid #ccc;cursor:pointer;background:#fff;"></i>
+                </div>
+                <!-- 蒙板 -->
+                <div id="ganntResizePale" style="position:absolute;top:0px;left:0px;width:100%;height:100%;display:none;z-index:10"></div>
               </div>
+              <div id="leftAndRightResize" style="width:5px;height:300px;float:right;position:absolute;right:49.8%;top:0px;cursor:w-resize;z-index:6"></div>
             </div>
+             <div id="webglAndGantt" style="width:100%;border:1px solid #ccc;padding:1px;">
+                    <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
+                    <iframe allowfullscreen=true  ref="iframeGanttByWg" id="webIframeByGantt" name="ifd" height="450px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeGanttUrl"  ></iframe>
+              </div>
           </div>
           <!-- 以下是以前的gantt图 -->
-          <div v-show="!hiddenGanttList" class="taskWarp1">
-            <div class="taskBody1">
-              <div id="workSpace"
-                   style="padding:0px; overflow-y:auto; overflow-x:hidden;border:1px solid #e5e5e5;position:relative;margin:0 5px">
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
 <!-- v-show="projectWorkShow" -->
     <div :class="[{'box-right-active1':!screenLeft.show},'box-right-container']"  v-if="!showCommonList">
       <div id="center-selection">
-        <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
+        <!-- screenLeft.show = screenLeft.show?false:true; -->
+        <div class="SH_right" @click="sliderRight()">
           <i class="icon-right"></i>
         </div>
         <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
@@ -1282,21 +1213,7 @@
   //import $ from 'jquery';
   //引入gantt图
   // import './Gantt/platform.css'
-  import './Gantt/gantt.css'
-  import './Gantt/ganttPrint.css'
-  import './Gantt/libs/jquery/dateField/jquery.dateField.css'
-  import './Gantt/libs/jquery/jquery.livequery.1.1.1.min.js'
-  import './Gantt/libs/jquery/jquery.timers.js'
-  import './Gantt/libs/utilities.js'
-  import './Gantt/libs/forms.js'
-  import './Gantt/libs/date.js'
-  import './Gantt/libs/dialogs.js'
- import './Gantt/libs/layout.js'
-  import './Gantt/libs/i18nJs.js'
-  import './Gantt/libs/jquery/dateField/jquery.dateField.js'
- import './Gantt/libs/jquery/JST/jquery.JST.js'
-  import './Gantt/libs/jquery/svg/jquery.svg.min.js'
-  import './Gantt/libs/jquery/svg/jquery.svgdom.1.8.js'
+  
   import {GanttMaster} from './Gantt/ganttMaster.js'
   // import commonList from './qingdan.vue'
   import commonList from '../planCost/qingDan.vue'
@@ -1304,7 +1221,8 @@
   import '../ManageCost/js/jquery-1.8.3.js'
   import '../ManageCost/js/date.js'
   import {method5} from '../constructionSite/js/method.js'
-  var app
+  var app;
+  var appGantt;
   var CurrentSelectPara='';
   var CurrentSelectedEntList='';
   var return4DImages='';
@@ -1319,6 +1237,10 @@
       //   false
       //   });
       return {
+        iframeGanttUrl:'',
+        ganttPlayShow:true,//甘特图播放显示
+        lfShow:false,
+        ganttPlayLinesShow:false,
         itemClickShow:false,
         taskMark:"",//任务备注
         taskTag:'',//任务标签
@@ -1443,7 +1365,11 @@
         taskFdEnd:'',
         fdPlayDataId:[],
         returnTraceIdsData:[],
+        afterFiveDayData:[],
+        dataNum:0,
+        ganttRun:{},
         returnTraceIds:[],
+        returnCompleteTraceIds:[],
         fdNum:'',
         addLinkDialog: false,
         editTaskDialog: false,
@@ -1467,6 +1393,7 @@
         startDate: '',//查询开始时间
         endDate: '',//查询结束时间
         relaTypeValue: "",
+        playRate:500,
         relaTypeList: [
           {
             value: 0,
@@ -2150,6 +2077,7 @@
         ],
         //以下为甘特图数据
         hiddenGanttList: true,
+        lengthNumber:0,
         xmlDoc: '',
         a: [],
         colorValueList: [],
@@ -2188,30 +2116,27 @@
       var vm = this
       // console.log('进入页面');
       window.addEventListener("message", this.ls);
-
       vm.projId = localStorage.getItem('projId');
       vm.defaultSubProjId = localStorage.getItem('defaultSubProjId');
       vm.token = localStorage.getItem('token');
       vm.projName=localStorage.getItem('projName');
       vm.userId = localStorage.getItem('userid');
+      vm.entId=localStorage.getItem('entId');
       vm.BDMSUrl = vm.$store.state.BDMSUrl;
       vm.QJFileManageSystemURL = vm.$store.state.QJFileManageSystemURL;
+      vm.iframeGanttUrl=vm.$store.state.iframeWebGlUrl+'?new='+Math.random();
       vm.qrShareUrl=vm.$store.state.qrShareUrl;
       vm.UPID = vm.$store.state.UPID
       vm.moduleList=JSON.parse(localStorage.getItem('moduleList'));
       vm.loadingTitle();
       vm.getTaskIndex();
+      vm.getUserGroup();
       vm.getProjectGroup();
       vm.addBroseNotice();
       vm.getProjectTaskAuthority();
       this.getlabelList();
       vm.getDirectoryList();
-     
-
-      
-     
-
-      
+      vm.initGanttByWebGl();
       // $('body').not($(".zk-table")).bind('click', function() {
          
       //   });
@@ -2227,6 +2152,96 @@
       );
     },
     mounted() {
+      let ganttBody=document.getElementById('taskBodyGantts');
+      let resize_lf=document.getElementById('leftAndRightResize');
+      let resize_ganttByScroll = document.getElementById('ganttByScrollTop');
+      let resize_left= document.getElementById('ganttLeft');
+      let resize_right= document.getElementById('ganttRightIndex');
+      let resize_pale = document.getElementById('ganntResizePale');
+      // console.log(resize_left.offsetHeight,'高度')
+      // resize_lf.style.height = resize_left.offsetHeight+'px';
+      resize_lf.addEventListener('mousedown',(e)=>{
+        this.lfShow=true;
+        resize_pale.style.display='block';
+        this.startResize=e.screenX;
+        //左边的移动宽度
+        this.resize_leftWidth=resize_left.offsetWidth;
+        this.resize_leftLeft=resize_left.offsetLeft;
+        //右边滚动条
+        this.resize_ganttByScrollWith =  resize_ganttByScroll.offsetWidth;
+        this.resize_ganttByScrollLeft =  resize_ganttByScroll.offsetLeft;
+         //右边的移动宽度
+        this.resize_rightWidth=resize_right.offsetWidth;
+        this.resize_rightLeft=resize_right.offsetLeft;
+        //滑动条
+        this.resize_lfLeft=resize_lf.offsetLeft;
+
+        // console.log(e);
+      })
+      resize_pale.addEventListener('mousemove',(e)=>{
+        if(this.lfShow){
+          this.changeLf=e.screenX-this.startResize;
+          resize_left.style.width=this.resize_leftWidth+this.changeLf+'px';
+          resize_right.style.width=this.resize_rightWidth-this.changeLf+'px';
+          resize_lf.style.left=this.resize_lfLeft+this.changeLf+'px';
+          resize_ganttByScroll.style.width= this.resize_ganttByScrollWith+this.changeLf+'px';
+          resize_ganttByScroll.style.left =this.resize_ganttByScrollLeft+this.changeLf+'px';
+          resize_ganttByScroll.style.width = resize_right.offsetWidth+'px';
+          // this.ganttByScrollNode.style.width=this.productGannttHead.style.width;
+          // console.log(this.changeLf)
+        }
+      })
+      resize_pale.addEventListener('mouseup',(e)=>{
+        resize_pale.style.display='none';
+        // this.endChangeLf=e.screenX-this.startResize;
+        // resize_left.style.width=this.resize_leftWidth+this.endChangeLf+'px';
+        // resize_right.style.width=this.resize_rightWidth-this.endChangeLf+'px';
+        this.lfShow=false;
+
+      })
+      window.addEventListener('resize',(e)=>{
+        resize_right.style.width=ganttBody.offsetWidth-resize_left.offsetWidth-resize_lf.offsetWidth+'px';
+        resize_ganttByScroll.style.width = resize_right.offsetWidth+'px';
+      })
+
+      let ganttPlayLines=document.getElementById('ganttPlayLine');
+      let ganttPlayLinePales = document.getElementById('ganttPlayLinePale');
+      ganttPlayLines.addEventListener('mousedown',(e)=>{
+        this.ganttPlayLinesShow=true;
+        console.log(e,'eee');
+        ganttPlayLinePales.style.display='block';
+        this.playLineStartX=e.screenX;
+        this.playLineLeft=ganttPlayLines.offsetLeft;
+      })
+
+      ganttPlayLinePales.addEventListener('mousemove',(e)=>{
+        if(this.ganttPlayLinesShow){
+          let xValue=e.screenX-this.playLineStartX;
+          ganttPlayLines.style.left=this.playLineLeft+xValue+'px';
+        }
+
+      })
+      ganttPlayLinePales.addEventListener('mouseup',(e)=>{
+        ganttPlayLinePales.style.display='none';
+        this.ganttPlayLinesShow=false;
+        let startTime;
+        let endTime;
+        let currentStamp;
+        let x;
+        x=Math.round(this.ganttPlayLines.offsetLeft/(this.ganttScale*10));
+        let apps = document.getElementById('webIframeByGantt').contentWindow;
+        let a=3600*24*1000;
+        startTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
+        endTime=moment((this.days_bar[x].date_stamp)).format('YYYY-MM-DD');
+        currentStamp=this.days_bar[x].date_stamp;
+        // console.log(startTime,endTime,currentStamp,'开始，结束，时间戳');
+        this.ganttPlayByWebGl(startTime,endTime,currentStamp);
+        this.ganttPlayByWebGlComplete(startTime,endTime,currentStamp);
+        this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"set"} 
+        apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*");
+        this.dataNum==1
+      })
+      // console.log(document.getElementById('leftAndRightResize'));
 
     },
     watch: {
@@ -2291,16 +2306,42 @@
           return val.substring(0,10);
         }
       },
+      initGanttByWebGl(){
+          setTimeout(()=>{
+                    app = this.$refs.iframeGanttByWg.contentWindow;
+                    app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
+            },1000)
+      },
        ls(evt){
-          
           this.callback(evt),
           false
         },
-
+        sliderRight(){
+          this.screenLeft.show = this.screenLeft.show?false:true;
+          setTimeout(()=>{
+             let ganttBody=document.getElementById('taskBodyGantts');
+              let resize_lf=document.getElementById('leftAndRightResize');
+              let resize_left= document.getElementById('ganttLeft');
+              let resize_ganttByScroll = document.getElementById('ganttByScrollTop');
+              let resize_right= document.getElementById('ganttRightIndex');
+              resize_right.style.width=ganttBody.offsetWidth-resize_left.offsetWidth-resize_lf.offsetWidth+'px';
+              resize_ganttByScroll.style.width = resize_right.offsetWidth+'px';
+          },0)
+          
+        },
        callback(e){
          
             switch(e.data.command){
               case "EngineReady":
+                {
+                    let Horder='';
+                    let para='';
+                    para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
+                    this.strJson=para;
+                    // appGantt.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
+                    app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
+                    
+				        }
                 break;
               case "CurrentSelectedEnt":
                   CurrentSelectPara=e.data.parameter[0];
@@ -2323,18 +2364,34 @@
                     'base64':item.split(',')[1]
                   })
                 })
-                
-                
-           
                 if(files){
                   this.uploadImg(files);
                   // return false;
                 }
-
-                // this.uploadImg(files);
               
               break;
+              // case "Return_4D_images_2":
             }
+        },
+        getUserGroup(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'userGroup/getAllGroup',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    projectId:vm.projId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    response.data.rt.forEach((item)=>{
+                        if(item.groupName=='默认群组'){
+                            this.groupId=item.groupId
+                        }
+                    })
+                }
+            })
         },
       //着色状态
       siteColorSearch() {
@@ -2377,8 +2434,6 @@
                       app.postMessage({command:"UsingColorStatus",parameter:this.showBimDataList},"*");
                       this.taskProgressStart="";
                       this.taskProgressEnd="";
-
-
                     }
                   })
 
@@ -2730,8 +2785,8 @@
       //放大
       bigLength(){
           this.ganttScale *= 2;
-          // this.drawingDateBar();
-         
+          this.ganttPlayLines=document.getElementById('ganttPlayLine');
+          // let ganttPlayLinesLeft=this.ganttPlayLines.offsetLeft;
           this.productGanttNode=document.getElementById('ganttRight');
           this.productGanttNode.innerHTML = "";
           this.Gantt_item_top = 3;
@@ -2742,16 +2797,16 @@
               this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
             }
           }
-          // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
+          this.ganttPlayLines.style.left=(this.currentLength*2)*this.lengthNumber+'px';
+          this.currentLength=this.currentLength*2;
       },
       //缩小
       smallLength(){
         // console.log(this.ganttScale,'this.ganttScale');
         if(this.ganttScale>0.4){
            this.ganttScale /= 2;
-        //  this.drawingDateBar();
-          // console.log(this.selectRowList,'this.selectRowList');
-            
+            this.ganttPlayLines=document.getElementById('ganttPlayLine');
+            console.log(this.lengthNumber,'this.lengthNumber');
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 3;
@@ -2761,6 +2816,10 @@
                 this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
               }
             }
+           console.log(this.currentLength,this.ganttScale,this.currentLength/this.ganttScale,this.lengthNumber,'目前长度');
+            this.ganttPlayLines.style.left=(this.currentLength/2)*this.lengthNumber+'px';
+            this.currentLength=this.currentLength/2;
+            // console.log(this.ganttPlayLines.style.left)
         }else{
           this.$message({
             type:'info',
@@ -2788,13 +2847,52 @@
           if(response.data.cd==0){
             // this.drawingDateBar()
             // this.drawingDateBar_reset();
+
+             this.getTaskList();
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 3;
-            // console.log(this.ganttScale,'this.ganttScale0000');
-            // this.ganttScale=0.5;
-            this.getTaskList();
-        //    this.drawingDateBar_reset();
+            console.log(this.ganttScale,'this.ganttScale0000');
+           
+            this.drawingDateBar_reset();
+            // setTimeout(()=>{
+                
+            // },2000)
+            for(var i = 0; i < this.selectRowList.length;i++){
+              if(this.selectRowList[i]._isHide == false){
+                this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
+              }
+            }
+          }
+        })
+      },
+      //拖拽gantt图
+      dragProjectTaskTime(day,id){
+         axios({
+          url:this.BDMSUrl+'schedule/'+this.projId+'/task/dragProjectTaskTime',
+          method:'get',
+          headers:{
+            'token':this.token
+          },
+          params:{
+            day:day,
+            id:id
+          }
+        }).then((response)=>{
+          if(response.data.cd==0){
+            // this.drawingDateBar()
+            // this.drawingDateBar_reset();
+
+             this.getTaskList();
+            this.productGanttNode=document.getElementById('ganttRight');
+            this.productGanttNode.innerHTML = "";
+            this.Gantt_item_top = 3;
+            console.log(this.ganttScale,'this.ganttScale0000');
+           
+            this.drawingDateBar_reset();
+            // setTimeout(()=>{
+                
+            // },2000)
             for(var i = 0; i < this.selectRowList.length;i++){
               if(this.selectRowList[i]._isHide == false){
                 this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
@@ -2814,32 +2912,28 @@
         // this.taskIndexData=[];
         this.taskIndexDataList=[];
         this.selectRowList=[];
+        this.taskIndexSelectDataList=[];
+        // this.selectRowList
         // this.selectRowList=[];
-        axios({
-          method: 'post',
-          url: this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
-          headers: {
-            'token': this.token
+        $.ajax({
+          url:this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
+          headers:{
+            'token':this.token
           },
-          params: {
+          data:{
             ugId: this.selectUgId,
-            taskName: this.searchTaskName
-          }
-        }).then(response => {
-          if (response.data.rt) {
+            taskName: this.searchTaskName,
+            sort:1
+          },
+          async:false,
+          success:(response)=>{
+            if (response.rt) {
             var vm=this
-            // vm.$emit('refresh')
-            this.taskIndexData = response.data.rt;
-           
-            // this.taskIndexData.forEach((item)=>{
-            //   this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
-            // })
-            // this.drawingDateBar_reset();
-
+            this.taskIndexData = response.rt;
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 0;
-            this.setValueDiGui(response.data.rt);
+            this.setValueDiGui(response.rt);
             this.productGantt(this.taskIndexData);
           
             //实现靠名称的升降排序
@@ -2897,43 +2991,137 @@
                         
                 })
             }
-            
-            this.dataDigui(response.data.rt);
-            this.getDataDigui(response.data.rt);
+            this.dataDigui(response.rt);
+            this.getDataDigui(response.rt);
            
-
             this.taskIndexDataList.forEach((item)=>{
               this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
               this.$set(item,'currentDate',Date.parse(new Date()))
-              // if(item.statusNum==NaN){
-              //   item.statusNum=100
-              // }
+
             })
-            // console.log(this.taskIndexDataList,'this.taskIndexDataList00');
             this.taskIndexSelectDataList.forEach((item)=>{
               this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
             })
             this.selectRowList=this.taskIndexSelectDataList;
-
-
               this.selectRowList.forEach((item)=>{
                 this.$set(item,'_isHide',false);
                 this.fdPlayDataId.push(item.taskId);
               })
-          
-           
-              //  this.productGantt(this.selectRowList);
-            if (response.data.rt == null) {
+            if (response.rt == null) {
               this.taskIndexData = [];
             }
 
             this.loading=false;
-          } else if (response.data.cd == "-1") {
-            alert(response.data.msg)
-          }else if(response.data.cd=='0'){
+          } else if (response.cd == "-1") {
+            alert(response.msg)
+          }else if(response.cd=='0'){
             this.loading=false;
           }
+          }
         })
+        // axios({
+        //   method: 'post',
+        //   url: this.BDMSUrl + 'schedule/' + this.projId + '/task/list',
+        //   headers: {
+        //     'token': this.token
+        //   },
+        //   params: {
+        //     ugId: this.selectUgId,
+        //     taskName: this.searchTaskName
+        //   }
+        // }).then(response => {
+        //   if (response.data.rt) {
+        //     var vm=this
+        //     this.taskIndexData = response.data.rt;
+        //     this.productGanttNode=document.getElementById('ganttRight');
+        //     this.productGanttNode.innerHTML = "";
+        //     this.Gantt_item_top = 0;
+        //     this.setValueDiGui(response.data.rt);
+        //     this.productGantt(this.taskIndexData);
+          
+        //     //实现靠名称的升降排序
+        //     {
+                
+        //         document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.cursor="pointer";
+        //         let c=0;
+        //         let name=document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0];
+        //         name.addEventListener('click',(e)=>{
+        //           if(c==0){
+        //                 this.taskSortMakeSure(1,1)
+        //                 document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.color="red";
+        //                 c++;
+        //           }else{
+        //               this.taskSortMakeSure(1,2)
+        //               document.getElementsByClassName('zk-table__header-row')[0].childNodes[0].childNodes[0].style.color="black";
+        //               c=0;
+        //           }     
+        //         })  
+        //     }
+        //     //实现靠数量的升降排序
+        //     {
+              
+        //       document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.cursor="pointer";
+        //       let num=document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0];
+        //       let b=0;
+        //       num.addEventListener('click',(e)=>{
+        //             if(b==0){
+        //                 this.taskSortMakeSure(2,1)
+        //                 document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.color="red";
+        //                 b++;
+        //             }else{
+        //               this.taskSortMakeSure(2,2)
+        //               document.getElementsByClassName('zk-table__header-row')[0].childNodes[1].childNodes[0].style.color="black";
+        //               b=0;
+        //             }
+        //       })
+        //     }
+        //     //实现靠优先级的升降排序
+        //     {
+                
+        //         document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.cursor="pointer";
+        //         let priority=document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0];
+        //         let a=0;
+        //         priority.addEventListener('click',(e)=>{
+        //           if(a==0){
+        //               this.taskSortMakeSure(3,1)
+        //               document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.color="red";
+        //               a++;
+        //           }else{
+        //             this.taskSortMakeSure(3,2)
+        //             document.getElementsByClassName('zk-table__header-row')[0].childNodes[2].childNodes[0].style.color="black";
+        //             a=0;
+        //           }          
+                        
+        //         })
+        //     }
+            
+        //     this.dataDigui(response.data.rt);
+        //     this.getDataDigui(response.data.rt);
+           
+        //     this.taskIndexDataList.forEach((item)=>{
+        //       this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
+        //       this.$set(item,'currentDate',Date.parse(new Date()))
+
+        //     })
+        //     this.taskIndexSelectDataList.forEach((item)=>{
+        //       this.$set(item,'statusNum',item.actualStatusStr.indexOf('全部完成')>-1?100:(item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0])));
+        //     })
+        //     this.selectRowList=this.taskIndexSelectDataList;
+        //       this.selectRowList.forEach((item)=>{
+        //         this.$set(item,'_isHide',false);
+        //         this.fdPlayDataId.push(item.taskId);
+        //       })
+        //     if (response.data.rt == null) {
+        //       this.taskIndexData = [];
+        //     }
+
+        //     this.loading=false;
+        //   } else if (response.data.cd == "-1") {
+        //     alert(response.data.msg)
+        //   }else if(response.data.cd=='0'){
+        //     this.loading=false;
+        //   }
+        // })
       },
     
       productGantt(taskIndexData){
@@ -2945,6 +3133,7 @@
         this.productGanttNodeBg=document.getElementById('ganttRightBg');
         this.productGannttHead=document.getElementById('ganttRightHead');
         this.productGannttIndex=document.getElementById('ganttRightIndex');
+        this.ganttByScrollNode = document.getElementById('ganttByScroll');
 
         this.Gantt_item_top = 3;
 
@@ -2972,26 +3161,18 @@
         this.max_Day_count_g = max_Day_count;
 
         ////////////////////// 画日 ////////////////////////////
-
+        
         this.drawingDateBar();
-        console.log('222');
-
+        // console.log('222');
         //////////////////////////////////////////////////////
 
         //////////////
-
         min_Day_count = parseInt(min_Day_count + 0.5);
         console.log(min_Day_count,'min_Day_count')
 
-        
         for(let i = 0;i < taskIndexData.length;i++){
           this.productGantt_loop(taskIndexData[i],min_Day_count);
-          // console.log(document.getElementById('item'+taskIndexData[i].taskId),'55555');
-          // document.getElementById('item'+taskIndexData[i].taskId).addEventListener('click',this.clickItem());
         }
-
-        // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
-
       },
 
       productGantt_loop(root,min_Day_count){
@@ -3003,6 +3184,9 @@
           }
       },
       drawingDateBar_reset(){
+        // this.productGanttNode=document.getElementById('ganttRight');
+        // this.productGanttNode.innerHTML = "";
+        // console.log(this.days_bar,this.months_bar,this.max_Day_count_g,this.min_Day_count_g,'重绘日月')
         this.productGannttHead.style.width=(this.max_Day_count_g - this.min_Day_count_g)*10 * this.ganttScale +"px";
         for(let i = 0;i<this.days_bar.length;i++){
 
@@ -3032,31 +3216,31 @@
 
       },
       drawingDateBar(){
-       
         this.days_bar = [];
-        this. months_bar = [];
+        this.months_bar = [];
         this.productGannttHead.innerHTML = "";
+        // this.ganttPlayLines=document.getElementById('ganttPlayLine')
         this.productGannttHead.style.width=(this.max_Day_count_g - this.min_Day_count_g)*10 * this.ganttScale +"px";
-      
-
         for(let i = 0; i < this.max_Day_count_g - this.min_Day_count_g;i++){
               var item = document.createElement("div");
               item.style.background = "#f8f8f9";
 
               //  item.style.borderTop = "1px solid #000";
               item.style.position = "absolute";
+              item.style.borderTop = "1px solid #fff";
               item.style.borderRight = "";
               item.style.top = "20px";
               item.style.left = (i * 10) * this.ganttScale + "px";
               // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
               item.style.height = 20 + "px";
               item.style.width = 10 * this.ganttScale + "px";
+              // this.ganttPlayLines.style.left =5* this.ganttScale+ "px";
               item.date_str = moment((this.min_Day_count_g + i) * (3600*24*1000)).format('YYYY-MM-DD');
+              item.date_stamp =(this.min_Day_count_g + i) * (3600*24*1000);
               // item.innerHTML=i;
               item.style.fontSize='12px';
               item.style.lineHeight='20px';
               this.days_bar.push(item);
-              
               this.productGannttHead.appendChild(item);
         }
 
@@ -3146,6 +3330,110 @@
       clickItem(){
         
       },
+      // 开始播放gantt图进度
+      ganttPlayStart(){
+        
+        this.ganttPlayLines=document.getElementById('ganttPlayLine');
+        let ganttSrcollLeft=document.getElementById('ganttByScrollTop').scrollLeft
+        let data=this.ganttPlayLines.offsetLeft;
+        let apps = document.getElementById('webIframeByGantt').contentWindow;
+       
+        let length=this.productGannttHead.offsetWidth/(this.max_Day_count_g - this.min_Day_count_g)
+
+        this.currentLength=length;       
+        if(this.playRate){
+          this.ganttPlayShow=false;
+          this.ganttSetInterVal=setInterval(()=>{
+            let x,startTime,endTime,currentStamp,startTimeComplete;
+            x=Math.floor(data/(this.ganttScale*10))
+            // console.log(data,x,'data000');
+            // console.log(this.ganttPlayLines.offsetLeft,'this.ganttPlayLines.offsetLeft')
+            let a=3600*24*1000;
+            startTime=moment((this.days_bar[x].date_stamp)).format('YYYY-MM-DD');
+            endTime=moment((this.days_bar[x].date_stamp)).format('YYYY-MM-DD');
+            // startTime=this.days_bar[x-1].date_str;
+            // endTime=this.days_bar[x+1].date_str;
+            startTimeComplete=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD');
+           
+            currentStamp=this.days_bar[x].date_stamp;
+            // 3600*24*1000
+            // console.log(currentStamp,x,startTime,endTime,this.days_bar,'结束播放时间节点');
+            this.ganttPlayByWebGl(startTime,endTime,currentStamp)
+            this.ganttPlayByWebGlComplete(startTimeComplete,endTime,currentStamp)
+            // console.log('1111');
+            if(this.dataNum==0){
+               this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"set"}
+            }else{
+              this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"run"}
+            }
+            console.log(this.ganttRun,'this.ganttRun000');
+            this.dataNum++
+            
+            apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*"); 
+
+
+            if(data>=this.productGannttHead.offsetWidth-length){
+                  this.ganttPlayShow=true;
+                  clearInterval(this.ganttSetInterVal)
+            }
+            if(this.ganttPlayShow==false){
+                data+=length;
+                this.lengthNumber=data/length;
+                this.ganttPlayLines.style.left=data+'px';
+            }
+          },this.playRate)
+         
+         
+        }else{
+          this.$message({
+            type:'info',
+            message:'请输入播放速率'
+          })
+        }
+      },
+      ganttPlayEnd(){
+        this.ganttPlayShow=true;
+       clearInterval(this.ganttSetInterVal)
+        {
+            let apps = document.getElementById('webIframeByGantt').contentWindow;
+            let x,startTime,endTime,currentStamp,startTimeComplete,data;
+            data=this.ganttPlayLines.offsetLeft;
+            x=Math.floor(data/(this.ganttScale*10))
+            startTime=moment((this.days_bar[x].date_stamp)).format('YYYY-MM-DD');
+            endTime=moment((this.days_bar[x].date_stamp)).format('YYYY-MM-DD');
+            startTimeComplete=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD');
+            currentStamp=this.days_bar[x].date_stamp;
+            // console.log(currentStamp,x,startTime,endTime,this.days_bar,'结束播放时间节点');
+            this.ganttPlayByWebGl(startTime,endTime,currentStamp)
+            this.ganttPlayByWebGlComplete(startTimeComplete,endTime,currentStamp)
+            this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"run"}
+            apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*"); 
+        }
+        
+        
+        this.dataNum=0
+      },
+      //归零
+      resetZero(){
+        let apps = document.getElementById('webIframeByGantt').contentWindow;
+        let startTime,endTime,currentStamp;
+        this.ganttPlayLines.style.left='3px';
+        this.playRate=500;
+        this.lengthNumber=0;
+        let a=3600*24*1000;
+        startTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
+        endTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
+        // startTime=this.days_bar[0].date_str;
+        // endTime=this.days_bar[1].date_str;
+        currentStamp=this.days_bar[0].date_stamp;
+        this.ganttPlayByWebGl(startTime,endTime,currentStamp)
+        this.ganttPlayByWebGlComplete(startTime,endTime,currentStamp)
+        // console.log('1111');
+        this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"set"}
+        apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*");
+        this.dataNum=0;
+        
+      },
       //拉伸gantt图
       stretchingGantt(item){
         var windowData=document.getElementById('ganttRight');
@@ -3183,6 +3471,7 @@
                   y=Math.ceil((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
                   startTime=this.days_bar[x-1].date_str;
                   endTime=this.days_bar[y-1].date_str;
+
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
                 //   console.log(startTime,endTime,'左边拉日,左边拉月');
                 }
@@ -3216,11 +3505,11 @@
               windowData.addEventListener('mouseup',(e)=>{
                 if(rightItem.show){
                   let x,y,startTime,endTime;
-                  x=Math.ceil(item.offsetLeft/(this.ganttScale*10));
-                  y=Math.ceil((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
-                  startTime=this.days_bar[x-1].date_str;
+                  x=Math.round(item.offsetLeft/(this.ganttScale*10));
+                  y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                  startTime=this.days_bar[x].date_str;
                   endTime=this.days_bar[y-1].date_str;
-                //   console.log(startTime,endTime,'右边拉日,右边拉月');
+                  console.log(startTime,endTime,'右边拉日,右边拉月');
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
                 }
                 rightItem.show=false;
@@ -3237,6 +3526,7 @@
               e.stopPropagation();
               this.start.x=e.pageX;
               this.itemStart=item.offsetLeft;
+              this.startTimeX=Math.round(item.offsetLeft/(this.ganttScale*10));
              
               item.upShow=true;
             })
@@ -3244,13 +3534,16 @@
               let x,y,startTime,endTime;
               if(item.upShow){
                 
-                  x=Math.floor(item.offsetLeft/(this.ganttScale*10));
-                  y=Math.floor((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
-                  console.log(x,y,'0日,0月');
+                  x=Math.round(item.offsetLeft/(this.ganttScale*10));
+                  y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                  this.dragTimeValue=x-this.startTimeX;
+                  console.log(this.dragTimeValue,'time000');
+                  // console.log(x,y,'0日,0月');
                   startTime=this.days_bar[x].date_str;
-                  endTime=this.days_bar[y].date_str;
-                  
-                  this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
+                  endTime=this.days_bar[y-1].date_str;
+                  console.log(startTime,endTime,'日,月');
+                  this.dragProjectTaskTime(this.dragTimeValue,this.ganttItemId);
+                  // this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
               }
               item.upShow=false;
             },true)
@@ -3277,10 +3570,10 @@
                 }
               }
                item.style.border = "2px solid #000";
-               console.log(item.rootData,'item.rootData000');
+            
                if(this.itemClickShow){
+                 this.dragGantt(item)
                  if(!item.rootData.children){
-                    this.dragGantt(item)
                     if(item.offsetWidth>30){
                       this.stretchingGantt(item);
                     }
@@ -3289,19 +3582,23 @@
             },false)
 
       },
+      ganttByScrolls(){
+      
+        let ganttSrcollLeft=document.getElementById('ganttByScrollTop').scrollLeft
+        this.productGannttIndex.scrollLeft=ganttSrcollLeft
+      },
       ganttItem(root,min_Day_count){
-        // console.log(root,'root111');
           root.taskStartDay = root.taskStart / (1000 * 3600 * 24);
           root.taskStartDay = parseInt(root.taskStartDay + 0.5);
 
           root.taskEndDay = root.taskEnd / (1000 * 3600 * 24);
           root.taskEndDay = parseInt(root.taskEndDay + 0.5);
-        //   console.log(root.taskStartDay,root.taskEndDay,'root.taskEndDay');
+      
 
           let Day_count = root.taskEndDay - root.taskStartDay-1;
           Day_count++;
-          this.productGanttNode.style.height = (this.Gantt_item_top+31) + "px";
-          this.productGanttNodeBg.style.height = (this.Gantt_item_top+31) + "px";
+          this.productGanttNode.style.height = (this.Gantt_item_top+21) + "px";
+          this.productGanttNodeBg.style.height = (this.Gantt_item_top+21) + "px";
 
           var item = document.createElement("div");
           //点击gantt图
@@ -3315,11 +3612,12 @@
           // item.style.border = "1px solid #000";
           item.style.top = this.Gantt_item_top + "px";
           item.style.left = ((root.taskStartDay - min_Day_count) * 10) * this.ganttScale + "px";
-          // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+         
           item.style.marginTop=5+'px';
-          item.style.height = 22 + "px";
+          item.style.height = 14 + "px";
           item.style.boxSizing='border-box';
           item.style.width = 10 * Day_count  * this.ganttScale + "px";
+          
           //进度条
           var item_sub = document.createElement("div");
           item_sub.style.background = "#68da68";
@@ -3329,29 +3627,30 @@
           item_sub.style.top = "0px";
           item_sub.style.left ="0px";
           item_sub.style.boxSizing='border-box';
-          // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+    
           item_sub.style.height = "100%";
           item_sub.style.width = 10 * Day_count  * this.ganttScale * root.statusNum / 100 + "px";
           item.appendChild(item_sub);
           var line = document.createElement("div");
           var line1 =document.createElement("div");
           line.style.position = "absolute";
-          line.style.top = (this.Gantt_item_top + 30) + "px";
+          line.style.top = (this.Gantt_item_top + 19) + "px";
           line.style.height = "1px";
           // line.style.width = '100%';
           line.style.width =this.productGannttHead.style.width;
           line.style.background = '#e9eaec';
         //   "rgba(0,0,0,0.1)"
+          this.ganttByScrollNode.style.width=this.productGannttHead.style.width;
 
           line1.style.position = "absolute";
-          line1.style.top = (this.Gantt_item_top + 30) + "px";
+          line1.style.top = (this.Gantt_item_top + 19) + "px";
           line1.style.height = "1px";
           line1.style.width = '100%';
           line1.style.background = '#e9eaec';
           this.productGanttNode.appendChild(line);
           this.productGanttNode.appendChild(line1);
           this.productGanttNode.appendChild(item);
-          this.Gantt_item_top += 32;
+          this.Gantt_item_top += 21;
 
           // var item_sub = document.createElement("div");
           // item_sub.style.background = "#68da68";
@@ -3361,7 +3660,7 @@
           // item_sub.style.top = "0px";
           // item_sub.style.left ="0px";
           // item_sub.style.boxSizing='border-box';
-          // // console.log(item.style.left,'item.style.left',Day_start_Day,min_Day_count);
+        
           // item_sub.style.height = "100%";
           // item_sub.style.width = 10 * Day_count  * this.ganttScale * root.statusNum / 100 + "px";
           // item.appendChild(item_sub);
@@ -3387,21 +3686,11 @@
 
       },
       getDataDigui(root){
-   
         for(let j = 0;j<root.length;j++){
-
           this.taskIndexSelectDataList.push(root[j]);
           if(root[j].children){
               this.getDataDigui(root[j].children);
           }
-          
-        
-          // if(root[j].children){
-          //     this.dataDigui(root[j].children);
-          //     this.taskIndexSelectDataList.push(root[j].children);
-          //   }else{
-              
-          //   }
         }
       },
     
@@ -3478,7 +3767,7 @@
             this.attachList = this.verifyLists.attachList;
             this.fileList = this.verifyLists.fileList;
             this.verifyList = this.verifyLists.verifyList;
-            // console.log(this.verifyList)
+       
           } else if (response.data.cd == "-1") {
             alert(response.data.msg)
           }
@@ -4100,7 +4389,7 @@
         }).then(response => {
           if (response.data.cd == "0") {
             this.taskResourceTaskList = response.data.rt;
-            //   console.log(this.taskResourceTaskList);
+        
           } else if (response.data.cd == "-1") {
             alert(resposne.data.msg)
           }
@@ -4154,7 +4443,7 @@
                  
                   // var num=this.ugList1[0].ugId;
                   // this.groupIds.push(num.toString());
-                  // console.log(this.groupIds)
+           
               }else if(response.data.cd=="-1"){
                   alert(response.data.msg)
               }
@@ -4260,7 +4549,7 @@
             response.data.rt.rows.forEach((item)=>{
               this.loadManifestList.push(item)
             });
-            //   console.log(JSON.stringify(this.loadManifestList))
+        
           } else if (response.data.cd == '-1') {
             alert(response.dara.msg);
           }
@@ -4280,8 +4569,7 @@
         //   console.log('00');
         // }
         // this.elementTraceIds=this.getElementByMid(vm.checkedItem.id);
-        // console.log(vm.checkedItem)
-        // console.log(this.elementTraceIds,'this.elementTraceIds');
+   
         
       },
       //加载清单列表
@@ -4635,32 +4923,6 @@
                 //     this.createdDetory();
                 // }
           }})
-            // $.ajax({
-            //   url:vm.BDMSUrl+'/doc/getDirectoryWithAll?projectId='+this.projId+'&groupId='+this.selectUgId,
-            //   async:false,
-            //   type:'GET',
-            //   headers:{
-            //         token:vm.token
-            //   },
-            //   // data:{
-            //   //   projectId:vm.projId,
-            //   //   groupId:vm.selectUgId
-            //   // },
-            //   success:(response)=>{
-            //     if(response.cd==0){
-            //       response.rt.forEach((item)=>{
-            //       if(item.dirName=='4D播放截图'){
-            //           this.dirIds=item.dirId
-            //         } 
-            //     })
-            //     console.log(this.dirIds,'this.dirIds');
-            //     if(!this.dirIds){
-            //         this.createdDetory();
-            //     }
-            //   }
-
-              // }
-            // })
       },
 
       fdPlayMakeSure(){
@@ -4691,29 +4953,22 @@
             // this.fdPlayDialog=false;
           }else{
               this.returnTraceIdsData=[];
-
               document.body.scrollTop = 0;
               document.documentElement.scrollTop = 0;
                const app = document.getElementById('webIframe').contentWindow;
               datas.forEach((item)=>{
-                        this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
-                })
-             
-             
-                this.fdPlayData=[];
-              
-                
-               
-                this.fdPlayDialog=false;
-                this.fdNum='';
-            
-                 setTimeout(()=>{
-                     app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
-                },0);
-                this.$message({
-                  type:'success',
-                  message:'4D播放加载中...'
-                })
+                    this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
+              })
+              this.fdPlayData=[];
+              this.fdPlayDialog=false;
+              this.fdNum='';
+                setTimeout(()=>{
+                    app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+              },0);
+              this.$message({
+                type:'success',
+                message:'4D播放加载中...'
+              })
           }
       },
       uploadImg(file){
@@ -4737,6 +4992,88 @@
                   })
             }
           })
+      },
+      ganttPlayByWebGl(taskFdStart,taskFdEnd,currentStamp){
+          var vm=this;
+          this.returnTraceIdsData=[];
+          this.dataIng=[];
+          this.dataComplete=[];
+          $.ajax({
+            url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskIdStart?startDate='+taskFdStart+'&endDate='+taskFdEnd,
+            headers:{
+                'token':this.token
+            },
+            type:'post',
+            // data:'',
+            dataType:"json",
+            data:JSON.stringify(this.fdPlayDataId),
+            async:false,
+            contentType:'application/json;charset=utf-8',
+            success:(response)=>{
+              if(response.cd==0){
+                this.returnTraceIds=response.rt;
+                // this.run_4d_data={timeLine: currentStamp, data:Data,state:"set"}
+                this.returnTraceIds.forEach((item)=>{
+                  this.dataIng.push({
+                    'taskId':item.taskId,
+                    'traceIds':item.traceIds
+                  })
+                  // console.log(moment(item.taskEnd).format('YYYY-MM-DD'),moment(currentStamp).format('YYYY-MM-DD'),item.taskEnd<=currentStamp,'当前是否相等');
+                  // if(item.taskEnd<=currentStamp){
+                  //      this.dataComplete.push({
+                  //        'taskId':item.taskId,
+                  //         'traceIds':item.traceIds
+                  //     })
+                  // }
+                })
+                this.returnTraceIdsData.push({
+                      'id':1,
+                      'data':this.dataIng
+                })
+                  
+                  // this.afterFiveDayData.push({
+                  //   'currentStamp':currentStamp,
+                  //   'returnTraceIdsData':returnTraceIdsData
+                  // })
+              }
+            }
+          })
+      },
+      ganttPlayByWebGlComplete(taskFdStart,taskFdEnd,currentStamp){
+         var vm=this;
+          this.returnTraceIdsDataComplete=[];
+          this.dataComplete=[];
+          $.ajax({
+            url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskIdStart?startDate='+taskFdStart+'&endDate='+taskFdEnd,
+            headers:{
+                'token':this.token
+            },
+            type:'post',
+            // data:'',
+            dataType:"json",
+            data:JSON.stringify(this.fdPlayDataId),
+            async:false,
+            contentType:'application/json;charset=utf-8',
+            success:(response)=>{
+              if(response.cd==0){
+                this.returnCompleteTraceIds=response.rt;
+                this.returnCompleteTraceIds.forEach((item)=>{
+                  // console.log(moment(item.taskEnd).format('YYYY-MM-DD'),moment(currentStamp).format('YYYY-MM-DD'),item.taskEnd<=currentStamp,'当前是否相等');
+                  if(item.taskEnd<=currentStamp){
+                       this.dataComplete.push({
+                         'taskId':item.taskId,
+                          'traceIds':item.traceIds
+                      })
+                  }
+                })
+                this.returnTraceIdsDataComplete.push({
+                      'id':1,
+                      'dataComplete':this.dataComplete,
+                })
+              }
+            }
+          })
+
       },
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
@@ -5853,6 +6190,7 @@
           }
         })
       },
+      
       deleteAssociationListMakeSure() {
         axios({
           method: 'get',
@@ -6345,7 +6683,7 @@
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
         width:15px;
-        height: 15px;
+        height: 12px;
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
@@ -6662,15 +7000,18 @@
         }
       }
     }
+   
     ::-webkit-scrollbar{width:0px}
     .taskWarp {
       width: 96%;
-      margin-top: 20px;
-      padding: 12px;
+      // margin-top: 20px;
+      padding: 4px;
       margin: 0 auto;
       box-sizing: border-box;
-      height: 750px; 
+      // height: 750px; 
       .taskHead {
+        position: relative;
+        height: 21px;
         // margin-bottom: 10px;
         .taskHeadLeft {
           float: left;
@@ -6686,17 +7027,46 @@
           cursor: pointer;
         }
         .taskHeadRight {
-          float: right;
-          .btn-operate {
+          // float: right;
+              z-index: 12;
+              height: 25px;
+              position: absolute;
+              right: 0;
+              span .el-icon-caret-left{
+                font-size: 30px;
+                cursor: pointer;
+                color: red;
+              }
+          .btn-operate1{
             display: inline-block;
-            padding: 3px 12px;
-            line-height: 22px;
+            // padding: 5px 12px;
+            line-height: 28px;
             font-size: 12px;
             font-weight: 100;
-            background: #f2f2f2;
-            border-radius: 2px;
+            background: #fff;
+            border:1px solid #ccc;
+            border-radius: 50%;
             height: 28px;
+             width: 28px;
+             cursor: pointer;
+            position: relative;
+          }
+          .btn-operate {
+            display: inline-block;
+            // padding: 3px 12px;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 100;
+            background: #fff;
+            border-radius: 50%;
+            height: 24px;
+            width: 24px;
+            border:1px solid #ccc;
+           
             cursor: pointer;
+            .el-icon-video-play{
+              font-size:14px;
+            }
             .el-icon-plus{
               font-size:14px;
             }
@@ -6708,14 +7078,16 @@
         }
 
       }
+     
       .taskBodyGantt {
         margin-top: 10px;
         width: 100%;
         overflow-y: auto;
-        height: 500px;
+        height: 300px;
         border-right:1px solid #e9eaec;
         border-bottom: 1px solid #e9eaec;
         border-left: 1px solid #e9eaec;
+        
 
       }
     }
@@ -8280,9 +8652,10 @@
 
       .zk-table {
         color: #333333;
+        line-height: 20px;
       }
       .zk-table__body-row{
-        height: 32px;
+        height: 20px;
         box-sizing:border-box
       }
       .zk-table__cell-inner{

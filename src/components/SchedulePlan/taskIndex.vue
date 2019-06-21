@@ -3353,11 +3353,9 @@
 
           var item = document.createElement("div");
           //点击gantt图
-          this.clickGantt(item);
+          // this.clickGantt(item);
           item.setAttribute('id','item'+root.taskId);
           item.rootData=root;
-         
-          
           item.style.background = "#6eb7ff";
           item.style.position = "absolute";
           // item.style.border = "1px solid #000";
@@ -4718,53 +4716,56 @@
         var date=1;
         var datas=[];
         console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
-        if(this.fdNum){
+        if(this.taskFdEnd<=this.taskFdStart){
+          this.$message({
+            type:'info',
+            message:'结束时间需要大于开始时间'
+          })
+        }else if(this.fdNum){
           date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
           date/=(1000 * 3600 * 24)
           date=parseInt(date+ 0.5)
-        }
-       
-       console.log(date,'date00');
-       for(let i=0;i<date;i++){
-         console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
-          datas.push({
-            'id':i+1,
-            'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
-            'taskFdEnd':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)).format('YYYY-MM-DD')
-          })
-       }
-        if(document.getElementById('webgl').style.display=='none'){
-            this.$message({
-                type:'info',
-                message:'请打开顶部的虚拟场景'
-            })
-            // this.fdPlayDialog=false;
-          }else{
-              this.returnTraceIdsData=[];
-
-              document.body.scrollTop = 0;
-              document.documentElement.scrollTop = 0;
-               const app = document.getElementById('webIframe').contentWindow;
-              datas.forEach((item)=>{
-                        this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
-                })
-             
-               console.log(date,'date00');
-                this.fdPlayData=[];
-              
-                
-               
-                this.fdPlayDialog=false;
-                this.fdNum='';
-                console.log(this.returnTraceIdsData,'返回的数据');
-                 setTimeout(()=>{
-                     app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
-                },0);
-                this.$message({
-                  type:'success',
-                  message:'4D播放加载中...'
-                })
+          for(let i=0;i<date;i++){
+            console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
+              datas.push({
+                'id':i+1,
+                'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
+                'taskFdEnd':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)).format('YYYY-MM-DD')
+              })
           }
+            if(document.getElementById('webgl').style.display=='none'){
+                this.$message({
+                    type:'info',
+                    message:'请打开顶部的虚拟场景'
+                })
+                // this.fdPlayDialog=false;
+              }else{
+                  this.returnTraceIdsData=[];
+
+                  document.body.scrollTop = 0;
+                  document.documentElement.scrollTop = 0;
+                  const app = document.getElementById('webIframe').contentWindow;
+                  datas.forEach((item)=>{
+                            this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
+                    })
+                
+                  console.log(date,'date00');
+                    this.fdPlayData=[];
+                  
+                    
+                  
+                    this.fdPlayDialog=false;
+                    this.fdNum='';
+                    console.log(this.returnTraceIdsData,'返回的数据');
+                    setTimeout(()=>{
+                        app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+                    },0);
+                    this.$message({
+                      type:'success',
+                      message:'4D播放加载中...'
+                    })
+              }
+        }
       },
       uploadImg(file){
         var vm=this;
@@ -4788,6 +4789,7 @@
             }
           })
       },
+     
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
         $.ajax({

@@ -187,9 +187,9 @@
                                     <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                                 </div>
                         </el-dialog>
-                        <el-dialog width="400px"  v-dialogDrag title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+                        <el-dialog width="360px"  v-dialogDrag title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
                             <div>
-                                <vue-highcharts id="leftHightchart" style="min-height:900px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                                <vue-highcharts id="leftHightchart" style="min-height:740px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                             </div>
                         </el-dialog>
                     </div>
@@ -1448,7 +1448,7 @@ export default {
                         xAxis: {
                             categories:[],
                             // angle:180
-                            opposite: true
+                            opposite: false
                         },
                         yAxis: {
                                 title: {
@@ -1457,11 +1457,11 @@ export default {
                                 labels:{
                                     enabled: true
                                 },
-                                opposite: true
+                                opposite: true,
+                                lineWidth: 1
                                 // angle:180
-                               
-                            
                                 },
+                                
                         credits: {
                             enabled: false
                         },
