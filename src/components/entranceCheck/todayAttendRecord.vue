@@ -35,6 +35,7 @@
                            <th>序号</th>
                            <th>姓名</th>
                            <th>部门</th>
+                           <th>工种</th>
                            <th>进场时间</th>
                            <th>打卡方式</th>
                            <th>考勤情况</th>
@@ -48,6 +49,11 @@
                             <td>{{index+1}}</td>
                             <td>{{item.userName}}</td>
                             <td>{{item.department}}</td>
+                            <td>
+                                <span v-for="(val,index) in item.positionList" :key="index">
+                                    {{val.posName+','}}
+                                </span>
+                            </td>
                             <td>{{timeChange(item.enterTime)}}</td>
                             <td>{{doorType(item.checkInType)}}</td>
                             <td>{{entOutCheckType(item.enterStatus)}}</td>

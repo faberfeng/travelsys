@@ -382,18 +382,21 @@ export default {
                     }
                 }).then((response)=>{
                     if(response.data.cd==0){
-                        this.dangerousList=response.data.rt;
-                        this.dangerLevels=this.dangerousList[0].name;
-                        this.dangerousListLength=response.data.rt.length;
-                        if(this.dangerousListLength<11){
-                            for(var i=0;i<this.dangerousListLength;i++){
-                                this.dangerousLists.push(this.dangerousList[i])
-                            }
-                        }else{
-                            for(var i=0;i<10;i++){
-                                this.dangerousLists.push(this.dangerousList[i])
+                        if(response.data.rt.length!=0){
+                            this.dangerousList=response.data.rt;
+                            this.dangerLevels=this.dangerousList[0].name;
+                            this.dangerousListLength=response.data.rt.length;
+                            if(this.dangerousListLength<11){
+                                for(var i=0;i<this.dangerousListLength;i++){
+                                    this.dangerousLists.push(this.dangerousList[i])
+                                }
+                            }else{
+                                for(var i=0;i<10;i++){
+                                    this.dangerousLists.push(this.dangerousList[i])
+                                }
                             }
                         }
+                       
                     }
                 })
         },

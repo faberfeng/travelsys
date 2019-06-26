@@ -137,6 +137,7 @@ export default {
             url:'http://10.252.26.240:8080/genDist/',
             isOpen:0,
             BDMSUrl:'',
+            strokeShow:'',
             settingsCenter:true,//是否是两边铺满
             header:{
                 userName:'',
@@ -346,7 +347,7 @@ export default {
 				{
                     let Horder='';
                     let para='';
-                    para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
+                    para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl,stroke:this.strokeShow}
                     this.strJson=para;
                     app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
@@ -784,6 +785,7 @@ export default {
                     vm.getUserInfo();
                     vm.header.projectName = response.data.rt.project?response.data.rt.project.projectName:'';
                     localStorage.setItem('projectName',vm.header.projectName);
+                    vm.strokeShow=response.data.rt.project.stroke;
                     
                     vm.header.projectImg = response.data.rt.image.length!=0?vm.BDMSUrl+response.data.rt.image[0].path:null;
                     console.log(vm.header.projectImg,'vm.header.projectImg');
@@ -809,6 +811,7 @@ export default {
             //     console.log(err)
             // }) 
         },
+        
         //排序函数
         compare(property) {
             return function(a, b) {

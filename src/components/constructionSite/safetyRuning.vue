@@ -251,7 +251,7 @@
                         <div class="editBody">
                             <ul>
                                 <li v-for="(item,index) in checkPointsForPageList" :key="index" class="item-label clearfix">
-                                    <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-CP-' + addZero(item.id, 7)" alt="">
+                                    <img class="img_left" :src="BDMSUrl+'manifest/qr/QR-CP-' + addZero(item.id, 7)" alt="">
                                     <div class="right">
                                         <p class="item-list clearfix">
                                             <span class="text-left">点位名称：</span>
@@ -314,7 +314,7 @@
                         <div class="editBody">
                             <ul>
                                 <li v-for="(item,index) in checkPointsForPageSingleList" :key="index" class="item-label clearfix">
-                                    <img class="img_left" :src="BDMSUrl+'QRCode2/getQRimage/QR-CP-' + addZero(item.checkPoint.id, 7)" alt="">
+                                    <img class="img_left" :src="BDMSUrl+'manifest/qr/QR-CP-' + addZero(item.checkPoint.id, 7)" alt="">
                                     <div class="right">
                                         <p class="item-list clearfix">
                                             <span class="text-left">点位名称：</span>

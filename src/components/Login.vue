@@ -7,9 +7,11 @@
                     <!-- <span class="firstTitleText"> 华建集团安全信息管理系统 </span>  -->
                     <!-- <span class="firstTitleText">BDMS建设工程项目数据管理系统 </span> -->
                     <span class="firstTitleText">BDViewer建筑数据浏览器</span>
+                    <!-- <span class="firstTitleText">面向建筑行业的VR协同设计系统</span> -->
                     <span class="sendTitle">工程建设全过程项目管理系统</span>
                     <!-- <span class="firstTitleText">建筑VR协同设计平台</span> 
                     <span class="sendTitle">BIM协作支撑系统</span> -->
+
                 </div>
                 <!-- <button class="registerBtn">注册</button> -->
             </div>

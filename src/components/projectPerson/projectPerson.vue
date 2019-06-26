@@ -13,7 +13,8 @@
                         <label class="nameLabel">账号：</label><label class="itemLabel"></label>
                     </li>
                     <li class="rightLi">
-                        <label class="nameLabel">工种：</label><label class="itemLabel">{{returnPosition(queryAttendancyRecordByUserList.positions)}}</label>
+                        <label class="nameLabel">工种：</label><label class="itemLabel"></label>
+                        <!-- {{returnPosition(queryAttendancyRecordByUserList.positions)}} -->
                     </li>
                     <li class="rightLi">
                         <label class="nameLabel">单位：</label><label class="itemLabel">{{queryAttendancyRecordByUserList.groupName}}</label>
@@ -720,10 +721,10 @@ export default {
 
         },
         returnPosition(val){
-            if(val){
-                return val[0].posName
+            if(val==[]){
+               return ''
             }else{
-                return ''
+                return val[0].posName
             }
         },
         getPersonEnterInfo(){

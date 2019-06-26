@@ -80,7 +80,6 @@
                           <button class="el-icon-picture-outline actionBtnA" style="width:0px;height:18px;" title="附加图片" @click="bindPic()"></button>
                          
                         </template>
-                      
                         <template slot="task" slot-scope="scope">
                             <el-tooltip :content="scope.row.taskName" placement="top">
                               <span style="cursor:pointer" >{{scope.row.taskName | splitRemark()}}</span>
@@ -119,7 +118,7 @@
                   </div>
                 </div>
                 <!-- 缩放按钮 -->
-                <div id="ganttScale" style="position:absolute;right:0px;top:0px;z-index:10">
+                <div v-show="ganttPlayShow" id="ganttScale" style="position:absolute;right:0px;top:0px;z-index:10">
                     <i @click="bigLength()" class="el-icon-plus" style="margin-right:1px;padding:4px;border:1px solid #ccc;cursor:pointer;background:#fff;"></i>
                     <i @click="smallLength()" class="el-icon-minus" style="margin-right:1px;padding:4px;border:1px solid #ccc;cursor:pointer;background:#fff;"></i>
                 </div>
@@ -2790,15 +2789,19 @@
           this.productGanttNode=document.getElementById('ganttRight');
           this.productGanttNode.innerHTML = "";
           this.Gantt_item_top = 3;
-            this.drawingDateBar_reset();
+          this.currentLeft=this.ganttPlayLines.offsetLeft;
+          this.drawingDateBar_reset();
             
           for(var i = 0; i < this.selectRowList.length;i++){
             if(this.selectRowList[i]._isHide == false){
               this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
             }
           }
-          this.ganttPlayLines.style.left=(this.currentLength*2)*this.lengthNumber+'px';
-          this.currentLength=this.currentLength*2;
+          // this.ganttPlayLines.style.left=(this.currentLength*2)*this.lengthNumber+'px';
+          // this.currentLength=this.currentLength*2;
+
+          this.ganttPlayLines.style.left = (this.currentLeft*2)+'px';
+          this.currentLeft=this.currentLeft*2;
       },
       //缩小
       smallLength(){
@@ -2810,16 +2813,19 @@
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
             this.Gantt_item_top = 3;
+            this.currentLeft=this.ganttPlayLines.offsetLeft;
             this.drawingDateBar_reset();
             for(var i = 0; i < this.selectRowList.length;i++){
               if(this.selectRowList[i]._isHide == false){
                 this.ganttItem(this.selectRowList[i],this.min_Day_count_g);
               }
             }
-           console.log(this.currentLength,this.ganttScale,this.currentLength/this.ganttScale,this.lengthNumber,'目前长度');
-            this.ganttPlayLines.style.left=(this.currentLength/2)*this.lengthNumber+'px';
-            this.currentLength=this.currentLength/2;
+          //  console.log(this.currentLength,this.ganttScale,this.currentLength/this.ganttScale,this.lengthNumber,'目前长度');
+            // this.ganttPlayLines.style.left=(this.currentLength/2)*this.lengthNumber+'px';
+            // this.currentLength=this.currentLength/2;
             // console.log(this.ganttPlayLines.style.left)
+            this.ganttPlayLines.style.left = (this.currentLeft/2)+'px';
+            this.currentLeft=this.currentLeft/2;
         }else{
           this.$message({
             type:'info',
@@ -2828,7 +2834,6 @@
         }
          
           // this.productGanttNode.style.height = (this.Gantt_item_top) + "px";
-        
       },
       //甘特图修改(限制时间)
       updateProjectTaskTime(taskStart,taskEnd,id){
@@ -3460,21 +3465,36 @@
                     let leftEndX=e.screenX-this.leftStartX;
                     item.style.width=this.leftWidth-leftEndX+'px';
                     item.style.left=this.leftLeft+leftEndX+'px';
+
                 }
               })
               windowData.addEventListener('mouseup',(e)=>{
                 //  e.stopPropagation()
                 // this.leftItemShow=false;
-                if(leftItem.show){
-                  let x,y,startTime,endTime;
-                  x=Math.ceil(item.offsetLeft/(this.ganttScale*10));
-                  y=Math.ceil((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
-                  startTime=this.days_bar[x-1].date_str;
-                  endTime=this.days_bar[y-1].date_str;
+                if(item.offsetWidth>this.ganttScale*10){
+                  if(leftItem.show){
+                    let x,y,startTime,endTime;
+                    x=Math.round(item.offsetLeft/(this.ganttScale*10));
+                    y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                    startTime=this.days_bar[x-1].date_str;
+                    endTime=this.days_bar[y-1].date_str;
 
+                    this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
+                  //   console.log(startTime,endTime,'左边拉日,左边拉月');
+                  }
+                }else if(leftItem.show){
+                  let x,y,startTime,endTime;
+                  // x=Math.ceil(item.offsetLeft/(this.ganttScale*10));
+                  y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                  startTime=this.days_bar[y-1].date_str;
+                  endTime=this.days_bar[y-1].date_str;
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
-                //   console.log(startTime,endTime,'左边拉日,左边拉月');
+                  this.$message({
+                    type:'info',
+                    message:'时间间隔不能小于一天'
+                  })
                 }
+                
                 leftItem.show=false;
               },true)
             
@@ -3503,15 +3523,29 @@
                 }
               })
               windowData.addEventListener('mouseup',(e)=>{
-                if(rightItem.show){
+                if(item.offsetWidth>this.ganttScale*10){
+                   if(rightItem.show){
+                    let x,y,startTime,endTime;
+                    x=Math.round(item.offsetLeft/(this.ganttScale*10));
+                    y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                    startTime=this.days_bar[x].date_str;
+                    endTime=this.days_bar[y-1].date_str;
+                    console.log(startTime,endTime,'右边拉日,右边拉月');
+                    this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
+                  }
+                }else if(rightItem.show){
                   let x,y,startTime,endTime;
                   x=Math.round(item.offsetLeft/(this.ganttScale*10));
-                  y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
+                  // y=Math.round((item.offsetWidth+item.offsetLeft)/(this.ganttScale*10))
                   startTime=this.days_bar[x].date_str;
-                  endTime=this.days_bar[y-1].date_str;
-                  console.log(startTime,endTime,'右边拉日,右边拉月');
+                  endTime=this.days_bar[x].date_str;
                   this.updateProjectTaskTime(startTime,endTime,this.ganttItemId)
+                  this.$message({
+                    type:'info',
+                    message:'时间间隔不能小于一天'
+                  })
                 }
+               
                 rightItem.show=false;
               },true)
             // }
@@ -5026,15 +5060,19 @@
                   //     })
                   // }
                 })
-                this.returnTraceIdsData.push({
+                this.returnTraceIdsData.push(
+                  {
                       'id':1,
                       'data':this.dataIng
-                })
-                  
-                  // this.afterFiveDayData.push({
-                  //   'currentStamp':currentStamp,
-                  //   'returnTraceIdsData':returnTraceIdsData
-                  // })
+                  }
+                )
+                  // if(this.afterFiveDayData.length<=5){
+                  //      this.afterFiveDayData.push({
+                  //       'currentStamp':currentStamp,
+                  //       'returnTraceIdsData':this.returnTraceIdsData
+                  //     })
+                  // }
+                 
               }
             }
           })
@@ -5058,7 +5096,6 @@
               if(response.cd==0){
                 this.returnCompleteTraceIds=response.rt;
                 this.returnCompleteTraceIds.forEach((item)=>{
-                  // console.log(moment(item.taskEnd).format('YYYY-MM-DD'),moment(currentStamp).format('YYYY-MM-DD'),item.taskEnd<=currentStamp,'当前是否相等');
                   if(item.taskEnd<=currentStamp){
                        this.dataComplete.push({
                          'taskId':item.taskId,

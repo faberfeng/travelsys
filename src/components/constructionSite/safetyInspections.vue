@@ -1459,7 +1459,7 @@ export default {
                                 },
                                 opposite: true,
                                 lineWidth: 1
-                                // angle:180
+                               
                                 },
                                 
                         credits: {
@@ -1474,11 +1474,11 @@ export default {
                         },
                         plotOptions: {
                             spline: {
-                                    marker: {
-                                        radius: 4,
-                                        lineColor: '#666666',
-                                        lineWidth: 1
-                                    }
+                                marker: {
+                                    radius: 4,
+                                    lineColor: '#666666',
+                                    lineWidth: 1
+                                }
                             },
                             series: {
                                 allowPointSelect: true,

@@ -132,7 +132,8 @@
                                 <tbody>
                                     <tr v-for="(item,index) in leftDisplayList.recentVariation" :key="index">
                                         <!-- {{leftDisplayListValue1[index].depth}} -->
-                                        <td>{{(leftDisplayList.recentVariation)[index].otherParam|addSprit}}</td>
+                                        <!-- <td>{{(leftDisplayList.recentVariation)[index].otherParam|addSprit}}</td> -->
+                                        <td>{{leftDisplayListValue1[index].depth|addSpritNum}}</td>
                                         <td >{{leftDisplayListValue1[index].shift|addSpritNum}}</td>
                                         <!-- {{leftDisplayListValue1[index].shift|addSpritNum}} -->
                                         <td >{{leftDisplayListValue2[index].shift|addSpritNum}}</td>
@@ -188,7 +189,8 @@
                                 </thead>
                                <tbody>
                                     <tr v-for="(item,index) in rightDisplayList.recentVariation" :key="index">
-                                        <td>{{(rightDisplayList.recentVariation)[index].otherParam|addSprit}}</td>
+                                        <!-- <td>{{(rightDisplayList.recentVariation)[index].otherParam|addSprit}}</td> -->
+                                        <td>{{leftDisplayListValue1[index].depth|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue1[index].shift|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue2[index].shift|addSpritNum}}</td>
                                         <td>{{(rightDisplayList.recentVariation)[index].recentVariation|addSpritNum}}</td>
@@ -524,6 +526,7 @@
                                         <!-- <td width="100px">{{item.slotNo}}</td> -->
                                         <!-- <td width="100px">{{item.sensorAddress}}</td> -->
                                         <td width="100px">
+                                            <i class="el-icon-edit" style="cursor:pointer;margin-right:6px;" title="编辑" @click="editAutoPitch(item)"></i>
                                             <i class="el-icon-delete" style="cursor:pointer" title="删除" @click="deleteAutoPitch(item.id)"></i>
                                         </td>
                                     </tr>
@@ -541,12 +544,30 @@
                 <div class="editBody">
                     <div class="editBodyone">
                         <label class="editTxt1">绑定测斜序列</label>
-                        <select v-model="pitchSeqId" class="gatherTimeName">
+                        <select v-model="pitchSeqId" class="gatherTimeName" @change="pitchChange(pitchSeqId)">
                             <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
                                 {{item.name}}
                             </option>
                         </select>
                     </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">绑定位置方法</label>
+                        <select v-model="pitchSeqWay" class="gatherTimeName">
+                            <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
+                                {{item.label}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editTxt1">基准点深度</label>
+                        <select v-model="basicPoint" class="gatherTimeName">
+                            <option v-for="(item,index) in basicPointList" :key="index" :value="item">
+                                {{item}}
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="editBodytwo">
                         <label class="editTxt1">通道编号:</label>
                         <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
@@ -568,6 +589,57 @@
                  <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeAutoPitch()">确定</button>
                     <button class="editBtnC" @click="autoPitchCancle()" >取消</button>
+                </div>
+            </el-dialog>
+
+            <el-dialog width="600px" title="编辑采集传感器" :visible="editAutoPitchShow" @close="editAutoPitchCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editTxt1">绑定测斜序列</label>
+                        <select v-model="pitchSeqId" class="gatherTimeName">
+                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">绑定位置方法</label>
+                        <select v-model="pitchSeqWay" class="gatherTimeName">
+                            <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
+                                {{item.label}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editTxt1">基准点深度</label>
+                       <select v-model="basicPoint" class="gatherTimeName">
+                            <option v-for="(item,index) in basicPointList" :key="index" :value="item">
+                                {{item}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editTxt1">通道编号:</label>
+                        <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">设备ID:</label>
+                        <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">传感器地址:</label>
+                        <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div> -->
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">卡槽序号:</label>
+                        <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div> -->
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeEditAutoPitch()">确定</button>
+                    <button class="editBtnC" @click="editAutoPitchCancle()" >取消</button>
                 </div>
             </el-dialog>
             <el-dialog title="采集测试" :visible="textShow" @close="textShowCancle()" >
@@ -740,6 +812,17 @@ export default Vue.component('commonPitch-detail',{
                 getPitchBaseInfoListLength:0,
                 pitchItemId:'',//自动采集斜度项目id
                 pitchSeqId:'',//序列id
+                pitchSeqWay:1,
+                pitchSeqWayList:[{
+                    value:1,
+                    label:'从序列起始深度开始'
+                },{
+                    value:2,
+                    label:'从序列结束深度开始'
+                }],
+                basicPoint:'',
+                basicPointList:[],
+                editPitchId:'',
                 channelNo:'',
                 sensorAddress:'',
                 slotNo:'',
@@ -813,6 +896,7 @@ export default Vue.component('commonPitch-detail',{
                         },
                         xAxis: {
                             categories:[],
+                            opposite: false
                         },
                         yAxis: {
                                 title: {
@@ -821,18 +905,18 @@ export default Vue.component('commonPitch-detail',{
                                 labels:{
                                     enabled: true
                                 },
-                               
-                            
-                                },
+                                opposite: true,
+                                lineWidth: 1
+                            },
                         credits: {
                             enabled: false
                         },
                         legend: {
                             align: 'right',
                             verticalAlign: 'top',
-                            
                             floating: true,
-                            borderWidth: 0
+                            borderWidth: 0,
+                            y:-12
                         },
                         plotOptions: {
                             spline: {
@@ -867,6 +951,7 @@ export default Vue.component('commonPitch-detail',{
                         xAxis: {
                             tickInterval: 1,
                             categories:[],
+                            opposite: false
                             // tickLength:200,
                             
 
@@ -880,7 +965,9 @@ export default Vue.component('commonPitch-detail',{
                                 labels:{
                                     enabled: true
                                 },
-                                },
+                                lineWidth: 1,
+                                opposite: true
+                            },
                         credits: {
                             enabled: false
                         },
@@ -889,7 +976,8 @@ export default Vue.component('commonPitch-detail',{
                             verticalAlign: 'top',
                             
                             floating: true,
-                            borderWidth: 0
+                            borderWidth: 0,
+                            y:-12
                         },
                         plotOptions: {
                             spline: {
@@ -938,6 +1026,7 @@ export default Vue.component('commonPitch-detail',{
                 getDeviceMonitorPointRelationList:'',
                 getAutoPitchList:'',
                 autoPitchShow:false,
+                editAutoPitchShow:false,
                 timeList:[
                     {
                         value:0,
@@ -1475,6 +1564,15 @@ export default Vue.component('commonPitch-detail',{
             editIndexNumCancle(){
                 this.editIndexNumShow=false;
             },
+            pitchChange(val){
+                var vm=this;
+                vm.getPitchBaseInfoList.forEach((item)=>{
+                    if(item.id==val){
+                        vm.basicPointList=item.depthList;
+                        vm.basicPoint=vm.basicPointList[0];
+                    }
+                })
+            },
             //获取斜度基本信息（上面的表）
             getPitchBaseInfo(){
                 var vm=this;
@@ -1496,6 +1594,8 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
                         vm.pitchSeqId=vm.getPitchBaseInfoList[0].id;
+                        vm.basicPointList=vm.getPitchBaseInfoList[0].depthList;
+                        vm.basicPoint=vm.basicPointList[0];
                         vm.pitchItemId=vm.getPitchBaseInfoList[0].itemId;
                         this.getPitchBaseInfoListLength=response.data.rt.length;
                         vm.getPitchBaseInfoList.forEach((item)=>{
@@ -2514,7 +2614,6 @@ export default Vue.component('commonPitch-detail',{
             //添加斜度自动采集
             addAutoVerify(){
                 this.autoPitchShow=true;
-
             },
             makeAutoPitch(){
                 var vm=this;
@@ -2530,7 +2629,9 @@ export default Vue.component('commonPitch-detail',{
                         itemId:this.itemMonitorId,
                         // sensorAddress:parseInt(this.sensorAddress),
                         seqId:parseInt(this.pitchSeqId),
-                        systemId:parseInt(this.systemId)
+                        systemId:parseInt(this.systemId),
+                        way:this.pitchSeqWay,
+                        basicPoint:this.basicPoint
                     }]
                 }).then((response)=>{
                     if(response.data.cd==0){
@@ -2539,6 +2640,7 @@ export default Vue.component('commonPitch-detail',{
                         // this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
+                        this.pitchSeqWay=1,
                         this.autoPitchShow=false;
                     }
                 })
@@ -2563,6 +2665,56 @@ export default Vue.component('commonPitch-detail',{
                        })
                    }
                })
+           },
+           editAutoPitch(item){
+               this.systemId=item.systemId;
+               this.pitchSeqId=item.seqId;
+               this.pitchSeqWay=item.way;
+               this.channelNo=item.channelNo;
+               this.editAutoPitchShow=true;
+               this.editPitchId=item.id;
+           },
+           editAutoPitchCancle(){
+               this.editAutoPitchShow=false;
+               this.channelNo='';
+                // this.sensorAddress='';
+                // this.slotNo='';
+                this.systemId='';
+                this.pitchSeqWay=1,
+                this.editAutoPitchShow=false;
+           },
+           makeEditAutoPitch(){
+               var vm=this;
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/updatePitchBind',
+                    headers:{
+                        'token':vm.token
+                    },
+                    method:"post",
+                    data:{
+                        channelNo:parseInt(this.channelNo),
+                        // itemId:this.pitchItemId,
+                        itemId:this.itemMonitorId,
+                        sensorAddress:null,
+                        seqId:parseInt(this.pitchSeqId),
+                        systemId:parseInt(this.systemId),
+                        way:this.pitchSeqWay,
+                        basicPoint:this.basicPoint
+                    },
+                    params:{
+                        id:this.editPitchId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getPitchBindInfo();
+                        this.channelNo='';
+                        // this.sensorAddress='';
+                        // this.slotNo='';
+                        this.systemId='';
+                        this.pitchSeqWay=1,
+                        this.editAutoPitchShow=false;
+                    }
+                })
            },
            deleteAutoPitch(id){
                this.$confirm('您要删除当前所选主题？', '提示', {

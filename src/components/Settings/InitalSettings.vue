@@ -25,6 +25,11 @@
                         </div> -->
                     </div>
                 </li>
+                <li class="pre ">
+                    <span>禁止描边</span>
+                    <el-checkbox v-model="isStroke" size="medium" @change="strokeChange()"></el-checkbox>
+                </li>
+
                 <!-- <li class="pre" id="preQRCode">
                     <span>加入工程二维码</span>
                     <div class="QRCode">
@@ -194,6 +199,7 @@ export default {
     name:'InitalSettings',
     data(){
         return{
+            isStroke:'',//是否显示描边
             addDialog:false,
             editDialog:false,
             deleteDialog:false,
@@ -664,6 +670,7 @@ export default {
                     // })
                     //  this.projectImage = response.data.rt.image[0];
                      this.proName=this.projectConfig.projectName;
+                     this.isStroke=this.projectConfig.stroke;
                     // this.projectLogoConfig = response.data.rt.projectConfig;
                     // this.isAsdefault = response.data.rt.projectConfig.confVal;
                     if(this.isAsdefault == 'true'){
@@ -683,6 +690,35 @@ export default {
                     })
                 }
             })
+        },
+        strokeChange(){
+            console.log(this.projectConfig.expireTime,this.projectConfig.userCount,this.projectConfig.location,'时间','数量','地址');
+            
+            axios({
+                url:this.BDMSUrlQRCode+'backstageManagement/updateProject',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    projectId:this.projId,
+                    userId:this.projectConfig.userId,
+                    projectName:this.projectConfig.projectName,
+                    location:'',
+                    stroke:this.projectConfig.stroke,
+                    expireTime:null,
+                    userCount:-1,
+                    diskSize:this.projectConfig.diskSize,
+                    stroke:this.isStroke
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getProjectInitalConfig();
+                }
+                
+
+            })
+            
+
         },
         //获取工程logo
         findProjectLogo(){

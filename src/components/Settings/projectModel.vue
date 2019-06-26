@@ -438,7 +438,10 @@ export default {
                 method:"get"
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.getCheckOnTimeList.push(response.data.rt);
+                    if(response.data.rt){
+                        this.getCheckOnTimeList.push(response.data.rt);
+                    }
+                    
                 }
             })
         },

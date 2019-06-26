@@ -1493,6 +1493,8 @@
         taskFdEnd:'',
         fdPlayDataId:[],
         returnTraceIdsData:[],
+        returnTraceIdsCompleteData:[],
+        returnCompleteTraceIds:[],
         returnTraceIds:[],
         fdNum:'',
         addLinkDialog: false,
@@ -2982,8 +2984,6 @@
       },
     
       productGantt(taskIndexData){
-        // console.log('进来了吗')
-
         var min_Day_count = 10000000000000000000;
         var max_Day_count = -1;
         
@@ -3346,7 +3346,7 @@
           
 
           let Day_count = root.taskEndDay - root.taskStartDay-1;
-          console.log(Day_count,'Day_count0000');
+          // console.log(Day_count,'Day_count0000');
           Day_count++;
           this.productGanttNode.style.height = (this.Gantt_item_top+37) + "px";
           this.productGanttNodeBg.style.height = (this.Gantt_item_top+37) + "px";
@@ -3366,6 +3366,18 @@
           item.style.height = 26 + "px";
           item.style.boxSizing='border-box';
           item.style.width = 10 * Day_count  * this.ganttScale + "px";
+          //文字
+          var item_text = document.createElement("div");
+          item_text.style.position = 'absolute';
+          item_text.style.left= 10 * Day_count  * this.ganttScale + "px";
+          item_text.innerHTML = root.taskName;
+          item_text.style.color = 'black';
+          item_text.style.fontSize = '12px';
+          item_text.style.lineHeight = "26px";
+          item_text.style.width = '100%';
+          item_text.style.textAlign = 'left';
+          item_text.style.whiteSpace = 'nowrap';
+          item.appendChild(item_text);
           //进度条
           var item_sub = document.createElement("div");
           item_sub.style.background = "#68da68";
@@ -4725,14 +4737,19 @@
           date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
           date/=(1000 * 3600 * 24)
           date=parseInt(date+ 0.5)
+          console.log(date,'date000');
+          let startCompleteTime=moment(this.taskFdStart).format('YYYY-MM-DD');
           for(let i=0;i<date;i++){
             console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
               datas.push({
                 'id':i+1,
                 'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
-                'taskFdEnd':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)).format('YYYY-MM-DD')
+                'taskFdEnd':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)).format('YYYY-MM-DD'),
+                'taskFdStartStamp':this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i,
+                 'taskFdEndStamp':this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*(i+1)
               })
           }
+          console.log(datas,'datas000');
             if(document.getElementById('webgl').style.display=='none'){
                 this.$message({
                     type:'info',
@@ -4741,24 +4758,24 @@
                 // this.fdPlayDialog=false;
               }else{
                   this.returnTraceIdsData=[];
-
+                  this.returnTraceIdsCompleteData=[];
                   document.body.scrollTop = 0;
                   document.documentElement.scrollTop = 0;
                   const app = document.getElementById('webIframe').contentWindow;
                   datas.forEach((item)=>{
-                            this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
-                    })
-                
+                          this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
+                          this.fdIndexComPlete(startCompleteTime,item.taskFdEnd,item.id,item.taskFdEndStamp);
+                  })
                   console.log(date,'date00');
                     this.fdPlayData=[];
-                  
-                    
-                  
                     this.fdPlayDialog=false;
                     this.fdNum='';
-                    console.log(this.returnTraceIdsData,'返回的数据');
+                    console.log(this.returnTraceIdsCompleteData,'已完成的模型数据');
+                    console.log(this.returnTraceIdsData,'正在进行的模型数据');
+                    this.FDrun={data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsCompleteData}
+                    console.log(this.FDrun,'postMessage给图形的')
                     setTimeout(()=>{
-                        app.postMessage({command:"Run_4D",parameter:this.returnTraceIdsData},"*"); 
+                        app.postMessage({command:"Run_4D",parameter:this.FDrun},"*"); 
                     },0);
                     this.$message({
                       type:'success',
@@ -4789,11 +4806,51 @@
             }
           })
       },
+      fdIndexComPlete(taskFdStart,taskFdEnd,i,taskFdEndStamp){
+        var vm=this;
+        
+        this.dataComplete=[];
+        $.ajax({
+          url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskIdStart?startDate='+taskFdStart+'&endDate='+taskFdEnd,
+          headers:{
+              'token':this.token
+          },
+          type:'post',
+          // data:'',
+          dataType:"json",
+          data:JSON.stringify(this.fdPlayDataId),
+          async:false,
+          contentType:'application/json;charset=utf-8',
+          success:(response)=>{
+            if(response.cd==0){
+              this.returnCompleteTraceIds=response.rt;
+                    // this.fdPlayDialog=false;
+              this.returnCompleteTraceIds.forEach((item)=>{
+                  if(item.taskEnd<=taskFdEndStamp){
+                      this.dataComplete.push({
+                        'taskId':item.taskId,
+                        'traceIds':item.traceIds
+                      })
+                  }
+                })
+                this.returnTraceIdsCompleteData.push({
+                    'id':i,
+                    'data':this.dataComplete
+                })
+
+                this.taskFdStart='';
+                this.taskFdEnd='';
+            }
+          }
+        })
+
+      },
      
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
         $.ajax({
-          url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskId?startDate='+taskFdStart+'&endDate='+taskFdEnd,
+          // schedule/getRelatedTraceIdByTaskId
+          url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskIdStart?startDate='+taskFdStart+'&endDate='+taskFdEnd,
           headers:{
               'token':this.token
           },
