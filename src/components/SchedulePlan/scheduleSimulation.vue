@@ -113,10 +113,10 @@
                       </div>
                   </div>
                 </div>
-                <div @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:40.2%;position:fixed;top:478px;left:42.2%;overflow:auto;">
+                <!-- <div @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:40.2%;position:fixed;top:478px;left:42.2%;overflow:auto;">
                   <div  id="ganttByScroll" style="height:30px;overflow:auto;">
                   </div>
-                </div>
+                </div> -->
                 <!-- 缩放按钮 -->
                 <div v-show="ganttPlayShow" id="ganttScale" style="position:absolute;right:0px;top:0px;z-index:10">
                     <i @click="bigLength()" class="el-icon-plus" style="margin-right:1px;padding:4px;border:1px solid #ccc;cursor:pointer;background:#fff;"></i>
@@ -126,6 +126,10 @@
                 <div id="ganntResizePale" style="position:absolute;top:0px;left:0px;width:100%;height:100%;display:none;z-index:10"></div>
               </div>
               <div id="leftAndRightResize" style="width:5px;height:300px;float:right;position:absolute;right:49.8%;top:0px;cursor:w-resize;z-index:6"></div>
+              <div @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:50%;position:absolute;top:288px;left:50%;overflow:auto;">
+                  <div  id="ganttByScroll" style="height:30px;overflow:auto;">
+                  </div>
+              </div>
             </div>
              <div id="webglAndGantt" style="width:100%;border:1px solid #ccc;padding:1px;">
                     <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
@@ -2202,7 +2206,7 @@
         resize_right.style.width=ganttBody.offsetWidth-resize_left.offsetWidth-resize_lf.offsetWidth+'px';
         resize_ganttByScroll.style.width = resize_right.offsetWidth+'px';
       })
-
+      // this.ganttPlayLines=document.getElementById('ganttPlayLine');
       let ganttPlayLines=document.getElementById('ganttPlayLine');
       let ganttPlayLinePales = document.getElementById('ganttPlayLinePale');
       ganttPlayLines.addEventListener('mousedown',(e)=>{
@@ -2227,7 +2231,7 @@
         let endTime;
         let currentStamp;
         let x;
-        x=Math.floor(this.ganttPlayLines.offsetLeft/(this.ganttScale*10));
+        x=Math.floor(ganttPlayLines.offsetLeft/(this.ganttScale*10));
         let apps = document.getElementById('webIframeByGantt').contentWindow;
         let a=3600*24*1000;
         startTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
@@ -2307,8 +2311,10 @@
       },
       initGanttByWebGl(){
           setTimeout(()=>{
-                    app = this.$refs.iframeGanttByWg.contentWindow;
-                    app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
+                    // app = this.$refs.iframeGanttByWg.contentWindow;
+                    // app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
+                    appGantt = this.$refs.iframeGanttByWg.contentWindow;
+                    appGantt.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
             },1000)
       },
        ls(evt){
@@ -2335,11 +2341,18 @@
                 {
                     let Horder='';
                     let para='';
+                    let paraRun='';
+                    let currentStamp=this.min_Day_count_g*1000 * 3600 * 24;
+                    
+                    // console.log(this.min_Day_count_g*1000 * 3600 * 24,'min_Day_count_g0000');
+                    console.log(currentStamp,'currentStamp');
                     para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl}
                     this.strJson=para;
                     // appGantt.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
-                    app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
-                    
+                    appGantt.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
+                    paraRun={timeLine:currentStamp,data:[],dataComplete:[],state:"run"}
+                    console.log(paraRun,'paraRun00');
+                    appGantt.postMessage({command:"Run_4D_2",parameter:paraRun},"*");
 				        }
                 break;
               case "CurrentSelectedEnt":
@@ -3421,6 +3434,7 @@
       //归零
       resetZero(){
         let apps = document.getElementById('webIframeByGantt').contentWindow;
+        this.ganttPlayLines=document.getElementById('ganttPlayLine');
         let startTime,endTime,currentStamp;
         this.ganttPlayLines.style.left='3px';
         this.playRate=500;
@@ -3437,7 +3451,6 @@
         this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"set"}
         apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*");
         this.dataNum=0;
-        
       },
       //拉伸gantt图
       stretchingGantt(item){

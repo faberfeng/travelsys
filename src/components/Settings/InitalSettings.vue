@@ -27,7 +27,7 @@
                 </li>
                 <li class="pre ">
                     <span>禁止描边</span>
-                    <el-checkbox v-model="isStroke" size="medium" @change="strokeChange()"></el-checkbox>
+                    <el-checkbox v-model="isStroke" size="medium"  @change="strokeChange()"></el-checkbox>
                 </li>
 
                 <!-- <li class="pre" id="preQRCode">
@@ -199,7 +199,7 @@ export default {
     name:'InitalSettings',
     data(){
         return{
-            isStroke:'',//是否显示描边
+            isStroke:true,//是否显示描边
             addDialog:false,
             editDialog:false,
             deleteDialog:false,
@@ -670,7 +670,8 @@ export default {
                     // })
                     //  this.projectImage = response.data.rt.image[0];
                      this.proName=this.projectConfig.projectName;
-                     this.isStroke=this.projectConfig.stroke;
+                     this.isStroke=JSON.parse(this.projectConfig.stroke);
+                     console.log(this.isStroke,'isStroke00');
                     // this.projectLogoConfig = response.data.rt.projectConfig;
                     // this.isAsdefault = response.data.rt.projectConfig.confVal;
                     if(this.isAsdefault == 'true'){

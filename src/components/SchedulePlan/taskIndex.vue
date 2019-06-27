@@ -218,6 +218,10 @@
                 </div>
                 <!-- <ganttView ref="ganttRef" id="ganttViewId" :taskIndexData="taskIndexData" :columnsSetting="columnsSetting" :props="props"></ganttView> -->
               </div>
+              <!-- <div v-show="projectGanntShow" @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:50%;position:absolute;top:288px;left:50%;overflow:auto;">
+                  <div  id="ganttByScroll" style="height:30px;overflow:auto;">
+                  </div>
+              </div> -->
             </div>
           </div>
           <!-- 以下是以前的gantt图 -->
@@ -2279,6 +2283,7 @@
       );
     },
     mounted() {
+      let resize_ganttByScroll = document.getElementById('ganttByScrollTop');
 
     },
     watch: {
@@ -2338,6 +2343,10 @@
 
     },
     methods: {
+      // ganttByScrolls(){
+      //   let ganttSrcollLeft=document.getElementById('ganttByScrollTop').scrollLeft
+      //   this.productGannttIndex.scrollLeft=ganttSrcollLeft
+      // },
       splitName(val){
         if(val){
           return val.substring(0,10);

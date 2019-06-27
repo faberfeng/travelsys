@@ -26,6 +26,7 @@
     "js-md5": "^0.7.3",
     "jspdf": "^1.4.1",
     "moment": "^2.24.0",
+    "npm": "^6.9.0",
     "sockjs-client": "^1.1.5",
     "three": "^0.92.0",
     "three-css3drenderer": "^1.0.1",
