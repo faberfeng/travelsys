@@ -229,7 +229,8 @@ export default {
                 params:{
                     projId:this.projId,
                     pageNo:0,
-                    pageSize:100
+                    pageSize:100,
+                    
                 }
             }).then((response)=>{
                 if(response.data.cd === '0'){

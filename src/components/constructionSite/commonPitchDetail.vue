@@ -190,7 +190,7 @@
                                <tbody>
                                     <tr v-for="(item,index) in rightDisplayList.recentVariation" :key="index">
                                         <!-- <td>{{(rightDisplayList.recentVariation)[index].otherParam|addSprit}}</td> -->
-                                        <td>{{leftDisplayListValue1[index].depth|addSpritNum}}</td>
+                                        <td>{{rightDisplayListValue1[index].depth|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue1[index].shift|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue2[index].shift|addSpritNum}}</td>
                                         <td>{{(rightDisplayList.recentVariation)[index].recentVariation|addSpritNum}}</td>
@@ -346,6 +346,23 @@
                         <label class="editTxt">关键字:</label>
                         <input placeholder="请输入Excel对应表名" v-model="keyword" class="inp" style="width:140px !important;height:30px !important"/>
                     </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt">绑定位置方法:</label>
+                         <select v-model="pitchSeqWay" class="bindSite">
+                            <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
+                                {{item.label}}
+                            </option>
+                        </select>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editTxt">初始数据采集时间:</label>
+                         <select v-model="initDataDate" class="bindSite">
+                            <option v-for="(item,index) in initDataDateList" :key="index" :value="item">
+                                {{timeChangeMethod1(item)}}
+                            </option>
+                        </select>
+                    </div>
+                    
                 </div>
                  <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="editPitchSeq()">确定</button>
@@ -550,14 +567,14 @@
                             </option>
                         </select>
                     </div>
-                    <div class="editBodytwo">
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">绑定位置方法</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="editBodytwo">
                         <label class="editTxt1">基准点深度</label>
@@ -602,14 +619,14 @@
                             </option>
                         </select>
                     </div>
-                    <div class="editBodytwo">
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">绑定位置方法</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="editBodytwo">
                         <label class="editTxt1">基准点深度</label>
@@ -812,6 +829,8 @@ export default Vue.component('commonPitch-detail',{
                 getPitchBaseInfoListLength:0,
                 pitchItemId:'',//自动采集斜度项目id
                 pitchSeqId:'',//序列id
+                initDataDate:"",//初始化时间
+                initDataDateList:[],
                 pitchSeqWay:1,
                 pitchSeqWayList:[{
                     value:1,
@@ -948,16 +967,17 @@ export default Vue.component('commonPitch-detail',{
                         title: {
                             text: ''
                         },
-                        xAxis: {
+                        xAxis:[
+                            {
                             tickInterval: 1,
-                            categories:[],
-                            opposite: false
-                            // tickLength:200,
-                            
-
-                            // tickPixelInterval:10,
-
-                        },
+                            categories:[]
+                            },
+                            // {
+                            // tickInterval: 1,
+                            // categories1:[],
+                            // opposite: true
+                            // }
+                        ],
                         yAxis: {
                                 title: {
                                     text: '位移'
@@ -1491,6 +1511,13 @@ export default Vue.component('commonPitch-detail',{
                 return moment(val).format("MM-DD HH:mm");
                 }
             },
+            timeChangeMethod1(val) {
+                if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("YYYY-MM-DD HH:mm:ss");
+                }
+            },
             //返回
             back(){
                 var vm = this
@@ -1741,7 +1768,7 @@ export default Vue.component('commonPitch-detail',{
                            
                             
                         }
-                    }else if(respose.data.cd=='-1'){
+                    }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:'error',
                             message:response.data.msg
@@ -1817,6 +1844,7 @@ export default Vue.component('commonPitch-detail',{
                                         lineRightChart.addSeries({name:this.timeChangeMethod(this.time2),data:this.rightDisplayListValueYdata1});
                                         lineRightChart.hideLoading();
                                         lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
+                                        // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
                                     },20)
                                 }else if(this.rightDisplayListValue.length!=recentVariationLength){
                                         this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
@@ -1841,6 +1869,7 @@ export default Vue.component('commonPitch-detail',{
                                             lineRightChart.addSeries({name:this.timeChangeMethod(this.time3),data:this.rightDisplayListValueYdata2});
                                             lineRightChart.hideLoading();
                                             lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
+                                            // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
                                         },20)
 
                                 }
@@ -1866,7 +1895,7 @@ export default Vue.component('commonPitch-detail',{
                             }
                         }
                         // console.log(this.pitchDetailDataList);
-                    }else if(respose.data.cd=='-1'){
+                    }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:'error',
                             message:response.data.msg
@@ -1960,6 +1989,7 @@ export default Vue.component('commonPitch-detail',{
                 var vm=this;
                 vm.itemseqId=valItemId;
                 vm.seqId=val;
+                vm.getImportHistoryBySeqId(val)
                 this.editIndexNumShow=true;
                 this.getPitchBaseInfoList.forEach((item)=>{
                     if(item.id==val){
@@ -1972,6 +2002,26 @@ export default Vue.component('commonPitch-detail',{
                     }
                 })
             },
+            //获取序列历史记录
+            getImportHistoryBySeqId(seqId){
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/getImportHistoryBySeqId',
+                    headers:{
+                        'token':this.token
+                    },
+                    method:'get',
+                    params:{
+                        seqId:seqId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.initDataDateList=response.data.rt;
+                        console.log(this.initDataDateList,'this.initDataDateList');
+                        this.initDataDate=this.initDataDateList[0]
+                    }
+                })
+            },
+            
             //修改斜度序列
             editPitchSeq(){
                 var vm=this;
@@ -1987,7 +2037,9 @@ export default Vue.component('commonPitch-detail',{
                         initDepth:vm.initDepth,
                         terminalDepth:vm.terminalDepth,
                         pointDistance:vm.pointDistance,
-                        keyword:vm.keyword
+                        keyword:vm.keyword,
+                        way:this.pitchSeqWay,
+                        initDataDate:new Date(new Date(this.initDataDate).toString().split('GMT')[0]+' UTC').toISOString()
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
@@ -2630,7 +2682,7 @@ export default Vue.component('commonPitch-detail',{
                         // sensorAddress:parseInt(this.sensorAddress),
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId),
-                        way:this.pitchSeqWay,
+                        // way:this.pitchSeqWay,
                         basicPoint:this.basicPoint
                     }]
                 }).then((response)=>{
@@ -2640,7 +2692,7 @@ export default Vue.component('commonPitch-detail',{
                         // this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
-                        this.pitchSeqWay=1,
+                        // this.pitchSeqWay=1,
                         this.autoPitchShow=false;
                     }
                 })
@@ -2669,7 +2721,7 @@ export default Vue.component('commonPitch-detail',{
            editAutoPitch(item){
                this.systemId=item.systemId;
                this.pitchSeqId=item.seqId;
-               this.pitchSeqWay=item.way;
+            //    this.pitchSeqWay=item.way;
                this.channelNo=item.channelNo;
                this.editAutoPitchShow=true;
                this.editPitchId=item.id;
@@ -2680,7 +2732,7 @@ export default Vue.component('commonPitch-detail',{
                 // this.sensorAddress='';
                 // this.slotNo='';
                 this.systemId='';
-                this.pitchSeqWay=1,
+                // this.pitchSeqWay=1,
                 this.editAutoPitchShow=false;
            },
            makeEditAutoPitch(){
@@ -2698,7 +2750,7 @@ export default Vue.component('commonPitch-detail',{
                         sensorAddress:null,
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId),
-                        way:this.pitchSeqWay,
+                        // way:this.pitchSeqWay,
                         basicPoint:this.basicPoint
                     },
                     params:{
@@ -2711,7 +2763,7 @@ export default Vue.component('commonPitch-detail',{
                         // this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
-                        this.pitchSeqWay=1,
+                        // this.pitchSeqWay=1,
                         this.editAutoPitchShow=false;
                     }
                 })
@@ -3589,6 +3641,23 @@ select.autoImport{
             display: inline-block;
             margin-left: 40px;
         }
+        .bindSite{
+            width: 140px;
+            border-radius: 2px;
+            height: 30px;
+            border: 1px solid #cccccc;
+            position: relative;
+            background: #ffffff;
+            padding-left: 10px;
+            padding-right: 20px;
+            box-sizing: border-box;
+            margin-right: 15px;
+            color: #333333;
+            font-size: 14px;
+            outline: none;
+
+        }
+
         .editTxt1{
             color: #666;
             font-size: 14px;
