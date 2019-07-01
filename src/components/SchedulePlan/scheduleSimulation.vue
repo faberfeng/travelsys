@@ -3384,7 +3384,7 @@
             }else{
               this.ganttRun={timeLine:currentStamp,data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsDataComplete,state:"run"}
             }
-            console.log(this.ganttRun,'this.ganttRun000');
+            // console.log(this.ganttRun,'this.ganttRun000');
             this.dataNum++
             
             apps.postMessage({command:"Run_4D_2",parameter:this.ganttRun},"*"); 

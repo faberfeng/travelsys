@@ -76,8 +76,8 @@
                 <!-- <span class="btn-operate" v-show="projectWorkShow" @click="sortLabel()">排序</span> -->
               </div>
             </div>
-            <div style="height:600px;">
-              <div v-show="projectWorkShow" style="overflow: auto;" class="taskBody">
+            <div style="height:700px;position:relative;">
+              <div v-show="projectWorkShow" style="overflow: auto;" id="taskWorkBody" class="taskBody">
                 <zk-table
                   index-text="序号"
                   :data="taskIndexData" :columns="columns" :max-height="props.height" :tree-type="props.treeType"
@@ -178,7 +178,7 @@
                     </zk-table>
               </div>
 
-              <div v-show="projectGanntShow" style="overflow-y: auto;overflow-x:hidden" class="taskBody">
+              <div v-show="projectGanntShow" style="overflow-y: auto;overflow-x:hidden;position:relative;" class="taskBody">
                 <div id='ganttLeft' style="float:left;width:49.8%;cursion:w-resize;white-space: nowrap;">
                      <zk-table
                         index-text="序号"
@@ -207,7 +207,7 @@
                         </template>
                     </zk-table>
                 </div>
-                <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:auto;">
+                <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:hidden;border-left:1px solid #e9eaec;">
                     <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
                       <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
                     </div>
@@ -218,10 +218,16 @@
                 </div>
                 <!-- <ganttView ref="ganttRef" id="ganttViewId" :taskIndexData="taskIndexData" :columnsSetting="columnsSetting" :props="props"></ganttView> -->
               </div>
-              <!-- <div v-show="projectGanntShow" @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:50%;position:absolute;top:288px;left:50%;overflow:auto;">
+              <div v-show="projectGanntShow" @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:50%;position:absolute;bottom:0px;left:50%;overflow:auto;">
                   <div  id="ganttByScroll" style="height:30px;overflow:auto;">
                   </div>
+              </div>
+
+              <!-- <div v-show="projectWorkShow" @scroll="projectWorkByScrolls()" id="projectWorkByScrollTop" style="height:21px;float:right;width:50%;position:absolute;bottom:0px;left:50%;overflow:auto;">
+                  <div  id="projectWorkByScroll" style="height:30px;overflow:auto;">
+                  </div>
               </div> -->
+
             </div>
           </div>
           <!-- 以下是以前的gantt图 -->
@@ -2285,6 +2291,7 @@
     mounted() {
       let resize_ganttByScroll = document.getElementById('ganttByScrollTop');
 
+
     },
     watch: {
       selectUgId: function (val) {
@@ -2343,9 +2350,13 @@
 
     },
     methods: {
-      // ganttByScrolls(){
-      //   let ganttSrcollLeft=document.getElementById('ganttByScrollTop').scrollLeft
-      //   this.productGannttIndex.scrollLeft=ganttSrcollLeft
+      ganttByScrolls(){
+        let ganttSrcollLeft=document.getElementById('ganttByScrollTop').scrollLeft
+        this.productGannttIndex.scrollLeft=ganttSrcollLeft
+      },
+      // projectWorkByScrolls(){
+      //   let projectWorkSrcollLeft = document.getElementById('projectWorkByScrollTop').scrollLeft
+      //   this.taskWorkBodyNode.scrollLeft = projectWorkSrcollLeft;
       // },
       splitName(val){
         if(val){
@@ -2891,6 +2902,10 @@
             //   this.$set(item,'statusNum',item.actualStatusStr=='未开始'?0:parseInt(item.actualStatusStr.substring(2).split('%')[0]));
             // })
             // this.drawingDateBar_reset();
+            // this.taskWorkBodyNode=document.getElementById('taskWorkBody');
+            // this.projectWorkByScrollNode=document.getElementById('projectWorkByScroll');
+            //  this.projectWorkByScrollNode.style.width=this.taskWorkBodyNode.style.width;
+
 
             this.productGanttNode=document.getElementById('ganttRight');
             this.productGanttNode.innerHTML = "";
@@ -3000,6 +3015,7 @@
         this.productGanttNodeBg=document.getElementById('ganttRightBg');
         this.productGannttHead=document.getElementById('ganttRightHead');
         this.productGannttIndex=document.getElementById('ganttRightIndex');
+        this.ganttByScrollNode = document.getElementById('ganttByScroll');
 
         this.Gantt_item_top = 3;
 
@@ -3410,7 +3426,7 @@
           // line.style.width = '100%';
           line.style.width =this.productGannttHead.style.width;
           line.style.background = "rgba(0,0,0,0.1)";
-
+          this.ganttByScrollNode.style.width=this.productGannttHead.style.width;
           line1.style.position = "absolute";
           line1.style.top = (this.Gantt_item_top + 37) + "px";
           line1.style.height = "1px";
@@ -5647,6 +5663,7 @@
         this.taskIndexSelectDataList=[];
         document.getElementsByClassName('zk-table__body')[0].getElementsByTagName("tbody")[0].style.backgroundColor='white';//清除列表之前背景
         this.getTaskList();
+        // this.productGantt(this.taskIndexData);
       },
       exportExcel(){
         document.getElementsByClassName('zk-table')[0].setAttribute('id','newDiv');
@@ -6787,7 +6804,7 @@
       padding: 12px;
       margin: 0 auto;
       box-sizing: border-box;
-      height: 750px; 
+      // height: 750px; 
       .taskHead {
         margin-top: 20px;
         .taskHeadLeft {
@@ -6830,6 +6847,7 @@
         margin-top: 60px;
         width: 100%;
         overflow-y: auto;
+        height:700px;
       }
     }
     .taskWarp1{

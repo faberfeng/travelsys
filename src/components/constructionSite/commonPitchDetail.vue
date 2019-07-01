@@ -2583,7 +2583,6 @@ export default Vue.component('commonPitch-detail',{
             },
             //导出选中记录
             exportSelectRecode(){
-
                 this.exportHistory()
             },
             //
@@ -3998,7 +3997,7 @@ select.autoImport{
          #toolTbale1{
                     width: 85%;
                     margin:10px auto;
-                    // height: 300px;
+                    height: 300px;
                     overflow: auto;
                     position: relative;
                     .toolTbaleList{

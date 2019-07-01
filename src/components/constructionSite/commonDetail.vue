@@ -448,7 +448,7 @@
              <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
                 <div class="editBody" >
                      <div class="editBodytwo">
-                        <div id="toolTbale1">
+                        <div id="toolTbale1" >
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
                                     <tr>
@@ -3507,7 +3507,7 @@ export default Vue.component('commonDetail',{
             #toolTbale1{
                 width: 85%;
                 margin:10px auto;
-                height: 300px;
+                height:300px;
                 overflow: auto;
                 position: relative;
                 .toolTbaleList{
