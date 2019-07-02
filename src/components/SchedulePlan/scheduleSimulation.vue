@@ -6709,7 +6709,12 @@
         // padding: 0;
         box-sizing: border-box;
         // font-size: 12px;
-      }
+    }
+       
+       
+       
+    
+
   select.inp-search {  
             /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/  
             /*很关键：将默认的select选择框样式清除*/  
@@ -6730,6 +6735,11 @@
   }
 
   #taskIndexGantt {
+     /*隐藏滚动条，当IE下溢出，仍然可以滚动*/
+      -ms-overflow-style:none;
+      /*火狐下隐藏滚动条*/
+      overflow:-moz-scrollbars-none;
+
      /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
         width:15px;
@@ -7052,6 +7062,7 @@
     }
    
     ::-webkit-scrollbar{width:0px}
+      
     .taskWarp {
       width: 96%;
       // margin-top: 20px;

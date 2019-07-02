@@ -1439,7 +1439,7 @@ export default {
             selectValue1:'',
             optionOnesLeft:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: true
                         },
                         title: {

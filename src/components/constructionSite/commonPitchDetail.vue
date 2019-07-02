@@ -613,8 +613,8 @@
                 <div class="editBody">
                     <div class="editBodyone">
                         <label class="editTxt1">绑定测斜序列</label>
-                        <select v-model="pitchSeqId" class="gatherTimeName">
-                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
+                        <select v-model="pitchSeqId" class="gatherTimeName" disabled="disabled">
+                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index"  :value="item.id">
                                 {{item.name}}
                             </option>
                         </select>
@@ -907,7 +907,7 @@ export default Vue.component('commonPitch-detail',{
                 show:false,
                  optionOnesLeft:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: true
                         },
                         title: {
@@ -961,7 +961,7 @@ export default Vue.component('commonPitch-detail',{
                 },
                 optionOnesRight:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: true
                         },
                         title: {
@@ -1593,10 +1593,13 @@ export default Vue.component('commonPitch-detail',{
             },
             pitchChange(val){
                 var vm=this;
+                vm.basicPoint='';
                 vm.getPitchBaseInfoList.forEach((item)=>{
                     if(item.id==val){
                         vm.basicPointList=item.depthList;
-                        vm.basicPoint=vm.basicPointList[0];
+                        if(!vm.basicPoint){
+                            vm.basicPoint=vm.basicPointList[0];
+                        }
                     }
                 })
             },
@@ -1999,6 +2002,8 @@ export default Vue.component('commonPitch-detail',{
                         vm.terminalDepth=item.terminalDepth;
                         vm.pointDistance=item.pointDistance;
                         vm.keyword=item.keyword;
+                        vm.pitchSeqWay=item.way;
+                        vm.initDataDate=item.initDataDate;
                     }
                 })
             },
@@ -2017,7 +2022,7 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd==0){
                         this.initDataDateList=response.data.rt;
                         console.log(this.initDataDateList,'this.initDataDateList');
-                        this.initDataDate=this.initDataDateList[0]
+                        // this.initDataDate=this.initDataDateList[0]
                     }
                 })
             },
@@ -2038,8 +2043,8 @@ export default Vue.component('commonPitch-detail',{
                         terminalDepth:vm.terminalDepth,
                         pointDistance:vm.pointDistance,
                         keyword:vm.keyword,
-                        way:this.pitchSeqWay,
-                        initDataDate:new Date(new Date(this.initDataDate).toString().split('GMT')[0]+' UTC').toISOString()
+                        way:vm.pitchSeqWay,
+                        initDataDate:new Date(new Date(vm.initDataDate).toString().split('GMT')[0]+' UTC').toISOString()
                     }
                 }).then((response)=>{
                     if(response.data.cd=='0'){
@@ -2693,6 +2698,7 @@ export default Vue.component('commonPitch-detail',{
                         this.systemId='';
                         // this.pitchSeqWay=1,
                         this.autoPitchShow=false;
+                        this.basicPoint='';
                     }
                 })
             },
@@ -2724,6 +2730,7 @@ export default Vue.component('commonPitch-detail',{
                this.channelNo=item.channelNo;
                this.editAutoPitchShow=true;
                this.editPitchId=item.id;
+               this.basicPoint=item.basicPoint;
            },
            editAutoPitchCancle(){
                this.editAutoPitchShow=false;
@@ -2733,6 +2740,7 @@ export default Vue.component('commonPitch-detail',{
                 this.systemId='';
                 // this.pitchSeqWay=1,
                 this.editAutoPitchShow=false;
+                this.basicPoint='';
            },
            makeEditAutoPitch(){
                var vm=this;
@@ -2764,6 +2772,7 @@ export default Vue.component('commonPitch-detail',{
                         this.systemId='';
                         // this.pitchSeqWay=1,
                         this.editAutoPitchShow=false;
+                        this.basicPoint='';
                     }
                 })
            },
@@ -2791,6 +2800,12 @@ export default Vue.component('commonPitch-detail',{
            },
             autoPitchCancle(){
                 this.autoPitchShow=false;
+                this.channelNo='';
+                // this.sensorAddress='';
+                // this.slotNo='';
+                this.systemId='';
+                // this.pitchSeqWay=1,
+                this.basicPoint='';
             },
             upImgCancle(){
                 this.uploadshow=false;
