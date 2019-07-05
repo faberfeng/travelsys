@@ -140,8 +140,8 @@ export default new Vuex.Store({
         loginUrl:"http://42.159.153.210:8080/BDWorks/#/registerIndex",
         userCenterUrl:'http://42.159.153.210:8080/BDWorks/#/userLogin',
         BDMSLoginUrl:'http://42.159.153.210:8080/BDWorks/#/login',
-        //无锡市政院（最新版本）
 
+        //无锡市政院（最新版本）
         // BIMServerPort:'443',
         // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
         // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
@@ -175,6 +175,28 @@ export default new Vuex.Store({
         // appShareUrl:'https://bdms.arctron.cn/bdmsRebuild/',
         // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
         // iframeWebGlUrl:'https://bdms.arctron.cn/BDView/',
+        // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
+        // messageUrl:'http://42.159.153.210:8079',
+        // webSocketUrl:"ws://42.159.153.210:16800/websocket",
+        // qrShareUrl:"https://bim.arctron.cn/bdms/#/qr",
+        // loginUrl:"https://bdms.arctron.cn/bdmsRebuild/#/registerIndex",
+        // userCenterUrl:'https://bdms.arctron.cn/bdmsRebuild/#/userLogin',
+        // BDMSLoginUrl:'https://bdms.arctron.cn/bdmsRebuild/#/login',
+
+
+        //本地地址
+        // BIMServerPort:'443',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
+        // BDMSUrl:'http://127.0.0.1:8080/bdms-rebuild/',//仅供文件上传使用
+        // // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
+        // WebGlUrl:"https://bim.arctron.cn",
+        // GMDUrl:"https://bim.arctron.cn",
+        // shareUrl:"https://bdms.arctron.cn/bdmsRebuild/#",
+        // appShareUrl:'https://bdms.arctron.cn/bdmsRebuild/',
+        // // iframeWebGlUrl:'https://bim.arctron.cn/genDist/',
+        // iframeWebGlUrl:'http://127.0.0.1:8080/BDView/',
         // applyIndexUrl:'https://bim.arctron.cn/arctron-usercenter/apply/applyIndex',
         // messageUrl:'http://42.159.153.210:8079',
         // webSocketUrl:"ws://42.159.153.210:16800/websocket",

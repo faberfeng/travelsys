@@ -1448,7 +1448,8 @@ export default {
                         xAxis: {
                             categories:[],
                             // angle:180
-                            opposite: false
+                            opposite: false,
+                            gridLineWidth: 1
                         },
                         yAxis: {
                                 title: {
@@ -1458,9 +1459,9 @@ export default {
                                     enabled: true
                                 },
                                 opposite: true,
-                                lineWidth: 1
-                               
-                                },
+                                lineWidth: 1,
+                                gridLineWidth: 1
+                            },
                                 
                         credits: {
                             enabled: false

@@ -915,7 +915,8 @@ export default Vue.component('commonPitch-detail',{
                         },
                         xAxis: {
                             categories:[],
-                            opposite: false
+                            opposite: false,
+                            gridLineWidth: 1
                         },
                         yAxis: {
                                 title: {
@@ -925,7 +926,8 @@ export default Vue.component('commonPitch-detail',{
                                     enabled: true
                                 },
                                 opposite: true,
-                                lineWidth: 1
+                                lineWidth: 1,
+                                gridLineWidth: 1
                             },
                         credits: {
                             enabled: false
@@ -970,7 +972,8 @@ export default Vue.component('commonPitch-detail',{
                         xAxis:[
                             {
                             tickInterval: 1,
-                            categories:[]
+                            categories:[],
+                            gridLineWidth: 1
                             },
                             // {
                             // tickInterval: 1,
@@ -986,7 +989,8 @@ export default Vue.component('commonPitch-detail',{
                                     enabled: true
                                 },
                                 lineWidth: 1,
-                                opposite: true
+                                opposite: true,
+                                gridLineWidth: 1
                             },
                         credits: {
                             enabled: false

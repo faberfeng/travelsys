@@ -67,7 +67,7 @@ const router = new Router({
     //文档管理私有分享路由
     {
       path:'/cloud/sharePassword/:id',
-      naem:'shareFilePassWord',
+      name:'shareFilePassWord',
       component:resolve=>require(['@/components/ManageCost/shareFilePassWord'],resolve),
     },
     //移动端申请项目
@@ -139,6 +139,15 @@ const router = new Router({
       path:'/projectlist',
       name:'projectlist',
       component:resolve=>require(['@/components/ProjectList'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+    //大屏项目
+    {
+      path:'/videoIndex',
+      name:'videoIndex',
+      component:resolve=>require(['@/components/videoIndex/videoIndex'],resolve),
       meta:{
         requireAuth:true
       }
