@@ -349,7 +349,7 @@ export default {
                     let para='';
                     para = {token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl,stroke:JSON.parse(this.strokeShow)}
                     this.strJson=para;
-                    console.log(this.strJson,'初始加载模型-stroke参数是判断禁止描边,true为禁止')
+                    // console.log(this.strJson,'初始加载模型-stroke参数是判断禁止描边,true为禁止')
                     app.postMessage({command:"SetMenuUrl",parameter:this.strJson},"*");
 				}
 				break;

@@ -137,10 +137,11 @@ export default {
                     if(response.data.cd=="0"){
                         if(response.data.rt.length!=0){
                             this.companyList=response.data.rt;
-                            localStorage.setItem('entId',response.data.rt[0].entId)
-                            localStorage.setItem('entName',response.data.rt[0].entName)
-                            localStorage.setItem('responseAuthInfo',response.data.rt[0].authInfo);
+                            
                             if(this.companyList.length==1){
+                                localStorage.setItem('entId',response.data.rt[0].entId)
+                                localStorage.setItem('entName',response.data.rt[0].entName)
+                                localStorage.setItem('responseAuthInfo',response.data.rt[0].authInfo);
                                 this.$router.push({
                                     path:'/projectlist',
                                     query:{entId:this.companyList[0].entId}
@@ -196,6 +197,9 @@ export default {
         },
         redirect(key,index){
             var vm = this;
+            localStorage.setItem('entId',this.companyList[index].entId)
+            localStorage.setItem('entName',this.companyList[index].entName)
+            localStorage.setItem('responseAuthInfo',this.companyList[index].authInfo);
             this.$router.push({
                 path:'/projectlist',
                 query:{entId:this.companyList[index].entId}

@@ -642,8 +642,9 @@
           </div>
       </el-dialog>
 
-      <el-dialog title="4D播放"  v-dialogDrag  width="600px"  :visible.sync="fdPlayDialog" @close="fdPlayCancle">
-          <div class="editBody" v-loading="loading"  >
+      <el-dialog title="4D播放"   width="600px"   :visible.sync="fdPlayDialog" @close="fdPlayCancle">
+       <div  style="margin-bottom:20px;height:250px;" v-loading="FDloading">
+          <div class="editBody"   style="height:200px"  >
             <div class="editBodytwo1">
                 <div class="startTime">
                     <label>计划开始:</label>
@@ -665,13 +666,15 @@
             
           </div>
           <div slot="footer" class="dialog-footer">
-            <button class="editBtnS" @click="fdPlayMakeSure">确定</button>
-            <button class="editBtnC" @click="fdPlayCancle">取消</button>
+            <button class="editBtnS"  element-loading-spinner="el-icon-loading" 
+             @click="fdPlayMakeSure">确定</button>
+            <button class="editBtnC"  @click="fdPlayCancle">取消</button>
           </div>
+       </div>
       </el-dialog>
 
       <el-dialog title="编辑工程任务" v-dialogDrag :visible.sync="editTaskDialog" @close="editTaskCancle">
-        <div class="editBody" v-loading="loading">
+        <div class="editBody" >
           <div class="editBodyone">
             <label class="text">上级节点:</label><label class="text">{{lastNodeName}}</label>
           </div>
@@ -1392,6 +1395,7 @@
         routerList:'',
         moduleList:'',
         loading:false,
+        FDloading:'',
         showCommonList: false,//显示清单
         checkList: '',
         labelListShow: false,//二维码显示
@@ -2790,6 +2794,7 @@
             })
             // this.fdPlayDialog=false;
           }else{
+              // this.FDloading=true;
               this.fdPlayDialog=true;
               if(this.dirIds){
                     // this.createdDetory();
@@ -4749,10 +4754,13 @@
       },
 
       fdPlayMakeSure(){
+        var vm=this;
+        console.log('过去00');
+        this.FDloading=true;
         // this.fdPlayDialog=false;
         var date=1;
         var datas=[];
-        console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
+        // console.log(this.taskFdEnd-this.taskFdStart,this.taskFdEnd.getTime(),this.taskFdStart.getTime(),'this.taskFdEnd-this.taskFdStart');
         if(this.taskFdEnd<=this.taskFdStart){
           this.$message({
             type:'info',
@@ -4762,10 +4770,10 @@
           date=(this.taskFdEnd-this.taskFdStart)/this.fdNum
           date/=(1000 * 3600 * 24)
           date=parseInt(date+ 0.5)
-          console.log(date,'date000');
+          // console.log(date,'date000');
           let startCompleteTime=moment(this.taskFdStart).format('YYYY-MM-DD');
           for(let i=0;i<date;i++){
-            console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
+            // console.log(this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*i,this.taskFdStart+this.fdNum*(1000 * 3600 * 24)*(i+1));
               datas.push({
                 'id':i+1,
                 'taskFdStart':moment(this.taskFdStart.getTime()+this.fdNum*(1000 * 3600 * 24)*i).format('YYYY-MM-DD'),
@@ -4782,30 +4790,38 @@
                 })
                 // this.fdPlayDialog=false;
               }else{
+                console.log('进去了吗')
+                this.FDloading=true;
                   this.returnTraceIdsData=[];
                   this.returnTraceIdsCompleteData=[];
                   document.body.scrollTop = 0;
                   document.documentElement.scrollTop = 0;
                   const app = document.getElementById('webIframe').contentWindow;
-                  datas.forEach((item)=>{
-                          this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
-                          this.fdIndexComPlete(startCompleteTime,item.taskFdEnd,item.id,item.taskFdEndStamp);
+                  
+                 
+                  if(this.FDloading==true){
+                      datas.forEach((item)=>{
+                            this.fdIndex(item.taskFdStart,item.taskFdEnd,item.id);
+                            this.fdIndexComPlete(startCompleteTime,item.taskFdEnd,item.id,item.taskFdEndStamp);
+                      })
+                      // console.log(date,'date00');
+                  }
+                  this.fdPlayData=[];
+                  this.FDloading=false;
+                  this.fdPlayDialog=false;
+                  this.fdNum='';
+                  // console.log(this.returnTraceIdsCompleteData,'已完成的模型数据');
+                  // console.log(this.returnTraceIdsData,'正在进行的模型数据');
+                  this.FDrun={data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsCompleteData}
+                  // console.log(this.FDrun,'postMessage给图形的')
+                  this.$message({
+                    type:'success',
+                    message:'4D播放加载中...'
                   })
-                  console.log(date,'date00');
-                    this.fdPlayData=[];
-                    this.fdPlayDialog=false;
-                    this.fdNum='';
-                    console.log(this.returnTraceIdsCompleteData,'已完成的模型数据');
-                    console.log(this.returnTraceIdsData,'正在进行的模型数据');
-                    this.FDrun={data:this.returnTraceIdsData,dataComplete:this.returnTraceIdsCompleteData}
-                    console.log(this.FDrun,'postMessage给图形的')
-                    setTimeout(()=>{
-                        app.postMessage({command:"Run_4D",parameter:this.FDrun},"*"); 
-                    },0);
-                    this.$message({
-                      type:'success',
-                      message:'4D播放加载中...'
-                    })
+                  setTimeout(()=>{
+                      app.postMessage({command:"Run_4D",parameter:this.FDrun},"*"); 
+                  },0);
+                 
               }
         }
       },
@@ -4846,6 +4862,10 @@
           data:JSON.stringify(this.fdPlayDataId),
           async:false,
           contentType:'application/json;charset=utf-8',
+           beforeSend:()=>{
+              // 禁用按钮防止重复提交
+             this.FDloading=true;
+          },
           success:(response)=>{
             if(response.cd==0){
               this.returnCompleteTraceIds=response.rt;
@@ -4873,6 +4893,7 @@
      
       fdIndex(taskFdStart,taskFdEnd,i){
         var vm=this;
+        
         $.ajax({
           // schedule/getRelatedTraceIdByTaskId
           url:this.BDMSUrl+'schedule/getRelatedTraceIdByTaskIdStart?startDate='+taskFdStart+'&endDate='+taskFdEnd,
@@ -4885,6 +4906,10 @@
           data:JSON.stringify(this.fdPlayDataId),
           async:false,
           contentType:'application/json;charset=utf-8',
+          beforeSend:()=>{
+              // 禁用按钮防止重复提交
+             this.FDloading=true;
+          },
           success:(response)=>{
             if(response.cd==0){
                this.returnTraceIds=response.rt;

@@ -844,11 +844,11 @@
                             <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">混凝土支撑宽度：</label>
+                            <label class="editTxt">混凝土支撑宽度(mm)：</label>
                             <input placeholder="请输入" v-model="concreteWidthValue" class="editInput"/>
                         </div>
                         <div class="editBodytwo">
-                            <label class="editTxt">混凝土支撑高度： ：</label>
+                            <label class="editTxt">混凝土支撑高度(mm)： ：</label>
                             <input placeholder="请输入" v-model="concreteHeightValue" @change="acMethod()" class="editInput"/>
                         </div>
                         <div class="editBodytwo">
@@ -1264,6 +1264,7 @@ export default {
             concreteHeightValue:null,//混凝土高度
             concreteLevelValue:null,//混凝土等级
             barGradeValue:null,//钢筋牌号
+            
             sendAlertMessageShow:false,//是否发送报警信息弹窗
             sendAlertMessageLoad:false,//loading
             uploadshow:false,//是否上传图片
@@ -1447,21 +1448,30 @@ export default {
                         },
                         xAxis: {
                             categories:[],
+                            labels:{
+                                    enabled: true,
+                                    format: '{value} m',
+                            },
                             // angle:180
                             opposite: false,
-                            gridLineWidth: 1
+                            gridLineWidth: 1,
+                            // crosshair: true,
+                            tickmarkPlacement: 'on',
+                            // offset: 150
                         },
                         yAxis: {
                                 title: {
-                                    text: '位移'
+                                    text: '位移(mm)'
                                 },
                                 labels:{
-                                    enabled: true
+                                    enabled: true,
+                                    // format: '{value} mm',
                                 },
                                 opposite: true,
                                 lineWidth: 1,
-                                gridLineWidth: 1
-                            },
+                                gridLineWidth: 1,
+                                // crosshair: true
+                        },
                                 
                         credits: {
                             enabled: false
@@ -1497,7 +1507,7 @@ export default {
             },
             optionSpotChangeLine1:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: false
                         },
                         title: {
@@ -1505,6 +1515,7 @@ export default {
                         },
                         xAxis: {
                             categories:[],
+                            tickmarkPlacement: 'on'
                         },
                         yAxis: {
                             min:4268.5,
@@ -1553,7 +1564,7 @@ export default {
             },
             optionMoreSpotChangeLine:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: false
                         },
                         title: {
@@ -1561,6 +1572,7 @@ export default {
                         },
                         xAxis: {
                             categories:[],
+                            tickmarkPlacement: 'on'
                         },
                         yAxis: {
                             min:'',
@@ -1628,7 +1640,7 @@ export default {
             },
             optionMoreSpotChangeLineType:{
                 chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: false
                         },
                         title: {
@@ -1636,6 +1648,7 @@ export default {
                         },
                         xAxis: {
                             categories:[],
+                            tickmarkPlacement: 'on'
                         },
                         yAxis: [{
                                     // min:4268.5,
@@ -3668,7 +3681,7 @@ export default {
             if (val == null) {
             return '/';
             } else {
-            return moment(val).format("MM-DD");
+            return moment(val).format("MM-DD HH:mm");
             }
         },
         timeChangeMethodPitch(val){

@@ -11,7 +11,7 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "build": "node build/build.js",
-    "fix-memory-limit": "cross-env LIMIT=8096 increase-memory-limit"
+    "fix-memory-limit": "cross-env LIMIT=20480 increase-memory-limit"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.0.38",
@@ -26,7 +26,7 @@
     "js-md5": "^0.7.3",
     "jspdf": "^1.4.1",
     "moment": "^2.24.0",
-    "npm": "^6.9.0",
+    "npm": "^6.10.2",
     "sockjs-client": "^1.1.5",
     "three": "^0.92.0",
     "three-css3drenderer": "^1.0.1",

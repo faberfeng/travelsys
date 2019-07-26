@@ -31,8 +31,12 @@ export default {
         // token:this.token,entId:this.entId,projectId:this.projId,groupId:this.groupId,url:this.BDMSUrl
         linkVideo(){
             var vm=this;
-            var link=vm.appShareUrl+'/videoIndex.html?token='+this.token+'&entId='+this.entId+'&projectId='+this.projId+'&groupId='+this.groupId+'&url='+this.BDMSUrl
-            window.open(link,"_self");
+            vm.$router.push({
+              path:'/videoIndex'
+            //   query: { firstView: 'Y' }
+            })
+            // var link=vm.appShareUrl+'/videoIndex.html?token='+this.token+'&entId='+this.entId+'&projectId='+this.projId+'&groupId='+this.groupId+'&url='+this.BDMSUrl
+            // window.open(link,"_self");
         },
         getUserGroup(){
             var vm=this;

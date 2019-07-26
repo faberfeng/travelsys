@@ -20,8 +20,8 @@
         <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
-        <div v-for="(item, index) in listData" :key="index" :class="[{'ongoing_color_b':item.strStatus=='进行中','end_color_b':item.strStatus!='进行中'},'item-proj']" @click="selectProject(item.projectId,item.strStatus!='进行中',item.projName)">
-            <div :class="[{'ongoing':item.strStatus=='进行中','end':item.strStatus!='进行中'},'item-head','new']">
+        <div v-for="(item, index) in listData" :key="index"  :class="[{'ongoing_color_b':item.status==1,'end_color_b':item.expireTime<currentStampTime&&item.status==1},'item-proj']" v-show="item.status!=2" @click="selectProject(item.projectId,item.expireTime<currentStampTime,item.projName)">
+            <div :class="[{'ongoing':item.status==1,'end':item.expireTime<currentStampTime&&item.status==1},'item-head','new']">
               <span class="item-title">工程名称</span>
               <div :class="[item.projectName.length>13?'item-name-box-s':'','item-name-box']">
                 <span class="item-name" v-text="item.projectName.length>25?item.projectName.substr(0,25)+'...':item.projectName" :title="item.projectName"></span>
@@ -40,15 +40,15 @@
                   <span class="body-left" v-text="val.viewKey"></span><span class="body-right" v-html="val.viewVal"></span>
                 </p> -->
               </div>
-              <span v-text="item.strStatus!='进行中'?'已到期':(item.strStatus=='进行中'?'进行中':'新项目')" :class="[{'ongoing_s':item.strStatus=='进行中','end_s':item.strStatus!='进行中'},'new_s','text-s']"></span>
+              <span v-text="item.status==1&&item.expireTime>currentStampTime?'进行中':(item.status==0?'新项目':'已到期')" :class="[{'ongoing_s':item.status==1,'end_s':item.expireTime<currentStampTime&&item.status==1},'new_s','text-s']"></span>
             </div>
         </div>
       </div>
       <div class="item-proj-box" v-if="show2" >
-        <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.strStatus=='进行中','end_color':item.strStatus!='进行中'},'item-proj-line']" @click="selectProject(item.projectId,item.expired,item.projName)">
+        <div  v-for="(item, index) in listData" :key="index+'line'" :class="[{'ongoing_color':item.status==1,'end_color':item.expireTime<currentStampTime&&item.status==1},'item-proj-line']" v-show="item.status!=2" @click="selectProject(item.projectId,item.expireTime<currentStampTime,item.projName)">
           <span class="proj-state-box">
-            <span class="proj-state-bg" :class="[{'ongoing_bg':item.strStatus=='进行中','end_bg':item.strStatus!='进行中'}]"></span>
-            <span class="proj-state-title" v-text="item.strStatus!='进行中'?'已到期':(item.strStatus=='进行中'?'进行中':'新项目')"></span>
+            <span class="proj-state-bg" :class="[{'ongoing_bg':item.status==1,'end_bg':item.expireTime<currentStampTime&&item.status==1}]"></span>
+            <span class="proj-state-title" v-text="item.status==1&&item.expireTime>currentStampTime?'进行中':(item.status==0?'新项目':'已到期')"></span>
           </span>
           <img :src="item.imgPath?item.imgPath:require('../assets/bg.png')" class="line-img" alt="">
           <div class="line-detial-box">
@@ -87,16 +87,20 @@
           </div>
         </div>
       </div>
-      <div v-if="show1" class="amap-page-container">
+      <div v-show="show1" class="gisMap">
+          <iframe allowfullscreen=true frameborder="no" border="0" marginwidth= "0" marginheight="0" src="http://42.159.153.210:8080/GISViewer/" style="width: 90%;height: 600px;padding: 30px" id ="gisWebgl"></iframe>
+      </div>
+      <!-- <el-amap-text style="color:white;background:#797979;font-size:16px;" v-for="text in markers" :key="text.projId" :text="text.projName" :offset="text.offset" :position="text.position" :events="text.events" ></el-amap-text>
+            <el-amap-info-window  v-for="(item,index) in windows" :key="index" :position="item.position" :visible="item.visible1"  :template="item.template1"></el-amap-info-window> -->
+      <!-- <div v-if="show1" class="amap-page-container">
         <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="mapCenter" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
             <el-amap-marker v-for="(marker,index1) in markers" :vid="index1"  :key="index1" :position="marker.position" :events="marker.events" :template="marker.template" :offset="marker.offset" :draggable="true" :title="marker.projName"  ></el-amap-marker>
             <el-amap-marker v-for="(marker) in markers" :vid="marker.projId" :key="marker.projId" :position="marker.position" :events="marker.events" :draggable="true" :title="marker.projName"  ></el-amap-marker>
             <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible" :template="window.content"  ></el-amap-info-window>
-            <!-- <el-amap-text style="color:white;background:#797979;font-size:16px;" v-for="text in markers" :key="text.projId" :text="text.projName" :offset="text.offset" :position="text.position" :events="text.events" ></el-amap-text> -->
-            <!-- <el-amap-info-window  v-for="(item,index) in windows" :key="index" :position="item.position" :visible="item.visible1"  :template="item.template1"></el-amap-info-window> -->
         </el-amap>
-      </div>
+      </div> -->
+     
     </div>
 </div>
 </template>
@@ -202,6 +206,9 @@
 }
 .item-proj-box0{
   padding-bottom:20px;
+}
+.gisMap{
+  border: 1px solid #ccc;
 }
 .amap-page-container{
   // margin-top:40px;
@@ -419,6 +426,7 @@ import axios from 'axios'
 import headerCommon from './header.vue'
 import {AMapManager} from "vue-amap"
 import moment from 'moment'
+var gisApp;
 let amapManager=new AMapManager();
 export default {
   name: 'ProjectList',
@@ -491,8 +499,7 @@ export default {
         },
         pathInit:'',
         userImg:'',
-
-        
+        currentStampTime:'',
       }
   },
   components: {
@@ -509,10 +516,11 @@ export default {
       if(defaultSubProjId != 'undefined'){
           localStorage.removeItem('defaultSubProjId')
       }
+      vm.currentStampTime=new Date().getTime();
       // vm.viewFlag()
       vm.getUserInfo()
       vm.initCompany()
-      console.log(this.$route.query.entId,'回来的entid');
+      // console.log(this.$route.query.entId,'回来的entid');
 
   },
   created(){
@@ -520,11 +528,16 @@ export default {
     vm.userName = localStorage.getItem('userName')
     vm.userId = localStorage.getItem('userId')
     this.titleName = localStorage.getItem('entName');
-    localStorage.removeItem("navigationPath")
+    localStorage.removeItem("navigationPath");
   },
   methods:{
-
-      getUserInfo(){
+    gisInit(){
+        gisApp = document.getElementById("gisWebgl").contentWindow;
+        console.log(gisApp,'gisApp');
+        gisApp.postMessage({command:"Init",parameter:{menu:false,loadingFiles_display:true,background_url:""}},"*");
+        // window.addEventListener("message", (e)=>{callback(e);})
+    },
+    getUserInfo(){
             var vm = this
             axios({
                 method:'GET',
@@ -561,7 +574,7 @@ export default {
             }).then((response)=>{
                 if(response.data.cd == "0"){//跳转项目首页
                     this.listData=response.data.rt;
-                    console.log(this.listData,'this.listData');
+                    // console.log(this.listData,'this.listData');
                 }else if(response.data.cd === "1"){
                     alert(response.data.msg);
                     setTimeout(()=>{
@@ -630,10 +643,12 @@ export default {
         this.show0=false;
         this.show1=true;
         var projIds=[];
-        vm.listData.forEach((num)=>{
-          projIds.push(num.projId)
-        })
-        vm.getPosition(projIds)
+        this.gisInit();
+        // console.log(vm.listData,'vm.listData');
+        // vm.listData.forEach((num)=>{
+        //   projIds.push(num.projectId)
+        // })
+        // vm.getPosition(projIds)
         // console.log(document.getElementsByClassName('amap-overlay-text-container'),'样式试试');
       },
       changeBrandStyle(){
@@ -777,8 +792,9 @@ export default {
             if(response.data.cd=='0'){
               vm.toProjectList();
               var projIds=[];
+              console.log(vm.listData,'vm.listData');
               vm.listData.forEach((num)=>{
-                projIds.push(num.projId)
+                projIds.push(num.projectId)
               })
               vm.getPosition(projIds)
               // vm.getPosition(projectId);
@@ -833,7 +849,7 @@ export default {
               // vm.getSiteStr.splice(0,vm.getPositionList.length);
               vm.listData.forEach((item)=>{
                 vm.getPositionList.forEach((val)=>{
-                  if(item.projId==val.projectId){
+                  if(item.projectId==val.projectId){
                     // console.log(item,'item000');
                     getSiteString.push(item);
                       // vm.getSiteStr.remove(item)
@@ -855,12 +871,12 @@ export default {
                       differentData.forEach((item)=>{
                         if(item.overviewList){
                             siteList.push({
-                              'projId':item.projId,
+                              'projId':item.projectId,
                               'site':vm.getSite(item.overviewList)
                             })
                         }else{
                           siteList.push({
-                              'projId':item.projId,
+                              'projId':item.projectId,
                               'site':'上海市人民广场'
                             })
                         }
@@ -1006,7 +1022,7 @@ export default {
               vm.toProjectList();
               var projIds=[];
               vm.listData.forEach((num)=>{
-                projIds.push(num.projId)
+                projIds.push(num.projectId)
               })
               vm.getPosition(projIds)
 

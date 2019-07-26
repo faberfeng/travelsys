@@ -128,6 +128,7 @@
             </div>
             <div  class="log-body clearfix">
                 <span class="log-head-title">岗位权限:</span>
+                <div style="float:left;margin-top:-4px;"><el-checkbox @change="authCheckChange()" v-model="allCheck">全选</el-checkbox></div>
                 <!--树形图-->
                 <el-tree
                 :data="jobTree"
@@ -159,6 +160,7 @@ export default {
     name:'',
     data(){
         return {
+            allCheck:false,//默认不全选
             title:'增加岗位',
             jobList:[],//岗位列表
             jobLists:[],//总体的岗位列表
@@ -167,6 +169,7 @@ export default {
             jobTree:[],
             jobTree_checked:[],
             jobTree_opend:[],
+            allAuthInfoList:[],
             defaultProps: {
                 children: 'undefined',
                 label: 'authName'
@@ -243,6 +246,19 @@ export default {
                 return 'disabled'
             }
         },
+        authCheckChange(){
+            if(this.allCheck==true){
+                    var jobTree_checked = []
+                    for(var i =0;i<this.allAuthInfoList.length;i++){
+                        jobTree_checked.push(this.allAuthInfoList[i].authCode)
+                    }
+                    this.jobTree_checked = jobTree_checked;
+            }else if(this.allCheck==false){
+                    console.log('是否为false');
+                    this.getJobShuXingTu();
+                    this.jobTree_checked=[]; 
+            }
+        },
         changePage(val){//分页 0 -1 1 2
             var vm = this; 
             if(vm.pageDetial.currentPage == 1 && (val == 0 || val == -1)){
@@ -294,7 +310,9 @@ export default {
                 // }
             }).then((response)=>{
                 if(response.data.rt){
+                    this.allAuthInfoList=response.data.rt;
                     var jobTree_opend = []
+                    // var jobTree_checked = []
 
                     for(var i =0;i<response.data.rt.length;i++){
                         // jobTree_checked.push(response.data.rt[i].authCode)
@@ -435,6 +453,7 @@ export default {
             vm.jobDetial.posName = '';
             vm.jobDetial.posType = '1';
             vm.adduser = false;
+            vm.allCheck=false;
             //vm.$refs.tree_job.setCheckedKeys([]);
             vm.getJobShuXingTu();
         },
@@ -501,6 +520,7 @@ export default {
                                 // vm.$refs.tree_job.setCheckedKeys([]);
                                 // vm.getInfo();
                                 vm.getInfoList();
+                                vm.allCheck=false;
                             }else if(response.data.cd == '-1'){
                                 alert(response.data.msg);
                             }else{
@@ -973,6 +993,7 @@ export default {
                     padding: 5px;
                     box-sizing: border-box;
                     border:1px solid #e0e0e0;
+                    margin-left:80px;
                 }
             }
             .el-dialog__footer{

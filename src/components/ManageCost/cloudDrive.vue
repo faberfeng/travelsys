@@ -10,417 +10,420 @@
             </select>
             <i class="icon-sanjiao"></i>
         </div>
-        <div :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]" >
-            <!-- style="min-width: 950px;overflow-y: auto;height:760px" -->
-            <!-- <div > -->
-            <div :style="{'min-width: 950px; overflow-y: auto; height: 760px;':!showCommonList}">
-                <div id="item-box-file">
-                    <!-- <router-link :to="'/Drive/costover'" class=" label-item">  
-                    最近文档  
-                    </router-link>
-                    <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
-                    工程云盘  
-                    </router-link>
-                    <router-link :to="'/Drive/Share'" class=" label-item">  
-                        已经分享  
-                    </router-link>
-                    <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
-                        个人中转  
-                    </router-link> -->
-                     <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
-                    </router-link>
-                    <div class="item-search" v-if="!showQuanJing">
-                        <span class="title-right">
-                            <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
-                            <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
-                        </span>
-                        <select v-model="docType" class="inp-search">
-                            <option value="">全部文档</option>
-                            <option value="1">我的上传</option>
-                        </select>
-                        <i class="icon-sanjiao"></i>
-                        <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
-                    </div>
-                </div>
-                <!-- <div id="project">
-                </div> -->
-                <div v-if="!showCommonList">
-                    <p class="antsLine" v-if="!showQuanJing">
-                        文档管理<i class="icon-sanjiao-right"></i>工程云盘<i class="icon-sanjiao-right"></i>
-                        <span v-show="spanShow" class="strong" v-for="item in mayiList" :key="item.dirId+'antLine'" @click="IntoDir(item)" v-html="item.dirName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
-                    </p>
-                    <p class="select-header clearfix">
-                        <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
-                        <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
-                        <span class="icon icon-upload" v-if="!haveImgBackShow && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*',2)">上传平面图</span>
-                        <span class="icon icon-refresh" v-if="haveImgBackShow && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground,'image/*',2)">更新平面图</span>
-                        <!--
-                            文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
-
-                            具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
-
-                        -->
-                        <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*',3)">新建点位</span>
-                        <ul class="operation" style="margin-right: 10px;">
-                            <li class="item-upload" v-if="!showQuanJing&&systemDrawFile&&clickBlank"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
-                        </ul>
-                        <ul class="operation">
-                            <!-- checkedRound.checked || -->
-                            <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow "  @click="copyfile(true)">剪切</li>
-                            <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder&&checkAll" @click="downloadFile" >下载</li>
-                            <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
-                            <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="goujianBindByWord()">构件绑定文件</li>
-                            <!-- <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li> -->
-                            <!-- (showQuanJing && checkedRound.checked) || -->
-                            <li class="item"  v-if="(( (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="rename">更名</li>
-                            <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
-                            <!-- checkedRound.checked || -->
-                            <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
-                            <!-- checkedRound.checked || -->
-                            <!-- &&outsideShare -->
-                            <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)" @click="shareURL">分享</li>
-                            <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
-                        </ul>
-                    </p>
-                    <!--全景图代码-->
-                    <div id="planeFigureDiv" v-if="showQuanJing">
-                        <div  id="planeDIV">
-                            <img v-show="haveImgBackShow" :src="QJ.imageBackground" id="planeFigure">
-                            <div v-show="!haveImgBackShow" id="planeFigure1">
-                                <img  src='../../assets/nodata.png' >
-                                 <!-- <img  src='../../assets/nopic.jpg' > -->
-                                <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的文件夹</p>
-                            </div>
-                            <!-- <span></span> -->
-                            <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" :data-pointId="item.id"
-                            @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xaxial,item.yaxial,QJ.imageBackground)"
-                            :data-left="item.xaxial" :data-top="item.yaxial"  :id="index+'round'"
-                            :key="index" :style="{'top':item.yaxial+'px','left':item.xaxial+'px'}">
+            <div id="boxLeft" :class="[{'box-left-avtive':!screenLeft.show},'box-left-container',{'qindanWidth':showCommonList}]" >
+                <!-- style="min-width: 950px;overflow-y: auto;height:760px" -->
+                <!-- <div > -->
+                <div :style="{'min-width: 950px; overflow-y: auto; height: 760px;':!showCommonList}">
+                    <div id="item-box-file">
+                        <!-- <router-link :to="'/Drive/costover'" class=" label-item">  
+                        最近文档  
+                        </router-link>
+                        <router-link :to="'/Drive/cloudDrive'"  class="label-item label-item-active">  
+                        工程云盘  
+                        </router-link>
+                        <router-link :to="'/Drive/Share'" class=" label-item">  
+                            已经分享  
+                        </router-link>
+                        <router-link :to="'/Drive/PersonalTransit'" class=" label-item">  
+                            个人中转  
+                        </router-link> -->
+                        <router-link v-for="(item,index) in routerList" :key="index" :to="item.routerLink" v-text="item.webName?item.webName:item.moduleName" :class="['label-item',{'label-item-active':item.isShow}]">        
+                        </router-link>
+                        <div class="item-search" v-if="!showQuanJing">
+                            <span class="title-right">
+                                <input type="text" v-model="fileSearchInfo" placeholder="请输入文件名称"  class="title-right-icon" @keyup.enter="getInfo">
+                                <span  class="title-right-edit-icon el-icon-search" @click="getInfo"></span>
                             </span>
+                            <select v-model="docType" class="inp-search">
+                                <option value="">全部文档</option>
+                                <option value="1">我的上传</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                            <span class="icon-type" @click="listStyle = (listStyle == 'card'?'table':'card')"></span>
                         </div>
                     </div>
-                    <div v-else>
-                    <!--文件夹代码-->
-                    <div id="file-container" v-if="listStyle == 'card'">
-                        <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
-                            <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)"></label>
-                                <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                <div class="item-file-box clearfix">
-                                    <span  class="item-file-image">
-                                    <img :src="require('./images/icon/'+typeIcon(item.extension)+'.png')" />
-                                    </span>
-                                    <span  class="item-file-detial">
-                                        <h3 v-text="item.fgName"></h3>
-                                        <!-- item.uploadFromExplorer -->
-                                        <!-- <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="1 == 1?'浏览器':'手机端'"></span>上传</p> -->
-                                        <p v-text="initData(item.uploadTime)"></p>
-                                        <p class="operation">
-                                            <!-- <span v-text="'版本'+item.fgVersion"></span> -->
-                                            <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
+                    <!-- <div id="project">
+                    </div> -->
+                    <div v-if="!showCommonList">
+                        <p class="antsLine" v-if="!showQuanJing">
+                            文档管理<i class="icon-sanjiao-right"></i>工程云盘<i class="icon-sanjiao-right"></i>
+                            <span v-show="spanShow" class="strong" v-for="item in mayiList" :key="item.dirId+'antLine'" @click="IntoDir(item)" v-html="item.dirName+'<i class=\'icon-sanjiao-right\'></i>'"></span>
+                        </p>
+                        <p class="select-header clearfix">
+                            <label  v-if="!showQuanJing" :class="[checkAll?'active':'','checkbox-fileItem']" for="allfile" @click="initAll()"></label>
+                            <input  v-if="!showQuanJing" type="checkbox" id='allfile' class="el-checkbox__original" v-model="checkAll">
+                            <span class="icon icon-upload" v-if="!haveImgBackShow && showQuanJing" @click="updateImg('上传平面图',false,0,'image/*',2)">上传平面图</span>
+                            <span class="icon icon-refresh" v-if="haveImgBackShow && showQuanJing" @click="updateImg('更新平面图',false,QJ.imageBackground,'image/*',2)">更新平面图</span>
+                            <!--
+                                文件夹的操作：剪切、粘贴、复制、分享、（批量下载） 
+
+                                具体文件（包括点位文件）的操作：剪切、粘贴、删除、更新、更名、复制、分享,（下载：：：：点位文件不包括下载）
+
+                            -->
+                            <span class="icon icon-new" v-if="showQuanJing" @click="updateImg('新建点位',true,0,'image/*',3)">新建点位</span>
+                            <ul class="operation" style="margin-right: 10px;">
+                                <li class="item-upload" v-if="!showQuanJing&&systemDrawFile&&clickBlank"  @click="uploadfile"><label v-show="systemDrawFile">上传文件</label><label v-show="!systemDrawFile">上传图纸</label></li>
+                            </ul>
+                            <ul class="operation">
+                                <!-- checkedRound.checked || -->
+                                <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow "  @click="copyfile(true)">剪切</li>
+                                <li class="item"  v-if="checkedFile_Folder.file && !checkedFile_Folder.folder&&checkAll" @click="downloadFile" >下载</li>
+                                <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="deletePoint">删除</li>
+                                <li class="item"  v-if="((showQuanJing && checkedRound.checked) || checkedFile_Folder.file) &&  !checkedFile_Folder.folder" @click="goujianBindByWord()">构件绑定文件</li>
+                                <!-- <li class="item"  v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder" @click="updatePoint">更新</li> -->
+                                <!-- (showQuanJing && checkedRound.checked) || -->
+                                <li class="item"  v-if="(( (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="rename">更名</li>
+                                <li class="item" @click="paste" v-if="hasFileToPaste.is">粘贴</li>
+                                <!-- checkedRound.checked || -->
+                                <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)&&checkedFile_Folder.isDrawingShow" @click="copyfile(false)" v-loading.fullscreen.lock="fullscreenLoading">复制</li>
+                                <!-- checkedRound.checked || -->
+                                <!-- &&outsideShare -->
+                                <li class="item"  v-if="( checkedFile_Folder.file || checkedFile_Folder.folder)" @click="shareURL">分享</li>
+                                <li class="item" v-if="!checkedFile_Folder.file && checkedFile_Folder.folder" @click="downloadBatchFile">批量下载</li>
+                            </ul>
+                        </p>
+                        <!--全景图代码-->
+                        <div id="planeFigureDiv" v-if="showQuanJing">
+                            <div  id="planeDIV">
+                                <img v-show="haveImgBackShow" :src="QJ.imageBackground" id="planeFigure">
+                                <div v-show="!haveImgBackShow" id="planeFigure1">
+                                    <img  src='../../assets/nodata.png' >
+                                    <!-- <img  src='../../assets/nopic.jpg' > -->
+                                    <p style="font-size:16px;color:#ccc">请在右侧列表中选择需要浏览的文件夹</p>
+                                </div>
+                                <!-- <span></span> -->
+                                <span :class="['round',{'active':item.checked}]" v-for="(item,index) in QJ.point" :data-fgId="item.fgId" :data-pointId="item.id"
+                                @click="checkRound(index)" @dblclick="dbcheckRound(item.fgId,item.xaxial,item.yaxial,QJ.imageBackground)"
+                                :data-left="item.xaxial" :data-top="item.yaxial"  :id="index+'round'"
+                                :key="index" :style="{'top':item.yaxial+'px','left':item.xaxial+'px'}">
+                                </span>
+                            </div>
+                        </div>
+                        <div v-else>
+                        <!--文件夹代码-->
+                        <div id="file-container" v-if="listStyle == 'card'">
+                            <ul class="clearfix" style="padding: 0px 10px 15px 20px;">
+                                <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in fileList" :key="index+'file'" @click="checkItem(index,true)" >
+                                    <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,true,true)"></label>
+                                    <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    <div class="item-file-box clearfix">
+                                        <span  class="item-file-image">
+                                        <img :src="require('./images/icon/'+typeIcon(item.extension)+'.png')" />
+                                        </span>
+                                        <span  class="item-file-detial">
+                                            <h3 v-text="item.fgName"></h3>
+                                            <!-- item.uploadFromExplorer -->
+                                            <!-- <p>由<span class="text-name" v-text="item.updateUser"></span>通过<span v-text="1 == 1?'浏览器':'手机端'"></span>上传</p> -->
+                                            <p v-text="initData(item.uploadTime)"></p>
+                                            <p class="operation">
+                                                <!-- <span v-text="'版本'+item.fgVersion"></span> -->
+                                                <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
+                                                <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
+                                            </p>
+                                        </span>
+                                    </div>
+                                </li>
+                                <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item)">
+                                    <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
+                                    <input type="checkbox" :id='item.dirId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                    <div class="item-file-box clearfix">
+                                        <span  class="item-file-image item-folder-image">
+                                        <img :src="require('./images/folderBig.png')" />
+                                        </span>
+                                        <span  class="item-file-detial">
+                                            <h3 v-text="item.dirName"></h3>
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- 文件表代码 -->
+                        <div id="file-container-table" v-else>
+                            <table class="UserList" width='100%'>
+                                <thead>
+                                    <tr  class="userList-thead">
+                                        <th style="width:55px;"></th>
+                                        <th style="min-width:428px;">文件名</th>
+                                        <th style="width:70px;"></th>
+                                        <!-- <th style="width:40px;">版本</th> -->
+                                        <th style="width:70px;">大小</th>
+                                        <th style="width:50px;">类型</th>
+                                        <!-- <th style="width:70px;">更新渠道</th> -->
+                                        <th style="min-width:60px;">上传人</th>
+                                        <th style="min-width:150px;">更新时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index,true)">
+                                        <td @click.stop="checkItem(index,true,true)"><!--多选框-->
+                                            <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                            <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                        </td>
+                                        <td>
+                                            <!-- <span>{{'./images/icon/'+item.extension+'.png'}}</span> -->
+                                            <img :src="require('./images/icon/'+typeIcon(item.extension)+'.png')" />
+                                            <span v-text="item.fgName"></span>
+                                        </td>
+                                        <td>
                                             <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
-                                        </p>
-                                    </span>
-                                </div>
+                                            <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
+                                        </td>
+                                        <!-- <td v-text="item.fgVersion"></td> -->
+                                        <td>{{item.fileSize|fileSizeChange()}}</td>
+                                        <td v-text="item.extension"></td>
+                                        <!-- item.uploadFromExplorer -->
+                                        <!-- <td  v-text="1 == 1?'浏览器':'手机端'"></td> -->
+                                        <td v-text="item.uploadUser"></td>
+                                        <td v-text="initData(item.uploadTime)"></td>
+                                    </tr>
+                                    <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item)">
+                                        <td @click.stop="checkItem(index,false,true)"><!--多选框-->
+                                            <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
+                                            <input type="checkbox" :id='item.dirId+"file"' class="el-checkbox__original" v-model="item.checked">
+                                        </td>
+                                        <td>
+                                            <img :src="require('./images/folderBig.png')" />
+                                            <span v-text="item.dirName"></span>
+                                        </td>
+                                        <td></td>
+                                        <td  v-text="'-'"></td>
+                                        <!-- <td v-text="'-'"></td>
+                                        <td v-text="'-'"></td> -->
+                                        <td v-text="'-'"></td>
+                                        <td v-text="'-'"></td>
+                                        <td v-text="item.createTime?initData(item.createTime):'-'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="!showCommonList" id="boxRight" :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
+                <div id="center-selection">
+                    <div class="SH_right" @click="screenLeftClick">
+                        <i class="icon-right"></i>
+                    </div>
+                    <div id='center-selectionClick' :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]" style="height:720px">
+                        <span class="item-property " @click="screenLeft.item = 1">目<br>录</span>
+                        <span class="item-version " @click="screenLeft.item = 2">属<br>性</span>
+                        <!-- <span class="item-version-3  " @click="screenLeft.item = 3;getVersion()">版<br>本</span> -->
+                    </div>
+                </div>
+                <!-- <div id="verticalBar"></div> -->
+                <div v-show="screenLeft.show"  v-if="screenLeft.item == 1" class="screenRight_1">
+                    <p class="clearfix">
+                        <!-- v-if="fileNewAndrename" -->
+                        <i class="icon-goujian icon-add"  title="添加" @click="addFile"></i>
+                        <!-- <i class="icon-goujian icon-authrity" v-if="editCatalogAuth"  title="权限" @click="authrityFile"></i> -->
+                        <!-- v-if="fileCopyAndCutAndDelete"  -->
+                        <i class="icon-goujian icon-delete" title="删除" @click="deleteFile"></i>
+                        <!-- v-if="fileNewAndrename" -->
+                        <i class="icon-goujian icon-edit"   title="重命名" @click="renameFile"></i>
+                    </p>
+                    <!-- @click.stop="initTreeFolder()" -->
+                    <div   @click.stop="initTreeFolder()">
+                        <el-tree
+                        :data="FileTree"
+                        ref="fileTree_cloudDrive"
+                        
+                        node-key="dirId"
+                        :props="defaultProps"
+                        :expand-on-click-node="false"
+                        :default-expanded-keys="expandedKeys"
+                        highlight-current
+                        @node-expand="nodeClick"
+                        @node-collapse="nodeClickClose"
+                        @node-click="handleNodeClick"
+                        id="cloudDirveFileTree"
+                        >
+                        <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'',(data.isAutoCreated == 1 && data.holderId != null || data.isDrawing==1)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="data.dirName?data.dirName:'(名称空)'"></span>
+                        </el-tree>
+                    </div>
+                </div>
+                <div id="box-right"  v-show="screenLeft.show" v-if="screenLeft.item == 2">
+                    <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
+                        <h3 class="header-attribute" style="margin-top:0px;">
+                            <i class="trrangle"></i>
+                            基本属性
+                            <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                        </h3>
+                        <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">文件名</span>
+                                <span class="detial-text-value" v-text="checkedItem.fgName"></span>
                             </li>
-                            <li :class="[{'item-file-active':item.checked},'item-file']" v-for="(item,index) in folderList" :key="index+'folder'" @click="checkItem(index)"  @dblclick="IntoDir(item)">
-                                <label :class="[item.checked?'active':'','checkbox-fileItem']"  @click.stop="checkItem(index,false,true)" ></label>
-                                <input type="checkbox" :id='item.dirId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                <div class="item-file-box clearfix">
-                                    <span  class="item-file-image item-folder-image">
-                                    <img :src="require('./images/folderBig.png')" />
-                                    </span>
-                                    <span  class="item-file-detial">
-                                        <h3 v-text="item.dirName"></h3>
-                                    </span>
-                                </div>
+                            <!-- <li class="detial-item clearfix">
+                                <span class="detial-text-name">版本</span>
+                                <span class="detial-text-value" v-text="checkedItem.version"></span>
+                            </li> -->
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传人</span>
+                                <span class="detial-text-value" v-text="checkedItem.uploadUser"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedItem.uploadTime)"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新人</span>
+                                <span class="detial-text-value" v-text="checkedItem.updateUser"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">文件大小</span>
+                                <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}</span>
+                            </li>
+                            <li v-show="!showBtn" class="detial-item clearfix">
+                                <span class="detial-text-name">图号</span>
+                                <span class="detial-text-value" v-text="updateDrawingNumber"></span>
+                            </li>
+                            <li v-show="!showBtn" class="detial-item clearfix">
+                                <span class="detial-text-name">图名</span>
+                                <span class="detial-text-value" v-text="updateDrawingName"></span>
+                            </li>
+                            <li v-show="!showBtn" class="detial-item clearfix">
+                                <span class="detial-text-name">比例</span>
+                                <span class="detial-text-value" v-text="updateDrawingRatio"></span>
+                            </li>
+                            <li v-show="!showBtn" class="detial-item clearfix">
+                                <span class="detial-text-name">相关空间</span>
+                                <span class="detial-text-value" v-text="updateDrawingHolderId"></span>
+                            </li>
+
+                        </ul>
+                        <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="showQuanJing">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">文件名</span>
+                                <span class="detial-text-value" v-text="checkedRound.fgName"></span>
+                            </li>
+                            <!-- <li class="detial-item clearfix">
+                                <span class="detial-text-name">版本</span>
+                                <span class="detial-text-value" v-text="checkedRound.version"></span>
+                            </li> -->
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传人</span>
+                                <span class="detial-text-value" v-text="checkedRound.uploadUser"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">上传时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedRound.uploadTime)"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新人</span>
+                                <span class="detial-text-value" v-text="checkedRound.updateUser"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name">更新时间</span>
+                                <span class="detial-text-value" v-text="initData(checkedRound.updateTime)"></span>
+                            </li>
+                            
+                        </ul>
+                        <h3 class="header-attribute" style="margin-top: 30px;">
+                            <i class="trrangle"></i>
+                            绑定构件
+                            <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
+                            <i class="el-icon-plus icon-dropDown1"  @click="showExtension"></i>
+                        </h3>
+                        <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
+                            <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
+                                <p class="clearfix">
+                                    <!-- @click="showDetialList(item)" -->
+                                    <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
+                                    <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
+                                    <i class="icon-goujian icon-location" @click="goToLocation(item)"></i>
+                                    <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
+                                </p>
+                                <p class="item-detial">
+                                    <span class="detial-text-name">ID :</span>
+                                <span class="detial-text-value" v-text="item.id"></span>
+                                </p>
+                                <!-- <p class="item-detial">
+                                    <span class="detial-text-name">状态 :</span>
+                                <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
+                                </p> -->
+                                <p class="item-detial">
+                                    <span class="detial-text-name">明细 :</span>
+                                <span class="detial-text-value" v-text="item.componentNumber"></span>
+                                </p>
+                                <p class="item-detial">
+                                    <span class="detial-text-name">名称 :</span>
+                                <span class="detial-text-value" v-text="item.name"></span>
+                                </p>
                             </li>
                         </ul>
                     </div>
-                    <!-- 文件表代码 -->
-                    <div id="file-container-table" v-else>
-                        <table class="UserList" width='100%'>
-                            <thead>
-                                <tr  class="userList-thead">
-                                    <th style="width:55px;"></th>
-                                    <th style="min-width:428px;">文件名</th>
-                                    <th style="width:70px;"></th>
-                                    <!-- <th style="width:40px;">版本</th> -->
-                                    <th style="width:70px;">大小</th>
-                                    <th style="width:50px;">类型</th>
-                                    <!-- <th style="width:70px;">更新渠道</th> -->
-                                    <th style="min-width:60px;">上传人</th>
-                                    <th style="min-width:150px;">更新时间</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item,index) in fileList" :key="index" :class="[{'active':item.checked}]"  @click="checkItem(index,true)">
-                                    <td @click.stop="checkItem(index,true,true)"><!--多选框-->
-                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                        <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                    </td>
-                                    <td>
-                                        <!-- <span>{{'./images/icon/'+item.extension+'.png'}}</span> -->
-                                        <img :src="require('./images/icon/'+typeIcon(item.extension)+'.png')" />
-                                        <span v-text="item.fgName"></span>
-                                    </td>
-                                    <td>
-                                        <i class="icon-goujian icon-download" @click="downLoad(item.fgId)"></i>
-                                        <i class="icon-goujian icon-search" @click="view(item.fgId,item.fgName)"></i>
-                                    </td>
-                                    <!-- <td v-text="item.fgVersion"></td> -->
-                                    <td>{{item.fileSize|fileSizeChange()}}</td>
-                                    <td v-text="item.extension"></td>
-                                    <!-- item.uploadFromExplorer -->
-                                    <!-- <td  v-text="1 == 1?'浏览器':'手机端'"></td> -->
-                                    <td v-text="item.uploadUser"></td>
-                                    <td v-text="initData(item.uploadTime)"></td>
-                                </tr>
-                                <tr v-for="(item,index) in folderList" :key="index+'table'" :class="[{'active':item.checked}]" @click="checkItem(index)"  @dblclick="IntoDir(item)">
-                                    <td @click.stop="checkItem(index,false,true)"><!--多选框-->
-                                        <label :class="[item.checked?'active':'','checkbox-fileItem']" ></label>
-                                        <input type="checkbox" :id='item.dirId+"file"' class="el-checkbox__original" v-model="item.checked">
-                                    </td>
-                                    <td>
-                                        <img :src="require('./images/folderBig.png')" />
-                                        <span v-text="item.dirName"></span>
-                                    </td>
-                                    <td></td>
-                                    <td  v-text="'-'"></td>
-                                    <!-- <td v-text="'-'"></td>
-                                    <td v-text="'-'"></td> -->
-                                    <td v-text="'-'"></td>
-                                    <td v-text="'-'"></td>
-                                    <td v-text="item.createTime?initData(item.createTime):'-'"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div v-else>
+                        <h3 class="header-attribute" style="margin-top:0px;">
+                            <i class="trrangle"></i>
+                            基本属性
+                            <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                        </h3>
+                        <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
+                                <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
+                                <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
+                            </li>
+                        </ul>
+                        <h3 class="header-attribute" style="margin-top:0px;">
+                            <i class="trrangle"></i>
+                            绑定构件
+                            <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
+                        </h3>
+                        <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
+                                <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
+                            </li>
+                            <li class="detial-item clearfix">
+                                <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
+                                <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div v-if="!showCommonList" :class="[{'box-right-avtive':!screenLeft.show},'box-right-container']">
-            <div id="center-selection">
-                <div class="SH_right" @click="screenLeft.show = screenLeft.show?false:true;">
-                    <i class="icon-right"></i>
-                </div>
-                <div :class="[screenLeft.item == 1?'active':(screenLeft.item == 2?'active-version':'active-version-3')]">
-                    <span class="item-property " @click="screenLeft.item = 1">目<br>录</span>
-                    <span class="item-version " @click="screenLeft.item = 2">属<br>性</span>
-                    <!-- <span class="item-version-3  " @click="screenLeft.item = 3;getVersion()">版<br>本</span> -->
-                </div>
-            </div>
-            <!-- <div id="verticalBar"></div> -->
-            <div v-show="screenLeft.show"  v-if="screenLeft.item == 1" class="screenRight_1">
-                 <p class="clearfix">
-                     <!-- v-if="fileNewAndrename" -->
-                    <i class="icon-goujian icon-add"  title="添加" @click="addFile"></i>
-                    <!-- <i class="icon-goujian icon-authrity" v-if="editCatalogAuth"  title="权限" @click="authrityFile"></i> -->
-                    <!-- v-if="fileCopyAndCutAndDelete"  -->
-                    <i class="icon-goujian icon-delete" title="删除" @click="deleteFile"></i>
-                    <!-- v-if="fileNewAndrename" -->
-                    <i class="icon-goujian icon-edit"   title="重命名" @click="renameFile"></i>
-                </p>
-                <!-- @click.stop="initTreeFolder()" -->
-                <div   @click.stop="initTreeFolder()">
-                    <el-tree
-                    :data="FileTree"
-                    ref="fileTree_cloudDrive"
-                    
-                    node-key="dirId"
-                    :props="defaultProps"
-                    :expand-on-click-node="false"
-                    :default-expanded-keys="expandedKeys"
-                    highlight-current
-                    @node-expand="nodeClick"
-                    @node-collapse="nodeClickClose"
-                    @node-click="handleNodeClick"
-                    id="cloudDirveFileTree"
-                    >
-                     <span :class="['custom-tree-node','el-tree-node__label','hahahhaha',data.isLeaf?'fileIcon':'',(data.isAutoCreated == 1 && data.holderId != null || data.isDrawing==1)?'qjLeaf':'']" slot-scope="{ node, data }" v-text="data.dirName?data.dirName:'(名称空)'"></span>
-                    </el-tree>
-                </div>
-            </div>
-            <div id="box-right"  v-show="screenLeft.show" v-if="screenLeft.item == 2">
-                <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
-                    <h3 class="header-attribute" style="margin-top:0px;">
-                        <i class="trrangle"></i>
-                        基本属性
-                        <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
-                    </h3>
-                    <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">文件名</span>
-                            <span class="detial-text-value" v-text="checkedItem.fgName"></span>
-                        </li>
-                        <!-- <li class="detial-item clearfix">
-                            <span class="detial-text-name">版本</span>
-                            <span class="detial-text-value" v-text="checkedItem.version"></span>
-                        </li> -->
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">上传人</span>
-                            <span class="detial-text-value" v-text="checkedItem.uploadUser"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">上传时间</span>
-                            <span class="detial-text-value" v-text="initData(checkedItem.uploadTime)"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">更新人</span>
-                            <span class="detial-text-value" v-text="checkedItem.updateUser"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">更新时间</span>
-                            <span class="detial-text-value" v-text="initData(checkedItem.updateTime)"></span>
-                        </li>
-                         <li class="detial-item clearfix">
-                            <span class="detial-text-name">文件大小</span>
-                            <span class="detial-text-value" >{{checkedItem.fileSize|fileSizeChange()}}</span>
-                        </li>
-                        <li v-show="!showBtn" class="detial-item clearfix">
-                            <span class="detial-text-name">图号</span>
-                            <span class="detial-text-value" v-text="updateDrawingNumber"></span>
-                        </li>
-                        <li v-show="!showBtn" class="detial-item clearfix">
-                            <span class="detial-text-name">图名</span>
-                            <span class="detial-text-value" v-text="updateDrawingName"></span>
-                        </li>
-                        <li v-show="!showBtn" class="detial-item clearfix">
-                            <span class="detial-text-name">比例</span>
-                            <span class="detial-text-value" v-text="updateDrawingRatio"></span>
-                        </li>
-                        <li v-show="!showBtn" class="detial-item clearfix">
-                            <span class="detial-text-name">相关空间</span>
-                            <span class="detial-text-value" v-text="updateDrawingHolderId"></span>
-                        </li>
-
-                    </ul>
-                    <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="showQuanJing">
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">文件名</span>
-                            <span class="detial-text-value" v-text="checkedRound.fgName"></span>
-                        </li>
-                        <!-- <li class="detial-item clearfix">
-                            <span class="detial-text-name">版本</span>
-                            <span class="detial-text-value" v-text="checkedRound.version"></span>
-                        </li> -->
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">上传人</span>
-                            <span class="detial-text-value" v-text="checkedRound.uploadUser"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">上传时间</span>
-                            <span class="detial-text-value" v-text="initData(checkedRound.uploadTime)"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">更新人</span>
-                            <span class="detial-text-value" v-text="checkedRound.updateUser"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name">更新时间</span>
-                            <span class="detial-text-value" v-text="initData(checkedRound.updateTime)"></span>
-                        </li>
-                        
-                    </ul>
-                    <h3 class="header-attribute" style="margin-top: 30px;">
-                        <i class="trrangle"></i>
-                        绑定构件
-                        <i :class="[{'active':show.BindingArtifacts},'icon-dropDown']" @click="show.BindingArtifacts = show.BindingArtifacts?false:true;"></i>
-                        <i class="el-icon-plus icon-dropDown1"  @click="showExtension"></i>
-                    </h3>
-                    <ul id="BindingArtifacts" :class="[{'show':show.BindingArtifacts}]">
-                        <li class="goujian-item" v-for="(item,index) in GouJianItem" :key="index">
-                            <p class="clearfix">
-                                <!-- @click="showDetialList(item)" -->
-                                <i class="icon-goujian icon-detial" @click="showDetialList(item)"></i>
-                                <i class="icon-goujian icon-QRcode" @click="viewListQrcode(item)"></i>
-                                <i class="icon-goujian icon-location" @click="goToLocation(item)"></i>
-                                <i class="icon-goujian icon-delete" @click="deleteList(item)"></i>
-                            </p>
-                            <p class="item-detial">
-                                <span class="detial-text-name">ID :</span>
-                            <span class="detial-text-value" v-text="item.id"></span>
-                            </p>
-                            <!-- <p class="item-detial">
-                                <span class="detial-text-name">状态 :</span>
-                            <span class="detial-text-value" v-text="parseMStatus(item.main.mStatus)+'('+item.main.mStatus+')'"></span>
-                            </p> -->
-                            <p class="item-detial">
-                                <span class="detial-text-name">明细 :</span>
-                            <span class="detial-text-value" v-text="item.componentNumber"></span>
-                            </p>
-                            <p class="item-detial">
-                                <span class="detial-text-name">名称 :</span>
-                            <span class="detial-text-value" v-text="item.name"></span>
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div v-else>
-                    <h3 class="header-attribute" style="margin-top:0px;">
-                        <i class="trrangle"></i>
-                        基本属性
-                        <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
-                    </h3>
-                    <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
-                            <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
-                            <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
-                        </li>
-                    </ul>
-                    <h3 class="header-attribute" style="margin-top:0px;">
-                        <i class="trrangle"></i>
-                        绑定构件
-                        <i :class="[{'active':show.basicAttributes},'icon-dropDown']" @click="show.basicAttributes = show.basicAttributes?false:true;"></i>
-                    </h3>
-                    <ul id="basicAttributes" :class="[{'show':show.basicAttributes}]" v-if="!showQuanJing">
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name" style="width: 80px;">文档选择数量</span>
-                            <span class="detial-text-value" v-text="checkedFile_Folder.fileCheckedNum"></span>
-                        </li>
-                        <li class="detial-item clearfix">
-                            <span class="detial-text-name" style="width: 90px;">文件夹选择数量</span>
-                            <span class="detial-text-value" v-text="checkedFile_Folder.folderCheckedNum"></span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div id="box-right-1" v-show="screenLeft.show"  v-if="screenLeft.item == 3">
-                <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
-                    <p class="head" v-if="checkedItem.dirId || checkedRound">
-                        <!-- <i class="icon-goujian icon-search" @click="view()"></i> -->
-                        <i class="icon-goujian icon-download" @click="downLoad()"></i>
-                        <i class="icon-goujian icon-deleteVersion" @click="deleteVersion()"></i>
-                        <select v-model="posType" class="inp-search">
-                            <option value="">所有版本</option>
-                            <option value="1">本周更新</option>
-                            <option value="2">本月更新</option>
-                            <option value="3">本年更新</option>
-                        </select>
-                        <i class="icon-sanjiao"></i>
-                    </p>
-                    <ul>
-                        <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
-                            <div class="clearfix">
-                                <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
-                                <div class="versin-detial">
-                                    <span class="user-name" v-text="item.uploadUserName"></span>
-                                    <span class="version-number" v-text="'版本-'+item.version"></span>
-                                    <p class="version-des">上传了新文档</p>
-                                    <!-- <p class="version-des1">{{updateDrawingNumber+'('+updateDrawingName+')'}}</p> -->
+                <div id="box-right-1" v-show="screenLeft.show"  v-if="screenLeft.item == 3">
+                    <div v-if="((showQuanJing && checkedRound.checked) || (checkedFile_Folder.file && checkedFile_Folder.fileCheckedNum == 1)) &&  !checkedFile_Folder.folder">
+                        <p class="head" v-if="checkedItem.dirId || checkedRound">
+                            <!-- <i class="icon-goujian icon-search" @click="view()"></i> -->
+                            <i class="icon-goujian icon-download" @click="downLoad()"></i>
+                            <i class="icon-goujian icon-deleteVersion" @click="deleteVersion()"></i>
+                            <select v-model="posType" class="inp-search">
+                                <option value="">所有版本</option>
+                                <option value="1">本周更新</option>
+                                <option value="2">本月更新</option>
+                                <option value="3">本年更新</option>
+                            </select>
+                            <i class="icon-sanjiao"></i>
+                        </p>
+                        <ul>
+                            <li :class="[item.checked?'active-item':'','item-version']" v-for="(item,index) in  versionItem" :key="index" @click="selectVersion(index)">
+                                <div class="clearfix">
+                                    <img :src="item.imgUuid?QJFileManageSystemURL+'/'+item.imgUuid:require('../../assets/people.png')" class="img" alt="">
+                                    <div class="versin-detial">
+                                        <span class="user-name" v-text="item.uploadUserName"></span>
+                                        <span class="version-number" v-text="'版本-'+item.version"></span>
+                                        <p class="version-des">上传了新文档</p>
+                                        <!-- <p class="version-des1">{{updateDrawingNumber+'('+updateDrawingName+')'}}</p> -->
+                                    </div>
                                 </div>
-                            </div>
-                            <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFrom == 1?'浏览器':'手机端')+'更新'}}</p>
-                        </li>
-                    </ul>
-                 </div>
+                                <p class="item-date">{{initData(item.uploadTime)+'来自'+(item.uploadFrom == 1?'浏览器':'手机端')+'更新'}}</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
+            <!-- 蒙板 -->
+            <div id="bodyMask" style="display:none;z-index:12;">
+            </div>
         <!--下面是报表清单的编码-->
         <common-list v-on:back="backToH" :mId="setId" :type=1  :title="'构件量清单'" v-if="showCommonList"></common-list>
       <div id="edit">
@@ -789,6 +792,7 @@
 </template>
 <style  lang='less'>
 #cloudDrive{
+    position: relative;
     #edit .el-dialog__body{
         margin-top:20px;
     }
@@ -1586,7 +1590,10 @@
         display: inline-block;
         width: 85%;
         position: relative;
-        transition:  all ease .5s;
+        position: absolute;
+        left:0px;
+
+        // transition:  all ease .2s;
         #planeFigureDiv{
             overflow: auto;
             position: absolute;
@@ -2087,7 +2094,7 @@
     .box-left-avtive{
         width: 98%;
         // right: 0px;
-        transition:  all ease .5s;
+        // transition:  all ease .2s;
           .icon-right{
               transform: rotateZ(180deg)!important;
               transition: all ease .5s;
@@ -2146,6 +2153,8 @@
         // overflow-y: auto;
         // display: inline-block;
         position: relative;
+        position:absolute;
+        right: 0px;
         float: right;
         width: 15%;
         // margin-top: -763px;
@@ -2172,6 +2181,7 @@
             left: 0;
             width: 25px;
             border-right: 1px solid #cccccc;
+            cursor: w-resize;
             .SH_right{
                 width: 100%;
                 height: 48px;
@@ -2698,6 +2708,7 @@ export default {
     data() {
          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
+            paleShow:false,
             elementTracId:'',
             routerList:'',
             moduleList:'',
@@ -2925,7 +2936,19 @@ export default {
         setTimeout(function(){
             vm.pointLocationBindClick()
         },1000)
+        this.lrSize();
+        window.addEventListener('resize',(e)=>{
+            let boxLeft = document.getElementById('boxLeft');
+            let boxRight = document.getElementById('boxRight');
+            this.screenLeft.show=true;
+            boxLeft.style.width = '85%';
+            boxRight.style.width = '15%';
+        })
     },
+    // updated(){
+    //     // this.rightHeight();
+    //     console.log('更新00')
+    // },
     filters:{
         //保留两位小数点
          fileSizeChange(val){
@@ -3014,6 +3037,66 @@ export default {
         },
     },
     methods:{
+        screenLeftClick(){
+            let boxLeft = document.getElementById('boxLeft');
+            let boxRight = document.getElementById('boxRight');
+            this.screenLeft.show = this.screenLeft.show?false:true;
+            if(this.screenLeft.show){
+                boxLeft.style.width = '85%';
+                boxRight.style.width = '15%';
+            }else{
+                 boxLeft.style.width = '98%';
+                boxRight.style.width = '2%';
+            }
+            
+        },
+        rightHeight(){
+            let boxLeft = document.getElementById('boxLeft');
+            let boxRight = document.getElementById('boxRight');
+            boxRight.style.height=boxLeft.offsetHeight+'px';
+        },
+        lrSize(){
+            let selection_resize = document.getElementById('center-selectionClick');
+            let bodyMaskPale = document.getElementById('bodyMask');
+            let boxLeft = document.getElementById('boxLeft');
+            let boxRight = document.getElementById('boxRight');
+            // let FileTree=document.getElementById('cloudDirveFileTree')
+            bodyMaskPale.style.width='100%';
+            bodyMaskPale.style.height=boxRight.offsetHeight+'px';
+            bodyMaskPale.style.position = 'absolute';
+            bodyMaskPale.style.top = '0px';
+            bodyMaskPale.style.left = '0px';
+            
+            // bodyMaskPale.style.background='red';
+            // if(boxRight.offsetWidth>30){
+                selection_resize.addEventListener('mousedown',(e)=>{
+                    // e.stopPropagation()
+                    e.preventDefault();
+                    console.log('点击');
+                    this.screenLeft.show=true;
+                    this.paleShow=true;
+                    bodyMaskPale.style.display='block';
+                    this.paleX=e.screenX;
+                    this.paleRightWidth=boxRight.offsetWidth;
+                    this.paleLeftWidth=boxLeft.offsetWidth;
+                })
+                bodyMaskPale.addEventListener('mousemove',(e)=>{
+                    if(this.paleShow){
+                        console.log('移动');
+                        let xValue = e.screenX-this.paleX;
+                        boxRight.style.width = this.paleRightWidth-xValue +'px';
+                        boxLeft.style.width = this.paleLeftWidth+xValue +'px';
+                    }
+                })
+                bodyMaskPale.addEventListener('mouseup',(e)=>{
+                    console.log('是否触发000');
+                    this.paleShow=false;
+                    bodyMaskPale.style.display='none';
+                    // boxLeft.style.width='760px'
+                    
+                })
+            // }
+        },
          callback(e){
             switch(e.data.command){
               case "EngineReady":
@@ -3771,7 +3854,8 @@ export default {
                     //     selectFolders: vm.hasFileToPaste.obj.fcIds,
                     // },
                     params:{
-                        targetDirId:vm.checkFileDir.dirId
+                        targetDirId:vm.checkFileDir.dirId,
+                        projectId:vm.projId
                     }
                 }).then((response)=>{
                     if(Math.ceil(response.data.cd) == 0){
@@ -3808,7 +3892,8 @@ export default {
                     'token':vm.token
                 },
                 params:{
-                    targetDirId:vm.checkFileDir.dirId
+                    targetDirId:vm.checkFileDir.dirId,
+                    projectId:vm.projId
                 },
                 // params:{
                 //     fgIds: vm.hasFileToPaste.obj.fgIds,

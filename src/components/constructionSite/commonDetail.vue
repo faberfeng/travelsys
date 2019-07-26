@@ -308,7 +308,7 @@
                     </div>
                     <div class="editBodytwo" v-show="manufacturerValue=='华桓'"><label class="editInpText" style="width:18% !important;">项目ID：</label><input v-model="nodeId" class="gatherTimeNameInp"/>
                     </div>
-                    <div class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
+                    <div v-show="manufacturerValue!='轴力'&&manufacturerValue!='水位'&&manufacturerValue!='竖直位移'&&manufacturerValue!='水平位移'" class="editBodytwo"><label class="editInpText" style="width:18% !important;">采集频率：</label>
                         <el-radio v-model="collectRateRadio" label="1">1小时</el-radio>
                         <el-radio v-model="collectRateRadio" label="2">1天</el-radio>
                     </div>
@@ -364,9 +364,208 @@
                             </table>
                         </div>
                     </div>
+                    <div class="editBodytwo" v-show="manufacturerValue=='轴力'">
+                        <label class="editInpText" style="width:13% !important;">轴力配置</label>
+                         <div class="tool">
+                             <!-- <span class="export" style="width:90px" @click="forceWaySetting()"><label class="el-icon-setting"></label><label class="exportTxt" style="width:80px">公式设定</label></span> -->
+                             <span class="export"  @click="addForce()"><label class="el-icon-circle-plus"></label><label class="exportTxt"  >新增</label></span>
+                        </div>
+                        <div id="toolTbale" style="height:300px">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="50px" rowspan="2">点位名称</th>
+                                        <th width="100px" rowspan="2">计算公式</th>
+                                        <!-- <th width="20px" rowspan="2">率定系数</th> -->
+                                        <th colspan="3">设备1</th>
+                                        <th colspan="3">设备2</th>
+                                        <th colspan="3">设备3</th>
+                                        <th colspan="3">设备4</th>
+                                        <th width="80px" rowspan="2">操作</th>
+                                    </tr>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>端口</th>
+                                        <th>率定系数</th>
+
+                                        <th>ID</th>
+                                        <th>端口</th>
+                                        <th>率定系数</th>
+
+                                        <th>ID</th>
+                                        <th>端口</th>
+                                        <th>率定系数</th>
+
+                                        <th>ID</th>
+                                        <th>端口</th>
+                                        <th>率定系数</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getForceBindInfoList" :key="index">
+                                       <!-- <td v-text="item.pointId"></td> -->
+                                       <td >{{getPointName(item.pointId)}}</td>
+                                       <td :title="getFormName(item.useFormula)">{{getFormName(item.useFormula)}}</td>
+                                       <!-- <td v-text="item.k"></td> -->
+
+                                       <td v-text="item.deviceId"></td>
+                                       <td v-text="item.port"></td>
+                                       <td v-text="item.k1"></td>
+
+                                       <td v-text="item.deviceId2"></td>
+                                       <td v-text="item.port2"></td>
+                                       <td v-text="item.k2"></td>
+
+                                       <td v-text="item.deviceId3"></td>
+                                       <td v-text="item.port3"></td>
+                                       <td v-text="item.k3"></td>
+
+                                       <td v-text="item.deviceId4"></td>
+                                       <td v-text="item.port4"></td>
+                                       <td v-text="item.k4"></td>
+                                       <td>
+                                           <button title="删除" @click="DeleteAutoForce(item.id)"  class="deleteBtn actionBtn"></button>
+                                            <!-- v-show="editInspectWordEdit" -->
+                                            <!-- <button title="编辑" @click="editAutoForce(item.id)"   class="editBtn actionBtn"></button> -->
+                                       </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="editBodytwo" v-show="manufacturerValue=='水位'">
+                        <label class="editInpText" style="width:10% !important;">点位映射</label>
+                         <div class="tool">
+                             <span class="export" @click="addWaterLevel()"><label class="el-icon-circle-plus"></label><label class="exportTxt" >新增</label></span>
+                        </div>
+                        <div id="toolTbale" style="height:300px">
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px" rowspan="2">点位名称</th>
+                                        
+                                        <!-- <th rowspan="2">初始频率</th> -->
+                                        <th rowspan="2">率定系数</th>
+                                        <th rowspan="2">水位深度</th>
+                                        <th rowspan="2">管口标高</th>
+                                        <th  colspan="2">设备</th>
+                                        <th  width="100px" rowspan="2">操作</th>
+                                    </tr>
+                                    <tr>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in WaterLevelList" :key="index">
+                                        <td>{{getPointName(item.pointId)}}</td>
+                                        <!-- <td v-text="item.f0"></td> -->
+                                        <td v-text="item.k"></td>
+                                        <td v-text="item.h"></td>
+                                        <td v-text="item.pipeHeight"></td>
+                                        <td v-text="item.deviceId"></td>
+                                        <td v-text="item.port"></td>
+                                        <td>
+                                             <button title="删除" @click="DeleteAutoWaterLevel(item.id)"  class="deleteBtn actionBtn"></button>
+                                            <!-- v-show="editInspectWordEdit" -->
+                                            <!-- <button title="编辑"   class="editBtn actionBtn"></button> -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="editBodytwo" v-show="manufacturerValue=='竖直位移'">
+                        <label class="editInpText" style="width:10% !important;">竖直位移</label>
+                         <div class="tool">
+                             <span class="export" @click="addVerticalDisplace()"><label class="el-icon-circle-plus"></label><label class="exportTxt" >新增</label></span>
+                        </div>
+                        <div id="toolTbale" style="height:300px">
+
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px" rowspan="2">点位名称</th>
+                                        <th colspan="3">绑定点位设备</th>
+                                        <th colspan="3">基准点位设备</th>
+                                        <th  width="100px" rowspan="2">操作</th>
+                                    </tr>
+                                    <tr>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">传感器地址</th>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">传感器地址</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getVerticalBindInfoList" :key="index">
+                                        <!-- <td v-text="item.pointId"></td> -->
+                                        <td >{{getPointName(item.pointId)}}</td>
+                                        <td v-text="item.systemId"></td>
+                                        <td v-text="item.channelNo"></td>
+                                        <td v-text="item.sensorAddress"></td>
+                                        <td v-text="item.baseSystemId"></td>
+                                        <td v-text="item.baseChannelNo"></td>
+                                        <td v-text="item.baseSensorAddress"></td>
+                                        <td>
+                                            <button title="删除" @click="DeleteAutoVerticalHeight(item.id)"  class="deleteBtn actionBtn"></button>
+                                            <!-- <button title="编辑"   class="editBtn actionBtn"></button> -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    <div class="editBodytwo" v-show="manufacturerValue=='水平位移'">
+                        <label class="editInpText" style="width:10% !important;">水平位移</label>
+                         <div class="tool">
+                             <span class="export" @click="addHorizontalDisplace()"><label class="el-icon-circle-plus"></label><label class="exportTxt" >新增</label></span>
+                        </div>
+                        <div id="toolTbale" style="height:300px">
+
+                            <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
+                                 <thead>
+                                    <tr>
+                                        <th width="100px">点位名称</th>
+                                        <td width="50px">初始位移</td>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">传感器地址</th>
+                                        <th  width="100px">操作</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr v-for="(item,index) in getHorizontalDisplaceList" :key="index">
+                                        <td >{{getPointName(item.pointId)}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <!-- <td v-text="item.systemId"></td>
+                                        <td v-text="item.channelNo"></td>
+                                        <td v-text="item.sensorAddress"></td>
+                                        <td v-text="item.baseSystemId"></td>
+                                        <td v-text="item.baseChannelNo"></td>
+                                        <td v-text="item.baseSensorAddress"></td> -->
+                                        <td>
+                                            <button title="删除" @click="DeleteAutoHorizontal(item.id)"  class="deleteBtn actionBtn"></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
+                        <button v-show="manufacturerValue!='轴力'&&manufacturerValue!='水位'&&manufacturerValue!='竖直位移'&&manufacturerValue!='水平位移'" class="editBtnS" @click="autoAcquisitionMakeSure()" >确定</button>
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
             </el-dialog>
@@ -445,6 +644,250 @@
                     <button class="editBtnC" @click="upImgCancle">取消</button>
                 </div>
             </el-dialog>
+
+            <el-dialog title="轴力配置" :visible="addForceShow" @close="cancleForce">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                        <select v-model="forcePointId" class="sheetName">
+                             <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">计算公式:</label>
+                        <select v-model="useFormulaValues" class="sheetName">
+                             <option v-for="(item,index) in useFormulaLists"  :value="item.value" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div v-show="useFormulaValues=='1'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
+                            <input placeholder="请输入" v-model="AsValue" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
+                            <input placeholder="请输入" v-model="EsValue" class="editInput"/>
+                            <label>千帕</label>
+                        </div>
+                    </div>
+                     <div v-show="useFormulaValues=='2'">
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">钢筋直径(mm)：</label>
+                            <input placeholder="请输入" v-model="barDiameterValue" @change="asMethod()" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">根数：</label>
+                            <input placeholder="请输入" v-model="barCountValue"  class="editInput"/>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积As：</label>
+                            <input placeholder="请输入" v-model="asValueArea"  class="editInput"/>
+                        </div>
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">钢筋应力计的截面积As'：</label>
+                            <input placeholder="请输入" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋的牌号：</label>
+                            <select class="eidtSelect" @change="esChange(barGradeValue)" v-model="barGradeValue">
+                                <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
+                            </select>
+                            <!-- <i class="sanjiaoicon"></i> -->
+                            <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
+                        </div>
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑宽度(mm)：</label>
+                            <input placeholder="请输入" v-model="concreteWidthValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑高度(mm)： ：</label>
+                            <input placeholder="请输入" v-model="concreteHeightValue" @change="acMethod()" class="editInput"/>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土截面积Ac：</label>
+                            <input placeholder="请输入" v-model="acValueArea" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土的等级：</label>
+                            <select placeholder="请选择" class="eidtSelect" @change="ecChange(concreteLevelValue)" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name"  :key="index" v-text="item.name"></option>
+                            </select>
+                             <!-- <i class="sanjiaoicon1"></i> -->
+                            <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{ecValue}}</label>
+                        </div>
+                    </div>
+
+                    <!-- <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">率定系数:</label>
+                        <input placeholder="率定系数" v-model="k" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div> -->
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备1:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data1" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备2:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备3:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备4:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeForceSure">确认</button>
+                    <button class="editBtnC" @click="cancleForce">取消</button>
+                </div>
+            </el-dialog>
+
+            <el-dialog title="水位配置" :visible="addWaterLevelShow" @close="waterLevelCancle()">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                        <select v-model="forcePointId" class="sheetName">
+                             <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">率定系数:</label>
+                        <input placeholder="率定系数" v-model="wLevelK" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">水位深度:</label>
+                        <input placeholder="水位深度" v-model="wLevelH" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">管口标高:</label>
+                        <input placeholder="管口标高" v-model="wLevelPipeH" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="wLevelDeviceId" style="width:185px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="wLevelPort" style="width:185px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeWaterLevelSure">确认</button>
+                    <button class="editBtnC" @click="waterLevelCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="垂直位移配置" :visible="addVerticalDisplaceShow" @close="VerticalDisplaceCancle" >
+                <div class="editBody">
+                    <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始高度:</label>
+                        <input placeholder="初始高度" v-model="initalHeight" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="systemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="channelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="传感器地址" class="inp" v-model="sensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">基准点位设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="baseSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="baseChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="传感器地址" class="inp" v-model="baseSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="makeVerticalDisplaceSure">确认</button>
+                        <button class="editBtnC" @click="VerticalDisplaceCancle">取消</button>
+                </div>
+            </el-dialog>
+
+            <el-dialog title="水平位移配置" :visible="addHorizontalDisplaceShow" @close="horizontalDisplaceCancle" >
+                <div class="editBody">
+                    <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始位移:</label>
+                         <input placeholder="设备ID" class="inp" v-model="horInitalValue" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="horSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="horChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="传感器地址" class="inp" v-model="horSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="makeHorizontalDisplaceSure">确认</button>
+                        <button class="editBtnC" @click="horizontalDisplaceCancle">取消</button>
+                </div>
+            </el-dialog>
+
+            <!-- <el-dialog title="竖直位移配置" :visible="addVerticalDisplaceShow" @close="VerticalDisplaceCancle" >
+                <div class="editBody">
+                    <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="makeVerticalDisplaceSure">确认</button>
+                        <button class="editBtnC" @click="VerticalDisplaceCancle">取消</button>
+                    </div>
+                </div>
+            </el-dialog> -->
+
              <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
                 <div class="editBody" >
                      <div class="editBodytwo">
@@ -480,6 +923,84 @@
                         <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
                 </div>
             </el-dialog>
+
+            <el-dialog title="受力计算公式设定" :visible="formulaSettingShow" @close="formulaSettingCancle()">
+                <div class="editBody" style="overflow:auto;height:600px">
+                    <div class="editBodyone">
+                        <el-radio v-model="useFormulaValue" label="1" style="margin-left:50px;">振弦式应变计计算公式：</el-radio>
+                    </div>
+                    <div v-show="useFormulaValue=='1'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
+                            <input placeholder="请输入" v-model="AsValue" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
+                            <input placeholder="请输入" v-model="EsValue" class="editInput"/>
+                            <label>千帕</label>
+                        </div>
+                    </div>
+                    <div class="editBodytwo">
+                       <el-radio v-model="useFormulaValue" label="2" style="margin-left:50px;">混凝土支撑内振弦式钢筋计计算公式：</el-radio>
+                    </div>
+                    <div v-show="useFormulaValue=='2'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋直径(mm)：</label>
+                            <input placeholder="请输入" v-model="barDiameterValue" @change="asMethod()" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">根数：</label>
+                            <input placeholder="请输入" v-model="barCountValue"  class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积As：{{asValueArea}}</label>
+                        </div>
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">钢筋应力计的截面积As'：</label>
+                            <input placeholder="请输入" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋的牌号：</label>
+                            <select class="eidtSelect" @change="esChange(barGradeValue)" v-model="barGradeValue">
+                                <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
+                            </select>
+                            <i class="sanjiaoicon"></i>
+                            <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑宽度(mm)：</label>
+                            <input placeholder="请输入" v-model="concreteWidthValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑高度(mm)： ：</label>
+                            <input placeholder="请输入" v-model="concreteHeightValue" @change="acMethod()" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积Ac：{{acValueArea}}</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土的等级：</label>
+                            <select placeholder="请选择" class="eidtSelect" @change="ecChange(concreteLevelValue)" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name"  :key="index" v-text="item.name"></option>
+                            </select>
+                             <i class="sanjiaoicon1"></i>
+                            <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{ecValue}}</label>
+                        </div>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="setFormula()">确定</button>
+                    <button class="editBtnC" @click="formulaSettingCancle()" >取消</button>
+                </div>
+            </el-dialog>
             
         </div>
     </div>
@@ -504,6 +1025,152 @@ export default Vue.component('commonDetail',{
         //         this.callback(evt)},true
         // );
         return{
+            //垂直位移
+            initalHeight:'',
+            systemId:'',
+            channelNo:'',
+            sensorAddress:'',
+            baseSystemId:'',
+            baseChannelNo:'',
+            baseSensorAddress:'',
+            getVerticalBindInfoList:'',
+
+            //公式设定参数
+            setInitCollectTimeList:'',
+            selectTimeValue:'',
+            formulaSettingShow:false,//公式设定
+            useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
+            getFormulaList:'',//获取受力公式
+            useFormulaNum:"1",
+            useFormulaList:[
+                {
+                    value:"1",
+                    name:"振弦式应变计计算公式"
+                },
+                {
+                    value:"2",
+                    name:"混凝土支撑内振弦式钢筋计计算公式"
+                }
+            ],
+            AsValue:null,//钢支撑/钢立柱的截面积
+            EsValue:null,//钢支撑/钢立柱的弹性模量
+            barDiameterValue:null,//钢筋直径
+            asValueArea:null,//as面积
+            acValueArea:null,//ac面积
+            ecList:[
+                {
+                    name:'C15',
+                    value:22000
+                },
+                {
+                    name:'C20',
+                    value:25500
+                },
+                {
+                    name:'C25',
+                    value:28000
+                },
+                {
+                    name:'C30',
+                    value:30000
+                },
+                {
+                    name:'C35',
+                    value:31500
+                },
+                {
+                    name:'C40',
+                    value:32500
+                },
+                {
+                    name:'C45',
+                    value:33500
+                },
+                {
+                    name:'C50',
+                    value:34500
+                },
+                {
+                    name:'C55',
+                    value:35500
+                },
+                {
+                    name:'C60',
+                    value:36000
+                },
+                {
+                    name:'C65',
+                    value:36500
+                },
+                {
+                    name:'C70',
+                    value:37000
+                },
+                {
+                    name:'C75',
+                    value:37500
+                },
+                {
+                    name:'C80',
+                    value:38000
+                },
+            ],
+            //钢筋的牌号
+            esList:[
+                {
+                    name:'HPB235',
+                    value:210000
+                },
+                {
+                    name:'HRB335',
+                    value:200000
+                },
+                 {
+                    name:'HRB400',
+                    value:200000
+                },
+                 {
+                    name:'RRB400',
+                    value:200000
+                },
+            ],
+            ecValue:'',
+            esValue:'',
+            barCountValue:null,//钢筋根数
+            concreteWidthValue:null,//混凝土宽度
+            concreteHeightValue:null,//混凝土高度
+            concreteLevelValue:null,//混凝土等级
+            barGradeValue:null,//钢筋牌号
+            useFormulaLists:[
+                {
+                    value:"1",
+                    name:"振弦式应变计计算公式"
+                },
+                {
+                    value:"2",
+                    name:"混凝土支撑内振弦式钢筋计计算公式"
+                }
+            ],
+            useFormulaValues:"1",
+            k:'',
+            deviceId:'',
+            port:'',
+            data1:'',
+
+            deviceId2:'',
+            port2:'',
+            data2:'',
+
+            deviceId3:'',
+            port3:'',
+            data3:'',
+
+            deviceId4:'',
+            port4:'',
+            data4:'',
+
+            getForceBindInfoList:'',
+
             startValue:'',
             endValue:'',
             startValue1:'',
@@ -554,6 +1221,17 @@ export default Vue.component('commonDetail',{
             autoAcquisitionShow:false,//自动采集配置
             textShow:false,
             uploadshow:false,
+            addForceShow:false,
+            addWaterLevelShow:false,
+            addVerticalDisplaceShow:false,
+
+            addHorizontalDisplaceShow:false,//水平位移
+            horSystemId:'',
+            horChannelNo:'',
+            horSensorAddress:'',
+            horInitalValue:'',
+            getHorizontalDisplaceList:'',
+
             exportHistoryRecoedShow:false,
             idsList:[],
             allCheck:false,
@@ -600,6 +1278,15 @@ export default Vue.component('commonDetail',{
             monitorPointInfo:'',
             dataLists:'',
             getDetailPointInfoList:'',
+            forcePointId:'',
+            fZero:'',
+            wLevelK:'',
+            wLevelH:'',
+            wLevelPipeH:'',
+            wLevelDeviceId:'',
+            wLevelPort:'',
+            WaterLevelList:'',
+
             getImportHistoryList:'',//获取导入历史
             isAlertNum:0,
             isBrokenNum:0,
@@ -613,7 +1300,7 @@ export default Vue.component('commonDetail',{
             measureId:'',
             optionSpotChangeLine:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: false
                         },
                         title: {
@@ -621,6 +1308,7 @@ export default Vue.component('commonDetail',{
                         },
                         xAxis: {
                             categories:[],
+                            tickmarkPlacement: 'on'
                         },
                         yAxis: {
                             // min:4268.5,
@@ -671,7 +1359,7 @@ export default Vue.component('commonDetail',{
             },
             optionSpotChangeLine1:{
                         chart: {
-                            type: 'spline',
+                            // type: 'spline',
                             inverted: false
                         },
                         title: {
@@ -679,6 +1367,7 @@ export default Vue.component('commonDetail',{
                         },
                         xAxis: {
                             categories:[],
+                            tickmarkPlacement: 'on'
                         },
                         yAxis: {
                             min:4268.5,
@@ -866,6 +1555,7 @@ export default Vue.component('commonDetail',{
         this.getDetailPointInfo();
         this.getDetectionItemCollectWay();
         this.checkAuth();
+        this.autoFacturerList();
         // this.getUserInfo();
         // console.log(vm.paramsListsSub)
         // this.getBaseMapList();
@@ -939,6 +1629,9 @@ export default Vue.component('commonDetail',{
         },
         manufacturerValue:function(val){
             this.getDeviceMonitorPointRelation()
+        },
+        forcePointId:function(val){
+            this.getInsertHistoryDate()
         }
     },
     mounted(){
@@ -950,6 +1643,141 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+        //得到点位
+        getPointName(val){
+            console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
+            var a;
+            this.getDetailPointInfoList.forEach((item)=>{
+                if(item.id==val){
+                    a=item.name;
+                }
+            })
+            return a;
+        },
+        getFormName(val){
+            var a;
+            this.useFormulaLists.forEach((item)=>{
+                if(item.value==val){
+                    a=item.name;
+                }
+            })
+            return a;
+        },
+        //触发改变时间
+        changeTimeValue(){
+            // this.setInitCollectTime();
+        },
+        //獲取歷史日期
+        getInsertHistoryDate(){
+            var pointIds=[];
+            pointIds.push(this.forcePointId);
+            console.log(pointIds,'pointIds');
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getInsertHistoryDate',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                },
+                data:pointIds,
+                method:'post'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.setInitCollectTimeList=response.data.rt[0].historyDate;
+                    this.selectTimeValue=this.setInitCollectTimeList[0];
+                }
+            })
+        },
+        //设置初始时间
+        setInitCollectTime(){
+            if(this.selectTimeValue){
+                this.selectTimeValue=new Date(new Date(this.selectTimeValue).toString().split('GMT')[0]+' UTC').toISOString();
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/setInitCollectTime',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId,
+                        pointId:this.forcePointId,
+                        initDataDate:this.selectTimeValue
+                    },
+                    method:'get'
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                            
+                    }else{
+
+                    }
+                })
+            }
+        },
+        autoFacturerList(){
+            if(this.itemMonitorType==4){
+                this.manufacturerList=[
+                        {
+                            value:'华桓',
+                            label:'华桓'
+                        },
+                        {
+                            value:'基康',
+                            label:'基康'
+                        },
+                        {
+                            value:'轴力',
+                            label:'轴力'
+                        }
+                ]
+            }else if(this.itemMonitorType==3){
+                this.manufacturerList=[
+                        {
+                            value:'华桓',
+                            label:'华桓'
+                        },
+                        {
+                            value:'基康',
+                            label:'基康'
+                        },
+                        {
+                            value:'水位',
+                            label:'水位'
+                        }
+                ]
+            }else if(this.itemMonitorType==2){
+                this.manufacturerList=[
+                        {
+                            value:'华桓',
+                            label:'华桓'
+                        },
+                        {
+                            value:'基康',
+                            label:'基康'
+                        },
+                        {
+                            value:'竖直位移',
+                            label:'竖直位移'
+                        }
+                ]
+            }else if(this.itemMonitorType==1){
+                this.manufacturerList=[
+                        {
+                            value:'华桓',
+                            label:'华桓'
+                        },
+                        {
+                            value:'基康',
+                            label:'基康'
+                        },
+                        {
+                            value:'水平位移',
+                            label:'水平位移'
+                        }
+                ]
+
+            }
+        },
+        
         downExcel(){
             method5('bottomTableList')   
         },
@@ -1442,6 +2270,7 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getDetailPointInfoList=response.data.rt;
+                    this.forcePointId=this.getDetailPointInfoList[0].id;
                     this.getDetailPointInfoList.forEach((item)=>{
                         if(item.isAlert==1){
                             this.isAlertNum++;
@@ -2313,7 +3142,15 @@ export default Vue.component('commonDetail',{
             this.autoAcquisitionShow=true;
             this.getCollectSetting();
             this.getHuahuanNode();
-           
+            if(this.itemMonitorType==4){
+                this.getForceBindInfo();
+            }else if(this.itemMonitorType==3){
+                this.getGaugeBindInfo();
+            }else if(this.itemMonitorType==2){
+                this.getVerticalBindInfo()
+            }else if(this.itemMonitorType==1){
+                this.getHorizontalDisplace();
+            }
         },
         //取消自动采集配置
         autoAcquisitionCancle(){
@@ -2349,6 +3186,390 @@ export default Vue.component('commonDetail',{
         //导入
         autoExport(){
             this.uploadshow=true;
+        },
+        //自动导入轴力
+        addForce(){
+            this.addForceShow=true;
+            this.getInsertHistoryDate();
+        },
+        DeleteAutoForce(id){
+            this.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/deleteForceBindInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getForceBindInfo();
+                    }
+                })
+
+            })
+        },
+        editAutoForce(){
+
+        },
+        forceMake(){
+             axios({
+                url:this.BDMSUrl+'detectionInfo/addForceBindInfo',
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    pointId:this.forcePointId,
+                    k:this.k,
+                    deviceId:this.deviceId,
+                    port:this.port,
+                    k1:this.data1,
+                    useFormula:this.useFormulaValues,
+                    deviceId2:this.deviceId2,
+                    port2:this.port2,
+                    k2:this.data2,
+
+                    deviceId3:this.deviceId3,
+                    port3:this.port3,
+                    k3:this.data3,
+
+                    deviceId4:this.deviceId4,
+                    port4:this.port4,
+                    k4:this.data4
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.ForceBindInfoList=response.data.rt;
+                    this.addForceShow=false;
+                    this.setFormula();
+                    this.setInitCollectTime();
+                    this.getForceBindInfo();
+                    this.k='';
+                    this.deviceId='';
+                    this.port='';
+                    this.data1='';
+                    this.useFormulaValues="1";
+
+                    this.deviceId2='';
+                    this.port2='';
+                    this.data2='';
+
+                    this.deviceId3='';
+                    this.port3='';
+                    this.data3='';
+
+                    this.deviceId4='';
+                    this.port4='';
+                    this.data4='';
+                }
+            })
+
+        },
+        makeForceSure(){
+            var vm=this;
+            if(vm.useFormulaValues=='1'){
+                if(vm.AsValue==null||vm.EsValue==null){
+                    this.$message({
+                        type:'info',
+                        message:'钢支撑/钢立柱的截面积或弹性模量不能为空'
+                    })
+                }else{
+                    this.forceMake()
+                }
+            }else{
+                if(this.asValueArea==null||this.acValueArea==null||this.barGradeValue==null||this.concreteLevelValue==null){
+                    this.$message({
+                        type:'info',
+                        message:'配置公式选项不能为空'
+                    })
+                }else{
+                    this.forceMake()
+                }
+            }
+        },
+        getForceBindInfo(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getForceBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                method:'get',
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getForceBindInfoList=response.data.rt;
+                }
+            })
+        },
+        cancleForce(){
+            this.addForceShow=false;
+            this.k='';
+            this.deviceId='';
+            this.port='';
+            this.data1='';
+
+            this.deviceId2='';
+            this.port2='';
+            this.data2='';
+
+            this.deviceId3='';
+            this.port3='';
+            this.data3='';
+
+            this.deviceId4='';
+            this.port4='';
+            this.data4='';
+        },
+
+        //自动导入水位
+        addWaterLevel(){
+            this.addWaterLevelShow=true;
+            this.getInsertHistoryDate();
+        },
+        //自动导入竖直位移
+        // addVerticalDisplace(){
+        //     this.addVerticalDisplaceShow=true;
+           
+        // },
+        makeWaterLevelSure(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'detectionInfo/addGaugeBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                method:'get',
+                params:{
+                    deviceId:this.wLevelDeviceId,
+                    port:this.wLevelPort,
+                    itemId:this.itemMonitorId,
+                    pointId:this.forcePointId,
+                    // f0:this.fZero,
+                    k:this.wLevelK,
+                    h:this.wLevelH,
+                    pipeHeight:this.wLevelPipeH
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.setInitCollectTime();
+                    this.getGaugeBindInfo();
+                    this.addWaterLevelShow=false;
+                    this.wLevelDeviceId='';
+                    this.wLevelPort='';
+                    this.fZero='';
+                    this.wLevelK='';
+                    this.wLevelH='';
+                    this.wLevelPipeH='';
+                }
+            })
+        },
+        getGaugeBindInfo(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getGaugeBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                },
+                method:'get'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.WaterLevelList=response.data.rt;
+                }
+            })
+        },
+         DeleteAutoWaterLevel(id){
+            this.$confirm('您要删除当前所选主题？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/deleteGaugeBindInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getGaugeBindInfo();
+                    }
+                })
+
+            })
+        },
+        waterLevelCancle(){
+            this.addWaterLevelShow=false;
+            this.wLevelDeviceId='';
+            this.wLevelPort='';
+            this.fZero='';
+            this.wLevelK='';
+            this.wLevelH='';
+            this.wLevelPipeH='';
+        },
+        //自动导入竖直位移
+        addVerticalDisplace(){
+            this.addVerticalDisplaceShow=true;
+             this.getInsertHistoryDate();
+        },
+        makeVerticalDisplaceSure(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+'detectionInfo/addVerticalBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    pointId:this.forcePointId,
+                    baseSystemId:this.baseSystemId,
+                    baseChannelNo:this.baseChannelNo,
+                    baseSensorAddress:this.baseSensorAddress,
+                    systemId:this.systemId,
+                    channelNo:this.channelNo,
+                    sensorAddress:this.sensorAddress,
+                    h:this.initalHeight
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                     this.setInitCollectTime();
+                    this.getVerticalBindInfo();
+                    this.addVerticalDisplaceShow=false;
+                    this.baseSystemId='';
+                    this.baseChannelNo='';
+                    this.baseSensorAddress='';
+                    this.systemId='';
+                    this.channelNo='';
+                    this.sensorAddress='';                        
+                }
+            })
+
+        },
+        getVerticalBindInfo(){
+            var vm=this;
+            axios({
+                url:this.BDMSUrl+"detectionInfo/getVerticalBindInfo",
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getVerticalBindInfoList=response.data.rt;
+                }
+            })
+        },
+        DeleteAutoVerticalHeight(id){
+            this.$confirm('您要删除当前所选主题?','提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then((response)=>{
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/deleteVerticalBindInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.getVerticalBindInfo()
+                    }
+                })
+            })
+        },
+        VerticalDisplaceCancle(){
+            this.addVerticalDisplaceShow=false;
+        },
+        //自动导入水平位移
+        addHorizontalDisplace(){
+            this.addHorizontalDisplaceShow=true;
+            this.getInsertHistoryDate();
+        },
+        horizontalDisplaceCancle(){
+            this.addHorizontalDisplaceShow=false;
+            this.horChannelNo='';
+            this.horSensorAddress='';
+            this.horSystemId='';
+            this.horInitalValue='';
+
+        },
+        makeHorizontalDisplaceSure(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/addHorizontalBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:this.forcePointId,
+                    systemId:this.horSystemId,
+                    channelNo:this.horChannelNo,
+                    sensorAddress:this.horSensorAddress,
+                    initShift:this.horInitalValue
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.addHorizontalDisplaceShow=false;
+                    this.setInitCollectTime();
+                    this.getHorizontalDisplace();
+                    this.horChannelNo='';
+                    this.horSensorAddress='';
+                    this.horSystemId='';
+                    this.horInitalValue='';
+                }
+            })
+        },
+        getHorizontalDisplace(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getHorizontalBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getHorizontalDisplaceList=response.data.rt;
+                }
+            })
+        },
+        DeleteAutoHorizontal(id){
+            this.$confirm('您要删除当前所选主题?','提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then((response)=>{
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/deleteHorizontalBindInfo',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        id:id
+                    }
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                      this.getHorizontalDisplace();
+                    }
+                })
+            })
         },
         upImgCancle(){
             this.uploadshow=false;
@@ -2705,6 +3926,134 @@ export default Vue.component('commonDetail',{
             })
 
         },
+
+        //受力公式设定
+        forceWaySetting(){
+            this.formulaSettingShow=true;
+            this.getFormula();
+        },
+        formulaSettingCancle(){
+            this.formulaSettingShow=false;
+            this.AsValue=null;
+            this.EsValue=null;
+            this.barDiameterValue=null;
+            this.barCountValue=null;
+            this.concreteWidthValue=null;
+            this.concreteHeightValue=null;
+            this.concreteLevel=null;
+            this.barGradeValue=null;
+            this.acValueArea=null;
+            this.asValueArea=null;
+        },
+        //获取受力公式
+        getFormula(){
+            var vm=this;
+            axios({
+                method:'get',
+                url:this.BDMSUrl+'detectionInfo/getFormula',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    if(response.data.rt.length!=0){
+                        this.getFormulaList=(response.data.rt)[0];
+                        this.AsValue=this.getFormulaList.as;
+                        this.barCountValue=this.getFormulaList.barCount;
+                        this.barDiameterValue=this.getFormulaList.barDiameter
+                        this.barGradeValue=this.getFormulaList.barGrade
+                        this.concreteHeightValue=this.getFormulaList.concreteHeight
+                        this.concreteLevelValue=this.getFormulaList.concreteLevel
+                        this.concreteWidthValue=this.getFormulaList.concreteWidth
+                        this.EsValue=this.getFormulaList.es
+                        this.useFormulaValue=this.getFormulaList.formula==1?'1':'2'
+                    }
+                    // console.
+                }else if(response.data.cd=='-1'){
+
+                }
+            })
+
+        },
+        asMethod(){
+            this.asValueArea=3.14*(this.barDiameterValue)*(this.barDiameterValue)/4
+        },
+        //
+        acMethod(){
+            this.acValueArea=(this.concreteWidthValue)*(this.concreteHeightValue)-(this.asValueArea)*(this.barCountValue);
+        },
+        ecChange(name){
+            this.ecList.forEach((item)=>{
+                if(item.name==name){
+                     this.ecValue=item.value;
+                }
+            })
+        },
+        esChange(val){
+             this.esList.forEach((item)=>{
+                 if(item.name==val){
+                     this.esValue=item.value;
+                 }
+             })
+        },
+        //设置受力公式
+        setFormula(){
+            var vm=this;
+            axios({
+                method:'post',
+                url:this.BDMSUrl+'detectionInfo/setFormula',
+                headers:{
+                    'token':vm.token
+                },
+                params:{
+                    itemId:vm.itemMonitorId,
+                    useFormula:vm.useFormulaValues,
+                    As:vm.AsValue,
+                    Es:vm.EsValue,
+                    barDiameter:vm.barDiameterValue,
+                    barCount:vm.barCountValue,
+                    concreteWidth:vm.concreteWidthValue,
+                    concreteHeight:vm.concreteHeightValue,
+                    concreteLevel:vm.concreteLevelValue,
+                    barGrade:vm.barGradeValue,
+                    pointId:this.forcePointId,
+                    As2:this.asValueArea,
+                    Es2:this.acValueArea
+                }
+            }).then((response)=>{
+                if(response.data.cd=='0'){
+                    // this.$message({
+                    //     type:'success',
+                    //     message:'公式设定成功'
+                    // })
+                    this.formulaSettingShow=false;
+                    this.AsValue=null;
+                    this.EsValue=null;
+                    this.barDiameterValue=null;
+                    this.barCountValue=null;
+                    this.concreteWidthValue=null;
+                    this.concreteHeightValue=null;
+                    this.concreteLevel=null;
+                    this.barGradeValue=null;
+                    this.acValueArea=null;
+                    this.asValueArea=null;
+
+                }else if(response.data.cd=='-1'){
+                    vm.$message({
+                        type:'error',
+                        message:response.data.msg
+                    })
+                }
+            })
+
+        },
+
+
+
+
         
 
 
@@ -3361,6 +4710,18 @@ export default Vue.component('commonDetail',{
                     position: relative;
                     width:60px;
                     display: inline-block;
+                    .el-icon-circle-plus{
+                        font-size:18px;
+                        display: inline-block;
+                        margin-right:4px;
+                        cursor: pointer;
+                    }
+                    .el-icon-setting{
+                        font-size:18px;
+                        display: inline-block;
+                        margin-right:4px;
+                        cursor: pointer;
+                    }
                     .export1{
                          display: inline-block;
                         width: 18px;
@@ -3465,6 +4826,20 @@ export default Vue.component('commonDetail',{
                                         不换行
                                         */
                                         white-space: nowrap;
+                                        .actionBtn{
+                                            width: 18px;
+                                            height: 18px;
+                                            border: none;
+                                            cursor: pointer;
+                                            margin-left: 10px;
+
+                                        }
+                                        .deleteBtn{
+                                            background: url('../../assets/delete.png') no-repeat 0 0;
+                                        }
+                                        .editBtn{
+                                            background: url('./images/overviewedit.png') no-repeat 0 0;
+                                        }
                                     }
                                 }
                             }
@@ -3668,6 +5043,54 @@ export default Vue.component('commonDetail',{
                             }
                         }
 
+
+            }
+            .editBody{
+                .editBodytwo{
+                    .editTxt{
+                        display: inline-block;
+                        // margin-left: 74px;
+                        margin-left:180px;
+                        color: #666;
+                        font-size: 14px;
+                        line-height: 14px;
+                        font-weight: normal;
+                        display: inline-block;
+                        margin-right: 20px;
+                        width: 27%;
+                        text-align: left;
+                    }
+                    .editInput{
+                        width: 130px;
+                        height: 32px;
+                        border: 1px solid #d1d1d1;
+                        border-radius: 2px;
+                        background: #fafafa;
+                        padding-left: 10px;
+                    }
+                    .eidtSelect{
+                        // width: 130px;
+                        // height: 32px;
+                        // border: 1px solid #d1d1d1;
+                        // border-radius: 2px;
+                        // background: #fafafa;
+                        // padding-left: 10px;
+                        width: 130px;
+                        border-radius: 2px;
+                        height: 32px;
+                        border: 1px solid #cccccc;
+                        position: relative;
+                        background: #fafafa;
+                        padding-left: 10px;
+                        padding-right: 20px;
+                        box-sizing: border-box;
+                        margin-right: 15px;
+                        color: #333333;
+                        font-size: 14px;
+                        outline: none;
+                        
+                    }
+                }
 
             }
 

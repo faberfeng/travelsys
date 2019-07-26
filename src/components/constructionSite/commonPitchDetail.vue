@@ -451,7 +451,7 @@
                     <button class="editBtnC" @click="editMarkCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
+            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" width="800px" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
@@ -527,19 +527,34 @@
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
                                     <tr>
-                                        <th width="100px">斜度序列ID</th>
-                                        <th width="100px">设备ID</th>
-                                        <th width="100px">通道编号</th>
+                                        <th rowspan="2" width="60px">斜度序列ID</th>
+                                        <th rowspan="2" width="60px">设备ID</th>
+                                        <th rowspan="2" width="60px">通道编号</th>
                                         <!-- <th width="100px">卡槽序号</th> -->
-                                        <!-- <th width="100px">传感器地址</th> -->
-                                        <th width="100px">操作</th>
+                                        <th rowspan="2" width="60px">传感器地址</th>
+                                        <th colspan="4">偏移量(设备采集)</th>
+                                        <th rowspan="2" width="60px">偏移量(无设备)</th>
+                                        <th rowspan="2" width="100px">操作</th>
+                                    </tr>
+                                    <tr>
+                                        <td width="60px">初始位移</td>
+                                        <td width="60px">设备ID</td>
+                                        <td width="60px">通道编号</td>
+                                        <td width="60px">传感器地址</td>
                                     </tr>
                                 </thead>
                                  <tbody>
                                     <tr v-for="(item,index) in getAutoPitchList" :key="index">
-                                        <td width="100px">{{item.seqId}}</td>
-                                        <td width="100px">{{item.systemId}}</td>
-                                        <td width="100px">{{item.channelNo}}</td>
+                                        <td width="60px">{{getPointName(item.seqId)}}</td>
+                                        <td width="60px">{{item.systemId}}</td>
+                                        <td width="60px">{{item.channelNo}}</td>
+                                        <td width="60px">{{item.sensorAdress}}</td>
+
+                                        <td width="60px">{{item.initShift}}</td>
+                                        <td width="60px">{{item.displacementSystemId}}</td>
+                                        <td width="60px">{{item.displacementChannelNo}}</td>
+                                        <td width="60px">{{item.displacementSensorAddress}}</td>
+                                        <td width="60px">{{item.customShift}}</td>
                                         <!-- <td width="100px">{{item.slotNo}}</td> -->
                                         <!-- <td width="100px">{{item.sensorAddress}}</td> -->
                                         <td width="100px">
@@ -567,17 +582,17 @@
                             </option>
                         </select>
                     </div>
-                    <!-- <div class="editBodytwo">
+                    <div class="editBodytwo">
                         <label class="editTxt1">绑定位置方法</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div> -->
+                    </div>
 
                     <div class="editBodytwo">
-                        <label class="editTxt1">基准点深度</label>
+                        <label class="editTxt1">深度</label>
                         <select v-model="basicPoint" class="gatherTimeName">
                             <option v-for="(item,index) in basicPointList" :key="index" :value="item">
                                 {{item}}
@@ -594,14 +609,25 @@
                         <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
                     
-                    <!-- <div class="editBodytwo">
+                    <div class="editBodytwo">
                         <label class="editTxt1">传感器地址:</label>
                         <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div> -->
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">偏移量(有设备采集):</label>
+                        <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="通道编号" v-model="displacementChannelNo" class="inp" style="width:100px !important;height:30px !important"/>
+                        <input  placeholder="传感器地址" v-model="displacementSensorAddress" class="inp" style="width:100px !important;height:30px !important"/>
+                    </div>
                     <!-- <div class="editBodytwo">
                         <label class="editTxt1">卡槽序号:</label>
                         <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
                     </div> -->
+                    <div class="editBodytwo">
+                        <label class="editTxt1">自定义偏移量(无设备):</label>
+                        <input  placeholder="偏移量" v-model="customShift" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
                 </div>
                  <div slot="footer" class="dialog-footer">
                     <button class="editBtnS" @click="makeAutoPitch()">确定</button>
@@ -619,17 +645,17 @@
                             </option>
                         </select>
                     </div>
-                    <!-- <div class="editBodytwo">
+                    <div class="editBodytwo">
                         <label class="editTxt1">绑定位置方法</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div> -->
+                    </div>
 
                     <div class="editBodytwo">
-                        <label class="editTxt1">基准点深度</label>
+                        <label class="editTxt1">深度</label>
                        <select v-model="basicPoint" class="gatherTimeName">
                             <option v-for="(item,index) in basicPointList" :key="index" :value="item">
                                 {{item}}
@@ -645,10 +671,21 @@
                         <label class="editTxt1">设备ID:</label>
                         <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
-                    <!-- <div class="editBodytwo">
+                    <div class="editBodytwo">
                         <label class="editTxt1">传感器地址:</label>
                         <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div> -->
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">偏移量(有设备采集):</label>
+                        <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="通道编号" v-model="displacementChannelNo" class="inp" style="width:100px !important;height:30px !important"/>
+                        <input  placeholder="传感器地址" v-model="displacementSensorAddress" class="inp" style="width:100px !important;height:30px !important"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">自定义偏移量(无设备):</label>
+                        <input  placeholder="偏移量" v-model="customShift" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
                     <!-- <div class="editBodytwo">
                         <label class="editTxt1">卡槽序号:</label>
                         <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
@@ -767,6 +804,7 @@
                         <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
                 </div>
             </el-dialog>
+
         </div>
 
     </div>
@@ -841,6 +879,12 @@ export default Vue.component('commonPitch-detail',{
                 }],
                 basicPoint:'',
                 basicPointList:[],
+                displacementChannelNo:'',
+                displacementSensorAddress:'',
+                displacementSystemId:'',
+                initShift:'',
+                customShift:'',//
+
                 editPitchId:'',
                 channelNo:'',
                 sensorAddress:'',
@@ -916,11 +960,16 @@ export default Vue.component('commonPitch-detail',{
                         xAxis: {
                             categories:[],
                             opposite: false,
-                            gridLineWidth: 1
+                            gridLineWidth: 1,
+                            tickmarkPlacement: 'on',
+                            labels:{
+                                    enabled: true,
+                                    format: '{value} m',
+                            }
                         },
                         yAxis: {
                                 title: {
-                                    text: '位移'
+                                    text: '位移(mm)'
                                 },
                                 labels:{
                                     enabled: true
@@ -971,9 +1020,14 @@ export default Vue.component('commonPitch-detail',{
                         },
                         xAxis:[
                             {
-                            tickInterval: 1,
-                            categories:[],
-                            gridLineWidth: 1
+                                tickInterval: 1,
+                                categories:[],
+                                gridLineWidth: 1,
+                                tickmarkPlacement: 'on',
+                                labels:{
+                                        enabled: true,
+                                        format: '{value} m',
+                                }
                             },
                             // {
                             // tickInterval: 1,
@@ -983,7 +1037,7 @@ export default Vue.component('commonPitch-detail',{
                         ],
                         yAxis: {
                                 title: {
-                                    text: '位移'
+                                    text: '位移(mm)'
                                 },
                                 labels:{
                                     enabled: true
@@ -1606,6 +1660,16 @@ export default Vue.component('commonPitch-detail',{
                         }
                     }
                 })
+            },
+
+            getPointName(val){
+                var a;
+                this.getPitchBaseInfoList.forEach((item)=>{
+                    if(item.id==val){
+                        a=item.name;
+                    }
+                })
+                return a;
             },
             //获取斜度基本信息（上面的表）
             getPitchBaseInfo(){
@@ -2677,7 +2741,13 @@ export default Vue.component('commonPitch-detail',{
             },
             makeAutoPitch(){
                 var vm=this;
-                axios({
+                if(this.basicPoint==''){
+                    this.$message({
+                        type:'info',
+                        message:'深度不能为空'
+                    })
+                }else{
+                    axios({
                     url:this.BDMSUrl+'detectionInfo/addPitchBind',
                     headers:{
                         'token':vm.token
@@ -2687,24 +2757,40 @@ export default Vue.component('commonPitch-detail',{
                         channelNo:parseInt(this.channelNo),
                         // itemId:this.pitchItemId,
                         itemId:this.itemMonitorId,
-                        // sensorAddress:parseInt(this.sensorAddress),
+                        sensorAddress:parseInt(this.sensorAddress),
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId),
-                        // way:this.pitchSeqWay,
-                        basicPoint:this.basicPoint
+                        way:this.pitchSeqWay,
+                        basicPoint:null,
+                        depth:this.basicPoint,
+
+                        displacementChannelNo:this.displacementChannelNo,
+                        displacementSensorAddress:this.displacementSensorAddress,
+                        displacementSystemId:this.displacementSystemId,
+                        initShift:this.initShift,
+                        customShift:this.customShift
                     }]
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.getPitchBindInfo();
                         this.channelNo='';
-                        // this.sensorAddress='';
+                        this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
-                        // this.pitchSeqWay=1,
+                        this.pitchSeqWay=1;
                         this.autoPitchShow=false;
                         this.basicPoint='';
+
+                        this.displacementChannelNo='';
+                        this.displacementSensorAddress='';
+                        this.displacementSystemId='';
+                        this.initShift='';
+                        this.customShift='';
                     }
                 })
+
+                }
+                
             },
            getPitchBindInfo(){
                var vm=this;
@@ -2730,19 +2816,27 @@ export default Vue.component('commonPitch-detail',{
            editAutoPitch(item){
                this.systemId=item.systemId;
                this.pitchSeqId=item.seqId;
-            //    this.pitchSeqWay=item.way;
+               this.pitchSeqWay=item.way;
+               
                this.channelNo=item.channelNo;
                this.editAutoPitchShow=true;
                this.editPitchId=item.id;
-               this.basicPoint=item.basicPoint;
+            //    this.basicPoint=item.basicPoint;
+                this.basicPoint = item.depth;
+                this.sensorAddress=item.sensorAdress;
+                this.displacementChannelNo=item.displacementChannelNo;
+                this.displacementSensorAddress=item.displacementSensorAddress;
+                this.displacementSystemId=item.displacementSystemId;
+                this.initShift=item.initShift;
+                this.customShift=item.customShift;
            },
            editAutoPitchCancle(){
                this.editAutoPitchShow=false;
                this.channelNo='';
-                // this.sensorAddress='';
+                this.sensorAddress='';
                 // this.slotNo='';
                 this.systemId='';
-                // this.pitchSeqWay=1,
+                this.pitchSeqWay=1,
                 this.editAutoPitchShow=false;
                 this.basicPoint='';
            },
@@ -2758,11 +2852,18 @@ export default Vue.component('commonPitch-detail',{
                         channelNo:parseInt(this.channelNo),
                         // itemId:this.pitchItemId,
                         itemId:this.itemMonitorId,
-                        sensorAddress:null,
+                        sensorAddress:this.sensorAddress,
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId),
-                        // way:this.pitchSeqWay,
-                        basicPoint:this.basicPoint
+                        way:this.pitchSeqWay,
+                        basicPoint:null,
+                        depth:this.basicPoint,
+
+                        displacementChannelNo:this.displacementChannelNo,
+                        displacementSensorAddress:this.displacementSensorAddress,
+                        displacementSystemId:this.displacementSystemId,
+                        initShift:this.initShift,
+                        customShift:this.customShift
                     },
                     params:{
                         id:this.editPitchId
@@ -2771,12 +2872,17 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd==0){
                         this.getPitchBindInfo();
                         this.channelNo='';
-                        // this.sensorAddress='';
+                        this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
-                        // this.pitchSeqWay=1,
+                        this.pitchSeqWay=1,
                         this.editAutoPitchShow=false;
                         this.basicPoint='';
+                        this.displacementChannelNo='';
+                        this.displacementSensorAddress='';
+                        this.displacementSystemId='';
+                        this.initShift='';
+                        this.customShift='';
                     }
                 })
            },
@@ -3864,11 +3970,6 @@ select.autoImport{
                      display: inline-block;
                      margin-right:4px;
                      cursor: pointer;
-                    // width: 18px;
-                    // height: 18px;
-                    // border: none;
-                    // cursor: pointer;
-                    // margin-right:10px;
                 }
                 .export1{
                         display: inline-block;

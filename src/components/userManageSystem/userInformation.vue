@@ -131,8 +131,8 @@
     </div>    
 </template>
 <script>
-import axios from 'axios'
-import md5 from 'js-md5'
+import axios from 'axios';
+import md5 from 'js-md5';
 export default {
     name:'userInformation',
     data(){
@@ -198,7 +198,10 @@ export default {
 
         },
         userLoginOut(){
-             var vm = this
+            var vm = this
+            vm.oldPassword='';
+            vm.newpassWord='';
+            vm.confirmPassword='';
             axios({
                 method:'GET',
                 url:vm.BDMSUrl+'api/v1/certification/logout',
@@ -321,15 +324,19 @@ export default {
                     message:'请确认新密码'
                 })
             }else{
+                vm.oldPassword=md5(vm.oldPassword);
+                vm.newpassWord=md5(vm.newpassWord);
+                vm.confirmPassword=md5(vm.confirmPassword)
+                console.log(vm.oldPassword,vm.newpassword,vm.confirmPassword,'密码');
                  axios({
-                url:vm.BDMSUrl+'user/resetPassword',
-                method:'POST',
-                headers:{
-                    'token':vm.tokenId
-                },
+                    url:vm.BDMSUrl+'user/resetPassword',
+                    method:'POST',
+                    headers:{
+                        'token':vm.tokenId
+                    },
                 params:{
                     oldPassword:vm.oldPassword,
-                    password:vm.newpassword,
+                    password:vm.newpassWord,
                     confirmPassword:vm.confirmPassword,
                     userId:vm.userId
                 }

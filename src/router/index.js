@@ -106,7 +106,6 @@ const router = new Router({
       name:'hasApply',
       component:resolve=>require(['@/components/mobile/hasApply'],resolve),
     },
-    
     {
       path: '/',
       redirect:'/login',
@@ -253,36 +252,36 @@ const router = new Router({
       },
       component:resolve=>require(['@/components/ManageCost'],resolve),
       children:[
-        {
-          path:'/Cost/management',
-          name:'manageCost',
-          component:resolve=>require(['@/components/planCost/overview'],resolve)
-        },
-        {
-          path:'/Cost/goujianList',
-          name:'goujianList',
-          component:resolve=>require(['@/components/planCost/goujianList'],resolve),
-        },
-        {
-          path:'/Cost/quantities',
-          name:'quantities',
-          component:resolve=>require(['@/components/planCost/quantities'],resolve)
-        },
-        {
-          path:'/Cost/inventory',
-          name:'inventory',
-          component:resolve=>require(['@/components/planCost/inventory'],resolve)
-        },
-        {
-          path:'/Cost/configmapping',
-          name:'ConfigMapping',
-          component:resolve=>require(['@/components/planCost/ConfigMapping'],resolve)
-        },
-        {
-          path:'/Cost/configmappingtwo',
-          name:'ConfigMappingTwo',
-          component:resolve=>require(['@/components/planCost/ConfigMappingTwo'],resolve)
-        },
+        // {
+        //   path:'/Cost/management',
+        //   name:'manageCost',
+        //   component:resolve=>require(['@/components/planCost/overview'],resolve)
+        // },
+        // {
+        //   path:'/Cost/goujianList',
+        //   name:'goujianList',
+        //   component:resolve=>require(['@/components/planCost/goujianList'],resolve),
+        // },
+        // {
+        //   path:'/Cost/quantities',
+        //   name:'quantities',
+        //   component:resolve=>require(['@/components/planCost/quantities'],resolve)
+        // },
+        // {
+        //   path:'/Cost/inventory',
+        //   name:'inventory',
+        //   component:resolve=>require(['@/components/planCost/inventory'],resolve)
+        // },
+        // {
+        //   path:'/Cost/configmapping',
+        //   name:'ConfigMapping',
+        //   component:resolve=>require(['@/components/planCost/ConfigMapping'],resolve)
+        // },
+        // {
+        //   path:'/Cost/configmappingtwo',
+        //   name:'ConfigMappingTwo',
+        //   component:resolve=>require(['@/components/planCost/ConfigMappingTwo'],resolve)
+        // },
         {
           path:'/Cost/wuliaoList',
           name:'wuliaoList',
@@ -449,14 +448,14 @@ const router = new Router({
         component:resolve=>require(['@/components/MetarialPurchase/Checked'],resolve)
       }]
     },
-    {
-      path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
-      name:'getManifestDetailInfoForPage',
-      meta:{
-        requireAuth:true
-      },
-      component:resolve=>require(['@/components/planCost/getManifestDetailInfoForPage'],resolve),
-    },
+    // {
+    //   path:'/Cost/getManifestDetailInfoForPage/:mid/:detialid',
+    //   name:'getManifestDetailInfoForPage',
+    //   meta:{
+    //     requireAuth:true
+    //   },
+    //   component:resolve=>require(['@/components/planCost/getManifestDetailInfoForPage'],resolve),
+    // },
     {
       path:'/Cost/getMainLabelInformation/:mid',
       name:'getMainLabelInformation',
