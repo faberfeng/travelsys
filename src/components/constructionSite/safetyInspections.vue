@@ -171,6 +171,8 @@
                         </div>
                     </div>
                     <div id="edit">
+                       
+                        
                         <el-dialog width="1000px" v-dialogDrag title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
                                 <div style="margin-bottom:20px;">
                                     <el-date-picker
@@ -179,7 +181,9 @@
                                         range-separator="至"
                                         start-placeholder="开始日期"
                                         end-placeholder="结束日期"
-                                        value-format="yyyy-MM-dd">                         
+                                       value-format="yyyy-MM-dd HH:mm:ss"
+                                        format="yyyy-MM-dd HH:mm:ss"
+                                        >                         
                                     </el-date-picker>
                                     <span class="searchBtn" @click="makeSureData1()">确认</span>
                                 </div>
@@ -187,7 +191,12 @@
                                     <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                                 </div>
                         </el-dialog>
-                        <el-dialog width="360px"  v-dialogDrag title="测斜序列变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+                        <el-dialog width="360px"  v-dialogDrag title="测斜点变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
+                            <!-- <div style="height:50px">
+                                <label>y轴最小值:</label><input v-model="yminValue" style="width:60px;margin-right:10px;margin-left:3px"/>
+                                <label>y轴最大值:</label><input v-model="ymaxValue" style="width:60px;margin-right:10px;margin-left:3px"/>
+                                <span style="width:40px;height:19px;line-height:18px;cursor:pointer;padding:2px;border-radius:2px;display:inline-block;background:#fc3439;color:white;vertical-align:middle" @click="makesureYchart()">修改</span>
+                            </div> -->
                             <div>
                                 <vue-highcharts id="leftHightchart" style="min-height:740px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                             </div>
@@ -250,7 +259,8 @@
                                     <td width="150px">{{item.recentVariation|addSprit1()}}</td>
                                     <td width="100px" :class="[{'red':item.recentAlert==true}]" >{{item.recentAlert|shifouChange()}}</td>
                                     <td width="200px">{{item.totalPointName|addSprit()}}</td>
-                                    <td width="150px">{{item.totalVariation|addSprit2()}}</td>
+                                    <td v-if="item.type==5" width="150px">{{item.totalVariation}}</td>
+                                    <td v-if="item.type!=5" width="150px">{{item.totalVariation|addSprit2()}}</td>
                                     <td :class="[{'red':item.totalAlert==true}]">{{item.totalAlert|shifouChange()}}</td>
                                     <td width="250px">
                                         <button title="删除" @click="deleteMonitorNameBtn(item.id)" class="deleteBtn actionBtn"></button>
@@ -1069,6 +1079,8 @@ export default {
             fullShow:false,
             spotChangeLineShow1:false,
             pitchLineShow:false,
+            yminValue:-300,
+            ymaxValue:300,
             singleData:{},
             defaultProps:{
                 children:'children',
@@ -1470,9 +1482,10 @@ export default {
                                 opposite: true,
                                 lineWidth: 1,
                                 gridLineWidth: 1,
+                                // max:'',
+                                // min:''
                                 // crosshair: true
-                        },
-                                
+                        },  
                         credits: {
                             enabled: false
                         },
@@ -2226,6 +2239,13 @@ export default {
         },
         spotChangeLineCancle1(){
             this.spotChangeLineShow1=false;
+            // this.selectValue1='';
+        },
+        makesureYchart(){ 
+            this.optionOnesLeft.yAxis.min=-300;
+            this.optionOnesLeft.yAxis.max=300;
+            this.getPitchDetailDataBySeqId(this.plotGroupOne);
+            console.log('0000')
         },
         pitchLineCancle(){
             this.pitchLineShow=false;
@@ -2248,6 +2268,7 @@ export default {
                  this.startValue1=this.selectValue1[0];
                 this.endValue1=this.selectValue1[1];
             }
+            console.log(this.startValue1,this.endValue1,this.selectValue1,'time11');
             $.ajax({
                 url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
                 headers:{
@@ -2282,8 +2303,8 @@ export default {
                             spotChangeLineChart.addSeries({name:this.getAllCurveName,data:this.elevationYlist1});
                             spotChangeLineChart.hideLoading();
                             spotChangeLineChart.getChart().xAxis[0].update({categories:this.acquisitionTimeXlist1});
-                            spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
-                            spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
+                            // spotChangeLineChart.getChart().yAxis[0].min=(3*min-2*max);
+                            // spotChangeLineChart.getChart().yAxis[0].max=(3*max-2*min);
                         },200)
                         this.startValue1='';
                         this.endValue1='';
@@ -7853,6 +7874,7 @@ export default {
         getBatchImportMatchingResult(){
 
         },
+
         generateReportNumber(){
             var vm=this;
             axios({
@@ -7899,6 +7921,12 @@ export default {
                             this.leftDisplayListValueXdata=[];
                             this.leftDisplayListValueYdata1=[];
                             this.leftDisplayListValueYdata2=[];
+                            // this.optionOnesLeft.yAxis.min='';
+                            // this.optionOnesLeft.yAxis.max='';
+                           
+                            // this.leftDisplayListValueXdata.push(0);
+                            // this.leftDisplayListValueYdata1.push(0);
+                            // this.leftDisplayListValueYdata2.push(0);
                             if(this.pitchDetailDataListLeft){
                                 this.leftDisplayList=this.pitchDetailDataListLeft;
                                 var recentVariationLength=this.leftDisplayList.recentVariation.length;
@@ -7908,11 +7936,9 @@ export default {
                                 //  str=document.getElementById('tableListid').clientHeight-50;
                                 //  setTimeout(()=>{
                                 //         console.log(document.getElementById('tableListid').clientHeight);
-                                       
-
                                 // },20)
                                 if(this.leftDisplayListValue.length==recentVariationLength){
-                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time1=null;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         this.leftDisplayListValue1.push(item)
@@ -7920,39 +7946,71 @@ export default {
                                         this.leftDisplayListValueXdata.push(item.depth)
                                         this.leftDisplayListValueYdata1.push(item.shift)
                                     })
-                                    
+                                    // this.optionOnesLeft.yAxis.min=-300;
+                                    // this.optionOnesLeft.yAxis.max=300;
+
                                     setTimeout(()=>{
                                         let lineLeftChart=this.$refs.lineLeftChartOne;
+                                        // console.log(this.leftDisplayListValueXdata,'this.leftDisplayListValueXdata');
                                         lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                         lineLeftChart.removeSeries();
                                         lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time),data:this.leftDisplayListValueYdata1});
                                         lineLeftChart.hideLoading();
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                        // lineLeftChart.options.yAxis.min=0;
+                                        // lineLeftChart.options.yAxis.max=100;
                                     },20)
                                 }else if(this.leftDisplayListValue.length!=recentVariationLength){
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
-                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
-                                    this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
+                                    console.log('000');
+                                    this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
+                                    this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
+                                    this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                    
+                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                    this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
+                                    console.log(this.leftDisplayListValue,'123');
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
+                                        
                                         if(array[index].acquisitionTime==this.time){
                                             this.leftDisplayListValue1.push(array[index])
+                                           
                                             this.leftDisplayListValueXdata.push(array[index].depth)
+                                            
                                             this.leftDisplayListValueYdata1.push(array[index].shift)
                                         }else if(array[index].acquisitionTime==this.time1){
+                                            // this.leftDisplayListValueXdata.push(array[0].depth)
                                             this.leftDisplayListValue2.push(array[index])
+                                            // this.leftDisplayListValueYdata1.push(array[0].shift)
                                             this.leftDisplayListValueYdata2.push(array[index].shift)
                                         }
                                     })
-                                    
+                                    // if(this.yminValue&&this.ymaxValue){
+                                    //     // console.log(this.yminValue,this.ymaxValue,'000')
+                                    //     //  this.optionOnesLeft.yAxis.min=-300;
+                                    //     //     this.optionOnesLeft.yAxis.max=300;
+                                    //         this.optionOnesLeft.yAxis.min=this.yminValue;
+                                    //         this.optionOnesLeft.yAxis.max=this.ymaxValue;
+
+                                    // }
+                                   
                                     
                                     setTimeout(()=>{
                                         let lineLeftChart=this.$refs.lineLeftChartOne;
+                                        console.log(lineLeftChart,this.leftDisplayListValueXdata,this.leftDisplayListValueYdata1,'this.leftDisplayListValueXdata');
+                                        
                                         lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                         lineLeftChart.removeSeries();
                                         lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time),data:this.leftDisplayListValueYdata1});
                                         lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time1),data:this.leftDisplayListValueYdata2});
                                         lineLeftChart.hideLoading();
+
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                        // lineLeftChart.options.yAxis.min=0;
+                                        // lineLeftChart.options.yAxis.max=100;
+
+                                        // lineLeftChart.getChart().yAxis[0].min=0;
+                                        // lineLeftChart.getChart().yAxis[0].max=100;
                                     },20)
                                 }
                                 this.leftDisplayShow==false;
@@ -8233,7 +8291,7 @@ export default {
                 right: 18px;
             }
         }
-         ::-webkit-scrollbar{width:0px}
+        //  ::-webkit-scrollbar{width:0px}
         .topHeader{
             box-sizing: border-box;
             float: left;
@@ -8750,7 +8808,7 @@ export default {
                         width: 100%;
                         position: relative;
                         .noDataFigure{
-                            height: 640px;
+                            height: 600px;
                             width: 100%;
                             // margin:0 auto;
                             // border: 1px solid #ccc;
@@ -8952,7 +9010,7 @@ export default {
                             z-index:11;
                             #fileTree{
                                 // height: 500px;
-                                overflow: auto;
+                                // overflow: auto;
                                 width: 200px;
                                 // z-index:-1000;
                             }
@@ -9109,7 +9167,11 @@ export default {
                                         }
 
                                     }
+                                    &:hover{
+                                        background:#ccc;
+                                    }
                                 }
+                                
                             }
                         }
                     }

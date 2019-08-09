@@ -189,7 +189,6 @@
                                 </thead>
                                <tbody>
                                     <tr v-for="(item,index) in rightDisplayList.recentVariation" :key="index">
-                                        <!-- <td>{{(rightDisplayList.recentVariation)[index].otherParam|addSprit}}</td> -->
                                         <td>{{rightDisplayListValue1[index].depth|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue1[index].shift|addSpritNum}}</td>
                                         <td >{{rightDisplayListValue2[index].shift|addSpritNum}}</td>
@@ -204,7 +203,6 @@
                                     <tr>
                                         <td>{{rightMaxShift1}}mm</td>
                                         <td>{{rightMaxShift2}}mm</td>
-                                        <!-- {{(rightDisplayList.recentVariation)[index].totalVariation|addSprit}} -->
                                         <td>{{rightMaxVariation}}mm/d</td>
                                     </tr>
                                 </tbody>
@@ -347,7 +345,7 @@
                         <input placeholder="请输入Excel对应表名" v-model="keyword" class="inp" style="width:140px !important;height:30px !important"/>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editTxt">绑定位置方法:</label>
+                        <label class="editTxt">起算位置:</label>
                          <select v-model="pitchSeqWay" class="bindSite">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
@@ -451,7 +449,7 @@
                     <button class="editBtnC" @click="editMarkCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" width="800px" @close="autoAcquisitionCancle()">
+            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" width="880px" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
@@ -518,6 +516,7 @@
                     <div class="editBodytwo" v-show="manufacturerValue=='华桓2'">
                         <label class="editInpText" style="width:13% !important;">测斜自动采集</label>
                          <div class="tool">
+                             <span class="export" style="width:100px;margin-right:10px" @click="addAutoPicthWidth()"><label class="el-icon-circle-plus"></label><label class="exportTxt" style="width:80px" >编辑偏移量</label></span>
                              <span class="export" @click="addAutoVerify()"><label class="el-icon-circle-plus"></label><label class="exportTxt" >添加</label></span>
                              <!-- <span class="export" @click="clearDeviceMonitorPointRelation()"><label class="export2"></label><label class="exportTxt">清空</label></span>
                              <span class="export" @click="textDeviceMonitorPointRelation()"><label class="export3"></label><label class="exportTxt">测试</label></span> -->
@@ -527,36 +526,36 @@
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
                                     <tr>
-                                        <th rowspan="2" width="60px">斜度序列ID</th>
-                                        <th rowspan="2" width="60px">设备ID</th>
-                                        <th rowspan="2" width="60px">通道编号</th>
+                                        <th rowspan="2" width="100px">斜度序列ID</th>
+                                        <th rowspan="2" width="100px">设备ID</th>
+                                        <th rowspan="2" width="50px">通道编号</th>
                                         <!-- <th width="100px">卡槽序号</th> -->
-                                        <th rowspan="2" width="60px">传感器地址</th>
+                                        <th rowspan="2" width="100px">传感器地址</th>
                                         <th colspan="4">偏移量(设备采集)</th>
                                         <th rowspan="2" width="60px">偏移量(无设备)</th>
                                         <th rowspan="2" width="100px">操作</th>
                                     </tr>
                                     <tr>
-                                        <td width="60px">初始位移</td>
-                                        <td width="60px">设备ID</td>
-                                        <td width="60px">通道编号</td>
-                                        <td width="60px">传感器地址</td>
+                                        <td width="80px">初始位移</td>
+                                        <td width="80px">设备ID</td>
+                                        <td width="80px">通道编号</td>
+                                        <td width="80px">传感器地址</td>
                                     </tr>
                                 </thead>
                                  <tbody>
                                     <tr v-for="(item,index) in getAutoPitchList" :key="index">
-                                        <td width="60px">{{getPointName(item.seqId)}}</td>
-                                        <td width="60px">{{item.systemId}}</td>
-                                        <td width="60px">{{item.channelNo}}</td>
-                                        <td width="60px">{{item.sensorAdress}}</td>
+                                        <td width="100px">{{getPointName(item.seqId)}}</td>
+                                        <td width="100px" :title="item.systemId">{{item.systemId}}</td>
+                                        <td width="50px" :title="item.channelNo">{{item.channelNo}}</td>
+                                        <td width="100px" :title="item.sensorAdress">{{item.sensorAdress}}</td>
 
-                                        <td width="60px">{{item.initShift}}</td>
-                                        <td width="60px">{{item.displacementSystemId}}</td>
-                                        <td width="60px">{{item.displacementChannelNo}}</td>
-                                        <td width="60px">{{item.displacementSensorAddress}}</td>
-                                        <td width="60px">{{item.customShift}}</td>
-                                        <!-- <td width="100px">{{item.slotNo}}</td> -->
-                                        <!-- <td width="100px">{{item.sensorAddress}}</td> -->
+                                        <td width="80px" :title="item.displace.initShift">{{item.displace.initShift}}</td>
+                                        <td width="80px" :title="item.displace.displacementSystemId">{{item.displace.displacementSystemId}}</td>
+                                        <td width="80px" :title="item.displace.displacementChannelNo">{{item.displace.displacementChannelNo}}</td>
+                                        <td width="80px" :title="item.displace.displacementSensorAddress">{{item.displace.displacementSensorAddress}}</td>
+                                        <td width="60px" :title="item.displace.customShift">{{item.displace.customShift}}</td>
+                                        <!-- <td width="100px">{{item.slotNo}}</td>
+                                        <td width="100px">{{item.sensorAddress}}</td> -->
                                         <td width="100px">
                                             <i class="el-icon-edit" style="cursor:pointer;margin-right:6px;" title="编辑" @click="editAutoPitch(item)"></i>
                                             <i class="el-icon-delete" style="cursor:pointer" title="删除" @click="deleteAutoPitch(item.id)"></i>
@@ -572,7 +571,7 @@
                         <button class="editBtnC" @click="autoAcquisitionCancle()" >取消</button>
                 </div>
             </el-dialog>
-            <el-dialog width="600px" title="添加采集传感器" :visible="autoPitchShow" @close="autoPitchCancle()">
+            <el-dialog width="700px" title="添加采集传感器" :visible="autoPitchShow" @close="autoPitchCancle()">
                 <div class="editBody">
                     <div class="editBodyone">
                         <label class="editTxt1">绑定测斜序列</label>
@@ -582,14 +581,14 @@
                             </option>
                         </select>
                     </div>
-                    <div class="editBodytwo">
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">绑定位置方法</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="editBodytwo">
                         <label class="editTxt1">深度</label>
@@ -599,8 +598,71 @@
                             </option>
                         </select>
                     </div>
-
                     <div class="editBodytwo">
+                        <label class="editTxt1">设备ID:</label>
+                        <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">通道编号:</label>
+                        <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    
+                    
+                    <div class="editBodytwo">
+                        <label class="editTxt1">传感器地址:</label>
+                        <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">偏移量(有设备采集):</label>
+                        <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:80px !important;height:30px !important"/>
+                        <input  placeholder="通道编号" v-model="displacementChannelNo" class="inp" style="width:100px !important;height:30px !important"/>
+                        <input  placeholder="传感器地址" v-model="displacementSensorAddress" class="inp" style="width:100px !important;height:30px !important"/>
+                    </div> -->
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">卡槽序号:</label>
+                        <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
+                    </div> -->
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">自定义偏移量(无设备):</label>
+                        <input  placeholder="偏移量" v-model="customShift" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div> -->
+                </div>
+                 <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeAutoPitch()">确定</button>
+                    <button class="editBtnC" @click="autoPitchCancle()" >取消</button>
+                </div>
+            </el-dialog>
+
+            <el-dialog width="620px" title="添加斜度初始采集位移" :visible="autoPitchWidthShow" @close="autoPitchWidthCancle()">
+                <div class="editBody">
+                    <div class="editBodyone">
+                        <label class="editTxt1" style="width:24%">绑定测斜序列</label>
+                        <select v-model="pitchSeqIds" class="gatherTimeName" @change="pitchChange(pitchSeqIds)">
+                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">绑定位置方法</label>
+                        <select v-model="pitchSeqWay" class="gatherTimeName">
+                            <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
+                                {{item.label}}
+                            </option>
+                        </select>
+                    </div> -->
+
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">深度</label>
+                        <select v-model="basicPoint" class="gatherTimeName">
+                            <option v-for="(item,index) in basicPointList" :key="index" :value="item">
+                                {{item}}
+                            </option>
+                        </select>
+                    </div> -->
+
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">通道编号:</label>
                         <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
@@ -612,30 +674,49 @@
                     <div class="editBodytwo">
                         <label class="editTxt1">传感器地址:</label>
                         <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt1">偏移量(有设备采集):</label>
-                        <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:80px !important;height:30px !important"/>
-                        <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:80px !important;height:30px !important"/>
-                        <input  placeholder="通道编号" v-model="displacementChannelNo" class="inp" style="width:100px !important;height:30px !important"/>
-                        <input  placeholder="传感器地址" v-model="displacementSensorAddress" class="inp" style="width:100px !important;height:30px !important"/>
-                    </div>
-                    <!-- <div class="editBodytwo">
-                        <label class="editTxt1">卡槽序号:</label>
-                        <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
                     </div> -->
                     <div class="editBodytwo">
-                        <label class="editTxt1">自定义偏移量(无设备):</label>
+                        <label class="editTxt1" style="width:24%">偏移量(有设备采集):</label>
+                         <!-- <label  style="width:50px">初始位移:</label>
+                        <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:100px !important;height:30px !important"/> -->
+                        <!-- <label  style="width:50px;">设备ID:</label> -->
+                        <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:100px !important;height:30px !important"/>
+                        <!-- <label  style="width:50px">通道编号:</label> -->
+                        <input  placeholder="通道编号" v-model="displacementChannelNo" class="inp" style="width:100px !important;height:30px !important"/>
+                         <!-- <label style="width:50px">传感器地址:</label> -->
+                        <input  placeholder="传感器地址" v-model="displacementSensorAddress" @blur="getDisplacementHistoryData()"  class="inp" style="width:100px !important;height:30px !important"/>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editTxt1" style="width:24%">初始时间:</label>
+                        <select v-model="initShiftTime" class="gatherTimeName" @focus="getDisplacementHistoryData()" @change="initShiftTimeChange()">
+                            <option v-for="(item,index) in initShiftTimeList"  :key="index" :value="item.collectTime">
+                                {{item.collectTime|timeChange2}}
+                            </option>
+                        </select>
+                        <!-- <input  placeholder="初始时间" v-model="initShiftTime" class="inp" style="width:375px !important;height:30px !important"/> -->
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editTxt1" style="width:24%">初始位移:</label>
+                        <!-- <select v-model="initShift" class="gatherTimeName">
+                            <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
+                                {{item.label}}
+                            </option>
+                        </select> -->
+                        <input  placeholder="初始位移" v-model="initShift" :disabled="true" class="inp"  style="width:375px !important;height:30px !important"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1" style="width:24%">自定义偏移量(无设备):</label>
                         <input  placeholder="偏移量" v-model="customShift" class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
                 </div>
                  <div slot="footer" class="dialog-footer">
-                    <button class="editBtnS" @click="makeAutoPitch()">确定</button>
-                    <button class="editBtnC" @click="autoPitchCancle()" >取消</button>
+                    <button class="editBtnS" @click="savePitchArg()">确定</button>
+                    <button class="editBtnC" @click="autoPitchWidthCancle()" >取消</button>
                 </div>
             </el-dialog>
 
-            <el-dialog width="600px" title="编辑采集传感器" :visible="editAutoPitchShow" @close="editAutoPitchCancle()">
+            <el-dialog width="700px" title="编辑采集传感器" :visible="editAutoPitchShow" @close="editAutoPitchCancle()">
                 <div class="editBody">
                     <div class="editBodyone">
                         <label class="editTxt1">绑定测斜序列</label>
@@ -645,14 +726,14 @@
                             </option>
                         </select>
                     </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt1">绑定位置方法</label>
+                    <!-- <div class="editBodytwo">
+                        <label class="editTxt1">起算位置</label>
                         <select v-model="pitchSeqWay" class="gatherTimeName">
                             <option v-for="(item,index) in pitchSeqWayList" :key="index" :value="item.value">
                                 {{item.label}}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="editBodytwo">
                         <label class="editTxt1">深度</label>
@@ -662,20 +743,21 @@
                             </option>
                         </select>
                     </div>
+                    <div class="editBodytwo">
+                        <label class="editTxt1">设备ID:</label>
+                        <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
+                    </div>
 
                     <div class="editBodytwo">
                         <label class="editTxt1">通道编号:</label>
                         <input placeholder="请输入通道编号" v-model="channelNo"  class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
-                    <div class="editBodytwo">
-                        <label class="editTxt1">设备ID:</label>
-                        <input placeholder="请输入设备ID" v-model="systemId" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div>
+                    
                     <div class="editBodytwo">
                         <label class="editTxt1">传感器地址:</label>
                         <input  placeholder="请输入传感器地址" v-model="sensorAddress" class="inp" style="width:375px !important;height:30px !important"/>
                     </div>
-                    <div class="editBodytwo">
+                    <!-- <div class="editBodytwo">
                         <label class="editTxt1">偏移量(有设备采集):</label>
                         <input  placeholder="初始位移" v-model="initShift" class="inp" style="width:80px !important;height:30px !important"/>
                         <input  placeholder="请输入设备ID" v-model="displacementSystemId" class="inp" style="width:80px !important;height:30px !important"/>
@@ -685,7 +767,7 @@
                     <div class="editBodytwo">
                         <label class="editTxt1">自定义偏移量(无设备):</label>
                         <input  placeholder="偏移量" v-model="customShift" class="inp" style="width:375px !important;height:30px !important"/>
-                    </div>
+                    </div> -->
                     <!-- <div class="editBodytwo">
                         <label class="editTxt1">卡槽序号:</label>
                         <input placeholder="请输入卡槽序号"  v-model="slotNo"  class="inp" style="width:375px !important;height:30px !important"/>
@@ -771,7 +853,28 @@
                 </div>
             </el-dialog>
              <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
-                <div class="editBody" >
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">筛选测斜序列:</label>
+                        <!-- <label class="editTxt1">绑定测斜序列</label> -->
+                        <!-- @change="pitchChange(pitchSeqId)" -->
+                        <select v-model="historyPointId" class="gatherTimeName" >
+                            <option v-for="(item,index) in getPitchBaseInfoList" :key="index" :value="item.id">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">筛选时间:</label>
+                        <el-date-picker
+                                v-model="selectHistoryTimeValue"
+                                type="daterange"
+                                :clearable='false'
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+                        </el-date-picker>
+                    </div>
+                <!-- <div class="editBody" >
                      <div class="editBodytwo">
                         <div id="toolTbale1">
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
@@ -798,10 +901,10 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button>
-                        <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
+                        <!-- <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button> -->
+                        <button class="editBtnS" @click="exportSelectRecode()">导出历史记录</button>
                 </div>
             </el-dialog>
 
@@ -867,15 +970,16 @@ export default Vue.component('commonPitch-detail',{
                 getPitchBaseInfoListLength:0,
                 pitchItemId:'',//自动采集斜度项目id
                 pitchSeqId:'',//序列id
+                pitchSeqIds:'',//自动偏移位移id
                 initDataDate:"",//初始化时间
                 initDataDateList:[],
                 pitchSeqWay:1,
                 pitchSeqWayList:[{
                     value:1,
-                    label:'从序列起始深度开始'
+                    label:'管口起算'
                 },{
                     value:2,
-                    label:'从序列结束深度开始'
+                    label:'管底起算'
                 }],
                 basicPoint:'',
                 basicPointList:[],
@@ -883,6 +987,8 @@ export default Vue.component('commonPitch-detail',{
                 displacementSensorAddress:'',
                 displacementSystemId:'',
                 initShift:'',
+                initShiftTime:'',
+                initShiftTimeList:[],
                 customShift:'',//
 
                 editPitchId:'',
@@ -1092,6 +1198,8 @@ export default Vue.component('commonPitch-detail',{
 
                 //获取导出的历史记录
                 exportHistoryRecoedShow:false,
+                historyPointId:'',
+                selectHistoryTimeValue:'',
                 getImportHistoryList:'',
                 allCheck:false,
                 filesList:'',
@@ -1102,8 +1210,9 @@ export default Vue.component('commonPitch-detail',{
                 collectRateRadio:'1',
                 collectHour:0,
                 getDeviceMonitorPointRelationList:'',
-                getAutoPitchList:'',
+                getAutoPitchList:[],
                 autoPitchShow:false,
+                autoPitchWidthShow:false,
                 editAutoPitchShow:false,
                 timeList:[
                     {
@@ -1211,7 +1320,7 @@ export default Vue.component('commonPitch-detail',{
                     },
                     {
                         value:'华桓2',
-                        label:'华桓(测斜传感器推送)'
+                        label:'华桓(固定测斜仪)'
                     },
                     {
                         value:'基康',
@@ -1301,6 +1410,14 @@ export default Vue.component('commonPitch-detail',{
             return moment(val).format("MM-DD HH:mm");
             }
         },
+        timeChange2(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("MM-DD HH:mm:ss");
+            }
+        },
+        
         typeChange(val){
             return val==1?'手动':'自动'
         },
@@ -1333,6 +1450,9 @@ export default Vue.component('commonPitch-detail',{
             manufacturerValue:function(val){
                 this.getDeviceMonitorPointRelation()
             },
+            pitchSeqIds:function(val){
+                this.getdata();
+            }
             // pitchSeqId:function(val){
             //     this.getPitchBaseInfoList.forEach((item)=>{
             //         if(item.id==val){
@@ -1692,8 +1812,11 @@ export default Vue.component('commonPitch-detail',{
                     if(response.data.cd=='0'){
                         vm.getPitchBaseInfoList=response.data.rt;
                         vm.pitchSeqId=vm.getPitchBaseInfoList[0].id;
+                        vm.pitchSeqIds=vm.getPitchBaseInfoList[0].id;
+                        vm.historyPointId=vm.getPitchBaseInfoList[0].id;
                         vm.basicPointList=vm.getPitchBaseInfoList[0].depthList;
-                        vm.basicPoint=vm.basicPointList[0];
+                        // vm.basicPoint=vm.basicPointList[0];
+                        // console.log(vm.basicPoint,'vm.basicPoint11111');
                         vm.pitchItemId=vm.getPitchBaseInfoList[0].itemId;
                         this.getPitchBaseInfoListLength=response.data.rt.length;
                         vm.getPitchBaseInfoList.forEach((item)=>{
@@ -1765,7 +1888,7 @@ export default Vue.component('commonPitch-detail',{
                                 // },1000)
                                 
                                 if(this.leftDisplayListValue.length==recentVariationLength){
-                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time1=null;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         this.leftDisplayListValue1.push(item)
@@ -1786,8 +1909,16 @@ export default Vue.component('commonPitch-detail',{
                                     },20)
                                 }else if(this.leftDisplayListValue.length!=recentVariationLength){
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
-                                    this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
-                                    this.time1=(this.leftDisplayList.recent2PitchData)[1].acquisitionTime;
+                                    console.log('111000');
+                                    this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
+                                    this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
+                                    this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                    this.leftDisplayListValue1.push(this.leftDisplayListValue[0])
+                                     this.leftDisplayListValue2.push(this.leftDisplayListValue[0])
+
+
+                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                    this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         if(array[index].acquisitionTime==this.time){
                                             this.leftDisplayListValue1.push(array[index])
@@ -1893,13 +2024,13 @@ export default Vue.component('commonPitch-detail',{
                             this.rightDisplayListValueXdata=[];
                             this.rightDisplayListValueYdata1=[];
                             this.rightDisplayListValueYdata2=[];
-                            console.log('1111');
+                            // console.log('1111');
                             if(this.pitchDetailDataListRight){
                                 this.rightDisplayList=this.pitchDetailDataListRight;
                                 this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
                                 var recentVariationLength=this.rightDisplayList.recentVariation.length;
                                 if(this.rightDisplayListValue.length==recentVariationLength){
-                                    this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time3=null;
                                     this.rightDisplayListValue.forEach((item,index,array)=>{
                                         this.rightDisplayListValue1.push(item)
@@ -1918,8 +2049,18 @@ export default Vue.component('commonPitch-detail',{
                                         // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
                                     },20)
                                 }else if(this.rightDisplayListValue.length!=recentVariationLength){
-                                        this.time2=(this.rightDisplayList.recent2PitchData)[0].acquisitionTime;
-                                        this.time3=(this.rightDisplayList.recent2PitchData)[1].acquisitionTime;
+
+                                        this.rightDisplayListValueXdata.push(this.rightDisplayListValue[0].depth)
+                                        this.rightDisplayListValueYdata1.push(this.rightDisplayListValue[0].shift)
+                                        this.rightDisplayListValueYdata2.push(this.rightDisplayListValue[0].shift)
+
+
+                                        this.rightDisplayListValue1.push(this.rightDisplayListValue[0])
+                                        this.rightDisplayListValue2.push(this.rightDisplayListValue[0])
+
+
+                                        this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time3=(this.rightDisplayList.recent2PitchData)[3].acquisitionTime;
                                         this.rightDisplayListValue.forEach((item,index,array)=>{
                                             if(array[index].acquisitionTime==this.time2){
                                                 this.rightDisplayListValue1.push(array[index])
@@ -1963,6 +2104,7 @@ export default Vue.component('commonPitch-detail',{
                                 })
                                 this.rightMaxVariation=this.getMaxValue(maxVariation)
                                 this.rightMaxHeight=this.getMaxValue(maxHeight)
+                                console.log()
                             }
                         }
                         // console.log(this.pitchDetailDataList);
@@ -2084,12 +2226,14 @@ export default Vue.component('commonPitch-detail',{
                     },
                     method:'get',
                     params:{
-                        seqId:seqId
+                        seqId:seqId,
+                        startDate:null,
+                        endDate:null
                     }
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.initDataDateList=response.data.rt;
-                        console.log(this.initDataDateList,'this.initDataDateList');
+                        // console.log(this.initDataDateList,'this.initDataDateList');
                         // this.initDataDate=this.initDataDateList[0]
                     }
                 })
@@ -2656,7 +2800,38 @@ export default Vue.component('commonPitch-detail',{
             },
             //导出选中记录
             exportSelectRecode(){
-                this.exportHistory()
+                 if(this.selectHistoryTimeValue==''){
+                    this.$message({
+                        type:"info",
+                        message:'请选择筛选时间'
+                    })
+                }else{
+                    let startDate=this.selectHistoryTimeValue[0];
+                    let endDate=this.selectHistoryTimeValue[1];
+                    axios({
+                        url:this.BDMSUrl+'detectionInfo/exportHistory',
+                        headers:{
+                            'token':this.token
+                        },
+                        responseType:'blob',
+                        params:{
+                            startDate:startDate,
+                            endDate:endDate,
+                            seqId:this.historyPointId,
+                            pointId:null
+                        }
+                    }).then((response)=>{
+                        let blob=new Blob([response.data],{
+                            type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'      //将会被放入到blob中的数组内容的MIME类型 
+                        });
+                        let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                        // console.log(objectUrl,'objectUrl');
+                        window.open(objectUrl)
+                        this.selectHistoryTimeValue='';
+                        this.exportHistoryRecoedShow=false;
+                    })
+                }
+                // this.exportHistory()
             },
             //
             exportHistoryRecoedCancle(){
@@ -2727,17 +2902,172 @@ export default Vue.component('commonPitch-detail',{
                             message:'自动采集成功'
                         })
                     this.autoAcquisitionShow=false;
+                }else if(this.manufacturerValue=='华桓2'){
+                    this.autoAcquisitionShow=false;
                 }
-
-
             },
             //导入
             autoExport(){
                 this.uploadshow=true;
             },
+            addAutoPicthWidth(){
+                this.autoPitchWidthShow=true;
+                this.getdata();
+            },
             //添加斜度自动采集
             addAutoVerify(){
                 this.autoPitchShow=true;
+            },
+            getdata(){
+                if(this.getPitchArg(this.pitchSeqIds)){
+                    this.displacementChannelNo=this.getPitchArg(this.pitchSeqIds).displacementChannelNo;
+                    this.displacementSensorAddress=this.getPitchArg(this.pitchSeqIds).displacementSensorAddress;
+                    this.displacementSystemId=this.getPitchArg(this.pitchSeqIds).displacementSystemId;
+                    this.initShift=this.getPitchArg(this.pitchSeqIds).initShift;
+                    this.customShift=this.getPitchArg(this.pitchSeqIds).customShift;
+                }else{
+                    this.displacementChannelNo='';
+                    this.displacementSensorAddress='';
+                    this.displacementSystemId='';
+                    this.initShift='';
+                    this.customShift='';
+                }
+                
+            },
+            autoPitchWidthCancle(){
+                this.autoPitchWidthShow=false;
+                this.displacementChannelNo='';
+                this.displacementSensorAddress='';
+                this.displacementSystemId='';
+                this.initShift='';
+                this.customShift='';
+            },
+            savePitchArg(){
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/savePitchArg',
+                    headers:{
+                        'token':this.token
+                    },
+                    method:"post",
+                    data:[{
+                        displacementChannelNo:this.displacementChannelNo,
+                        displacementSensorAddress:this.displacementSensorAddress,
+                        displacementSystemId:this.displacementSystemId,
+                        initShift:this.initShift,
+                        customShift:this.customShift,
+                        seqId:parseInt(this.pitchSeqIds)
+                    }]
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.autoPitchWidthShow=false;
+                        this.getPitchBindInfo();
+                        this.displacementChannelNo='';
+                        this.displacementSensorAddress='';
+                        this.displacementSystemId='';
+                        this.initShift='';
+                        this.customShift='';
+                    }
+                })
+            },
+            initShiftTimeChange(){
+                this.initShiftTimeList.forEach((item)=>{
+                    if(this.initShiftTime==item.collectTime){
+                        this.initShift=item.data
+                    }
+                })
+                console.log(this.initShift,'this.initShift');
+            },
+            getDisplacementHistoryData(){
+                if(this.displacementSystemId==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写设备ID'
+                    })
+                }else if(this.displacementChannelNo==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写通道标号'
+                    })
+                }else if(this.displacementSensorAddress==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写传感器地址'
+                    })
+                }else{
+                     axios({
+                        url:this.BDMSUrl+'detectionInfo/getDisplacementHistoryData',
+                        headers:{
+                            'token':this.token
+                        },
+                        method:'get',
+                        params:{
+                            systemId:this.displacementSystemId,
+                            sensorNo:this.displacementSensorAddress,
+                            ChannelNo:this.displacementChannelNo,
+                            startDate:null,
+                            endDate:null,
+                        }
+                    }).then((response)=>{
+                        if(response.data.cd==0){
+                            this.initShiftTimeList=response.data.rt;
+
+                            // console.log(response.data.rt,'response.data.rt');
+                            // this.initShift='';
+                            this.initShiftTime='';
+                            // this.initShiftTime='';
+                            // this.displacementChannelNo='';
+                            // this.displacementSensorAddress='';
+                            // this.displacementSystemId='';
+
+                        }
+                    })
+                }
+               
+            },
+
+            getPitchArg(id){
+                var data;
+                $.ajax({
+                    url:this.BDMSUrl+'detectionInfo/getPitchArg',
+                    type:'get',
+                    headers:{
+                        'token':this.token
+                    },
+                    data:{
+                        seqId:id
+                    },
+                    async:false,
+                    success:(response)=>{
+                        if(response.rt){
+                            data=response.rt;
+                        }else{
+                            data={
+                                    // 'displacementChannelNo':'',
+                                    // 'displacementSensorAddress':'',
+                                    // 'displacementSystemId':'',
+                                    // 'initShift':'',
+                                    // 'customShift':''
+                                    'customShift': null,
+                                    'displacementChannelNo': null,
+                                    'displacementSensorAddress': null,
+                                    'displacementSystemId': null,
+                                    'initShift': null,
+                                    'itemId': null,
+                                    'seqId': null
+                            };
+                        }
+                    }
+                })
+                return data;
+                // axios({
+                //     url:this.BDMSUrl+'detectionInfo/getPitchArg',
+                //     headers:{
+                //         'token':this.token
+                //     },
+                //     params:{
+                //         seqId
+                //     }
+                // })
             },
             makeAutoPitch(){
                 var vm=this;
@@ -2760,32 +3090,35 @@ export default Vue.component('commonPitch-detail',{
                         sensorAddress:parseInt(this.sensorAddress),
                         seqId:parseInt(this.pitchSeqId),
                         systemId:parseInt(this.systemId),
-                        way:this.pitchSeqWay,
+                        // way:this.pitchSeqWay,
+                        way:null,
                         basicPoint:null,
                         depth:this.basicPoint,
 
-                        displacementChannelNo:this.displacementChannelNo,
-                        displacementSensorAddress:this.displacementSensorAddress,
-                        displacementSystemId:this.displacementSystemId,
-                        initShift:this.initShift,
-                        customShift:this.customShift
+                        // displacementChannelNo:this.displacementChannelNo,
+                        // displacementSensorAddress:this.displacementSensorAddress,
+                        // displacementSystemId:this.displacementSystemId,
+                        // initShift:this.initShift,
+                        // customShift:this.customShift
                     }]
                 }).then((response)=>{
                     if(response.data.cd==0){
+                         this.autoPitchShow=false;
                         this.getPitchBindInfo();
+                        // this.savePitchArg();
                         this.channelNo='';
                         this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
                         this.pitchSeqWay=1;
-                        this.autoPitchShow=false;
+                       
                         this.basicPoint='';
 
-                        this.displacementChannelNo='';
-                        this.displacementSensorAddress='';
-                        this.displacementSystemId='';
-                        this.initShift='';
-                        this.customShift='';
+                        // this.displacementChannelNo='';
+                        // this.displacementSensorAddress='';
+                        // this.displacementSystemId='';
+                        // this.initShift='';
+                        // this.customShift='';
                     }
                 })
 
@@ -2794,6 +3127,7 @@ export default Vue.component('commonPitch-detail',{
             },
            getPitchBindInfo(){
                var vm=this;
+               this.getAutoPitchList=[];
                axios({
                    url:this.BDMSUrl+'detectionInfo/getPitchBindInfo',
                    headers:{
@@ -2803,8 +3137,17 @@ export default Vue.component('commonPitch-detail',{
                        groupId:this.userGroupId
                    }
                }).then((response)=>{
-                   if(response.data.cd==0){
-                       this.getAutoPitchList=response.data.rt;
+                   if(response.data.rt){
+                    //    this.getAutoPitchList=response.data.rt;
+                       response.data.rt.forEach((item)=>{
+                           if(item.itemId==this.itemMonitorId){
+                               this.getAutoPitchList.push(item)
+                           }
+                       })
+                       this.getAutoPitchList.forEach((item)=>{
+                           this.$set(item,'displace',this.getPitchArg(item.seqId));
+                       })
+                       console.log(this.getAutoPitchList,'this.getAutoPitchList000000');
                    }else{
                        this.$message({
                            type:"error",
@@ -2859,30 +3202,33 @@ export default Vue.component('commonPitch-detail',{
                         basicPoint:null,
                         depth:this.basicPoint,
 
-                        displacementChannelNo:this.displacementChannelNo,
-                        displacementSensorAddress:this.displacementSensorAddress,
-                        displacementSystemId:this.displacementSystemId,
-                        initShift:this.initShift,
-                        customShift:this.customShift
+                        // displacementChannelNo:this.displacementChannelNo,
+                        // displacementSensorAddress:this.displacementSensorAddress,
+                        // displacementSystemId:this.displacementSystemId,
+                        // initShift:this.initShift,
+                        // customShift:this.customShift
                     },
                     params:{
                         id:this.editPitchId
                     }
                 }).then((response)=>{
                     if(response.data.cd==0){
+                         this.editAutoPitchShow=false;
                         this.getPitchBindInfo();
+                        // this.savePitchArg();
                         this.channelNo='';
                         this.sensorAddress='';
                         // this.slotNo='';
                         this.systemId='';
                         this.pitchSeqWay=1,
-                        this.editAutoPitchShow=false;
+                       
                         this.basicPoint='';
-                        this.displacementChannelNo='';
-                        this.displacementSensorAddress='';
-                        this.displacementSystemId='';
-                        this.initShift='';
-                        this.customShift='';
+
+                        // this.displacementChannelNo='';
+                        // this.displacementSensorAddress='';
+                        // this.displacementSystemId='';
+                        // this.initShift='';
+                        // this.customShift='';
                     }
                 })
            },
@@ -4026,7 +4372,7 @@ select.autoImport{
         #toolTbale{
             width: 85%;
             margin:10px auto;
-            // height: 300px;
+            height: 300px;
             overflow: auto;
             position: relative;
             .toolTbaleList{

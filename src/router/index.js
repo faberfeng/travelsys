@@ -151,6 +151,34 @@ const router = new Router({
         requireAuth:true
       }
     },
+    //智慧管网系统
+     
+    //首页
+    {
+      path:'/smartPipeIndex',
+      name:'smartPipeIndex',
+      component:resolve=>require(['@/components/smartPipe/smartPipeIndex'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path:'/picturePreview',
+      name:'picturePreview',
+      component:resolve=>require(['@/components/ManageCost/picturePreview'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path:'/videoPreview',
+      name:'videoPreview',
+      component:resolve=>require(['@/components/ManageCost/videoPreview'],resolve),
+      meta:{
+        requireAuth:true
+      }
+    },
+
     {
       path:'/home',
       name:'Home',

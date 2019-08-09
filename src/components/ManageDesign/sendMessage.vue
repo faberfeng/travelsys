@@ -574,12 +574,12 @@ export default Vue.component('common-upload',{
             
             // console.log(data);
             console.log(vm.valuemonomer,'vm.valuemonomer');
-            // if(vm.valuemonomer==undefined){
-            //         vm.$message({
-            //             type:'info',
-            //             message:'请新建目录上传模型'
-            //         })
-            // }else{
+            if(vm.holderid==""){
+                    vm.$message({
+                        type:'info',
+                        message:'请上传模型选择层级'
+                    })
+            }else{
                 vm.fullscreenLoading = true;
                  axios({
                      method:'POST',
@@ -636,7 +636,7 @@ export default Vue.component('common-upload',{
                     console.log(err)
                 })
                 
-            // }
+            }
             
         },
         uploadIMG(){

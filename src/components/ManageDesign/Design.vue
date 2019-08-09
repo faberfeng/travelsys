@@ -4429,7 +4429,7 @@ export default {
         // });
         console.log(fileName,'fileName');
         // console.log(fileName.substr(fileName.length-4,fileName.length));
-        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'||fileName.split('.')[1]=='txt'){
+        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'){
             var data=val.replace('/doc/dl/','');
             console.log(data,'加载数据')
             axios({
@@ -4442,6 +4442,59 @@ export default {
                let objUrl=URL.createObjectURL(blob);
                window.open(objUrl);
            })
+
+        }else if(fileName.split('.')[1]=='pdf'||fileName.split('.')[1]=='PDF'){
+            axios({
+               url:this.BDMSUrl+val,
+               responseType:'blob'
+           }).then((response)=>{
+               let blob = new Blob([response.data],{
+                   type:'application/pdf'
+               })
+               let objUrl=URL.createObjectURL(blob);
+               window.open(objUrl);
+           })
+
+        }else if(fileName.split('.')[1]=='txt'){
+            axios({
+               url:this.BDMSUrl+val,
+               responseType:'blob'
+           }).then((response)=>{
+               let blob = new Blob([response.data],{
+                   type:'text/plain'
+               })
+               let objUrl=URL.createObjectURL(blob);
+               window.open(objUrl);
+           })
+        }else if(fileName.split('.')[1]=='png'||fileName.split('.')[1]=='jpg'||fileName.split('.')[1]=='jpeg'||fileName.split('.')[1]=='gif'){
+
+            let routeUrl = this.$router.resolve({
+                path:'/picturePreview',
+                query:{
+                    id:val
+                }
+            });
+            window.open(routeUrl.href, '_blank');
+            // this.$router.push({
+            //     path:'/picturePreview',
+            //     query:{
+            //         id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+            //     }
+            // })
+        }else if(fileName.split('.')[1]=='mp4'){
+             let routeUrl = this.$router.resolve({
+                path:'/videoPreview',
+                query:{
+                    id:val
+                }
+            });
+            window.open(routeUrl.href, '_blank');
+            // this.$router.push({
+            //     path:'/videoPreview',
+            //     query:{
+            //         id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+            //     }
+            // })
 
         }else{
             window.open(this.BDMSUrl+val,"_blank")

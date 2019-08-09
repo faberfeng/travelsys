@@ -17,7 +17,7 @@
         <span class="bar-title">工程导航</span>
         <span class="bar-button" v-show="barShow" @click="changeBarStyle" >条形风格</span>
         <span class="bar-button" v-show="brandShow" @click="changeBrandStyle">牌形风格</span>
-        <!-- <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span> -->
+        <span class="bar-button" v-show="mapShow" @click="changeMapStyle">地图风格</span>
       </div>
       <div class="clearfix item-proj-box0" v-if="show0">
         <div v-for="(item, index) in listData" :key="index"  :class="[{'ongoing_color_b':item.status==1,'end_color_b':item.expireTime<currentStampTime&&item.status==1},'item-proj']" v-show="item.status!=2" @click="selectProject(item.projectId,item.expireTime<currentStampTime,item.projName)">
@@ -643,7 +643,10 @@ export default {
         this.show0=false;
         this.show1=true;
         var projIds=[];
-        this.gisInit();
+        this.$router.push({
+            path:'/smartPipeIndex'
+        })
+        // this.gisInit();
         // console.log(vm.listData,'vm.listData');
         // vm.listData.forEach((num)=>{
         //   projIds.push(num.projectId)

@@ -4902,11 +4902,16 @@ export default {
         console.log(fileId,fileName,'fileId,fileName');
 
         // console.log(fileName.split('.')[1]=='doc'||'docx'||'odt'||'ott'||'rtf'||'text'||'csv'||'ods'||'ots'||'tsv'||'xls'||'xlsx'||'odg'||'otg'||'html','1111');
-        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'||fileName.split('.')[1]=='txt'){
+        if(fileName.split('.')[1]=='doc'||fileName.split('.')[1]=='docx'||fileName.split('.')[1]=='odt'||fileName.split('.')[1]=='ott'||fileName.split('.')[1]=='rtf'||fileName.split('.')[1]=='text'||fileName.split('.')[1]=='csv'||fileName.split('.')[1]=='ods'||fileName.split('.')[1]=='ots'||fileName.split('.')[1]=='tsv'||fileName.split('.')[1]=='xls'||fileName.split('.')[1]=='xlsx'||fileName.split('.')[1]=='odg'||fileName.split('.')[1]=='otg'||fileName.split('.')[1]=='html'){
+            this.$message({
+                        type:'info',
+                        message:'文件正在加载'
+            })
             axios({
                     url:this.BDMSUrl+'doc/preview?fgId='+fileId,
                     responseType:'blob'
             }).then((response)=>{
+                
                 let blob=new Blob([response.data],{
                     type:'application/pdf'      //将会被放入到blob中的数组内容的MIME类型 
                 });
@@ -4915,8 +4920,87 @@ export default {
                 window.open(objectUrl)
                 // window.location.href = objectUrl;   //浏览器打开这个url
             })
-        }else{
-            window.open(vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId);
+        }else if(fileName.split('.')[1]=='pdf'||fileName.split('.')[1]=='PDF'){
+             this.$message({
+                        type:'info',
+                        message:'文件正在加载'
+            })
+            axios({
+                    url:vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId,
+                    responseType:'blob'
+            }).then((response)=>{
+                let blob=new Blob([response.data],{
+                    type:'application/pdf'      //将会被放入到blob中的数组内容的MIME类型 
+                });
+                let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                // console.log(objectUrl,'objectUrl');
+                
+                if(objectUrl){
+                    window.open(objectUrl)
+                }
+                // window.location.href = objectUrl;   //浏览器打开这个url
+            })
+        }else if(fileName.split('.')[1]=='txt'){
+            axios({
+                    url:vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId,
+                    responseType:'blob'
+            }).then((response)=>{
+                let blob=new Blob([response.data],{
+                    type:'text/plain'      //将会被放入到blob中的数组内容的MIME类型 
+                });
+                let objectUrl = URL.createObjectURL(blob);  //生成一个url==
+                window.open(objectUrl)
+                // console.log(objectUrl,'objectUrl');
+                // window.open(objectUrl)
+                // window.location.href = objectUrl;   //浏览器打开这个url
+            })
+        }else if(fileName.split('.')[1]=='js'){
+            axios({
+                    url:vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId,
+                    responseType:'blob'
+            }).then((response)=>{
+                let blob=new Blob([response.data],{
+                    type:'application/x-javascript'      //将会被放入到blob中的数组内容的MIME类型 
+                });
+                let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                console.log(objectUrl,'objectUrl');
+                window.open(objectUrl)
+                // window.location.href = objectUrl;   //浏览器打开这个url
+            })
+            
+        }else if(fileName.split('.')[1]=='png'||fileName.split('.')[1]=='jpg'||fileName.split('.')[1]=='jpeg'||fileName.split('.')[1]=='gif'){
+
+            let routeUrl = this.$router.resolve({
+                path:'/picturePreview',
+                query:{
+                    id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+                }
+            });
+            window.open(routeUrl.href, '_blank');
+            // this.$router.push({
+            //     path:'/picturePreview',
+            //     query:{
+            //         id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+            //     }
+            // })
+        }else if(fileName.split('.')[1]=='mp4'){
+             let routeUrl = this.$router.resolve({
+                path:'/videoPreview',
+                query:{
+                    id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+                }
+            });
+            window.open(routeUrl.href, '_blank');
+            // this.$router.push({
+            //     path:'/videoPreview',
+            //     query:{
+            //         id:'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId
+            //     }
+            // })
+
+        }
+        else{
+            window.open(vm.BDMSUrl+'/doc/download/'+fileId+'?token='+vm.token+'&groupId='+vm.selectUgId,'_blank');
         } 
     },
     /**

@@ -728,20 +728,6 @@ export default {
                     // weatherChart.getChart().yAxis[0].min=(3*min-2*max);
                     // weatherChart.getChart().yAxis[0].max=(3*max-2*min);
                 },0)
-                // let xAxisPeopleData=[];
-                // let yAxisPeopleData=[];
-                // setTimeout(()=>{
-                //     let peopleChart=this.$refs.peopleChartRef; 
-                //     peopleChart.delegateMethod('showLoading', 'Loading...');
-                //     peopleChart.removeSeries();
-                //     peopleChart.addSeries({name:'温度',data:yAxisData});
-                //     peopleChart.hideLoading();
-                //     peopleChart.getChart().xAxis[0].update({categories:xAxisData});
-                //     peopleChart.options.chart.height=left_bottomChart;
-                //     // weatherChart.getChart().yAxis[0].min=(3*min-2*max);
-                //     // weatherChart.getChart().yAxis[0].max=(3*max-2*min);
-                // },0)
-               
           })
       },
       getNotice(){

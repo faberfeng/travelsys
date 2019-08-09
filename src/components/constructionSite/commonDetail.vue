@@ -138,8 +138,8 @@
                                 <td>
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <!-- <button title="定位" class="location actionBtn"></button> -->
-                                    <button title="曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
-                                    <i class="el-icon-date" style="color:red;width:18px;height:18px;cursor:pointer;margin-left:12px;" @click="getAllCurve(item.pointId)"></i>
+                                    <button title="变化曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
+                                    <i class="el-icon-date" title="累计变化曲线" style="color:red;width:18px;height:18px;cursor:pointer;margin-left:12px;" @click="getAllCurve(item.pointId)"></i>
                                 </td>
                             </tr>
                         </tbody>
@@ -292,7 +292,9 @@
                             range-separator="至"
                             start-placeholder="开始日期"
                             end-placeholder="结束日期"
-                            value-format="yyyy-MM-dd">                         
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            format="yyyy-MM-dd HH:mm:ss"
+                           >                         
                         </el-date-picker>
                         <span class="searchBtn" @click="makeSureData1()">确认</span>
                     </div>
@@ -302,7 +304,7 @@
             </el-dialog>
 
 
-            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" @close="autoAcquisitionCancle()">
+            <el-dialog title="自动采集配置" :visible="autoAcquisitionShow" width="800px" @close="autoAcquisitionCancle()">
                 <div class="editBody" >
                     <div class="editBodyone"><label class="editInpText" style="width:18% !important;">采集设备厂家：</label><select class="gatherTimeName" @click="manufacturerChange" v-model="manufacturerValue" placeholder="请选择"><option v-for="(item,index) in manufacturerList" :value="item.value" :key="index" v-text="item.label"></option></select>
                     </div>
@@ -377,28 +379,27 @@
                                         <th width="50px" rowspan="2">点位名称</th>
                                         <th width="100px" rowspan="2">计算公式</th>
                                         <!-- <th width="20px" rowspan="2">率定系数</th> -->
-                                        <th colspan="3">设备1</th>
+                                        <th  colspan="3">设备1</th>
                                         <th colspan="3">设备2</th>
                                         <th colspan="3">设备3</th>
                                         <th colspan="3">设备4</th>
                                         <th width="80px" rowspan="2">操作</th>
                                     </tr>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>端口</th>
-                                        <th>率定系数</th>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">率定系数</th>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">率定系数</th>
 
-                                        <th>ID</th>
-                                        <th>端口</th>
-                                        <th>率定系数</th>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">率定系数</th>
 
-                                        <th>ID</th>
-                                        <th>端口</th>
-                                        <th>率定系数</th>
-
-                                        <th>ID</th>
-                                        <th>端口</th>
-                                        <th>率定系数</th>
+                                        <th width="50px">ID</th>
+                                        <th width="50px">端口</th>
+                                        <th width="50px">率定系数</th>
                                     </tr>
                                 </thead>
                                  <tbody>
@@ -426,7 +427,7 @@
                                        <td>
                                            <button title="删除" @click="DeleteAutoForce(item.id)"  class="deleteBtn actionBtn"></button>
                                             <!-- v-show="editInspectWordEdit" -->
-                                            <!-- <button title="编辑" @click="editAutoForce(item.id)"   class="editBtn actionBtn"></button> -->
+                                            <button title="编辑" @click="editAutoForce(item.id)"   class="editBtn actionBtn"></button>
                                        </td>
 
                                     </tr>
@@ -489,17 +490,19 @@
                                  <thead>
                                     <tr>
                                         <th width="100px" rowspan="2">点位名称</th>
-                                        <th colspan="3">绑定点位设备</th>
-                                        <th colspan="3">基准点位设备</th>
+                                        <th colspan="4">绑定点位设备</th>
+                                        <th colspan="4">基准点位设备</th>
                                         <th  width="100px" rowspan="2">操作</th>
                                     </tr>
                                     <tr>
                                         <th width="50px">ID</th>
                                         <th width="50px">端口</th>
                                         <th width="50px">传感器地址</th>
+                                        <th width="50px">传感器编号(华桓)</th>
                                         <th width="50px">ID</th>
                                         <th width="50px">端口</th>
                                         <th width="50px">传感器地址</th>
+                                        <th width="50px">传感器编号(华桓)</th>
                                     </tr>
                                 </thead>
                                  <tbody>
@@ -509,12 +512,15 @@
                                         <td v-text="item.systemId"></td>
                                         <td v-text="item.channelNo"></td>
                                         <td v-text="item.sensorAddress"></td>
+                                        <td v-text="item.hhSensorNo"></td>
+
                                         <td v-text="item.baseSystemId"></td>
                                         <td v-text="item.baseChannelNo"></td>
                                         <td v-text="item.baseSensorAddress"></td>
+                                        <td v-text="item.hhBaseSensorNo"></td>
                                         <td>
                                             <button title="删除" @click="DeleteAutoVerticalHeight(item.id)"  class="deleteBtn actionBtn"></button>
-                                            <!-- <button title="编辑"   class="editBtn actionBtn"></button> -->
+                                            <button title="编辑" @click="editAutoVerticalHeight(item.id)" class="editBtn actionBtn"></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -543,10 +549,10 @@
                                  <tbody>
                                     <tr v-for="(item,index) in getHorizontalDisplaceList" :key="index">
                                         <td >{{getPointName(item.pointId)}}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{{item.initShift}}</td>
+                                        <td>{{item.systemId}}</td>
+                                        <td>{{item.channelNo}}</td>
+                                        <td>{{item.sensorAddress}}</td>
                                         <!-- <td v-text="item.systemId"></td>
                                         <td v-text="item.channelNo"></td>
                                         <td v-text="item.sensorAddress"></td>
@@ -555,6 +561,7 @@
                                         <td v-text="item.baseSensorAddress"></td> -->
                                         <td>
                                             <button title="删除" @click="DeleteAutoHorizontal(item.id)"  class="deleteBtn actionBtn"></button>
+                                            <button title="编辑" @click="editAutoHorizontal(item.id)"  class="editBtn actionBtn"></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -777,7 +784,7 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:18% !important;">初始时间:</label>
-                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                        <select v-model="selectTimeValue" @change="changeWaterTimeValue()" class="sheetName">
                              <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
                         </select>
                     </div>
@@ -807,33 +814,80 @@
             <el-dialog title="垂直位移配置" :visible="addVerticalDisplaceShow" @close="VerticalDisplaceCancle" >
                 <div class="editBody">
                     <div class="editBodytwo">
-                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
-                            <select v-model="forcePointId" class="sheetName">
-                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
-                            </select>
-                    </div>
-                    <div class="editBodytwo">
-                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
-                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
-                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        <label class="editInpText" style="width:18% !important;">厂家设备:</label>
+                            <select v-model="equipmentType" class="sheetName">
+                                <option v-for="(item,index) in equipmentList"  :value="item.value" :key="index" v-text="item.name"></option>
                         </select>
                     </div>
                     <div class="editBodytwo">
-                        <label class="editInpText" style="width:18% !important;">初始高度:</label>
-                        <input placeholder="初始高度" v-model="initalHeight" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" @change="changeVerticalPoint()" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
                     </div>
-                    <div class="editBodytwo">
-                        <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
-                        <input placeholder="设备ID" class="inp" v-model="systemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
-                        <input placeholder="端口号" class="inp" v-model="channelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
-                        <input placeholder="传感器地址" class="inp" v-model="sensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                   
+                    <div v-show="equipmentType==1">
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">初始高度:</label>
+                            <input placeholder="初始高度" v-model="initalHeight" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
+                            <input placeholder="设备ID" class="inp" v-model="systemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="端口号" class="inp" v-model="channelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="传感器地址" class="inp" v-model="sensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">基准点位设备:</label>
+                            <input placeholder="设备ID" class="inp" v-model="baseSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="端口号" class="inp" v-model="baseChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="传感器地址" class="inp" v-model="baseSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
                     </div>
+                    <div v-show="equipmentType==2">
+                         <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">筛选初始时间:</label>
+                            <el-date-picker
+                                v-model="selectInitTimeValue"
+                                type="daterange"
+                                :clearable='false'
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期" @change="selectInitTime()" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+                            </el-date-picker>
+                        </div>
+                        <div v-show="selectInitTimeValue">
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">绑定点位初始时间:</label>
+                                    <select v-model="hhInitDataTime" @change="hhInitDataChange()"  class="sheetName">
+                                        <option v-for="(item,index) in bindPointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
+                                    </select>
+                            </div>
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">绑定点位初始高度:</label>
+                                    <input placeholder="初始高度" :disabled="true" v-model="hhInitData" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                            </div>
+                            <div class="editBodytwo">
+                                <label class="editInpText" style="width:18% !important;">基准点位初始时间:</label>
+                                <select v-model="hhBaseInitDataTime" @change="hhBaseInitDataChange()" class="sheetName">
+                                    <option v-for="(item,index) in basePointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
+                                </select>
+                            </div>
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">基准点位初始高度:</label>
+                                    <input placeholder="初始高度" :disabled="true" v-model="hhBaseInitData" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                            </div>
+                        </div>
 
-                    <div class="editBodytwo">
-                        <label class="editInpText" style="width:18% !important;">基准点位设备:</label>
-                        <input placeholder="设备ID" class="inp" v-model="baseSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
-                        <input placeholder="端口号" class="inp" v-model="baseChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
-                        <input placeholder="传感器地址" class="inp" v-model="baseSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定传感器编号:</label>
+                            <input placeholder="绑定点位传感器编号" v-model="hhSensorNo" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">基准传感器编号:</label>
+                            <input placeholder="基准点位传感器编号" v-model="hhBaseSensorNo" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
@@ -841,6 +895,97 @@
                         <button class="editBtnC" @click="VerticalDisplaceCancle">取消</button>
                 </div>
             </el-dialog>
+
+            <el-dialog title="修改垂直位移配置" :visible="editVerticalDisplaceShow" @close="editVerticalDisplaceCancle" >
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">厂家设备:</label>
+                            <select v-model="equipmentType" class="sheetName">
+                                <option v-for="(item,index) in equipmentList"  :value="item.value" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
+                    </div>
+                   
+                    <div v-show="equipmentType==1">
+                         <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                            <select v-model="selectTimeValue" @change="changeVerticalTimeValue()" class="sheetName">
+                                <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                            </select>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">初始高度:</label>
+                            <input placeholder="初始高度" v-model="initalHeight" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
+                            <input placeholder="设备ID" class="inp" v-model="systemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="端口号" class="inp" v-model="channelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="传感器地址" class="inp" v-model="sensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">基准点位设备:</label>
+                            <input placeholder="设备ID" class="inp" v-model="baseSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="端口号" class="inp" v-model="baseChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                            <input placeholder="传感器地址" class="inp" v-model="baseSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                    </div>
+                    <div v-show="equipmentType==2">
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">筛选初始时间:</label>
+                            <el-date-picker
+                                v-model="selectInitTimeValue"
+                                :clearable='false'
+                                type="daterange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期" @change="selectInitTime()" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+                            </el-date-picker>
+                        </div>
+                        <div >
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">绑定点位初始时间:</label>
+                                    <select v-model="hhInitDataTime" @change="hhInitDataChange()"  class="sheetName">
+                                        <option v-for="(item,index) in bindPointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
+                                    </select>
+                            </div>
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">绑定点位初始高度:</label>
+                                    <input placeholder="初始高度" :disabled="true" v-model="hhInitData" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                            </div>
+                            <div class="editBodytwo">
+                                <label class="editInpText" style="width:18% !important;">基准点位初始时间:</label>
+                                <select v-model="hhBaseInitDataTime" @change="hhBaseInitDataChange()" class="sheetName">
+                                    <option v-for="(item,index) in basePointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
+                                </select>
+                            </div>
+                            <div class="editBodytwo">
+                                    <label class="editInpText" style="width:18% !important;">基准点位初始高度:</label>
+                                    <input placeholder="初始高度" :disabled="true" v-model="hhBaseInitData" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                            </div>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定传感器编号:</label>
+                            <input placeholder="绑定点位传感器编号" v-model="hhSensorNo" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">基准传感器编号:</label>
+                            <input placeholder="基准点位传感器编号" v-model="hhBaseSensorNo" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                        </div>
+
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="makeEditVerticalDisplaceSure">确认</button>
+                        <button class="editBtnC" @click="editVerticalDisplaceCancle">取消</button>
+                </div>
+            </el-dialog>
+
 
             <el-dialog title="水平位移配置" :visible="addHorizontalDisplaceShow" @close="horizontalDisplaceCancle" >
                 <div class="editBody">
@@ -858,7 +1003,7 @@
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:18% !important;">初始位移:</label>
-                         <input placeholder="设备ID" class="inp" v-model="horInitalValue" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                         <input placeholder="初始位移" class="inp" v-model="horInitalValue" style="width:375px !important;height:30px !important;margin-right:10px;"/>
                     </div>
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
@@ -870,6 +1015,36 @@
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="makeHorizontalDisplaceSure">确认</button>
                         <button class="editBtnC" @click="horizontalDisplaceCancle">取消</button>
+                </div>
+            </el-dialog>
+            <el-dialog title="编辑水平位移配置" :visible="editHorizontalDisplaceShow" @close="edithorizontalDisplaceCancle" >
+                <div class="editBody">
+                    <div class="editBodytwo">
+                            <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                            <select v-model="forcePointId" class="sheetName">
+                                <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                            </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始位移:</label>
+                         <input placeholder="初始位移" class="inp" v-model="horInitalValue" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="horSystemId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="horChannelNo" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="传感器地址" class="inp" v-model="horSensorAddress" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="editHorizontalDisplaceSure">确认</button>
+                        <button class="editBtnC" @click="edithorizontalDisplaceCancle">取消</button>
                 </div>
             </el-dialog>
 
@@ -890,7 +1065,25 @@
 
              <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
                 <div class="editBody" >
-                     <div class="editBodytwo">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">筛选点位:</label>
+                        <select v-model="historyPointId" class="sheetName">
+                             <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">筛选时间:</label>
+                        <el-date-picker
+                                v-model="selectHistoryTimeValue"
+                                type="daterange"
+                                :clearable='false'
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+                        </el-date-picker>
+                    </div>
+
+                     <!-- <div class="editBodytwo">
                         <div id="toolTbale1" >
                             <table class="toolTbaleList" style="table-layout: fixed;" border="1" cellspacing="0" width="100%">
                                  <thead>
@@ -913,14 +1106,13 @@
                                         <td>{{item.pointAmount}}</td>
                                     </tr>
                                 </tbody>
-                                <!-- <img style="height:230px" src="../../assets/nodata.png" v-show="!getImportHistoryList"> -->
                             </table>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div slot="footer" class="dialog-footer">
-                        <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button>
-                        <button class="editBtnC" @click="exportSelectRecode()">导出选中记录</button>
+                        <!-- <button class="editBtnS" @click="exportAllRecode()" >导出全部记录</button> -->
+                        <button class="editBtnS" @click="exportSelectRecode()">导出历史记录</button>
                 </div>
             </el-dialog>
 
@@ -1031,13 +1223,24 @@ export default Vue.component('commonDetail',{
             channelNo:'',
             sensorAddress:'',
             baseSystemId:'',
+            verticalHeightId:'',
             baseChannelNo:'',
             baseSensorAddress:'',
             getVerticalBindInfoList:'',
-
+            hhBaseSensorNo:'',
+            hhSensorNo:'',
             //公式设定参数
             setInitCollectTimeList:'',
             selectTimeValue:'',
+            selectInitTimeValue:'',
+            bindPointInitList:"",
+            basePointInitList:'',
+            hhInitData:'',
+            hhInitDataTime:'',
+            hhBaseInitData:'',
+            hhBaseInitDataTime:'',
+
+            selectInitTimeList:[],
             formulaSettingShow:false,//公式设定
             useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
             getFormulaList:'',//获取受力公式
@@ -1224,8 +1427,20 @@ export default Vue.component('commonDetail',{
             addForceShow:false,
             addWaterLevelShow:false,
             addVerticalDisplaceShow:false,
-
+            editVerticalDisplaceShow:false,
+            equipmentType:1,
+            equipmentList:[
+                {
+                    value:1,
+                    name:'岩联'
+                },
+                {
+                    value:2,
+                    name:'华桓'
+                }
+            ],
             addHorizontalDisplaceShow:false,//水平位移
+            editHorizontalDisplaceShow:false,//编辑水平位移
             horSystemId:'',
             horChannelNo:'',
             horSensorAddress:'',
@@ -1278,6 +1493,8 @@ export default Vue.component('commonDetail',{
             monitorPointInfo:'',
             dataLists:'',
             getDetailPointInfoList:'',
+            historyPointId:'',//导出日期
+            selectHistoryTimeValue:'',//筛选历史时期
             forcePointId:'',
             fZero:'',
             wLevelK:'',
@@ -1645,7 +1862,7 @@ export default Vue.component('commonDetail',{
     methods:{
         //得到点位
         getPointName(val){
-            console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
+            // console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
             var a;
             this.getDetailPointInfoList.forEach((item)=>{
                 if(item.id==val){
@@ -1665,7 +1882,90 @@ export default Vue.component('commonDetail',{
         },
         //触发改变时间
         changeTimeValue(){
+            this.getHorizontalDataHistory();
             // this.setInitCollectTime();
+        },
+        changeVerticalPoint(){
+            this.selectInitTimeValue='';
+          
+            this.selectInitTime();
+
+
+        },
+        //筛选初始时间
+        selectInitTime(){
+            var startDate=this.selectInitTimeValue[0];
+            var endDate=this.selectInitTimeValue[1];
+            this.bindPointInitList=[];
+            this.basePointInitList=[];
+            this.hhInitData='';
+            this.hhBaseInitData='';
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getOriginalHHData',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:this.forcePointId,
+                    startDate:startDate,
+                    endDate:endDate
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.selectInitTimeList=response.data.rt;
+                    this.bindPointInitList=this.selectInitTimeList.originalData;
+                    if(this.bindPointInitList.length!=0){
+                        this.hhInitDataTime=this.bindPointInitList[0].collectTime;
+                        this.hhInitData=this.bindPointInitList[0].shift;
+                    }
+                    this.basePointInitList=this.selectInitTimeList.baseOriginalData;
+                    if(this.basePointInitList.length!=0){
+                        this.hhBaseInitDataTime=this.basePointInitList[0].collectTime;
+                        this.hhBaseInitData=this.basePointInitList[0].shift;
+                    }
+                }
+            })
+        },
+        hhInitDataChange(){
+            this.bindPointInitList.forEach((item)=>{
+                if(item.collectTime==this.hhInitDataTime){
+                    this.hhInitData=item.shift;
+                }
+            })
+        },
+        hhBaseInitDataChange(){
+            this.basePointInitList.forEach((item)=>{
+                if(item.collectTime==this.hhBaseInitDataTime){
+                    this.hhBaseInitData=item.shift;
+                }
+            })
+        },
+        changeVerticalTimeValue(){
+
+        },
+        changeWaterTimeValue(){
+
+        },
+        //获取水平位移历史数据
+        getHorizontalDataHistory(){
+            this.selectTimeValue=new Date(new Date(this.selectTimeValue).toString().split('GMT')[0]+' UTC').toISOString();
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getHorizontalDataHistory',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:this.forcePointId,
+                    collectTime:this.selectTimeValue
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.horInitalValue=response.data.rt[0].data;
+                    this.selectTimeValue=response.data.rt[0].acquisitionTime;
+                }
+            })
+
+
         },
         //獲取歷史日期
         getInsertHistoryDate(){
@@ -1678,14 +1978,16 @@ export default Vue.component('commonDetail',{
                     'token':this.token
                 },
                 params:{
-                    itemId:this.itemMonitorId
+                    itemId:this.itemMonitorId,
+                    startDate:null,
+                    endDate:null
                 },
                 data:pointIds,
                 method:'post'
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.setInitCollectTimeList=response.data.rt[0].historyDate;
-                    this.selectTimeValue=this.setInitCollectTimeList[0];
+                    // this.selectTimeValue=this.setInitCollectTimeList[0];
                 }
             })
         },
@@ -2056,7 +2358,9 @@ export default Vue.component('commonDetail',{
                     'token':vm.token
                 },
                 params:{
-                    itemId:this.itemMonitorId
+                    itemId:this.itemMonitorId,
+                    startDate:null,
+                    endDate:null
                 }
             }).then((response)=>{
                 if(response.data.cd=='0'){
@@ -2088,8 +2392,45 @@ export default Vue.component('commonDetail',{
         },
         //导出选中记录
         exportSelectRecode(){
+           
+            if(this.selectHistoryTimeValue==''){
+                this.$message({
+                    type:"info",
+                    message:'请选择筛选时间'
+                })
+            }else{
+                let startDate=this.selectHistoryTimeValue[0];
+                let endDate=this.selectHistoryTimeValue[1];
+                //  window.open('blob:'+this.BDMSUrl+'detectionInfo/exportHistory?token='+this.token+'&endDate='+endDate+'&startDate='+startDate+'&pointId='+this.historyPointId+'&seqId='+null)
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/exportHistory',
+                    headers:{
+                        'token':this.token
+                    },
+                    responseType:'blob',
+                    params:{
+                        startDate:startDate,
+                        endDate:endDate,
+                        seqId:null,
+                        pointId:this.historyPointId
+                    }
+                }).then((response)=>{
+                    let blob=new Blob([response.data],{
+                        // application/vnd.ms-excel
+                        // 
+                        type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'      //将会被放入到blob中的数组内容的MIME类型 
+                    });
+                    let objectUrl = URL.createObjectURL(blob);  //生成一个url
+                    // console.log(objectUrl,'objectUrl');
+                    window.open(objectUrl);
+                    this.selectHistoryTimeValue='';
+                    this.exportHistoryRecoedShow=false;
+                })
 
-            this.exportHistory()
+            }
+           
+
+            // this.exportHistory()
         },
         //
         exportHistoryRecoedCancle(){
@@ -2271,6 +2612,7 @@ export default Vue.component('commonDetail',{
                 if(response.data.cd=='0'){
                     this.getDetailPointInfoList=response.data.rt;
                     this.forcePointId=this.getDetailPointInfoList[0].id;
+                    this.historyPointId=this.getDetailPointInfoList[0].id;
                     this.getDetailPointInfoList.forEach((item)=>{
                         if(item.isAlert==1){
                             this.isAlertNum++;
@@ -2746,6 +3088,13 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getPointDatasList=response.data.rt;
+
+                    this.getPointDatasList.forEach((item)=>{
+                        if(this.forcePointId==item.pointId)
+                            this.selectTimeValue=item.initAcquisitionTime
+                    })
+                   
+                    // console.log(this.getPointDatasList,'this.getPointDatasList');
                     this.getPointDatasListLength=response.data.rt.length;
                     // this.itemSubmitCount=this.getPointDatasListLength;
                     if(this.getPointDatasListLength<11){
@@ -3215,6 +3564,8 @@ export default Vue.component('commonDetail',{
             })
         },
         editAutoForce(){
+            this.editAutoForceShow=true;
+
 
         },
         forceMake(){
@@ -3249,7 +3600,7 @@ export default Vue.component('commonDetail',{
                     this.ForceBindInfoList=response.data.rt;
                     this.addForceShow=false;
                     this.setFormula();
-                    this.setInitCollectTime();
+                    // this.setInitCollectTime();
                     this.getForceBindInfo();
                     this.k='';
                     this.deviceId='';
@@ -3360,7 +3711,7 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                    this.setInitCollectTime();
+                    // this.setInitCollectTime();
                     this.getGaugeBindInfo();
                     this.addWaterLevelShow=false;
                     this.wLevelDeviceId='';
@@ -3426,6 +3777,11 @@ export default Vue.component('commonDetail',{
         },
         makeVerticalDisplaceSure(){
             var vm=this;
+            // if(this.hhBaseInitDataTime||this.hhInitDataTime){
+            //     this.hhBaseInitDataTime=new Date(new Date(this.hhBaseInitDataTime).toString().split('GMT')[0]+' UTC').toISOString();
+            //     this.hhInitDataTime==new Date(new Date(this.hhInitDataTime).toString().split('GMT')[0]+' UTC').toISOString();
+            // }
+            
             axios({
                 url:this.BDMSUrl+'detectionInfo/addVerticalBindInfo',
                 headers:{
@@ -3440,11 +3796,18 @@ export default Vue.component('commonDetail',{
                     systemId:this.systemId,
                     channelNo:this.channelNo,
                     sensorAddress:this.sensorAddress,
-                    h:this.initalHeight
+                    h:this.initalHeight,
+                    type:this.equipmentType,
+                    hhBaseSensorNo:this.hhBaseSensorNo,
+                    hhSensorNo:this.hhSensorNo,
+                    hhBaseInitData:this.hhBaseInitData,
+                    hhInitData:this.hhInitData,
+                    hhBaseInitDataTime:this.hhBaseInitDataTime==''?'':new Date(new Date(this.hhBaseInitDataTime).toString().split('GMT')[0]+' UTC').toISOString(),
+                    hhInitDataTime:this.hhInitDataTime==''?'':new Date(new Date(this.hhInitDataTime).toString().split('GMT')[0]+' UTC').toISOString()
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
-                     this.setInitCollectTime();
+                    //  this.setInitCollectTime();
                     this.getVerticalBindInfo();
                     this.addVerticalDisplaceShow=false;
                     this.baseSystemId='';
@@ -3452,7 +3815,67 @@ export default Vue.component('commonDetail',{
                     this.baseSensorAddress='';
                     this.systemId='';
                     this.channelNo='';
-                    this.sensorAddress='';                        
+                    this.sensorAddress='';      
+                    this.hhSensorNo='';
+                    this.hhBaseSensorNo='';     
+                    this.hhBaseInitDataTime='';
+                    this.hhInitDataTime='';             
+                }
+            })
+
+        },
+
+        makeEditVerticalDisplaceSure(){
+             var vm=this;
+            // if(this.hhBaseInitDataTime||this.hhInitDataTime){
+            //     this.hhBaseInitDataTime=new Date(new Date(this.hhBaseInitDataTime).toString().split('GMT')[0]+' UTC').toISOString();
+            //     this.hhInitDataTime==new Date(new Date(this.hhInitDataTime).toString().split('GMT')[0]+' UTC').toISOString();
+            //     console.log(this.hhBaseInitDataTime,this.hhInitDataTime,'this.hhInitDataTime');
+            // }
+            axios({
+                url:this.BDMSUrl+'detectionInfo/updateVerticalBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.verticalHeightId,
+                    itemId:this.itemMonitorId,
+                    pointId:this.forcePointId,
+                    baseSystemId:this.baseSystemId,
+                    baseChannelNo:this.baseChannelNo,
+                    baseSensorAddress:this.baseSensorAddress,
+                    systemId:this.systemId,
+                    channelNo:this.channelNo,
+                    sensorAddress:this.sensorAddress,
+                    h:this.initalHeight,
+                    type:this.equipmentType,
+                    hhBaseSensorNo:this.hhBaseSensorNo,
+                    hhSensorNo:this.hhSensorNo,
+                    hhBaseInitData:this.hhBaseInitData,
+                    hhInitData:this.hhInitData,
+                    hhBaseInitDataTime:this.hhBaseInitDataTime==''?'':new Date(new Date(this.hhBaseInitDataTime).toString().split('GMT')[0]+' UTC').toISOString(),
+                    hhInitDataTime:this.hhInitDataTime==''?'':new Date(new Date(this.hhInitDataTime).toString().split('GMT')[0]+' UTC').toISOString()
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    //  this.setInitCollectTime();
+                    this.getVerticalBindInfo();
+                    // this.addVerticalDisplaceShow=false;
+                    this.editVerticalDisplaceShow=false;
+                    this.baseSystemId='';
+                    this.baseChannelNo='';
+                    this.baseSensorAddress='';
+                    this.systemId='';
+                    this.channelNo='';
+                    this.sensorAddress='';      
+                    this.hhSensorNo='';
+                    this.hhBaseSensorNo='';
+                    this.initalHeight='';          
+                    this.hhBaseInitData='';   
+                    this.hhInitData='';     
+                     this.selectInitTimeValue='';
+                     this.hhInitDataTime='';
+                     this.hhBaseInitDataTime='';
                 }
             })
 
@@ -3494,8 +3917,68 @@ export default Vue.component('commonDetail',{
                 })
             })
         },
+
+        editAutoVerticalHeight(id){
+            this.getVerticalBindInfoList.forEach((item)=>{
+                if(item.id==id){
+                        this.verticalHeightId=id;
+                        // itemId:this.itemMonitorId=item.itemId,
+                        this.forcePointId=item.pointId,
+                        this.baseSystemId=item. baseSystemId;
+                        this.baseChannelNo=item.baseChannelNo;
+                        this.baseSensorAddress=item.baseSensorAddress;
+                        this.systemId=item.systemId;
+                        this.channelNo=item.channelNo;
+                        this.sensorAddress=item.sensorAddress;
+                        this.initalHeight=item.h;
+                        this.hhBaseSensorNo=item.hhBaseSensorNo;
+                        this.hhSensorNo=item.hhSensorNo;
+                        this.hhBaseInitData=item.hhBaseInitData;
+                        this.hhInitData=item.hhInitData;
+                        this.hhInitDataTime=item.hhInitDataTime;
+                        this.hhBaseInitDataTime=item.hhBaseInitDataTime
+                }
+            })
+            if(this.hhBaseSensorNo==null&&this.hhSensorNo==null){
+                this.equipmentType=1
+            }else{
+                 this.equipmentType=2
+            }
+            this.editVerticalDisplaceShow=true;
+        },
         VerticalDisplaceCancle(){
-            this.addVerticalDisplaceShow=false;
+                this.addVerticalDisplaceShow=false;
+                this.baseSystemId='';
+                this.baseChannelNo='';
+                this.baseSensorAddress='';
+                this.systemId='';
+                this.channelNo='';
+                this.sensorAddress='';      
+                this.hhSensorNo='';
+                this.hhBaseSensorNo='';
+                this.initalHeight='';
+                 this.hhBaseInitData='';   
+                    this.hhInitData='';
+                    this.selectInitTimeValue='';
+                    this.hhBaseInitDataTime='';
+                    this.hhInitDataTime='';
+        },
+        editVerticalDisplaceCancle(){
+            this.editVerticalDisplaceShow=false;
+            this.baseSystemId='';
+            this.baseChannelNo='';
+            this.baseSensorAddress='';
+            this.systemId='';
+            this.channelNo='';
+            this.sensorAddress='';      
+            this.hhSensorNo='';
+            this.hhBaseSensorNo='';
+            this.initalHeight='';
+             this.hhBaseInitData='';   
+                    this.hhInitData='';
+                     this.selectInitTimeValue='';
+                     this.hhBaseInitDataTime='';
+                    this.hhInitDataTime='';
         },
         //自动导入水平位移
         addHorizontalDisplace(){
@@ -3509,6 +3992,13 @@ export default Vue.component('commonDetail',{
             this.horSystemId='';
             this.horInitalValue='';
 
+        },
+        edithorizontalDisplaceCancle(){
+            this.editHorizontalDisplaceShow=false;
+            this.horChannelNo='';
+            this.horSensorAddress='';
+            this.horSystemId='';
+            this.horInitalValue='';
         },
         makeHorizontalDisplaceSure(){
             axios({
@@ -3526,8 +4016,52 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.addHorizontalDisplaceShow=false;
-                    this.setInitCollectTime();
+                    // this.setInitCollectTime();
                     this.getHorizontalDisplace();
+                    this.horChannelNo='';
+                    this.horSensorAddress='';
+                    this.horSystemId='';
+                    this.horInitalValue='';
+                }
+            })
+        },
+        editAutoHorizontal(id){
+            this.editHorizontalDisplaceShow=true;
+            this.getPointDatas();
+            this.getInsertHistoryDate();
+            this.getHorizontalDisplaceList.forEach((item)=>{
+                if(item.id==id){
+                    this.editId=item.id;
+                    this.forcePointId=item.pointId;
+                    this.horChannelNo=item.channelNo;
+                    this.horSensorAddress=item.sensorAddress;
+                    this.horSystemId=item.systemId;
+                    this.horInitalValue=item.initShift;
+                }
+            })
+             
+            // console.log(this.selectTimeValue,'this.selectTimeValue');
+        },
+        editHorizontalDisplaceSure(){
+             axios({
+                url:this.BDMSUrl+'detectionInfo/updateHorizontalBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.editId,
+                    pointId:this.forcePointId,
+                    systemId:this.horSystemId,
+                    channelNo:this.horChannelNo,
+                    sensorAddress:this.horSensorAddress,
+                    initShift:this.horInitalValue
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.editHorizontalDisplaceShow=false;
+                    // this.setInitCollectTime();
+                    this.getHorizontalDisplace();
+                    this.getPointDatas();
                     this.horChannelNo='';
                     this.horSensorAddress='';
                     this.horSystemId='';
@@ -4777,7 +5311,7 @@ export default Vue.component('commonDetail',{
             #toolTbale{
                 width: 85%;
                 margin:10px auto;
-                // height: 300px;
+                height: 300px;
                 overflow: auto;
                 position: relative;
                 .toolTbaleList{

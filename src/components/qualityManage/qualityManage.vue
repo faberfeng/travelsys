@@ -914,7 +914,8 @@ export default {
                 if(response.data.cd=='0'){
                     this.ugList=response.data.rt;
                     this.ugList.forEach((item)=>{
-                        if(item.groupName.indexOf('质量管理')>-1&&item.isDefault==1){
+                        // &&item.isDefault==1
+                        if(item.groupName.indexOf('质量管理')>-1){
                             this.getGroupUser(item.groupId)
                             this.groupId=item.groupId;
                         }
