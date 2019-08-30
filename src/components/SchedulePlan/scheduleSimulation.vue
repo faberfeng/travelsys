@@ -96,7 +96,7 @@
                 <!-- <div id="leftAndRightResize" style="width:5px;background:red;height:500px;float:right;position:absolute;right:49.8%;top:0px;cursor:w-resize;z-index:6"></div> -->
                 <div>
                   <!-- overflow-x:auto; -->
-                  <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:hidden;border-left:1px solid #e9eaec;">
+                  <div id="ganttRightIndex"  style="float:right;width:49.8%;position:relative;overflow-x:hidden;overflow-y:hidden;border-left:1px solid #e9eaec;">
                       <div id="ganttRightHeadBg" style="width:100%;height:42px;position:relative;background:#f8f8f9;border:1px solid #e9eaec">
                         <div id="ganttRightHead" style="width:100%;height:41px;position:relative;position:absolute;top:0px;left:0px;overflow:hidden"></div>
                       </div>
@@ -104,7 +104,7 @@
                           <div id='ganttRight' style="width:100%;position:relative;position:absolute;top:0px;left:0px;">
                           </div>
                       </div>
-                      <div id="ganttPlayLine" style="width:2px;height:100%;position:absolute;top:0px;left:2px;cursor:pointer;border:1px dashed red;">
+                      <div id="ganttPlayLine" style="width:2px;height:100%;position:absolute;top:0px;left:2px;cursor:pointer;border:1px dashed red">
                         <i class="el-icon-caret-bottom" style="position:absolute;top:-5px;left:-6px;color:red"></i>
                         <i class="el-icon-caret-top" style="position:absolute;bottom:-5px;left:-6px;color:red"></i>
                       </div>
@@ -125,7 +125,7 @@
                 <!-- 蒙板 -->
                 <div id="ganntResizePale" style="position:absolute;top:0px;left:0px;width:100%;height:100%;display:none;z-index:10"></div>
               </div>
-              <div id="leftAndRightResize" style="width:5px;height:300px;float:right;position:absolute;right:49.8%;top:0px;cursor:w-resize;z-index:6"></div>
+              <div id="leftAndRightResize" style="width:10px;height:300px;float:right;position:absolute;left:49%;top:0px;cursor:w-resize;z-index:6"></div>
               <div @scroll="ganttByScrolls()" id="ganttByScrollTop" style="height:21px;float:right;width:50%;position:absolute;top:288px;left:50%;overflow:auto;">
                   <div  id="ganttByScroll" style="height:30px;overflow:auto;">
                   </div>
@@ -3442,8 +3442,6 @@
         let a=3600*24*1000;
         startTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
         endTime=moment((this.days_bar[0].date_stamp)).format('YYYY-MM-DD')
-        // startTime=this.days_bar[0].date_str;
-        // endTime=this.days_bar[1].date_str;
         currentStamp=this.days_bar[0].date_stamp;
         this.ganttPlayByWebGl(startTime,endTime,currentStamp)
         this.ganttPlayByWebGlComplete(startTime,endTime,currentStamp)
@@ -4344,7 +4342,7 @@
       //鼠标单击树形icon
       treeIconClick(row, rowIndex) {
         this.selectRowList = rowIndex;
-    
+      console.log(this.selectRowList,'this.selectRowList');
 
         this.productGanttNode=document.getElementById('ganttRight');
         this.productGanttNode.innerHTML = "";
@@ -6756,7 +6754,7 @@
         border-radius:10px;
         background:rgba(0,0,0,0.1);
         box-shadow:inset 006px rgba(0, 0, 0, .5);
-    -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+      -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
     }
     ::-webkit-scrollbar-thumb:window-inactive {
         background:rgba(255,0,0,0.4);

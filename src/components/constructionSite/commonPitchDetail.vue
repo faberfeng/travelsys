@@ -110,7 +110,7 @@
                     </div>
                 </div>
                 <div class="containerBottom" v-show="totalShow">
-                    <div class="containerBottomOne" v-show="leftShow">
+                    <div class="containerBottomOne" v-if="leftShow">
                         <div class="oneHeader">
                             <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{leftDisplayName}}详情</label>
@@ -168,7 +168,7 @@
                             <canvas style="position:absolute;top:48px;left:15px"  ref="canvasLeftRef" id="canvasLeft"></canvas>
                         </div>
                     </div>
-                    <div class="containerBottomThree" v-show="rightShow">
+                    <div class="containerBottomThree" v-if="rightShow">
                         <div class="threeHeader">
                              <label class="tableIcon"></label>
                             <label class="tableTxt">序列{{rightDisplayName}}详情</label>
@@ -527,6 +527,7 @@
                                  <thead>
                                     <tr>
                                         <th rowspan="2" width="100px">斜度序列ID</th>
+                                        <th rowspan="2" width="100px">深度</th>
                                         <th rowspan="2" width="100px">设备ID</th>
                                         <th rowspan="2" width="50px">通道编号</th>
                                         <!-- <th width="100px">卡槽序号</th> -->
@@ -545,6 +546,7 @@
                                  <tbody>
                                     <tr v-for="(item,index) in getAutoPitchList" :key="index">
                                         <td width="100px">{{getPointName(item.seqId)}}</td>
+                                        <td  :title="item.depth">{{item.depth}}</td>
                                         <td width="100px" :title="item.systemId">{{item.systemId}}</td>
                                         <td width="50px" :title="item.channelNo">{{item.channelNo}}</td>
                                         <td width="100px" :title="item.sensorAdress">{{item.sensorAdress}}</td>
@@ -1320,7 +1322,7 @@ export default Vue.component('commonPitch-detail',{
                     },
                     {
                         value:'华桓2',
-                        label:'华桓(固定测斜仪)'
+                        label:'岩联(固定测斜仪)'
                     },
                     {
                         value:'基康',
@@ -1860,7 +1862,7 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.rt){
                         this.pitchDetailDataListLeft=response.data.rt;
-                        console.log('00000');
+                     
                         if(this.pitchDetailDataListLeft.recent2PitchData.length==0){
                             this.$message({
                                 type:'info',
@@ -1868,9 +1870,9 @@ export default Vue.component('commonPitch-detail',{
                             })
                             return ;
                         }else if(this.leftDisplayShow==true){
-                            this.totalShow=true;
-                            this.leftShow=true;
-                             this.leftDisplayListValue1=[];
+                            this.totalShow=false;
+                            this.leftShow=false;
+                            this.leftDisplayListValue1=[];
                             this.leftDisplayListValue2=[];
                             this.leftDisplayListValueXdata=[];
                             this.leftDisplayListValueYdata1=[];
@@ -1887,7 +1889,38 @@ export default Vue.component('commonPitch-detail',{
                                        
                                 // },1000)
                                 
-                                if(this.leftDisplayListValue.length==recentVariationLength){
+                                if(this.leftDisplayListValue.length==recentVariationLength-1||this.leftDisplayListValue.length==2*(recentVariationLength-1)){
+                                    this.$message({
+                                        type:'info',
+                                        message:'请设置初始值'
+                                    })
+                                    console.log('第一种')
+                                    // this.totalShow=true;
+                                    // this.leftShow=true;
+                                    // this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    // this.time1=null;
+                                    // this.leftDisplayListValue1.push({acquisitionTime:null,depth:0,shift:null})
+                                    // this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                    // this.leftDisplayListValueXdata.push(0)
+                                    // this.leftDisplayListValueYdata1.push(null)
+                                    // this.leftDisplayListValue.forEach((item,index,array)=>{
+                                    //     this.leftDisplayListValue1.push(item)
+                                    //     this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                    //     this.leftDisplayListValueXdata.push(item.depth)
+                                    //     this.leftDisplayListValueYdata1.push(item.shift)
+                                    // })
+                                    // let lineLeftChart=this.$refs.lineLeftChartOne;
+                                    // lineLeftChart.delegateMethod('showLoading', 'Loading...');
+                                    // setTimeout(()=>{
+                                    //     lineLeftChart.removeSeries();
+                                    //     lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
+                                    //     lineLeftChart.hideLoading();
+                                    //     lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                    // },20)
+                                }else if(this.leftDisplayListValue.length==recentVariationLength){
+                                    console.log('第二种')
+                                    this.totalShow=true;
+                                    this.leftShow=true;
                                     this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time1=null;
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
@@ -1896,6 +1929,7 @@ export default Vue.component('commonPitch-detail',{
                                         this.leftDisplayListValueXdata.push(item.depth)
                                         this.leftDisplayListValueYdata1.push(item.shift)
                                     })
+                                    console.log(this.leftDisplayListValueXdata,this.leftDisplayListValueYdata1,'数据相等');
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                     setTimeout(()=>{
@@ -1903,22 +1937,30 @@ export default Vue.component('commonPitch-detail',{
                                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time),data:this.leftDisplayListValueYdata1});
                                         lineLeftChart.hideLoading();
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
-                                        console.log(document.getElementById('tableListid').offsetHeight,'clientHeight000');
+                                        
                                         // console.log(lineLeftChart,'lineLeftChart.style');
                                         // lineLeftChart.$el.style.minHeight=document.getElementById('tableListid').offsetHeight+'px';
                                     },20)
-                                }else if(this.leftDisplayListValue.length!=recentVariationLength){
+                                }else if(this.leftDisplayListValue.length==2*recentVariationLength){
+                                    console.log('第三种')
+                                    this.totalShow=true;
+                                    this.leftShow=true;
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
-                                    console.log('111000');
-                                    this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
-                                    this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
-                                    this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
-                                    this.leftDisplayListValue1.push(this.leftDisplayListValue[0])
-                                     this.leftDisplayListValue2.push(this.leftDisplayListValue[0])
+                                 
+                                    if((this.leftDisplayList.recent2PitchData)[0].acquisitionTime==null){
+                                         this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
+                                        this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
+                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                        this.leftDisplayListValue1.push(this.leftDisplayListValue[0])
+                                        this.leftDisplayListValue2.push(this.leftDisplayListValue[0])
 
-
-                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
-                                    this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
+                                        this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
+                                    }else{
+                                        this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
+                                    }
+                                   
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         if(array[index].acquisitionTime==this.time){
                                             this.leftDisplayListValue1.push(array[index])
@@ -1931,7 +1973,7 @@ export default Vue.component('commonPitch-detail',{
                                     })
                                     
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
-                                    console.log(lineLeftChart,'lineLeftChart00');
+                                   
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                     setTimeout(()=>{
                                         // lineLeftChart.$el.style.minHeight=document.getElementById('tableListid').offsetHeight-70+'px';
@@ -1941,10 +1983,16 @@ export default Vue.component('commonPitch-detail',{
                                         lineLeftChart.addSeries({name:this.timeChangeMethod(this.time1),data:this.leftDisplayListValueYdata2});
                                         lineLeftChart.hideLoading();
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
-                                        console.log(document.getElementById('tableListid').offsetHeight,'clientHeight001');
+                                      
                                         
                                     },20)
+                                }else{
+                                    this.$message({
+                                        type:"error",
+                                        message:'测斜绑定点位有误,请重新检查'
+                                    })
                                 }
+                                
                                 this.leftDisplayShow==false;
                                 var maxShift1=[];
                                 this.leftDisplayListValue1.forEach((item)=>{
@@ -1964,8 +2012,8 @@ export default Vue.component('commonPitch-detail',{
                                 })
                                 this.leftMaxVariation=this.getMaxValue(maxVariation)
                                 this.leftMaxHeight=this.getMaxValue(maxHeight)
-                                console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
-                                console.log(this.leftDisplayListValue2,'this.leftDisplayListValue2');
+                                // console.log(this.leftDisplayListValue1,'this.leftDisplayListValue1');
+                                // console.log(this.leftDisplayListValue2,'this.leftDisplayListValue2');
                             }
                            
                             
@@ -2017,19 +2065,52 @@ export default Vue.component('commonPitch-detail',{
                             })
                             return ;
                         }else if(this.rightDisplayShow==true){
-                            this.totalShow=true;
-                            this.rightShow=true;
+                            
                             this.rightDisplayListValue1=[];
                             this.rightDisplayListValue2=[];
                             this.rightDisplayListValueXdata=[];
                             this.rightDisplayListValueYdata1=[];
                             this.rightDisplayListValueYdata2=[];
+                            this.totalShow=false;
+                            this.leftShow=false;
                             // console.log('1111');
                             if(this.pitchDetailDataListRight){
                                 this.rightDisplayList=this.pitchDetailDataListRight;
                                 this.rightDisplayListValue=this.rightDisplayList.recent2PitchData;
                                 var recentVariationLength=this.rightDisplayList.recentVariation.length;
-                                if(this.rightDisplayListValue.length==recentVariationLength){
+                                if(this.rightDisplayListValue.length==recentVariationLength-1||this.rightDisplayListValue.length==2*(recentVariationLength-1)){
+                                    this.$message({
+                                        type:'info',
+                                        message:'请设置初始值'
+                                    })
+                                    // this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
+                                    // this.time3=null;
+                                    // this.rightDisplayListValue1.push({acquisitionTime:null,depth:0,shift:null})
+                                    // this.rightDisplayListValue2.push({acquisitionTime:null,depth:0,shift:null})
+                                    // this.rightDisplayListValueXdata.push(0)
+                                    // this.rightDisplayListValueYdata1.push(null)
+                                    // this.rightDisplayListValue.forEach((item,index,array)=>{
+                                    //     this.rightDisplayListValue1.push(item)
+                                    //     this.rightDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                    //     this.rightDisplayListValueXdata.push(item.depth)
+                                    //     this.rightDisplayListValueYdata1.push(item.shift)
+                                    // })
+                                    // console.log(this.rightDisplayListValue1,this.rightDisplayListValue2);
+                                    // // let lineLeftChart=this.$refs.lineLeftChartOne;
+                                    // let lineRightChart=this.$refs.lineRightChartOne;
+                                    // lineRightChart.delegateMethod('showLoading', 'Loading...');
+                                    // setTimeout(()=>{
+                                    //     lineRightChart.removeSeries();
+                                    //     lineRightChart.addSeries({name:this.timeChangeMethod(this.time2),data:this.rightDisplayListValueYdata1});
+                                    //     lineRightChart.hideLoading();
+                                    //     lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
+                                    //     // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
+                                    // },20)
+
+                                }
+                                else if(this.rightDisplayListValue.length==recentVariationLength){
+                                    this.totalShow=true;
+                                    this.rightShow=true;
                                     this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time3=null;
                                     this.rightDisplayListValue.forEach((item,index,array)=>{
@@ -2038,6 +2119,7 @@ export default Vue.component('commonPitch-detail',{
                                         this.rightDisplayListValueXdata.push(item.depth)
                                         this.rightDisplayListValueYdata1.push(item.shift)
                                     })
+                                    console.log(this.rightDisplayListValue1,this.rightDisplayListValue2);
                                     // let lineLeftChart=this.$refs.lineLeftChartOne;
                                     let lineRightChart=this.$refs.lineRightChartOne;
                                     lineRightChart.delegateMethod('showLoading', 'Loading...');
@@ -2048,19 +2130,26 @@ export default Vue.component('commonPitch-detail',{
                                         lineRightChart.getChart().xAxis[0].update({categories:this.rightDisplayListValueXdata});
                                         // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
                                     },20)
-                                }else if(this.rightDisplayListValue.length!=recentVariationLength){
-
+                                }else if(this.rightDisplayListValue.length==2*recentVariationLength){
+                                    this.totalShow=true;
+                                    this.rightShow=true;
+                                     if((this.rightDisplayList.recent2PitchData)[0].acquisitionTime==null){
                                         this.rightDisplayListValueXdata.push(this.rightDisplayListValue[0].depth)
                                         this.rightDisplayListValueYdata1.push(this.rightDisplayListValue[0].shift)
                                         this.rightDisplayListValueYdata2.push(this.rightDisplayListValue[0].shift)
 
-
                                         this.rightDisplayListValue1.push(this.rightDisplayListValue[0])
                                         this.rightDisplayListValue2.push(this.rightDisplayListValue[0])
 
-
                                         this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
                                         this.time3=(this.rightDisplayList.recent2PitchData)[3].acquisitionTime;
+
+                                     }else{
+                                        this.time2=(this.rightDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time3=(this.rightDisplayList.recent2PitchData)[3].acquisitionTime;
+                                     }
+
+                                       
                                         this.rightDisplayListValue.forEach((item,index,array)=>{
                                             if(array[index].acquisitionTime==this.time2){
                                                 this.rightDisplayListValue1.push(array[index])
@@ -2084,6 +2173,11 @@ export default Vue.component('commonPitch-detail',{
                                             // lineRightChart.getChart().xAxis[0].update({categories1:this.rightDisplayListValueXdata});
                                         },20)
 
+                                }else{
+                                    this.$message({
+                                        type:"error",
+                                        message:'测斜绑定点位有误,请重新检查'
+                                    })
                                 }
                                 this.rightDisplayShow==false;
                                  var maxShift1=[];
@@ -2104,7 +2198,7 @@ export default Vue.component('commonPitch-detail',{
                                 })
                                 this.rightMaxVariation=this.getMaxValue(maxVariation)
                                 this.rightMaxHeight=this.getMaxValue(maxHeight)
-                                console.log()
+                          
                             }
                         }
                         // console.log(this.pitchDetailDataList);
@@ -2822,7 +2916,8 @@ export default Vue.component('commonPitch-detail',{
                         }
                     }).then((response)=>{
                         let blob=new Blob([response.data],{
-                            type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'      //将会被放入到blob中的数组内容的MIME类型 
+                            type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                            //将会被放入到blob中的数组内容的MIME类型 
                         });
                         let objectUrl = URL.createObjectURL(blob);  //生成一个url
                         // console.log(objectUrl,'objectUrl');
@@ -2975,7 +3070,7 @@ export default Vue.component('commonPitch-detail',{
                         this.initShift=item.data
                     }
                 })
-                console.log(this.initShift,'this.initShift');
+                // console.log(this.initShift,'this.initShift');
             },
             getDisplacementHistoryData(){
                 if(this.displacementSystemId==''){
@@ -3006,6 +3101,7 @@ export default Vue.component('commonPitch-detail',{
                             ChannelNo:this.displacementChannelNo,
                             startDate:null,
                             endDate:null,
+                            seqId:this.pitchSeqIds
                         }
                     }).then((response)=>{
                         if(response.data.cd==0){
@@ -3157,6 +3253,8 @@ export default Vue.component('commonPitch-detail',{
                })
            },
            editAutoPitch(item){
+               var vm=this;
+               vm.basicPointList=[]
                this.systemId=item.systemId;
                this.pitchSeqId=item.seqId;
                this.pitchSeqWay=item.way;
@@ -3172,6 +3270,12 @@ export default Vue.component('commonPitch-detail',{
                 this.displacementSystemId=item.displacementSystemId;
                 this.initShift=item.initShift;
                 this.customShift=item.customShift;
+                console.log(vm.getPitchBaseInfoList,this.pitchSeqId,'000000')
+                 vm.getPitchBaseInfoList.forEach((val)=>{
+                    if(val.id==this.pitchSeqId){
+                        vm.basicPointList=val.depthList;
+                    }
+                })
            },
            editAutoPitchCancle(){
                this.editAutoPitchShow=false;
@@ -3185,7 +3289,14 @@ export default Vue.component('commonPitch-detail',{
            },
            makeEditAutoPitch(){
                var vm=this;
-                axios({
+               if(this.basicPoint==''){
+                    this.$message({
+                        type:'info',
+                        message:'深度不能为空'
+                    })
+
+               }else{
+                   axios({
                     url:this.BDMSUrl+'detectionInfo/updatePitchBind',
                     headers:{
                         'token':vm.token
@@ -3231,6 +3342,9 @@ export default Vue.component('commonPitch-detail',{
                         // this.customShift='';
                     }
                 })
+
+               }
+                
            },
            deleteAutoPitch(id){
                this.$confirm('您要删除当前所选主题？', '提示', {

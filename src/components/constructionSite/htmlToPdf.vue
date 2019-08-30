@@ -240,12 +240,16 @@
                             <!-- <div  class="showBasePic"></div> -->
                             <div class="pageNum"><label class="pageNum1">第{{item.order+2}}页</label></div>
                         </div>
-                        <!-- <div class="commonSlope" v-show="item.type==5">
+                    </li>
+                    <li class="inspectLi" v-for="vals in getSlopeLists" :key="vals[0].seqId" >
+                         <div class="commonSlope">
                             <label class="pdfSummaryHead1">{{company}}</label>
                             <label class="pdfSummaryHead">监测报表</label>
                             <div class="pdfSummarytext"><label>工程名称:{{projectName}}</label></div>
-                            <div class="txt"><label class="label1">测量日期</label><span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span></div>
-                            <div class="txt1"><label>监测内容：{{item.name}}</label></div>
+                            <!-- <div class="txt"><label class="label1">测量日期</label> -->
+                            <!-- <span class="span1"><label>观测：</label><label>计算：</label><label>检核：</label></span> -->
+                            <!-- </div> -->
+                            <div class="txt1"><label>监测内容：{{vals[0].seqName}}</label></div>
                             <div class="slopeTable">
                                 <div class="slopeTableBody">
                                     <div class="left">
@@ -258,26 +262,27 @@
                                                         <th rowspan="2">本次变化</th>
                                                     </tr>
                                                     <tr>
-                                                        <th></th>
-                                                        <th></th>
+                                                        <th>{{vals[1].referenceAcquisitionTime|slopeTimeChange}}</th>
+                                                        <th>{{vals[1].acquisitionTime|slopeTimeChange}}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(val,index) in item.dataList" :key="index">
-                                                        <td>{{val.otherParam}}</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                    <tr v-for="(val,index) in vals" :key="index">
+                                                        <td>{{val.otherParam|addSprit()}}</td>
+                                                        <td>{{val.referenceValue|addSprit()}}</td>
+                                                        <td>{{val.currentValue|addSprit()}}</td>
+                                                        <td>{{val.totalVariation|addSprit()}}</td>
                                                     </tr>
-                                                   
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="leftLine"></div>
+                                        <!-- <div class="leftLine"></div> -->
                                     </div>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
+
+
                     </li>
                 </ul>
                 <!-- 下载到本地 -->
@@ -320,6 +325,8 @@ export default {
             getAllMonitorItemList:'',//获取所有监测项目
             getPageNumList:'',//所有页面
             getReportDatasList:'',//获取所有监测数据
+            getSlopeList:[],//斜度
+            getSlopeLists:[],
             mapList:'',
             coverPath:'',//封面地址
             suggestion:'',
@@ -444,6 +451,13 @@ export default {
             return moment(val).format("YYYY-MM-DD HH:mm:ss");
             }
         },
+        slopeTimeChange(val){
+            if (val == null) {
+                return '/';
+                } else {
+                return moment(val).format("MM-DD HH:mm");
+            }
+        },
         timeStamp(StatusMinute){	
             var day=parseInt(StatusMinute/1000/60/60/24);
             var hour=parseInt(StatusMinute/1000/60/60%24);
@@ -482,7 +496,7 @@ export default {
             // console.log(this.dpiHeight,'this.dpiHeight');
         },
          timeChangeMethod(val) {
-                return moment(val).format("YYYY-MM-DD hh:mm:ss");
+                return moment(val).format("YYYY-MM-DD HH:mm:ss");
         },
         getItemDutyUser(val){
             var vm=this;
@@ -506,7 +520,7 @@ export default {
                              this.$set(item,'getItemDutyUserList',this.getItemDutyUserList1)
                          }
                      })
-                     console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
+                    //  console.log(this.getAllMonitorItemList,'this.getAllMonitorItemList');
                 }else if(response.data.cd=='-1'){
                     this.$message({
                         type:'error',
@@ -902,6 +916,9 @@ export default {
         // 获取报告所需的数据
         getReportDatas(){
             var vm=this;
+            this.getSlopeList=[];
+            this.getSlopeLists=[];
+            console.log(this.$route.query.consultValue,this.$route.query.userValue,'时间戳');
             axios({
                 method:'post',
                 url:vm.BDMSUrl+'detectionInfo/getReportDatas',
@@ -916,10 +933,34 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.getReportDatasList=response.data.rt;
-                    // this.getReportDatasList.forEach((item)=>{
-                        
-                    // })
-                    // console.log(this.getReportDatasList,'this.getReportDatasList');
+                    {
+                        this.getReportDatasList.forEach((item)=>{
+                        if(item.seqId){
+                                this.getSlopeList.push(item)
+                            }
+                        });
+                        var slopeMapList = new Map();
+                        for(var i=0;i<this.getSlopeList.length;i++){
+                            var seqId = this.getSlopeList[i].seqId;
+                            if(!slopeMapList.has(seqId)){
+                                var array = new Array();
+                                array.push(this.getSlopeList[i]);
+                                slopeMapList.set(seqId,array)
+                            }else{
+                                var array = slopeMapList.get(seqId);
+                                array.push(this.getSlopeList[i]);
+                                slopeMapList.set(seqId,array);
+                            }
+                        }
+                        slopeMapList.forEach((value,key,mapObject)=>{
+                            // var a;
+                            // a=value;
+                            this.getSlopeLists.push(value);
+                        })
+                        // console.log(slopeMapList,'slopeMapList');
+
+                    }
+                    console.log(this.getSlopeLists,'this.getSlopeLists');
                     var mapList = new Map();
                     for (var i = 0; i < this.getReportDatasList.length;i++){
                         var itemId = this.getReportDatasList[i].itemId;
@@ -934,12 +975,14 @@ export default {
                             mapList.set(itemId, array);
                         }
                     }
+
+                    
                     this.getAllMonitorItemList.forEach((item)=>{
                         
                         
                         mapList.forEach((value, key, mapObject)=>{
                             // console.log(value,'value1');
-                            console.log(key,'key1');
+                            // console.log(key,'key1');
                             if(key==item.id){
                                 
                                     // console.log(value,'value123');
@@ -2080,20 +2123,20 @@ export default {
                         .slopeTableBody{
                             width: 90%;
                             margin:0 auto;
-                            border: 1px solid #ccc;
+                            // border: 1px solid #ccc;
                             position: relative;
                             height: 650px;
                             .left{
                                 position: absolute;
                                 height: inherit;
                                 width: 100%;
-                                border:1px solid #ccc;
+                                // border:1px solid #ccc;
                                 left:0px;
                                 .leftTable{
                                     position: absolute;
                                     height: inherit;
-                                    width: 50%;
-                                    border:1px solid #ccc;
+                                    width: 60%;
+                                    border:1px solid #000;
                                     left:0px;
                                     table{
                                         border-collapse: collapse;
@@ -2143,30 +2186,30 @@ export default {
                                 .leftLine{
                                     position: absolute;
                                     height: inherit;
-                                    width: 50%;
+                                    width: 60%;
                                     border:1px solid #ccc;
                                     right:0px;
                                 }
                             }
                             .right{
                                 position: absolute;
-                                 width: 50%;
+                                 width: 40%;
                                 right: 0px;
                                  height: inherit;
-                                border:1px solid #ccc;
+                                // border:1px solid #ccc;
                                 .rightTable{
                                      position: absolute;
                                     height: inherit;
-                                    width: 50%;
-                                    border:1px solid #ccc;
+                                    width: 40%;
+                                    // border:1px solid #ccc;
                                     left:0px;
 
                                 }
                                 .rightLine{
                                     position: absolute;
                                     height: inherit;
-                                    width: 50%;
-                                    border:1px solid #ccc;
+                                    width: 40%;
+                                    // border:1px solid #ccc;
                                     right:0px;
 
                                 }

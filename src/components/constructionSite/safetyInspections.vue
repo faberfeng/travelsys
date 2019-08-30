@@ -15,10 +15,10 @@
             <div id="inspectionBody" v-show="!pitchDetailShow&&!walkThroughShow&&!commonDetailShow" >
                 <!-- v-show="exportReportEdit" -->
                 <!-- v-show="searchCheckEdit" -->
-                <!-- <div class="textBtnLeft">
+                <div class="textBtnLeft">
                     <label class="recordTxt"  @click="exportrEportsBtn()">导出报告</label>
-                    <label class="exportTxt"    @click="walkThroughBtn()">巡视记录</label>
-                </div> -->
+                    <!-- <label class="exportTxt"    @click="walkThroughBtn()">巡视记录</label> -->
+                </div>
                 <!-- <div class="overviewBody">
                     <div class="overviewHead">
                         <label class="overviewHeadBtn"></label>
@@ -174,6 +174,14 @@
                        
                         
                         <el-dialog width="1000px" v-dialogDrag title="测点累计变化曲线" :visible="spotChangeLineShow1" @close="spotChangeLineCancle1()" >
+                                <div style="height:50px">
+                                    <div style="width:400px;height:36px;border:1px solid #c0c4cc;border-radius:2px;display:inline-block;margin-left:0px">
+                                            <input v-model="yOtherminValue" style="width:170px;color:#606266;margin-right:10px;margin-left:5px;border:none;display:inline-block;height:34px;padding-left:2px" placeholder="x轴最小值"/>
+                                            <label>至</label>
+                                            <input v-model="yOthermaxValue" style="width:170px;color:#606266;margin-right:10px;margin-left:5px;border:none;display:inline-block;height:34px;padding-left:2px" placeholder="最大值"/>
+                                    </div>
+                                    <span style="width:54px;height:26px;margin-left:0px;cursor:pointer;padding:2px;border-radius:2px;display:inline-block;background:#fc3439;color:white;vertical-align:middle" @click="makesureYOtherchart()">修改</span>
+                                </div>
                                 <div style="margin-bottom:20px;">
                                     <el-date-picker
                                         v-model="selectValue1"
@@ -187,18 +195,22 @@
                                     </el-date-picker>
                                     <span class="searchBtn" @click="makeSureData1()">确认</span>
                                 </div>
+                               
                                 <div v-if="spotChangeLineShow1">
-                                    <vue-highcharts  id="spotChangeLine1" style="max-height:900px"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
+                                    <vue-highcharts  id="spotChangeLine1" style="max-height:900px" v-if="optionOtherShow"  :options="optionSpotChangeLine1" ref="spotChangeLine1"></vue-highcharts>
                                 </div>
                         </el-dialog>
                         <el-dialog width="360px"  v-dialogDrag title="测斜点变化曲线" :visible="pitchLineShow" @close="pitchLineCancle()" >
-                            <!-- <div style="height:50px">
-                                <label>y轴最小值:</label><input v-model="yminValue" style="width:60px;margin-right:10px;margin-left:3px"/>
-                                <label>y轴最大值:</label><input v-model="ymaxValue" style="width:60px;margin-right:10px;margin-left:3px"/>
-                                <span style="width:40px;height:19px;line-height:18px;cursor:pointer;padding:2px;border-radius:2px;display:inline-block;background:#fc3439;color:white;vertical-align:middle" @click="makesureYchart()">修改</span>
-                            </div> -->
+                            <div style="height:50px">
+                                <div style="width:200px;height:28px;border:1px solid #c0c4cc;border-radius:2px;display:inline-block;margin-left:30px">
+                                        <input v-model="yminValue" style="width:70px;margin-right:10px;margin-left:3px;border:none;display:inline-block;height:26px;padding-left:2px" placeholder="x轴最小值"/>
+                                        <label>至</label>
+                                        <input v-model="ymaxValue" style="width:70px;margin-right:10px;margin-left:3px;border:none;display:inline-block;height:26px;padding-left:2px" placeholder="最大值"/>
+                                </div>
+                                <span style="width:40px;height:22px;margin-left:10px;line-height:20px;cursor:pointer;padding:2px;border-radius:2px;display:inline-block;background:#fc3439;color:white;vertical-align:middle" @click="makesureYchart()">修改</span>
+                            </div>
                             <div>
-                                <vue-highcharts id="leftHightchart" style="min-height:740px"   :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
+                                <vue-highcharts id="leftHightchart" style="min-height:740px"  v-if="optionShow"  :options="optionOnesLeft" ref="lineLeftChartOne"></vue-highcharts>
                             </div>
                         </el-dialog>
                     </div>
@@ -1079,8 +1091,12 @@ export default {
             fullShow:false,
             spotChangeLineShow1:false,
             pitchLineShow:false,
-            yminValue:-300,
-            ymaxValue:300,
+            optionShow:false,
+            optionOtherShow:false,
+            yminValue:'',
+            ymaxValue:'',
+            yOtherminValue:'',
+            yOthermaxValue:'',
             singleData:{},
             defaultProps:{
                 children:'children',
@@ -1531,8 +1547,8 @@ export default {
                             tickmarkPlacement: 'on'
                         },
                         yAxis: {
-                            min:4268.5,
-                            max:43403.3542,
+                            // min:4268.5,
+                            // max:43403.3542,
                                 title: {
                                     text: '数量'
                                 },
@@ -1998,9 +2014,9 @@ export default {
         //     }
         // };
         // console.log(document.getElementById('planeFigureBody'),'文件00');
-        var body=document.getElementById('planeFigureBody');
+        // var body=document.getElementById('planeFigureBody');
         // console.log(window.innerHeight,'高度');
-        body.style.height=(window.innerHeight-450)+'px';
+        // body.style.height=(window.innerHeight-450)+'px';
         this.$refs.pic.Max_Select = 8;
         this.$refs.pic.Max_type = 2;
         
@@ -2239,28 +2255,81 @@ export default {
         },
         spotChangeLineCancle1(){
             this.spotChangeLineShow1=false;
+            this.optionOnesLeft.yAxis.min='';
+            this.optionOnesLeft.yAxis.max='';
+            this.yminValue='';
+            this.ymaxValue='';
             // this.selectValue1='';
         },
         makesureYchart(){ 
-            this.optionOnesLeft.yAxis.min=-300;
-            this.optionOnesLeft.yAxis.max=300;
-            this.getPitchDetailDataBySeqId(this.plotGroupOne);
-            console.log('0000')
+        
+          
+            if(this.yminValue&&this.ymaxValue){
+                if(this.yminValue>this.ymaxValue){
+                    this.$message({
+                        type:'info',
+                        message:'x轴的最大值小于最小值'
+                    })
+                }else{
+                    this.optionShow=false;
+                    this.optionOnesLeft.yAxis.min='';
+                    this.optionOnesLeft.yAxis.max='';
+                    this.optionOnesLeft.yAxis.min=this.yminValue;
+                    this.optionOnesLeft.yAxis.max=this.ymaxValue;
+                  
+             
+                    setTimeout(()=>{
+                        this.getPitchDetailDataBySeqId(this.plotGroupOne);
+                    },0)
+                }
+            }
+            // this.optionOnesLeft.yAxis.min='';
+            // this.optionOnesLeft.yAxis.max='';
+            // this.optionOnesLeft.yAxis.min=-400;
+            // this.optionOnesLeft.yAxis.max=400;
+            
+            // console.log('0000')
         },
         pitchLineCancle(){
             this.pitchLineShow=false;
+            // this.optionOnesLeft.yAxis.min='';
+            // this.optionOnesLeft.yAxis.max='';
+            // this.yminValue='';
+            // this.ymaxValue='';
+        },
+
+        makesureYOtherchart(){
+             if(this.yOtherminValue&&this.yOthermaxValue){
+                if(this.yOtherminValue>this.yOthermaxValue){
+                    this.$message({
+                        type:'info',
+                        message:'x轴的最大值小于最小值'
+                    })
+                }else{
+                   this.optionOtherShow=false;
+                    this.optionSpotChangeLine1.yAxis.min='';
+                    this.optionSpotChangeLine1.yAxis.max='';
+                    this.optionSpotChangeLine1.yAxis.min=this.yOtherminValue;
+                    this.optionSpotChangeLine1.yAxis.max=this.yOthermaxValue;
+                     
+                    setTimeout(()=>{
+                        this.getAllCurve(this.getAllCurveId);
+                    },0)
+                }
+            }
         },
         makeSureData1(){
             this.getAllCurve(this.getAllCurveId)
         },
          getAllCurve(id){
             var vm=this;
+            this.optionOtherShow=true;
             this.acquisitionTimeXlist1=[];
             this.elevationYlist1=[];
             this.startValue1='';
             this.endValue1='';
-            this.optionSpotChangeLine1.yAxis.min=undefined;
-            this.optionSpotChangeLine1.yAxis.max=undefined;
+            // this.optionSpotChangeLine1.yAxis.min=undefined;
+            // this.optionSpotChangeLine1.yAxis.max=undefined;
             this.getAllCurveId=id;
             this.getAllCurveList=[];
             this.getAllCurveName=this.plotGroupName;
@@ -2268,7 +2337,7 @@ export default {
                  this.startValue1=this.selectValue1[0];
                 this.endValue1=this.selectValue1[1];
             }
-            console.log(this.startValue1,this.endValue1,this.selectValue1,'time11');
+            // console.log(this.startValue1,this.endValue1,this.selectValue1,'time11');
             $.ajax({
                 url:this.BDMSUrl+'detectionInfo/getPointChartTotalVariation',
                 headers:{
@@ -2282,6 +2351,7 @@ export default {
                 async:false,
                 success:(response)=>{
                     if(response.cd==0){
+                        this.optionOtherShow=true;
                         this.getAllCurveList=response.rt;
                         // console.log(this.getAllCurveList,'this.getAllCurveList');
                         if(this.getAllCurveList.length>0){
@@ -2652,16 +2722,21 @@ export default {
             // }else{
             //     this.isBindPoint=false;
             // }
-            if(status==true){
+            // this.pointIds=[];
+            console.log('xxx')
 
-               
             
+            
+
+
+
+            if(status==true){
 
                 this.pointId=list[0].ID_out;
                 this.toolShow=status;
                 this.broken=list[0].isBroken;
                 this.alert=list[0].isAlert;
-                this.pointIds=[];
+                
                 this.selectpointGroupIds=[];
                 this.pointIdName=[];
                 this.picMarkName=list[0].type;
@@ -2675,11 +2750,13 @@ export default {
                                 this.plotGroupName=list[0].pointGroupData[0].name;
                                 this.plotGroupType=list[0].pointGroupData[0].itemType;
                         }
-                        list.forEach((item)=>{
+                       list.forEach((item)=>{
                                 this.pointIds.push(item.ID_out);
                                 this.pointIdName.push(item.pointName);
                                     // this.selectpointGroupIds.push(item.pointGroupData[0].id);
                         })
+                       this.pointIds=Array.from(new Set(this.pointIds));
+                       this.pointIdName=Array.from(new Set(this.pointIdName));
                         
                         
                         this.bindMorePoint=status;
@@ -4218,6 +4295,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
+            console.log(list,'list00');
             
             // var list1=this.
             if(this.moveClick==false){
@@ -4295,6 +4373,8 @@ export default {
                                         this.startpointShow=false;
                                         this.isBindPoint=false;
                                         this.bindMorePoint=false;
+                                        this.pointIds=[];
+                                        // dlist=[]
                                 }else if(response.data.cd=='-1'){
                                 
                                     this.$message({
@@ -4305,7 +4385,7 @@ export default {
                         })
                     }
             }else if(this.moveClick==true){
-                // console.log(this.pointIds,'this.pointIds');
+                console.log(this.pointIds,'this.pointIds');
                 this.pointIds.forEach((item)=>{
                     list.forEach((item1)=>{
                          if(item==item1.id){
@@ -4316,6 +4396,7 @@ export default {
                          }
                     })
                 })
+                console.log(elist,'elist');
                
                 axios({
                     url:this.BDMSUrl+'detectionInfo/updatePointGroupPosition',
@@ -4993,6 +5074,7 @@ export default {
                                 this.bindInspectContentShow=false;
                                 this.isBindPoint=false;
                                 this.bindMorePoint=false;
+                                this.pointIds=[];
                         }else if(response.data.cd=='-1'){
                             this.$message({
                                 type:'error',
@@ -7894,6 +7976,7 @@ export default {
         },
         //获取斜度曲线
         getPitchDetailDataBySeqId(num){
+            this.optionShow=true;
             axios({
                 url:this.BDMSUrl+'detectionInfo/getPitchDetailDataBySeqId',
                 headers:{
@@ -7913,7 +7996,6 @@ export default {
                             })
                             return ;
                         }else{
-                            this.pitchLineShow=true;
                             // this.totalShow=true;
                             // this.leftShow=true;
                             this.leftDisplayListValue1=[];
@@ -7931,23 +8013,62 @@ export default {
                                 this.leftDisplayList=this.pitchDetailDataListLeft;
                                 var recentVariationLength=this.leftDisplayList.recentVariation.length;
                                 this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
+                                console.log(this.leftDisplayListValue.length,recentVariationLength,'1111');
                                 // var str='';
                                 // console.log(document.getElementById('tableListid'),'style');
                                 //  str=document.getElementById('tableListid').clientHeight-50;
                                 //  setTimeout(()=>{
                                 //         console.log(document.getElementById('tableListid').clientHeight);
                                 // },20)
-                                if(this.leftDisplayListValue.length==recentVariationLength){
+                                if(this.leftDisplayListValue.length==recentVariationLength-1||this.leftDisplayListValue.length==2*(recentVariationLength-1)){
+                                    console.log('第一种')
+                                    this.$message({
+                                        type:'info',
+                                        message:'请设置初始值'
+                                    })
+                                    //  this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
+                                    // this.time1=null;
+                                    // this.leftDisplayListValueXdata.push(0);
+                                    // this.leftDisplayListValueYdata1.push(null);
+                                    // this.leftDisplayListValue.forEach((item,index,array)=>{
+                                    //     this.leftDisplayListValue1.push(item)
+                                    //     this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
+                                    //     this.leftDisplayListValueXdata.push(item.depth)
+                                    //     this.leftDisplayListValueYdata1.push(item.shift)
+                                    // })
+                                    // // console.log(this.leftDisplayListValueYdata1,this.leftDisplayListValueXdata,'222');
+                                    // setTimeout(()=>{
+                                    //     let lineLeftChart=this.$refs.lineLeftChartOne;
+                                    //     // console.log(this.leftDisplayListValueXdata,'this.leftDisplayListValueXdata');
+                                    //     lineLeftChart.delegateMethod('showLoading', 'Loading...');
+                                    //     lineLeftChart.removeSeries();
+                                    //     lineLeftChart.addSeries({name:this.plotGroupName+'-'+this.timeChangeMethodPitch(this.time),data:this.leftDisplayListValueYdata1});
+                                    //     lineLeftChart.hideLoading();
+                                    //     lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                    //     // lineLeftChart.options.yAxis.min=0;
+                                    //     // lineLeftChart.options.yAxis.max=100;
+                                    // },20)
+                                }
+                                else if(this.leftDisplayListValue.length==recentVariationLength){
+                                     console.log('第二种')
+                                    this.pitchLineShow=true;
+                                    this.optionShow=true;
                                     this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                     this.time1=null;
+                                    this.leftDisplayListValueXdata.push(0);
+                                    this.leftDisplayListValueYdata1.push(null)
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         this.leftDisplayListValue1.push(item)
                                         this.leftDisplayListValue2.push({acquisitionTime:null,depth:null,shift:null})
                                         this.leftDisplayListValueXdata.push(item.depth)
                                         this.leftDisplayListValueYdata1.push(item.shift)
+
+                                        //  this.leftDisplayListValueXdata.push(item.otherParam)
+                                        // this.leftDisplayListValueYdata1.push(item.totalVariation)
                                     })
                                     // this.optionOnesLeft.yAxis.min=-300;
                                     // this.optionOnesLeft.yAxis.max=300;
+                                    // console.log(this.leftDisplayListValueYdata1,this.leftDisplayListValueXdata,'222');
 
                                     setTimeout(()=>{
                                         let lineLeftChart=this.$refs.lineLeftChartOne;
@@ -7960,16 +8081,26 @@ export default {
                                         // lineLeftChart.options.yAxis.min=0;
                                         // lineLeftChart.options.yAxis.max=100;
                                     },20)
-                                }else if(this.leftDisplayListValue.length!=recentVariationLength){
+                                }else if(this.leftDisplayListValue.length==2*recentVariationLength){
+                                    console.log('第三种')
+                                    this.pitchLineShow=true;
+                                    this.optionShow=true;
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
-                                    console.log('000');
-                                    this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
-                                    this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
-                                    this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                
+                                    if((this.leftDisplayList.recent2PitchData)[0].acquisitionTime==null){
+                                         this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
+                                        this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
+                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                        
+                                        this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
                                     
-                                    this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
-                                    this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
-                                    console.log(this.leftDisplayListValue,'123');
+                                    }else{
+                                        this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
+                                        this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
+                                       
+                                    }
+                                   
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         
                                         if(array[index].acquisitionTime==this.time){
@@ -7985,19 +8116,14 @@ export default {
                                             this.leftDisplayListValueYdata2.push(array[index].shift)
                                         }
                                     })
-                                    // if(this.yminValue&&this.ymaxValue){
-                                    //     // console.log(this.yminValue,this.ymaxValue,'000')
-                                    //     //  this.optionOnesLeft.yAxis.min=-300;
-                                    //     //     this.optionOnesLeft.yAxis.max=300;
-                                    //         this.optionOnesLeft.yAxis.min=this.yminValue;
-                                    //         this.optionOnesLeft.yAxis.max=this.ymaxValue;
-
-                                    // }
+                                    // this.optionOnesLeft.yAxis.min=-300;
+                                    // this.optionOnesLeft.yAxis.max=300;
+                                  
                                    
                                     
                                     setTimeout(()=>{
                                         let lineLeftChart=this.$refs.lineLeftChartOne;
-                                        console.log(lineLeftChart,this.leftDisplayListValueXdata,this.leftDisplayListValueYdata1,'this.leftDisplayListValueXdata');
+                                      
                                         
                                         lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                         lineLeftChart.removeSeries();
@@ -8006,12 +8132,19 @@ export default {
                                         lineLeftChart.hideLoading();
 
                                         lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
+                                        
                                         // lineLeftChart.options.yAxis.min=0;
                                         // lineLeftChart.options.yAxis.max=100;
 
                                         // lineLeftChart.getChart().yAxis[0].min=0;
                                         // lineLeftChart.getChart().yAxis[0].max=100;
                                     },20)
+                                    console.log(this.leftDisplayListValueYdata1,this.leftDisplayListValueYdata2,this.leftDisplayListValueXdata);
+                                }else{
+                                    this.$message({
+                                        type:"error",
+                                        message:'测斜绑定点位有误,请重新检查'
+                                    })
                                 }
                                 this.leftDisplayShow==false;
                                 var maxShift1=[];
@@ -8804,7 +8937,7 @@ export default {
                         margin-top:15px !important;
                         margin:0 auto;
                         border:1px solid #e6e6e6;
-                        // height: 600px;
+                        height: 550px;
                         width: 100%;
                         position: relative;
                         .noDataFigure{

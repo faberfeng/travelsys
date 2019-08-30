@@ -704,10 +704,10 @@ export default {
                     projectId:this.projId,
                     userId:this.projectConfig.userId,
                     projectName:this.projectConfig.projectName,
-                    location:'',
+                    location:this.projectConfig.location,
                     stroke:this.projectConfig.stroke,
-                    expireTime:null,
-                    userCount:-1,
+                    expireTime:this.projectConfig.expireTime,
+                    userCount:this.projectConfig.userCount,
                     diskSize:this.projectConfig.diskSize,
                     stroke:this.isStroke
                 }

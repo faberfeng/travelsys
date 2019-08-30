@@ -128,11 +128,13 @@
                                 <td v-show="itemMonitorType==3">{{item.latestPipeHeight|addSpritNum1()}}</td>
                                 <td>{{item.variationTime|timeStamp()}}</td>
                                 <td v-show="itemMonitorType==1">{{item.recentVariation|addSpritNum2()}}</td>
-                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.recentVariation*1000|addSpritNum1()}}</td>
+                                <!-- item.recentVariation*1000 -->
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.recentVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==4">{{item.recentVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.recentVariation*100|addSpritNum1()}}</td>
                                  <td v-show="itemMonitorType==1">{{item.recentVariation|addSpritNum2()}}</td>
-                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.totalVariation*1000|addSpritNum1()}}</td>
+                                 <!-- item.totalVariation*1000 -->
+                                <td v-show="itemMonitorType!=4&&itemMonitorType!=3&&itemMonitorType!=1">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
@@ -471,7 +473,7 @@
                                         <td>
                                              <button title="删除" @click="DeleteAutoWaterLevel(item.id)"  class="deleteBtn actionBtn"></button>
                                             <!-- v-show="editInspectWordEdit" -->
-                                            <!-- <button title="编辑"   class="editBtn actionBtn"></button> -->
+                                            <button title="编辑" @click="editAutoWaterLevel(item.id)"   class="editBtn actionBtn"></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -656,7 +658,7 @@
                 <div class="editBody">
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:18% !important;">绑定点位:</label>
-                        <select v-model="forcePointId" class="sheetName">
+                        <select v-model="forcePointId" @change="forceChange()" class="sheetName">
                              <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
                         </select>
                     </div>
@@ -774,6 +776,128 @@
                 </div>
             </el-dialog>
 
+             <el-dialog title="编辑轴力配置" :visible="editAutoForceShow" @close="editCancleForce">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                        <select v-model="forcePointId" :disabled="true" class="sheetName">
+                             <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">计算公式:</label>
+                        <select v-model="useFormulaValues" class="sheetName">
+                             <option v-for="(item,index) in useFormulaLists"  :value="item.value" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div v-show="useFormulaValues=='1'">
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的截面积As:</label>
+                            <input placeholder="请输入" v-model="AsValue" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢支撑/钢立柱的弹性模量Es:</label>
+                            <input placeholder="请输入" v-model="EsValue" class="editInput"/>
+                            <label>千帕</label>
+                        </div>
+                    </div>
+                     <div v-show="useFormulaValues=='2'">
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">钢筋直径(mm)：</label>
+                            <input placeholder="请输入" v-model="barDiameterValue" @change="asMethod()" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">根数：</label>
+                            <input placeholder="请输入" v-model="barCountValue"  class="editInput"/>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">截面积As：</label>
+                            <input placeholder="请输入" v-model="asValueArea"  class="editInput"/>
+                        </div>
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">钢筋应力计的截面积As'：</label>
+                            <input placeholder="请输入" class="editInput"/>
+                            <label>平方毫米</label>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">钢筋的牌号：</label>
+                            <select class="eidtSelect" @change="esChange(barGradeValue)" v-model="barGradeValue">
+                                <option  v-for="(item,index) in esList"  :value="item.name" :key="index" v-text="item.name"></option>
+                            </select>
+                            <!-- <i class="sanjiaoicon"></i> -->
+                            <!-- <input placeholder="请输入" v-model="barGradeValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Es：</label><label>{{esValue}}</label>
+                        </div>
+                        <!-- <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑宽度(mm)：</label>
+                            <input placeholder="请输入" v-model="concreteWidthValue" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土支撑高度(mm)： ：</label>
+                            <input placeholder="请输入" v-model="concreteHeightValue" @change="acMethod()" class="editInput"/>
+                        </div> -->
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土截面积Ac：</label>
+                            <input placeholder="请输入" v-model="acValueArea" class="editInput"/>
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">混凝土的等级：</label>
+                            <select placeholder="请选择" class="eidtSelect" @change="ecChange(concreteLevelValue)" v-model="concreteLevelValue">
+                                <option v-for="(item,index) in ecList" :value="item.name"  :key="index" v-text="item.name"></option>
+                            </select>
+                             <!-- <i class="sanjiaoicon1"></i> -->
+                            <!-- <input placeholder="请输入" v-model="concreteLevelValue" class="editInput"/> -->
+                        </div>
+                        <div class="editBodytwo">
+                            <label class="editTxt">对应弹性模量Ec:</label><label>{{ecValue}}</label>
+                        </div>
+                    </div>
+
+                    <!-- <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">率定系数:</label>
+                        <input placeholder="率定系数" v-model="k" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div> -->
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备1:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data1" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备2:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data2" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备3:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data3" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                     <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备4:</label>
+                        <input placeholder="设备ID" class="inp" v-model="deviceId4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="port4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="率定系数" class="inp" v-model="data4" style="width:120px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeEditForceSure">确认</button>
+                    <button class="editBtnC" @click="editCancleForce">取消</button>
+                </div>
+            </el-dialog>
+
             <el-dialog title="水位配置" :visible="addWaterLevelShow" @close="waterLevelCancle()">
                 <div class="editBody">
                     <div class="editBodytwo">
@@ -811,6 +935,45 @@
                     <button class="editBtnC" @click="waterLevelCancle">取消</button>
                 </div>
             </el-dialog>
+
+             <el-dialog title="修改水位配置" :visible="editWaterLevelShow" @close="editwaterLevelCancle()">
+                <div class="editBody">
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">绑定点位:</label>
+                        <select v-model="forcePointId" class="sheetName">
+                             <option v-for="(item,index) in getDetailPointInfoList"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">初始时间:</label>
+                        <select v-model="selectTimeValue" @change="changeWaterTimeValue()" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeList"  :value="item" :key="index">{{item|timeChange}}</option>
+                        </select>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">率定系数:</label>
+                        <input placeholder="率定系数" v-model="wLevelK" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">水位深度:</label>
+                        <input placeholder="水位深度" v-model="wLevelH" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">管口标高:</label>
+                        <input placeholder="管口标高" v-model="wLevelPipeH" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                    </div>
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">设备:</label>
+                        <input placeholder="设备ID" class="inp" v-model="wLevelDeviceId" style="width:185px !important;height:30px !important;margin-right:10px;"/>
+                        <input placeholder="端口号" class="inp" v-model="wLevelPort" style="width:185px !important;height:30px !important;margin-right:10px;"/>
+                     </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <button class="editBtnS" @click="makeEditWaterLevelSure">确认</button>
+                    <button class="editBtnC" @click="editwaterLevelCancle">取消</button>
+                </div>
+            </el-dialog>
+
             <el-dialog title="垂直位移配置" :visible="addVerticalDisplaceShow" @close="VerticalDisplaceCancle" >
                 <div class="editBody">
                     <div class="editBodytwo">
@@ -944,13 +1107,14 @@
                                 type="daterange"
                                 range-separator="至"
                                 start-placeholder="开始日期"
-                                end-placeholder="结束日期" @change="selectInitTime()" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
+                                end-placeholder="结束日期" @change="selectInitTime1()" format="yyyy-MM-dd"  value-format="yyyy-MM-dd">
                             </el-date-picker>
                         </div>
                         <div >
                             <div class="editBodytwo">
                                     <label class="editInpText" style="width:18% !important;">绑定点位初始时间:</label>
-                                    <select v-model="hhInitDataTime" @change="hhInitDataChange()"  class="sheetName">
+                                    <input v-if="bindPointInitList.length==0" placeholder="请筛选时间" :disabled="true" v-model="hhInitDataTime1" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                                    <select v-if="bindPointInitList.length!=0" v-model="hhInitDataTime" @change="hhInitDataChange()"  class="sheetName">
                                         <option v-for="(item,index) in bindPointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
                                     </select>
                             </div>
@@ -960,7 +1124,8 @@
                             </div>
                             <div class="editBodytwo">
                                 <label class="editInpText" style="width:18% !important;">基准点位初始时间:</label>
-                                <select v-model="hhBaseInitDataTime" @change="hhBaseInitDataChange()" class="sheetName">
+                                <input v-if="basePointInitList.length==0" placeholder="请筛选时间" :disabled="true" v-model="hhBaseInitDataTime1" class="inp" style="width:375px !important;height:30px !important;margin-right:10px;"/>
+                                <select v-if="basePointInitList.length!=0" v-model="hhBaseInitDataTime" @change="hhBaseInitDataChange()" class="sheetName">
                                     <option v-for="(item,index) in basePointInitList"  :value="item.collectTime" :key="index">{{item.collectTime|timeChange}}</option>
                                 </select>
                             </div>
@@ -1233,15 +1398,19 @@ export default Vue.component('commonDetail',{
             setInitCollectTimeList:'',
             selectTimeValue:'',
             selectInitTimeValue:'',
-            bindPointInitList:"",
-            basePointInitList:'',
+            bindPointInitList:[],
+            basePointInitList:[],
             hhInitData:'',
             hhInitDataTime:'',
+            hhInitDataTime1:'',
             hhBaseInitData:'',
             hhBaseInitDataTime:'',
+            hhBaseInitDataTime1:'',
 
             selectInitTimeList:[],
             formulaSettingShow:false,//公式设定
+            getFormulaLists:'',
+
             useFormulaValue:"1",//使用的公式:1-振弦式应变计计算公式；2-混凝土支撑内振弦式钢筋计计算公式
             getFormulaList:'',//获取受力公式
             useFormulaNum:"1",
@@ -1360,6 +1529,8 @@ export default Vue.component('commonDetail',{
             port:'',
             data1:'',
 
+            forceId:'',
+
             deviceId2:'',
             port2:'',
             data2:'',
@@ -1425,7 +1596,11 @@ export default Vue.component('commonDetail',{
             textShow:false,
             uploadshow:false,
             addForceShow:false,
+
+            editAutoForceShow:false,
+
             addWaterLevelShow:false,
+            editWaterLevelShow:false,
             addVerticalDisplaceShow:false,
             editVerticalDisplaceShow:false,
             equipmentType:1,
@@ -1503,6 +1678,7 @@ export default Vue.component('commonDetail',{
             wLevelDeviceId:'',
             wLevelPort:'',
             WaterLevelList:'',
+            waterLevelId:'',
 
             getImportHistoryList:'',//获取导入历史
             isAlertNum:0,
@@ -1898,8 +2074,8 @@ export default Vue.component('commonDetail',{
             var endDate=this.selectInitTimeValue[1];
             this.bindPointInitList=[];
             this.basePointInitList=[];
-            this.hhInitData='';
-            this.hhBaseInitData='';
+            // this.hhInitData='';
+            // this.hhBaseInitData='';
             axios({
                 url:this.BDMSUrl+'detectionInfo/getOriginalHHData',
                 headers:{
@@ -1922,6 +2098,49 @@ export default Vue.component('commonDetail',{
                     if(this.basePointInitList.length!=0){
                         this.hhBaseInitDataTime=this.basePointInitList[0].collectTime;
                         this.hhBaseInitData=this.basePointInitList[0].shift;
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:'筛选时间无监测数据'
+                        })
+                    }
+                }
+            })
+        },
+        selectInitTime1(){
+            var startDate=this.selectInitTimeValue[0];
+            var endDate=this.selectInitTimeValue[1];
+            this.bindPointInitList=[];
+            this.basePointInitList=[];
+            // this.hhInitData='';
+            // this.hhBaseInitData='';
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getOriginalHHData',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    pointId:this.forcePointId,
+                    startDate:startDate,
+                    endDate:endDate
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.selectInitTimeList=response.data.rt;
+                    this.bindPointInitList=this.selectInitTimeList.originalData;
+                    if(this.bindPointInitList.length!=0){
+                        // this.hhInitDataTime=this.bindPointInitList[0].collectTime;
+                        // this.hhInitData=this.bindPointInitList[0].shift;
+                    }
+                    this.basePointInitList=this.selectInitTimeList.baseOriginalData;
+                    if(this.basePointInitList.length!=0){
+                        // this.hhBaseInitDataTime=this.basePointInitList[0].collectTime;
+                        // this.hhBaseInitData=this.basePointInitList[0].shift;
+                    }else{
+                        this.$message({
+                            type:'info',
+                            message:'筛选时间无监测数据'
+                        })
                     }
                 }
             })
@@ -1971,7 +2190,7 @@ export default Vue.component('commonDetail',{
         getInsertHistoryDate(){
             var pointIds=[];
             pointIds.push(this.forcePointId);
-            console.log(pointIds,'pointIds');
+         
             axios({
                 url:this.BDMSUrl+'detectionInfo/getInsertHistoryDate',
                 headers:{
@@ -2408,6 +2627,7 @@ export default Vue.component('commonDetail',{
                         'token':this.token
                     },
                     responseType:'blob',
+
                     params:{
                         startDate:startDate,
                         endDate:endDate,
@@ -2418,7 +2638,9 @@ export default Vue.component('commonDetail',{
                     let blob=new Blob([response.data],{
                         // application/vnd.ms-excel
                         // 
-                        type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'      //将会被放入到blob中的数组内容的MIME类型 
+                        // type:'application/vnd.ms-excel'
+                        type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                              //将会被放入到blob中的数组内容的MIME类型 
                     });
                     let objectUrl = URL.createObjectURL(blob);  //生成一个url
                     // console.log(objectUrl,'objectUrl');
@@ -3430,7 +3652,7 @@ export default Vue.component('commonDetail',{
                         this.acquisitionTimeXlist.push(this.timeChangeMethod(item.acquisitionTime))
                         this.elevationYlist.push(item.elevation)
                     })
-                     console.log(this.elevationYlist,'this.elevationYlist');
+                  
                     this.spotChangeLineShow=true;
                     // if(this.elevationYlist.length>0){}
                         // this.optionSpotChangeLine.yAxis.min=undefined;
@@ -3440,8 +3662,8 @@ export default Vue.component('commonDetail',{
                         var middle=(min+max)/2;
                         //  this.optionSpotChangeLine.yAxis.min=(3*min-2*max);
                         // this.optionSpotChangeLine.yAxis.max=(3*max-2*min);
-                        console.log(3*min-2*max,'min');
-                        console.log(3*max-2*min,'max');
+                        // console.log(3*min-2*max,'min');
+                        // console.log(3*max-2*min,'max');
                         
                         
                         setTimeout(()=>{
@@ -3563,11 +3785,160 @@ export default Vue.component('commonDetail',{
 
             })
         },
-        editAutoForce(){
+        editAutoForce(id){
             this.editAutoForceShow=true;
+            this.getInsertHistoryDate();
+            this.getFormula();
+            console.log(this.getForceBindInfoList,'this.getForceBindInfoList');
+            this.getForceBindInfoList.forEach((item)=>{
+                if(item.id==id){
+                    this.forceId=item.id;
+                    this.forcePointId=item.pointId;
+                    this.data1=item.k1;
+                    this.deviceId=item.deviceId;
+                    this.port=item.port;
+                    this.data2=item.k2;
+                    this.deviceId2=item.deviceId2;
+                    this.port2=item.port2;
+                    this.data3=item.k3;
+                    this.deviceId3=item.deviceId3;
+                    this.port3=item.port3;
 
+                    this.port4=item.port4;
+                    this.data4=item.k4;
+                    this.deviceId4=item.deviceId4;
+                    this.useFormulaValues=item.useFormula;
+                }
+            })
+            
+        },
+        editCancleForce(){
+            this.editAutoForceShow=false;
+            
+            this.k='';
+            this.deviceId='';
+            this.port='';
+            this.data1='';
+            this.useFormulaValues="1";
+
+            this.deviceId2='';
+            this.port2='';
+            this.data2='';
+
+            this.deviceId3='';
+            this.port3='';
+            this.data3='';
+
+            this.deviceId4='';
+            this.port4='';
+            this.data4='';
+
+            this.AsValue=null;
+            this.EsValue=null;
+            this.barDiameterValue=null;
+            this.barCountValue=null;
+            this.concreteWidthValue=null;
+            this.concreteHeightValue=null;
+            this.concreteLevel=null;
+            this.barGradeValue=null;
+            this.acValueArea=null;
+            this.asValueArea=null;
+            
+        },
+        makeEditForceSure(){
+            var vm=this;
+            if(vm.useFormulaValues=='1'){
+                if(vm.AsValue==null||vm.EsValue==null){
+                    this.$message({
+                        type:'info',
+                        message:'钢支撑/钢立柱的截面积或弹性模量不能为空'
+                    })
+                }else{
+                    this.EditForceMake()
+                }
+            }else{
+                if(this.asValueArea==null||this.acValueArea==null||this.barGradeValue==null||this.concreteLevelValue==null){
+                    this.$message({
+                        type:'info',
+                        message:'配置公式选项不能为空'
+                    })
+                }else{
+                    this.EditForceMake()
+                }
+            }
 
         },
+        EditForceMake(){
+            axios({
+                url:this.BDMSUrl+' detectionInfo/updateForceBindInfo',
+                method:'get',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    // itemId:this.itemMonitorId,
+                    id:this.forceId,
+
+                    pointId:this.forcePointId,
+
+                    k:this.k,
+                    deviceId:this.deviceId,
+                    port:this.port,
+                    k1:this.data1,
+                    useFormula:this.useFormulaValues,
+                    deviceId2:this.deviceId2,
+                    port2:this.port2,
+                    k2:this.data2,
+
+                    deviceId3:this.deviceId3,
+                    port3:this.port3,
+                    k3:this.data3,
+
+                    deviceId4:this.deviceId4,
+                    port4:this.port4,
+                    k4:this.data4
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                  
+                    this.ForceBindInfoList=response.data.rt;
+                    this.editAutoForceShow=false;
+                    this.setFormula();
+                    // this.setInitCollectTime();
+                    this.getForceBindInfo();
+                    this.k='';
+                    this.deviceId='';
+                    this.port='';
+                    this.data1='';
+                    this.useFormulaValues="1";
+
+                    this.deviceId2='';
+                    this.port2='';
+                    this.data2='';
+
+                    this.deviceId3='';
+                    this.port3='';
+                    this.data3='';
+
+                    this.deviceId4='';
+                    this.port4='';
+                    this.data4='';
+
+                    this.AsValue=null;
+                    this.EsValue=null;
+                    this.barDiameterValue=null;
+                    this.barCountValue=null;
+                    this.concreteWidthValue=null;
+                    this.concreteHeightValue=null;
+                    this.concreteLevel=null;
+                    this.barGradeValue=null;
+                    this.acValueArea=null;
+                    this.asValueArea=null;
+                }
+            })
+
+        },
+
         forceMake(){
              axios({
                 url:this.BDMSUrl+'detectionInfo/addForceBindInfo',
@@ -3597,6 +3968,7 @@ export default Vue.component('commonDetail',{
                 }
             }).then((response)=>{
                 if(response.data.cd==0){
+                  
                     this.ForceBindInfoList=response.data.rt;
                     this.addForceShow=false;
                     this.setFormula();
@@ -3619,6 +3991,17 @@ export default Vue.component('commonDetail',{
                     this.deviceId4='';
                     this.port4='';
                     this.data4='';
+
+                    this.AsValue=null;
+                    this.EsValue=null;
+                    this.barDiameterValue=null;
+                    this.barCountValue=null;
+                    this.concreteWidthValue=null;
+                    this.concreteHeightValue=null;
+                    this.concreteLevel=null;
+                    this.barGradeValue=null;
+                    this.acValueArea=null;
+                    this.asValueArea=null;
                 }
             })
 
@@ -3679,8 +4062,48 @@ export default Vue.component('commonDetail',{
             this.deviceId4='';
             this.port4='';
             this.data4='';
-        },
 
+            this.AsValue=null;
+            this.EsValue=null;
+            this.barDiameterValue=null;
+            this.barCountValue=null;
+            this.concreteWidthValue=null;
+            this.concreteHeightValue=null;
+            this.concreteLevel=null;
+            this.barGradeValue=null;
+            this.acValueArea=null;
+            this.asValueArea=null;
+        },
+        forceChange(){
+            this.k='';
+            this.deviceId='';
+            this.port='';
+            this.data1='';
+
+            this.deviceId2='';
+            this.port2='';
+            this.data2='';
+
+            this.deviceId3='';
+            this.port3='';
+            this.data3='';
+
+            this.deviceId4='';
+            this.port4='';
+            this.data4='';
+
+            this.AsValue=null;
+            this.EsValue=null;
+            this.barDiameterValue=null;
+            this.barCountValue=null;
+            this.concreteWidthValue=null;
+            this.concreteHeightValue=null;
+            this.concreteLevel=null;
+            this.barGradeValue=null;
+            this.acValueArea=null;
+            this.asValueArea=null;
+
+        },
         //自动导入水位
         addWaterLevel(){
             this.addWaterLevelShow=true;
@@ -3769,6 +4192,66 @@ export default Vue.component('commonDetail',{
             this.wLevelK='';
             this.wLevelH='';
             this.wLevelPipeH='';
+        },
+        editAutoWaterLevel(id){
+             this.editWaterLevelShow=true;
+             this.getInsertHistoryDate();
+            this.WaterLevelList.forEach((item)=>{
+                if(item.id==id){
+                    this.waterLevelId=item.id;
+                    this.wLevelDeviceId=item.deviceId;
+                    this.wLevelPort=item.port;
+                    this.forcePointId=item.pointId;
+                    // itemId:this.itemMonitorId,
+                    // pointId:this.forcePointId,
+                    // f0:this.fZero,
+                    this.wLevelK=item.k;
+                    this.wLevelH=item.h;
+                    this.wLevelPipeH=item.pipeHeight;
+                }
+            })
+        },
+        editwaterLevelCancle(){
+            this.editWaterLevelShow=false;
+            this.wLevelDeviceId='';
+            this.wLevelPort='';
+            this.fZero='';
+            this.wLevelK='';
+            this.wLevelH='';
+            this.wLevelPipeH='';
+        },
+        makeEditWaterLevelSure(){
+            axios({
+                url:this.BDMSUrl+'detectionInfo/updateGaugeBindInfo',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    id:this.waterLevelId,
+                    deviceId:this.wLevelDeviceId,
+                    port:this.wLevelPort,
+                    itemId:this.itemMonitorId,
+                    pointId:this.forcePointId,
+                    // f0:this.fZero,
+                    k:this.wLevelK,
+                    h:this.wLevelH,
+                    pipeHeight:this.wLevelPipeH
+                }
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.getGaugeBindInfo();
+                    this.editWaterLevelShow=false;
+                    this.wLevelDeviceId='';
+                    this.wLevelPort='';
+                    this.fZero='';
+                    this.wLevelK='';
+                    this.wLevelH='';
+                    this.wLevelPipeH='';
+                }
+
+            })
+
+
         },
         //自动导入竖直位移
         addVerticalDisplace(){
@@ -3873,9 +4356,11 @@ export default Vue.component('commonDetail',{
                     this.initalHeight='';          
                     this.hhBaseInitData='';   
                     this.hhInitData='';     
-                     this.selectInitTimeValue='';
-                     this.hhInitDataTime='';
-                     this.hhBaseInitDataTime='';
+                    this.selectInitTimeValue='';
+                    this.hhInitDataTime='';
+                    this.hhBaseInitDataTime='';
+                    this.basePointInitList=[];
+                    this.bindPointInitList=[];
                 }
             })
 
@@ -3935,6 +4420,8 @@ export default Vue.component('commonDetail',{
                         this.hhSensorNo=item.hhSensorNo;
                         this.hhBaseInitData=item.hhBaseInitData;
                         this.hhInitData=item.hhInitData;
+                        this.hhInitDataTime1=item.hhInitDataTime?moment(item.hhInitDataTime).format("YYYY-MM-DD HH:mm"):'';
+                        this.hhBaseInitDataTime1=item.hhBaseInitDataTime?moment(item.hhBaseInitDataTime).format("YYYY-MM-DD HH:mm"):'';
                         this.hhInitDataTime=item.hhInitDataTime;
                         this.hhBaseInitDataTime=item.hhBaseInitDataTime
                 }
@@ -3974,11 +4461,15 @@ export default Vue.component('commonDetail',{
             this.hhSensorNo='';
             this.hhBaseSensorNo='';
             this.initalHeight='';
-             this.hhBaseInitData='';   
-                    this.hhInitData='';
-                     this.selectInitTimeValue='';
-                     this.hhBaseInitDataTime='';
-                    this.hhInitDataTime='';
+            this.hhBaseInitData='';   
+            this.hhInitData='';
+            this.selectInitTimeValue='';
+            this.hhBaseInitDataTime='';
+            this.hhInitDataTime='';
+            this.hhBaseInitDataTime1='';
+            this.hhInitDataTime1='';
+            this.basePointInitList=[];
+            this.bindPointInitList=[];
         },
         //自动导入水平位移
         addHorizontalDisplace(){
@@ -4460,7 +4951,6 @@ export default Vue.component('commonDetail',{
             })
 
         },
-
         //受力公式设定
         forceWaySetting(){
             this.formulaSettingShow=true;
@@ -4494,16 +4984,25 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     if(response.data.rt.length!=0){
-                        this.getFormulaList=(response.data.rt)[0];
-                        this.AsValue=this.getFormulaList.as;
-                        this.barCountValue=this.getFormulaList.barCount;
-                        this.barDiameterValue=this.getFormulaList.barDiameter
-                        this.barGradeValue=this.getFormulaList.barGrade
-                        this.concreteHeightValue=this.getFormulaList.concreteHeight
-                        this.concreteLevelValue=this.getFormulaList.concreteLevel
-                        this.concreteWidthValue=this.getFormulaList.concreteWidth
-                        this.EsValue=this.getFormulaList.es
-                        this.useFormulaValue=this.getFormulaList.formula==1?'1':'2'
+                        this.getFormulaList=response.data.rt
+                        this.getFormulaList.forEach((item)=>{
+                            if(item.pointId==this.forcePointId){
+                                this.AsValue=item.as;
+                                this.barCountValue=item.barCount;
+                                this.barDiameterValue=item.barDiameter
+                                this.barGradeValue=item.barGrade
+                                this.concreteHeightValue=item.concreteHeight
+                                this.concreteLevelValue=item.concreteLevel
+                                this.concreteWidthValue=item.concreteWidth
+                                this.EsValue=item.es
+                                this.useFormulaValue=item.formula==1?'1':'2'
+                                this.asValueArea=item.as2;
+                                this.acValueArea=item.es2;
+                                this.esChange(this.barGradeValue);
+                                this.ecChange(this.concreteLevelValue);
+                            }
+                        })
+                       
                     }
                     // console.
                 }else if(response.data.cd=='-1'){
@@ -4533,6 +5032,22 @@ export default Vue.component('commonDetail',{
                  }
              })
         },
+        //获取受力公式
+        // getFormula(){
+        //     axios({
+        //         url:this.BDMSUrl+'detectionInfo/getFormula',
+        //         method:"get",
+        //         params:{
+        //             itemId:this.itemMonitorId,
+        //         }
+        //     }).then((response)=>{
+        //         if(response.data.cd==0){
+        //             this.getFormulaLists=response.data.rt;
+
+        //         }
+        //     })
+        // },
+        
         //设置受力公式
         setFormula(){
             var vm=this;

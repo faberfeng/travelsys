@@ -5,10 +5,12 @@
         <div class="contentBody">
             <div class="downWebGl" @click="webGlbtn">虚拟场景<i :class="[{'active':webGlShow},'webGlDownBtn']"></i></div>
             <div v-show="webGlShow" id="webgladd" class="webglBackground">
-                <div id="webgl" v-show="webGlShow">
+                <!-- <div class="webglLeft"></div> -->
+                <div id="webgl" v-show="webGlShow" style="background:#fff">
                     <!-- <iframe v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" src="http://10.252.26.240:8080/genDist/index.html"  ></iframe> -->
                     <iframe allowfullscreen=true v-show="webGlShow" ref="iframe1" id="webIframe" name="ifd" height="800px" frameborder="no" border="0" marginwidth="0" marginheight="0"  width="100%" :src="iframeUrl"  ></iframe>
                 </div>
+                <!-- <div class="webglRight"></div> -->
             </div>
             <div  class="main">
                 <div class="content">
@@ -320,7 +322,7 @@ export default {
             this.isOpen++;
             // console.log(this.isOpen,'isOpen00');
             if(this.isOpen==1){
-                    setTimeout(()=>{
+                setTimeout(()=>{
                     app = this.$refs.iframe1.contentWindow;
                     // app = document.getElementById("webIframe").contentWindow;
                     app.postMessage({command:"Init",parameter:{menu:true,loadingFiles_display:true}},"*");
@@ -1639,21 +1641,41 @@ export default {
     .active{
             transform: rotate(0deg);
     }
+    .webglLeft{
+        width: 2.5%;
+        height: 800px;
+        position: absolute;
+        left: 0px;
+       background-color: rgba(34, 34, 34, 0.72);
+       box-sizing: border-box;
+
+    }
+    .webglRight{
+         width: 2.5%;
+         box-sizing: border-box;
+        height: 800px;
+        position: absolute;
+        right: 0px;
+        top:0px;
+        background-color: rgba(34, 34, 34, 0.72)
+
+    }
     #webgl{
        	height: 800px;
-        width: 95%;
+        width: 94%;
         margin:0 auto;
         /* margin-top: 60px; */
         display: inline-block;
         z-index: 10;
-        background-color:#333333;
+        /* background-color:#333333; */
         /* border:1px solid #666; */
         /* overflow-y: auto; */
-        transition: all 10s ease;
+        /* transition: all 10s ease; */
     }
     .webglBackground{
          width: 100%;
          height: 810px;
+         position: relative;
         background-color:#333333;
     }
     .navigation1{

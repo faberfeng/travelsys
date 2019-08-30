@@ -25,7 +25,7 @@
 
                 </div>
                 <ul class="content_ul">
-                    <li class="content_li" v-for="(item,index) in listData" :key="index">
+                    <li class="content_li" v-for="(item,index) in listData" :key="index" v-show="item.status!=2">
                         <div class="icon1left"></div>
                         <div class="icon1top"></div>
                         <div class="icon2top"></div>
@@ -38,7 +38,9 @@
                             <span>{{item.projectName}}</span>
                         </div>
                         <div class="text">
-                            <label style="width:80px;margin-right:10px;display:inline-block;font-size:16px;color:rgb(79,192,220)">项目地址:</label><label style="width:100px;display:inline-block;font-size:16px;color:rgb(79,192,220)">{{item.location}}</label><i title="定位" @click="locationGis()" class="el-icon-location"></i>
+                            <label style="width:80px;margin-right:10px;display:inline-block;font-size:16px;color:rgb(79,192,220)">项目地址:</label>
+                            <label style="width:100px;display:inline-block;font-size:16px;color:rgb(79,192,220)">{{item.location}}</label>
+                            <i title="定位"  @click="locationGis(item,item.projectName,item.entId,item.projectId,item.latitude,item.longitude)" class="el-icon-location"></i>
                         </div>
                     </li>
                 </ul>
@@ -80,31 +82,55 @@
                                 <li class="right_wrappLi color1">
                                     <div>
                                         <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
+                                    </div>
+                                    <div>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
                                     </div>
                                 </li>
                                 <li class="right_wrappLi color1">
                                     <div>
                                         <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
+                                    </div>
+                                    <div>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
                                     </div>
                                 </li>
                                 <li class="right_wrappLi color2">
-                                    <div>
+                                   <div>
                                         <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
+                                    </div>
+                                    <div>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
                                     </div>
                                 </li>
                                 <li class="right_wrappLi color2">
-                                    <div>
+                                   <div>
                                         <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
+                                    </div>
+                                    <div>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
+                                    </div>
+                                </li>
+                                <li class="right_wrappLi color3">
+                                   <div>
+                                        <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
+                                    </div>
+                                    <div>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
                                     </div>
                                 </li>
                                 <li class="right_wrappLi color3">
                                     <div>
                                         <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">窨井液位  1级预警</label>
                                     </div>
-                                </li>
-                                <li class="right_wrappLi color3">
                                     <div>
-                                        <i class="el-icon-warning"></i>
+                                        <label style="height:24px;line-height:24px;font-size:14px;display:inline-block">1号园区--24#监测点</label>
                                     </div>
                                 </li>
                             </ul>
@@ -121,6 +147,22 @@
                             <div class="icon3left"></div>
                             <div class="icon4bottom"></div>
                             <div class="icon4right"></div>
+                            <!-- <div>
+                                <vue-highcharts id="HightchartOne" style="min-height:440px"   :options="optionOnes" ref="lineChartOne"></vue-highcharts>
+                            </div> -->
+                        </li>
+                        <li class="content_right_bottom_li">
+                            <div class="icon1left"></div>
+                            <div class="icon1top"></div>
+                            <div class="icon2top"></div>
+                            <div class="icon2right"></div>
+                            <div class="icon3bottom"></div>
+                            <div class="icon3left"></div>
+                            <div class="icon4bottom"></div>
+                            <div class="icon4right"></div>
+                            <!-- <div>
+                                <vue-highcharts id="HightchartTwo" style="min-height:440px"   :options="optionTwos" ref="lineChartTwo"></vue-highcharts>
+                            </div> -->
 
                         </li>
                         <li class="content_right_bottom_li">
@@ -132,17 +174,9 @@
                             <div class="icon3left"></div>
                             <div class="icon4bottom"></div>
                             <div class="icon4right"></div>
-
-                        </li>
-                        <li class="content_right_bottom_li">
-                            <div class="icon1left"></div>
-                            <div class="icon1top"></div>
-                            <div class="icon2top"></div>
-                            <div class="icon2right"></div>
-                            <div class="icon3bottom"></div>
-                            <div class="icon3left"></div>
-                            <div class="icon4bottom"></div>
-                            <div class="icon4right"></div>
+                             <!-- <div>
+                                <vue-highcharts id="HightchartThree" style="min-height:440px"   :options="optionThrees" ref="lineChartThree"></vue-highcharts>
+                            </div> -->
 
                         </li>
                     </ul>
@@ -168,7 +202,71 @@ export default {
             weatherList:'',
             currentTime1:'',
             currentTime2:'',
-            currentWeatherData:''
+            currentWeatherData:'',
+            optionOnes:{
+                 chart: {
+                            // type: 'spline',
+                            inverted: true
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories:[],
+                            labels:{
+                                    enabled: true,
+                                    // format: '{value} m',
+                            },
+                            gridLineWidth: 1,
+                            tickmarkPlacement: 'on',
+                        },
+                        yAxis: {
+                                title: {
+                                    text: '位移(mm)'
+                                },
+                                labels:{
+                                    enabled: true,
+                                    // format: '{value} mm',
+                                },
+                                opposite: true,
+                                lineWidth: 1,
+                                gridLineWidth: 1,
+                                // max:'',
+                                // min:''
+                           
+                        },  
+                        credits: {
+                            enabled: false
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            floating: true,
+                            borderWidth: 0,
+                            y:-10
+                        },
+                        plotOptions: {
+                            spline: {
+                                marker: {
+                                    radius: 4,
+                                    lineColor: '#666666',
+                                    lineWidth: 1
+                                }
+                            },
+                            series: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click(e) {
+                                        
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        series:[],
+            }
         }
     },
     created(){
@@ -197,109 +295,200 @@ export default {
        
     },
     methods:{
-    gisInit(){
-        gisApp = document.getElementById("gisWebgl").contentWindow;
-        console.log(gisApp,'gisApp');
-         this.loadGisShow=true;
-        setTimeout(()=>{
-            gisApp.postMessage({command:"Init",parameter:{menu:false,loadingFiles_display:true,background_url:""}},"*");
-           
-            // gisApp.document.body.style.backgroundColor= "rgba(17, 24, 56, 0.5)";
-           
-        },1000)
-        setTimeout(()=>{
-                gisApp.postMessage({command:"EarthMove",parameter:{latitude:32,longitude:114.98}},"*");
-        },5000)
-        //  var a=32,b=114.98;
-        // setInterval(()=>{
-           
-        //     gisApp.postMessage({command:"EarthMove",parameter:{latitude:a,longitude:b}},"*")
-        //     // a++;
-        //     if(b<180&&b>-180){
-        //         b=b+10;
-        //     }else{
-        //         b=b-10;
-        //     }
-        //     // console.log()
-        // },1000)
+        gisInit(){
+            gisApp = document.getElementById("gisWebgl").contentWindow;
+            // console.log(gisApp,'gisApp');
+            this.loadGisShow=true;
+            setTimeout(()=>{
+                gisApp.postMessage({command:"Init",parameter:{menu:false,loadingFiles_display:true,background_url:""}},"*");
+            
+                // gisApp.document.body.style.backgroundColor= "rgba(17, 24, 56, 0.5)";
+            
+            },1000)
+        //    setTimeout(()=>{
+        //                     gisApp.postMessage({command:"EarthMove",parameter:{latitude:32,longitude:114.98}},"*");
+        //     },5000)
+            //  var a=32,b=114.98;
+            // setInterval(()=>{
+            
+            //     gisApp.postMessage({command:"EarthMove",parameter:{latitude:a,longitude:b}},"*")
+            //     // a++;
+            //     if(b<180&&b>-180){
+            //         b=b+10;
+            //     }else{
+            //         b=b-10;
+            //     }
+            //     // console.log()
+            // },1000)
 
-        // setTimeout(()=>{
-        //         gisApp.postMessage({command:"EarthMove",parameter:{latitude:32,longitude:114.98}},"*");
-        // },000)
-        // window.addEventListener("message", (e)=>{this.callback(e);})
-    },
+            // setTimeout(()=>{
+            //         gisApp.postMessage({command:"EarthMove",parameter:{latitude:32,longitude:114.98}},"*");
+            // },000)
+            window.addEventListener("message", (e)=>{this.callback(e);})
+        },
         //获取工程列表
-      initCompany(){
-         var vm = this
-            axios({
-                method:'GET',
-                url:vm.BDMSUrl+'projectInfo/getUserProjectList',
-                 headers:{
-                    'accept':'application/json;charset=UTF-8',
-                    'token':vm.token
-                },
-                params:{
-                  entId:vm.entId
-                }
-            }).then((response)=>{
-                if(response.data.cd == "0"){//跳转项目首页
-                    this.listData=response.data.rt;
-                    // console.log(this.listData,'this.listData');
-                }else if(response.data.cd === "1"){
-                    alert(response.data.msg);
-                    setTimeout(()=>{
-                         vm.$router.push({
-                            path:'/login'
-                        })
-                    },1000)
-                }
-            }).catch(function(error){
-                vm.$router.push({
-                  path:'/login'
+        initCompany(){
+            var vm = this
+                axios({
+                    method:'GET',
+                    url:vm.BDMSUrl+'projectInfo/getUserProjectList',
+                    headers:{
+                        'accept':'application/json;charset=UTF-8',
+                        'token':vm.token
+                    },
+                    params:{
+                    entId:vm.entId
+                    }
+                }).then((response)=>{
+                    if(response.data.cd == "0"){//跳转项目首页
+                        this.listData=response.data.rt;
+                        // console.log(this.listData,'this.listData');
+                    }else if(response.data.cd === "1"){
+                        alert(response.data.msg);
+                        setTimeout(()=>{
+                            vm.$router.push({
+                                path:'/login'
+                            })
+                        },1000)
+                    }
+                }).catch(function(error){
+                    vm.$router.push({
+                    path:'/login'
+                    })
                 })
-            })
-
       },
       //获得天气
         getWeather(){
-          axios({
-              url:'https://www.tianqiapi.com/api/?version=v1&city=上海',
-              method:'get'
-          }).then((response)=>{
-              this.weatherList=response.data;
-              console.log(this.weatherList,'this.weatherList');
-              this.weatherListData=this.weatherList.data;
-              this.currentWeatherData=this.weatherListData[0];
-            //   let hours = this.currentWeatherData.hours;
-            //   let xAxisData = [];
-            //   let yAxisData = [];
-            //   hours.forEach((item)=>{
-            //       xAxisData.push(item.day)
-            //       yAxisData.push(parseInt(item.tem))
-            //   })
-            //   let left_bottomChart=document.getElementById('left_bottomChart').offsetHeight;
-            //     document.getElementsByClassName('highcharts-background')[0].attributes[0].nodeValue='#121c3e'
+            axios({
+                url:'https://www.tianqiapi.com/api/?version=v1&city=上海',
+                method:'get'
+            }).then((response)=>{
+                this.weatherList=response.data;
+                console.log(this.weatherList,'this.weatherList');
+                this.weatherListData=this.weatherList.data;
+                this.currentWeatherData=this.weatherListData[0];
+                //   let hours = this.currentWeatherData.hours;
+                //   let xAxisData = [];
+                //   let yAxisData = [];
+                //   hours.forEach((item)=>{
+                //       xAxisData.push(item.day)
+                //       yAxisData.push(parseInt(item.tem))
+                //   })
+                //   let left_bottomChart=document.getElementById('left_bottomChart').offsetHeight;
+                //     document.getElementsByClassName('highcharts-background')[0].attributes[0].nodeValue='#121c3e'
 
-            //    setTimeout(()=>{
-            //         let weatherChart=this.$refs.weatherChartRef; 
-            //         weatherChart.delegateMethod('showLoading', 'Loading...');
-            //         weatherChart.removeSeries();
-            //         weatherChart.addSeries({name:'温度',data:yAxisData});
-            //         weatherChart.hideLoading();
-            //         weatherChart.getChart().xAxis[0].update({categories:xAxisData});
-            //         weatherChart.options.chart.height=left_bottomChart;
-            //     },0)
-          })
-      },
-      callback(e){
+                //    setTimeout(()=>{
+                //         let weatherChart=this.$refs.weatherChartRef; 
+                //         weatherChart.delegateMethod('showLoading', 'Loading...');
+                //         weatherChart.removeSeries();
+                //         weatherChart.addSeries({name:'温度',data:yAxisData});
+                //         weatherChart.hideLoading();
+                //         weatherChart.getChart().xAxis[0].update({categories:xAxisData});
+                //         weatherChart.options.chart.height=left_bottomChart;
+                //     },0)
+            })
+        },
+        updateProject(coordinate){
+
+            axios({
+                url:this.BDMSUrl+'backstageManagement/updateProject',
+                headers:{
+                    'token':this.token,
+                },
+                params:{
+                    projectId:this.projectConfig.projectId,
+                    userId:this.projectConfig.userId,
+                    projectName:this.projectConfig.projectName,
+                    location:this.projectConfig.location,
+                    stroke:this.projectConfig.stroke,
+                    expireTime:moment(this.projectConfig.expireTime).format('YYYY-MM-DD'),
+                    userCount:this.projectConfig.userCount==null?-1:this.projectConfig.userCount,
+                    diskSize:this.projectConfig.diskSize,
+                    // latitude:latitude,
+                    // longitude:longitude,
+                    coordinate:coordinate
+                    // stroke:this.isStroke
+                }
+            }).then((response)=>{
+                this.projectConfig='';
+                this.initCompany()
+
+            })
+        },
+        getAvg(arr){
+            var sum=0;
+            for (var i = 0; i < arr.length; i++) {
+                sum+=parseInt(arr[i]);
+            };
+            var avg=Math.ceil(sum/arr.length);
+            return avg
+        },
+        
+        callback(e){
             switch(e.data.command){
 			case "EngineReady":
 				{
-                    
+                    gisApp = document.getElementById("gisWebgl").contentWindow;
+                    var url = "http://42.159.153.210:8080/BDView/image/logo.png";
+                    var latitudeMid=[],longitudeMid=[];
+                    this.listData.forEach((item)=>{
+                        if(item.coordinate){
+                            // console.log(JSON.parse(item.coordinate),'item.coordinate');
+                            latitudeMid.push(JSON.parse(item.coordinate).latitude);
+                            longitudeMid.push(JSON.parse(item.coordinate).longitude);
+                            var label = {type:"[Tag]Building",name:item.projectName,image:url,value:null,Id:item.projectId,File_ID:item.entId,position:JSON.parse(item.coordinate).position,url:"www.baidu.com"}
+                            // console.log(label,'label111');
+                            gisApp.postMessage({command:"AddLabel",parameter:label},"*");
+                           
+                        }
+                        //  console.log(this.getAvg(latitudeMid),this.getAvg(longitudeMid),'经纬度平均值');
+                        
+                    })
+                    var a=0;
+                    a++;
+                     setTimeout(()=>{
+                            gisApp.postMessage({command:"EarthMove",parameter:{latitude:this.getAvg(latitudeMid),longitude:this.getAvg(longitudeMid)}},"*");
+                            console.log(a,'aa')
+                    },1000)
 				}
-				break;
+                break;
+            case "Set_Earth_Position_finish":
+                var position = e.data.parameter.position;
+                this.Set(position);
+                this.updateProject(e.data.parameter);
+                console.log(e.data.parameter,'返回值')
+                break;
+            case "CurrentSelectedLabel":
+				alert(e.data.parameter.url + "&name=" + e.data.parameter.name);
+            break;
 		    }
         },
+        locationGis(item,projectName,entId,projectId,latitude,longitude){
+            gisApp = document.getElementById("gisWebgl").contentWindow;
+            gisApp.postMessage({command:"Set_Earth_Position_begin",parameter:null},"*");
+          
+            this.projectConfig=item;
+            this.projectName=projectName;
+            this.entId=entId
+            this.projectId=projectId;
+            gisApp.postMessage({command:"DeleteLabel",parameter:{Id:this.projectId}},"*");
+            // this.latitude=latitude;
+            // this.longitude=longitude;
+            // var url = "image/tooltip2.png";
+            
+            // var url = "http://42.159.153.210:8080/BDView/image/logo.png";
+            // var label = {type:"[Tag]Building",name:"abc",image:url,value:null,Id:4324,File_ID:21,testOffset:{x:200,y:200,size:40,maxLength:200},imgOffset:{x:200,y:200,width:64,height:64}}
+            // gisApp.postMessage({command:"AddLabel",parameter:label},"*");
+        },
+        Set(position){
+            gisApp = document.getElementById("gisWebgl").contentWindow;
+            var url = "http://42.159.153.210:8080/BDView/image/logo.png";
+            var label = {type:"[Tag]Building",name:this.projectName,image:url,value:null,Id:this.projectId,File_ID:this.entId,position:position,url:"www.baidu.com"}
+            gisApp.postMessage({command:"AddLabel",parameter:label},"*");
+        },
+        initHightChartOne(){
+            
+        }
     }
 }
 </script>
