@@ -138,6 +138,7 @@
                                 <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
+                                    <i class="el-icon-time" style="color:red;width:18px;height:18px;cursor:pointer;margin-right:3px;" @click="editTime(item.pointId)"></i>
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <!-- <button title="定位" class="location actionBtn"></button> -->
                                     <button title="变化曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
@@ -1227,6 +1228,20 @@
                     </div>
                 </div>
             </el-dialog> -->
+            <el-dialog title="初始时间设置" :visible="editTimeShow" @close="setInitTimeCancle()">
+                <div class="editBody" >
+                    <div class="editBodytwo">
+                        <label class="editInpText" style="width:18% !important;">选择初始时间:</label>
+                        <select v-model="selectTimeValues" class="sheetName">
+                             <option v-for="(item,index) in setInitCollectTimeLists"  :value="item.id" :key="index" v-text="item.name"></option>
+                        </select>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                        <button class="editBtnS" @click="makeInitSelectTimeSure">确认</button>
+                        <button class="editBtnC" @click="initSelectTimeCancle">取消</button>
+                </div>
+            </el-dialog>
 
              <el-dialog title="导出历史数据记录 " :visible="exportHistoryRecoedShow" @close="exportHistoryRecoedCancle()">
                 <div class="editBody" >
@@ -1396,6 +1411,8 @@ export default Vue.component('commonDetail',{
             hhSensorNo:'',
             //公式设定参数
             setInitCollectTimeList:'',
+            setInitCollectTimeLists:'',
+            selectTimeValues:'',
             selectTimeValue:'',
             selectInitTimeValue:'',
             bindPointInitList:[],
@@ -1926,6 +1943,7 @@ export default Vue.component('commonDetail',{
             pointNameValue:'',
             pointNumValue:'',
             scaleValue:1,
+            editTimeShow:false
         }
     },
     created(){
@@ -2186,6 +2204,32 @@ export default Vue.component('commonDetail',{
 
 
         },
+        //获取点位历史日期
+        getHistoryDate(id){
+            var pointIds=[];
+            pointIds.push(id);
+         
+            axios({
+                url:this.BDMSUrl+'detectionInfo/getInsertHistoryDate',
+                headers:{
+                    'token':this.token
+                },
+                params:{
+                    itemId:this.itemMonitorId,
+                    startDate:null,
+                    endDate:null
+                },
+                data:pointIds,
+                method:'post'
+            }).then((response)=>{
+                if(response.data.cd==0){
+                    this.setInitCollectTimeLists=response.data.rt[0].historyDate;
+                    this.selectTimeValues=this.setInitCollectTimeLists[0];
+                    console.log(this.setInitCollectTimeLists,'this.setInitCollectTimeList');
+                    // this.selectTimeValue=this.setInitCollectTimeList[0];
+                }
+            })
+        },
         //獲取歷史日期
         getInsertHistoryDate(){
             var pointIds=[];
@@ -2206,6 +2250,7 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.setInitCollectTimeList=response.data.rt[0].historyDate;
+                    console.log(this.setInitCollectTimeList,'this.setInitCollectTimeList');
                     // this.selectTimeValue=this.setInitCollectTimeList[0];
                 }
             })
@@ -3199,6 +3244,16 @@ export default Vue.component('commonDetail',{
             this.currentPointId=id;
             this.editAlertValueShow=true;
             this.getAlertArguments(id);
+        },
+        editTime(id){
+            this.getHistoryDate(id);
+            this.editTimeShow=true;
+        },
+        setInitTimeCancle(){
+
+        },
+        makeInitSelectTimeSure(){
+
         },
         editAlertValueBtn(){
             this.editAlertValueShow=true;
@@ -5533,6 +5588,9 @@ export default Vue.component('commonDetail',{
                                         }
                                         .el-icon-warning{
                                             font-size: 17px;
+                                        }
+                                        .el-icon-time{
+                                            font-size: 18px;
                                         }
                                         .el-icon-date{
                                             font-size: 17px;

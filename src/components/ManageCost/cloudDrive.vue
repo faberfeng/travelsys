@@ -2709,7 +2709,7 @@ export default {
          window.addEventListener("message", (evt)=>{this.callback(evt)});
         return {
             paleShow:false,
-            elementTracId:'',
+            elementTracId:[],
             routerList:'',
             moduleList:'',
             spanShow:true,
@@ -4373,6 +4373,7 @@ export default {
                     // if(response.data.rt[response.data.rt.length-1].para2=='structure'){
                     //     this.elementTracId.push(response.data.rt[response.data.rt.length-1].traceId)
                     // }
+                //    this.elementTracId=[];
                     response.data.rt.forEach((item)=>{
                         if(item.para2=='structure'){
                             this.elementTracId.push(item.traceId)
@@ -4381,8 +4382,27 @@ export default {
                 }
             })
         },
+       uniq(array){
+            var temp = []; //一个新的临时数组
+            for(var i = 0; i < array.length; i++){
+                if(temp.indexOf(array[i]) == -1){
+                    temp.push(array[i]);
+                }
+            }
+            return temp;
+        },
       //构件绑定文件
       goujianBindByWord(){
+          var dataarry=[]
+          
+          dataarry.push(1)
+           dataarry.push(1)
+            dataarry.push(1)
+            dataarry.push(2)
+               dataarry.push(2)
+        //   console.log(dataarry,'dataarry');
+        //   dataarry=Array.from(new Set(dataarry));
+        //   console.log(this.uniq(dataarry),'dataarry');
           var vm=this;
            if(document.getElementById('webgl').style.display=='none'){
             this.$message({
@@ -4428,6 +4448,8 @@ export default {
                     }
                     msg = '文件'
                 }
+            //    this.elementTracId= Array.from(new Set(this.elementTracId));
+            //    console.log(this.elementTracId,Array.isArray(this.elementTracId),this.uniq(JSON.parse(this.elementTracId)),Array.isArray(dataarry),this.uniq(dataarry),'加油');
                 mb={
                     "businessIds":fgIdList,
                     "elementTraceIds":this.elementTracId
