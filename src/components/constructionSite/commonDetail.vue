@@ -138,7 +138,7 @@
                                 <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
-                                    <i class="el-icon-time" style="color:red;width:18px;height:18px;cursor:pointer;margin-right:3px;" @click="editTime(item.pointId)"></i>
+                                    <!-- <i class="el-icon-time" style="color:red;width:18px;height:18px;cursor:pointer;margin-right:3px;" @click="editTime(item.pointId)"></i> -->
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <!-- <button title="定位" class="location actionBtn"></button> -->
                                     <button title="变化曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
@@ -3253,6 +3253,9 @@ export default Vue.component('commonDetail',{
 
         },
         makeInitSelectTimeSure(){
+
+        },
+        initSelectTimeCancle(){
 
         },
         editAlertValueBtn(){

@@ -2796,10 +2796,9 @@ export default {
                 }else{
                     this.moveClick=false;
                 }
-                if(deleteValue=='delete'){
-                    this.deleteDraw()
+                if(deleteValue=='delete'){              
+                         this.deleteDraw()
                 }
-
             }
         },
         timeChangeMethod1(val) {
@@ -7344,92 +7343,99 @@ export default {
         //删除点
         deleteDraw(){
             var vm=this;
-            if(this.toolShow==false){
-                this.$message({
-                    type:'info',
-                    message:'请先选择一个或多个点位再删除'
-                })
-            }else{
-                this.$refs.pic.setDrawCancel();
-                this.isClick1=false;
-                this.isClick2=false;
-                this.isClick3=false;
-                this.isClick4=false;
-                this.isClick5=false;
-                this.isClick6=true;
-                this.isClick7=false;
-                this.isClick8=false;
-                this.moveClick=false;
-                if(this.picMarkName!="Select_img_Mark"){
-                    // this.$refs.pic.deleteDraw();
-                    axios({
-                        url:vm.BDMSUrl+'detectionInfo/deletePointGroup',
-                        method:'post',
-                        headers:{
-                            'token':vm.token
-                        },
-                        data:this.pointIds,
-                    }).then((response)=>{
-                        if(response.data.cd==0){
-                            this.getAllMonitorPoint();
-                            this.getMonitorMainTable();
-                            if(this.picMark==true){
-                                this.getTagList();
-                            }
+             this.$confirm('您要删除当前点位,请慎重操作？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(()=>{
+                         if(this.toolShow==false){
+                                this.$message({
+                                    type:'info',
+                                    message:'请先选择一个或多个点位再删除'
+                                })
+                            }else{
+                                this.$refs.pic.setDrawCancel();
+                                this.isClick1=false;
+                                this.isClick2=false;
+                                this.isClick3=false;
+                                this.isClick4=false;
+                                this.isClick5=false;
+                                this.isClick6=true;
+                                this.isClick7=false;
+                                this.isClick8=false;
+                                this.moveClick=false;
+                                if(this.picMarkName!="Select_img_Mark"){
+                                    // this.$refs.pic.deleteDraw();
+                                    axios({
+                                        url:vm.BDMSUrl+'detectionInfo/deletePointGroup',
+                                        method:'post',
+                                        headers:{
+                                            'token':vm.token
+                                        },
+                                        data:this.pointIds,
+                                    }).then((response)=>{
+                                        if(response.data.cd==0){
+                                            this.getAllMonitorPoint();
+                                            this.getMonitorMainTable();
+                                            if(this.picMark==true){
+                                                this.getTagList();
+                                            }
 
-                            this.isClick6=false;
-                            this.isBindPoint=false;
-                            this.bindMorePoint=false;
-                            this.$message({
-                                type:'sucess',
-                                message:'删除点位集合成功'
-                            })
-                        }
-                    })
-                }
-                if(this.picMarkName=="Select_img_Mark"){
-                 
-                        this.spotPicInfo=[];
-                        this.spotPicInfo.push({
-                            "coordinateInfo":null,
-                            "operationType":2,
-                            "photoId":this.photoIdList,
-                        });
-                            axios({
-                                method:'post',
-                                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
-                                headers:{
-                                    'token':vm.token
-                                },
-                                params:{
-                                    userGroupId:vm.selectUgId
-                                },
-                                data:this.spotPicInfo
-                        }).then((response)=>{
-                            if(response.data.cd=='0'){
-                                // this.uploadshow=true;
-                                this.isClick6=false;
-                                this.$message({
-                                    type:'success',
-                                    message:'删除点位图片成功'
-                                })
-                                this.spotPicInfo=[];
-                                this.getAllMonitorPoint();
+                                            this.isClick6=false;
+                                            this.isBindPoint=false;
+                                            this.bindMorePoint=false;
+                                            this.$message({
+                                                type:'sucess',
+                                                message:'删除点位集合成功'
+                                            })
+                                        }
+                                    })
+                                }
+                                if(this.picMarkName=="Select_img_Mark"){
                                 
-                                setTimeout(()=>{
-                                    this.getTagList();
-                                },400)
-                            //    this.picShowMark();
-                            }else if(response.data.cd=='-1'){
-                                this.$message({
-                                    type:'error',
-                                    message:response.data.msg
-                                })
+                                        this.spotPicInfo=[];
+                                        this.spotPicInfo.push({
+                                            "coordinateInfo":null,
+                                            "operationType":2,
+                                            "photoId":this.photoIdList,
+                                        });
+                                            axios({
+                                                method:'post',
+                                                url:vm.BDMSUrl+'detectionInfo/editPhotoTag',
+                                                headers:{
+                                                    'token':vm.token
+                                                },
+                                                params:{
+                                                    userGroupId:vm.selectUgId
+                                                },
+                                                data:this.spotPicInfo
+                                        }).then((response)=>{
+                                            if(response.data.cd=='0'){
+                                                // this.uploadshow=true;
+                                                this.isClick6=false;
+                                                this.$message({
+                                                    type:'success',
+                                                    message:'删除点位图片成功'
+                                                })
+                                                this.spotPicInfo=[];
+                                                this.getAllMonitorPoint();
+                                                
+                                                setTimeout(()=>{
+                                                    this.getTagList();
+                                                },400)
+                                            //    this.picShowMark();
+                                            }else if(response.data.cd=='-1'){
+                                                this.$message({
+                                                    type:'error',
+                                                    message:response.data.msg
+                                                })
+                                            }
+                                        })
+                                    }
+                                
                             }
-                        })
-                    }
-                
-            }
+                    })
+           
                 
 
         },

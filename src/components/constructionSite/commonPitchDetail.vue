@@ -688,10 +688,22 @@
                          <!-- <label style="width:50px">传感器地址:</label> -->
                         <input  placeholder="传感器地址" v-model="displacementSensorAddress" @blur="getDisplacementHistoryData()"  class="inp" style="width:100px !important;height:30px !important"/>
                     </div>
-
                     <div class="editBodytwo">
+                        <!-- :clearable='false' -->
+                            <label class="editTxt1" style="width:24%">筛选初始时间:</label>
+                            <el-date-picker
+                                v-model="selectInitTimeValue"
+                                type="datetimerange"
+                                :clearable='false'
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期" @change="selectInitTime()" format="yyyy-MM-dd HH:mm:ss"  value-format="yyyy-MM-dd HH:mm:ss">
+                            </el-date-picker>
+                    </div>
+                    <div class="editBodytwo" v-if="initShiftTimeList.length!=0">
                         <label class="editTxt1" style="width:24%">初始时间:</label>
-                        <select v-model="initShiftTime" class="gatherTimeName" @focus="getDisplacementHistoryData()" @change="initShiftTimeChange()">
+                        <!-- @focus="getDisplacementHistoryData()" @change="initShiftTimeChange()" -->
+                        <select v-model="initShiftTime" class="gatherTimeName" >
                             <option v-for="(item,index) in initShiftTimeList"  :key="index" :value="item.collectTime">
                                 {{item.collectTime|timeChange2}}
                             </option>
@@ -926,6 +938,7 @@ export default Vue.component('commonPitch-detail',{
         },
         data(){
             return{
+                selectInitTimeValue:'',
                 editPersonShow:false,
                 editAlertValueShow:false,
                 variationAlertTotal:"",
@@ -3036,6 +3049,9 @@ export default Vue.component('commonPitch-detail',{
                 this.displacementSystemId='';
                 this.initShift='';
                 this.customShift='';
+                this.selectInitTimeValue='';
+                this.initShiftTimeList=[];
+                this.initShiftTime='';
             },
             savePitchArg(){
                 axios({
@@ -3072,7 +3088,30 @@ export default Vue.component('commonPitch-detail',{
                 })
                 // console.log(this.initShift,'this.initShift');
             },
-            getDisplacementHistoryData(){
+            selectInitTime(){
+                var startDate=this.selectInitTimeValue[0];
+                var endDate=this.selectInitTimeValue[1];
+                console.log(startDate,endDate,'startDate');
+                 if(this.displacementSystemId==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写设备ID'
+                    })
+                }else if(this.displacementChannelNo==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写通道标号'
+                    })
+                }else if(this.displacementSensorAddress==''){
+                    this.$message({
+                        type:'info',
+                        message:'请填写传感器地址'
+                    })
+                }else{
+                     this.getDisplacementHistoryData(startDate,endDate);
+                }
+            },
+            getDisplacementHistoryData(startDate,endDate){
                 if(this.displacementSystemId==''){
                     this.$message({
                         type:'info',
@@ -3089,6 +3128,7 @@ export default Vue.component('commonPitch-detail',{
                         message:'请填写传感器地址'
                     })
                 }else{
+               
                      axios({
                         url:this.BDMSUrl+'detectionInfo/getDisplacementHistoryData',
                         headers:{
@@ -3099,8 +3139,8 @@ export default Vue.component('commonPitch-detail',{
                             systemId:this.displacementSystemId,
                             sensorNo:this.displacementSensorAddress,
                             ChannelNo:this.displacementChannelNo,
-                            startDate:null,
-                            endDate:null,
+                            startDate:startDate,
+                            endDate:endDate,
                             seqId:this.pitchSeqIds
                         }
                     }).then((response)=>{
