@@ -61,12 +61,17 @@ export default Vue.component('common-upload',{
             var vm = this
             console.log(vm.$refs.file.files,'多文件上传');
             // var FileLength = vm.$refs.file.files.length
-            vm.filesList = vm.$refs.file.files[0]
+            vm.filesList = vm.$refs.file.files;
             // vm.filesList= vm.$refs.file.files;
             // for(var i= 0;i<FileLength;i++){
             //     vm.filesList.push(vm.$refs.file.files[i])
             // }
-            vm.imageName = vm.filesList.name
+            var imgname='';
+            for(var i=0;i<vm.filesList.length;i++){
+                imgname=imgname+vm.filesList[i].name+',';
+            }
+            vm.imageName = imgname
+            console.log(vm.imageName,'vm.imageName');
             // if(vm.filesList.length == 1){
             //      vm.imageName = vm.filesList.name
             // }else if(vm.filesList.length > 1){
@@ -123,8 +128,11 @@ export default Vue.component('common-upload',{
             var formData = new FormData()
             // formData.append('token',vm.token);
             // formData.append('projId',vm.projId);
-            //  formData.append('type',1);
-            formData.append('files',vm.filesList);
+            //  formData.append('type',1);   
+          for(var i=0;i<vm.filesList.length;i++){
+              formData.append("files", vm.filesList[i]);// 文件对象   
+          }
+            // formData.append('files',vm.filesList);
             // formData.append('userId',vm.userId);
             // formData.append('modelCode','002');
             // formData.append('returnUrl',returnUrl);

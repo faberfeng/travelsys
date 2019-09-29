@@ -1768,6 +1768,7 @@ export default {
 
         },
         handleNodeClick(obj){
+            
             var vm=this;
             this.drawingLoading=true;
             // this.annotationlist='';

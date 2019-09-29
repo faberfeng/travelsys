@@ -2722,14 +2722,7 @@ export default {
             // }else{
             //     this.isBindPoint=false;
             // }
-            // this.pointIds=[];
-            console.log('xxx')
-
-            
-            
-
-
-
+            // this.pointIds=[];       
             if(status==true){
 
                 this.pointId=list[0].ID_out;
@@ -4294,7 +4287,7 @@ export default {
             var elist=[];
             var map=new Map();
             var list = this.$refs.pic.saveList();
-            console.log(list,'list00');
+      
             
             // var list1=this.
             if(this.moveClick==false){
@@ -4384,7 +4377,7 @@ export default {
                         })
                     }
             }else if(this.moveClick==true){
-                console.log(this.pointIds,'this.pointIds');
+               
                 this.pointIds.forEach((item)=>{
                     list.forEach((item1)=>{
                          if(item==item1.id){
@@ -4395,7 +4388,7 @@ export default {
                          }
                     })
                 })
-                console.log(elist,'elist');
+              
                
                 axios({
                     url:this.BDMSUrl+'detectionInfo/updatePointGroupPosition',
@@ -5121,7 +5114,12 @@ export default {
                  this.monitorPointInfo.forEach((item)=>{
                       var a=[]
                      vm.dataLists.forEach((item1)=>{
-                        
+                         if(item1.itemType==5&&item1.data){
+                            //  item1.data = (parseFloat(item1.data)/1000.0);
+                            //  console.log(item1.data,(parseFloat(item1.data)/1000.0));
+                            //  /1000).toString()
+                            //  console.log(item1.data,'item1.data');
+                         }
                          if(item.id==item1.pointGroupId){
                              a.push(item1);
                             vm.$set(item,'pointGroupData',a);
@@ -5131,7 +5129,7 @@ export default {
                         //  }
                      })
                  })
-                //  console.log(this.monitorPointInfo,'this.monitorPointInfo');  
+                 console.log(this.$refs.pic,'this.$refs.pic');
                   this.$refs.pic.loadPoints(this.monitorPointInfo);
                   this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                 
@@ -5369,8 +5367,6 @@ export default {
 
             // })
            
-
-            // console.log(listData,'listData');
              var vm=this;
             axios({
                 method:'post',
@@ -5409,7 +5405,7 @@ export default {
         },
         singleBatchImportVerifyMake(id,type,item,sheetIndex){
            
-            // console.log(id,type,item,sheetIndex,'id,type,item','sheetIndex');
+           
             this.singleData[sheetIndex]={
                 // sheetIndex:this.spilitMethod(this.documentMethod('sheetName',item)),//sheet下标*
                 sheetIndex:sheetIndex,
@@ -5428,7 +5424,7 @@ export default {
                 pointIndex:this.spilitMethod(this.documentMethod('spotNumCol',item)),//监测点位下标(除斜度外)*
             }
             this.singleBatchImportDataShow=false;
-            // console.log(this.sheetList,'this.sheetList0000');
+           
             this.sheetList.forEach((val)=>{
                 if(val.itemId==id){
                     // this.$set(val,'exportTip',val.itemName+'已成功配置')
@@ -5444,7 +5440,7 @@ export default {
                     }
                 }
             })
-            // console.log(this.singleData,'this.singleData11');
+           
         },
         singleBatchImportCancle(){
             var vm=this;
@@ -7510,8 +7506,6 @@ export default {
             }).then((response)=>{
                 if(response.data.cd=='0'){
                     this.monitorPointInfo=response.data.rt;
-                    
-                   
                     this.monitorPointInfo.forEach((item)=>{
                         data.push(item.id);
                     })
@@ -7519,6 +7513,7 @@ export default {
                         this.getPointByPointGroupId(data);
                     }
                     else{
+                       
                         this.$refs.pic.loadPoints(this.monitorPointInfo);
                         this.$refs.pic.setHeader(this.pointNameValue,this.pointNumValue,this.scaleValue);
                     }
@@ -8019,7 +8014,7 @@ export default {
                                 this.leftDisplayList=this.pitchDetailDataListLeft;
                                 var recentVariationLength=this.leftDisplayList.recentVariation.length;
                                 this.leftDisplayListValue=this.leftDisplayList.recent2PitchData;
-                                console.log(this.leftDisplayListValue.length,recentVariationLength,'1111');
+                                
                                 // var str='';
                                 // console.log(document.getElementById('tableListid'),'style');
                                 //  str=document.getElementById('tableListid').clientHeight-50;
@@ -8027,7 +8022,7 @@ export default {
                                 //         console.log(document.getElementById('tableListid').clientHeight);
                                 // },20)
                                 if(this.leftDisplayListValue.length==recentVariationLength-1||this.leftDisplayListValue.length==2*(recentVariationLength-1)){
-                                    console.log('第一种')
+                                   
                                     this.$message({
                                         type:'info',
                                         message:'请设置初始值'
@@ -8056,7 +8051,7 @@ export default {
                                     // },20)
                                 }
                                 else if(this.leftDisplayListValue.length==recentVariationLength){
-                                     console.log('第二种')
+                                    
                                     this.pitchLineShow=true;
                                     this.optionShow=true;
                                     this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
@@ -8088,7 +8083,8 @@ export default {
                                         // lineLeftChart.options.yAxis.max=100;
                                     },20)
                                 }else if(this.leftDisplayListValue.length==2*recentVariationLength){
-                                    console.log('第三种')
+                                    console.log('第3种');
+                                   
                                     this.pitchLineShow=true;
                                     this.optionShow=true;
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
@@ -8096,7 +8092,7 @@ export default {
                                     if((this.leftDisplayList.recent2PitchData)[0].acquisitionTime==null){
                                          this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
                                         this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
-                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[1].shift)
                                         
                                         this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                         this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
@@ -8104,32 +8100,32 @@ export default {
                                     }else{
                                         this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                         this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
-                                       
                                     }
+                                      console.log(this.time,this.time1,this.leftDisplayListValue,'时间');
+                                      var vm=this;
                                    
                                     this.leftDisplayListValue.forEach((item,index,array)=>{
                                         
-                                        if(array[index].acquisitionTime==this.time){
-                                            this.leftDisplayListValue1.push(array[index])
+                                        if(array[index].acquisitionTime==vm.time){
+                                            vm.leftDisplayListValue1.push(array[index])
                                            
-                                            this.leftDisplayListValueXdata.push(array[index].depth)
+                                            vm.leftDisplayListValueXdata.push(array[index].depth)
                                             
-                                            this.leftDisplayListValueYdata1.push(array[index].shift)
-                                        }else if(array[index].acquisitionTime==this.time1){
+                                            vm.leftDisplayListValueYdata1.push(array[index].shift)
+                                        }else if(array[index].acquisitionTime==vm.time1){
                                             // this.leftDisplayListValueXdata.push(array[0].depth)
-                                            this.leftDisplayListValue2.push(array[index])
+                                            vm.leftDisplayListValue2.push(array[index])
                                             // this.leftDisplayListValueYdata1.push(array[0].shift)
-                                            this.leftDisplayListValueYdata2.push(array[index].shift)
+                                            vm.leftDisplayListValueYdata2.push(array[index].shift)
                                         }
                                     })
                                     // this.optionOnesLeft.yAxis.min=-300;
                                     // this.optionOnesLeft.yAxis.max=300;
                                   
-                                   
-                                    
+                                     console.log(this.leftDisplayListValueYdata1,this.leftDisplayListValueYdata2,'地下院');
                                     setTimeout(()=>{
                                         let lineLeftChart=this.$refs.lineLeftChartOne;
-                                      
+                                     
                                         
                                         lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                         lineLeftChart.removeSeries();
@@ -8145,7 +8141,7 @@ export default {
                                         // lineLeftChart.getChart().yAxis[0].min=0;
                                         // lineLeftChart.getChart().yAxis[0].max=100;
                                     },20)
-                                    console.log(this.leftDisplayListValueYdata1,this.leftDisplayListValueYdata2,this.leftDisplayListValueXdata);
+                                
                                 }else{
                                     this.$message({
                                         type:"error",
@@ -8205,7 +8201,7 @@ export default {
         return document.fullscreenElement ||document.msFullscreenElement  || document.mozFullScreenElement || document.webkitFullscreenElement || false;
     },
     fullSrceen(){
-        // console.log(this.isFullscreen(),'是否全屏');
+        
         
         if(this.fullShow==false){
             var full=document.getElementById("planeFigure");

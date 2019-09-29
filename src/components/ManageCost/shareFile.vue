@@ -28,7 +28,7 @@
                         <input type="checkbox" :id='item.fgId+"file"' class="el-checkbox__original" v-model="item.checked">
                         <div class="item-file-box clearfix">
                             <span  class="item-file-image">
-                            <img :src="require('./images/icon/'+item.extension+'.png')" />
+                            <img :src="require('./images/icon/'+typeIcon(item.extension)+'.png')" />
                             </span>
                             <span  class="item-file-detial">
                                 <h3 v-text="item.fileName"></h3>
@@ -194,6 +194,17 @@ export default {
         judgeUserAgent(){
             var shareNum=this.$route.path.replace(new RegExp("/cloud/share/"), "")
             window.location.href = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? this.appShareUrl+'/cloudShare.html?shareNo='+shareNum : this.shareUrl+'/cloud/share/'+shareNum;
+        },
+        typeIcon(val){
+            var vm = this
+            // console.log(val,'val1111');
+            var iconArr = ['AVI','BMP','CAD','DOC','DOCX','FILE','GIF','GMD','JPG','MIDI','MP3','MPEG','PDF','PNG','PPT','PPTX','RAR','RVT','TIFF','TXT','WAV','WMA','XLS','XLSX']
+            if(iconArr.indexOf(val) > -1){
+                return val
+            }else{
+                return 'FILE'
+            }
+
         },
         showShareFilesOrFolder(){
             this.backshow=false;

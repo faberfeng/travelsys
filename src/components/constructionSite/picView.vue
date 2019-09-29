@@ -1405,7 +1405,11 @@ export default {
                         if(this.drawList[i].pointGroupData[k].display == true){
                             this.drawList[i].type = this.drawList[i].pointGroupData[k].itemTypeToDisplay;
                             drawItemTagType_ = this.drawList[i].pointGroupData[k].sign;
-                            data = this.drawList[i].pointGroupData[k].data;
+                            if(this.drawList[i].pointGroupData[k].itemType==5&&this.drawList[i].pointGroupData[k].data){
+                                data = (parseInt(this.drawList[i].pointGroupData[k].data)/1000).toString();
+                            }else{
+                                data = this.drawList[i].pointGroupData[k].data;
+                            }
                             name = this.drawList[i].pointGroupData[k].name;
                             needContinue = false;
                             break;

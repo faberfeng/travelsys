@@ -688,8 +688,8 @@
                          <!-- <label style="width:50px">传感器地址:</label> -->
                         <input  placeholder="传感器地址" v-model="displacementSensorAddress" @blur="getDisplacementHistoryData()"  class="inp" style="width:100px !important;height:30px !important"/>
                     </div>
-                    <div class="editBodytwo">
-                        <!-- :clearable='false' -->
+                    <!-- <div class="editBodytwo">
+                       
                             <label class="editTxt1" style="width:24%">筛选初始时间:</label>
                             <el-date-picker
                                 v-model="selectInitTimeValue"
@@ -699,11 +699,12 @@
                                 start-placeholder="开始日期"
                                 end-placeholder="结束日期" @change="selectInitTime()" format="yyyy-MM-dd HH:mm:ss"  value-format="yyyy-MM-dd HH:mm:ss">
                             </el-date-picker>
-                    </div>
-                    <div class="editBodytwo" v-if="initShiftTimeList.length!=0">
+                    </div> -->
+                    <!-- v-if="initShiftTimeList.length!=0" -->
+                    <div class="editBodytwo" >
                         <label class="editTxt1" style="width:24%">初始时间:</label>
                         <!-- @focus="getDisplacementHistoryData()" @change="initShiftTimeChange()" -->
-                        <select v-model="initShiftTime" class="gatherTimeName" >
+                        <select v-model="initShiftTime" class="gatherTimeName" @focus="getDisplacementHistoryData()" @change="initShiftTimeChange()">
                             <option v-for="(item,index) in initShiftTimeList"  :key="index" :value="item.collectTime">
                                 {{item.collectTime|timeChange2}}
                             </option>
@@ -1467,6 +1468,9 @@ export default Vue.component('commonPitch-detail',{
             },
             pitchSeqIds:function(val){
                 this.getdata();
+            },
+            historyPointId:function(val){
+                this.getImportHistoryBySeqId(this.historyPointId);
             }
             // pitchSeqId:function(val){
             //     this.getPitchBaseInfoList.forEach((item)=>{
@@ -1829,6 +1833,7 @@ export default Vue.component('commonPitch-detail',{
                         vm.pitchSeqId=vm.getPitchBaseInfoList[0].id;
                         vm.pitchSeqIds=vm.getPitchBaseInfoList[0].id;
                         vm.historyPointId=vm.getPitchBaseInfoList[0].id;
+                        // vm.getImportHistoryBySeqId(vm.historyPointId);
                         vm.basicPointList=vm.getPitchBaseInfoList[0].depthList;
                         // vm.basicPoint=vm.basicPointList[0];
                         // console.log(vm.basicPoint,'vm.basicPoint11111');
@@ -1907,7 +1912,7 @@ export default Vue.component('commonPitch-detail',{
                                         type:'info',
                                         message:'请设置初始值'
                                     })
-                                    console.log('第一种')
+                                    
                                     // this.totalShow=true;
                                     // this.leftShow=true;
                                     // this.time=(this.leftDisplayList.recent2PitchData)[0].acquisitionTime;
@@ -1931,7 +1936,7 @@ export default Vue.component('commonPitch-detail',{
                                     //     lineLeftChart.getChart().xAxis[0].update({categories:this.leftDisplayListValueXdata});
                                     // },20)
                                 }else if(this.leftDisplayListValue.length==recentVariationLength){
-                                    console.log('第二种')
+                                    
                                     this.totalShow=true;
                                     this.leftShow=true;
                                     this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
@@ -1942,7 +1947,7 @@ export default Vue.component('commonPitch-detail',{
                                         this.leftDisplayListValueXdata.push(item.depth)
                                         this.leftDisplayListValueYdata1.push(item.shift)
                                     })
-                                    console.log(this.leftDisplayListValueXdata,this.leftDisplayListValueYdata1,'数据相等');
+                                   
                                     let lineLeftChart=this.$refs.lineLeftChartOne;
                                     lineLeftChart.delegateMethod('showLoading', 'Loading...');
                                     setTimeout(()=>{
@@ -1955,7 +1960,7 @@ export default Vue.component('commonPitch-detail',{
                                         // lineLeftChart.$el.style.minHeight=document.getElementById('tableListid').offsetHeight+'px';
                                     },20)
                                 }else if(this.leftDisplayListValue.length==2*recentVariationLength){
-                                    console.log('第三种')
+                                   
                                     this.totalShow=true;
                                     this.leftShow=true;
                                     // document.getElementById('leftHightchart').style.minHeight=str+'px';
@@ -1963,9 +1968,9 @@ export default Vue.component('commonPitch-detail',{
                                     if((this.leftDisplayList.recent2PitchData)[0].acquisitionTime==null){
                                          this.leftDisplayListValueXdata.push(this.leftDisplayListValue[0].depth)
                                         this.leftDisplayListValueYdata1.push(this.leftDisplayListValue[0].shift)
-                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[0].shift)
+                                        this.leftDisplayListValueYdata2.push(this.leftDisplayListValue[1].shift)
                                         this.leftDisplayListValue1.push(this.leftDisplayListValue[0])
-                                        this.leftDisplayListValue2.push(this.leftDisplayListValue[0])
+                                        this.leftDisplayListValue2.push(this.leftDisplayListValue[1])
 
                                         this.time=(this.leftDisplayList.recent2PitchData)[2].acquisitionTime;
                                         this.time1=(this.leftDisplayList.recent2PitchData)[3].acquisitionTime;
@@ -2132,7 +2137,7 @@ export default Vue.component('commonPitch-detail',{
                                         this.rightDisplayListValueXdata.push(item.depth)
                                         this.rightDisplayListValueYdata1.push(item.shift)
                                     })
-                                    console.log(this.rightDisplayListValue1,this.rightDisplayListValue2);
+                                    
                                     // let lineLeftChart=this.$refs.lineLeftChartOne;
                                     let lineRightChart=this.$refs.lineRightChartOne;
                                     lineRightChart.delegateMethod('showLoading', 'Loading...');
@@ -2214,7 +2219,7 @@ export default Vue.component('commonPitch-detail',{
                           
                             }
                         }
-                        // console.log(this.pitchDetailDataList);
+                       
                     }else if(response.data.cd=='-1'){
                         vm.$message({
                             type:'error',
@@ -2340,7 +2345,8 @@ export default Vue.component('commonPitch-detail',{
                 }).then((response)=>{
                     if(response.data.cd==0){
                         this.initDataDateList=response.data.rt;
-                        // console.log(this.initDataDateList,'this.initDataDateList');
+                        
+                     
                         // this.initDataDate=this.initDataDateList[0]
                     }
                 })
@@ -2907,7 +2913,12 @@ export default Vue.component('commonPitch-detail',{
             },
             //导出选中记录
             exportSelectRecode(){
-                 if(this.selectHistoryTimeValue==''){
+                if(this.initDataDateList.length==0){
+                            this.$message({
+                                type:'info',
+                                message:"测点请设置初始值"
+                            })
+                }else if(this.selectHistoryTimeValue==''){
                     this.$message({
                         type:"info",
                         message:'请选择筛选时间'
@@ -3091,7 +3102,7 @@ export default Vue.component('commonPitch-detail',{
             selectInitTime(){
                 var startDate=this.selectInitTimeValue[0];
                 var endDate=this.selectInitTimeValue[1];
-                console.log(startDate,endDate,'startDate');
+         
                  if(this.displacementSystemId==''){
                     this.$message({
                         type:'info',
@@ -3283,7 +3294,7 @@ export default Vue.component('commonPitch-detail',{
                        this.getAutoPitchList.forEach((item)=>{
                            this.$set(item,'displace',this.getPitchArg(item.seqId));
                        })
-                       console.log(this.getAutoPitchList,'this.getAutoPitchList000000');
+                       
                    }else{
                        this.$message({
                            type:"error",
@@ -3310,7 +3321,7 @@ export default Vue.component('commonPitch-detail',{
                 this.displacementSystemId=item.displacementSystemId;
                 this.initShift=item.initShift;
                 this.customShift=item.customShift;
-                console.log(vm.getPitchBaseInfoList,this.pitchSeqId,'000000')
+              
                  vm.getPitchBaseInfoList.forEach((val)=>{
                     if(val.id==this.pitchSeqId){
                         vm.basicPointList=val.depthList;

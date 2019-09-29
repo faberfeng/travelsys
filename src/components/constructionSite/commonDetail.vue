@@ -138,7 +138,7 @@
                                 <td v-show="itemMonitorType==4">{{item.totalVariation|addSpritNum1()}}</td>
                                 <td v-show="itemMonitorType==3">{{item.totalVariation*100|addSpritNum1()}}</td>
                                 <td>
-                                    <!-- <i class="el-icon-time" style="color:red;width:18px;height:18px;cursor:pointer;margin-right:3px;" @click="editTime(item.pointId)"></i> -->
+                                    <!-- <i class="el-icon-time" title="设置初始时间" style="color:red;width:18px;height:18px;cursor:pointer;margin-right:3px;" @click="editTime(item.initCollectTime,item.pointId)"></i> -->
                                     <i class="el-icon-warning" style="color:red;width:18px;height:18px;cursor:pointer" @click="editWarn(item.pointId)"></i>
                                     <!-- <button title="定位" class="location actionBtn"></button> -->
                                     <button title="变化曲线" @click="getCurve(item.pointId,item.pointName,null)" class="curve actionBtn"></button>
@@ -1229,17 +1229,29 @@
                 </div>
             </el-dialog> -->
             <el-dialog title="初始时间设置" :visible="editTimeShow" @close="setInitTimeCancle()">
-                <div class="editBody" >
+                <div class="editBodytwo">
+                    <label class="editInpText" style="width:18% !important;">筛选时间:</label>
+                    <el-date-picker
+                            v-model="selectInitTimeValues"
+                            type="datetimerange"
+                            :clearable='false'
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期" format="yyyy-MM-dd HH:mm:ss" @change="selectInitTimeChange()"  value-format="yyyy-MM-dd HH:mm:ss">
+                    </el-date-picker>
+                </div>
+
+                <div class="editBody" v-if="setInitCollectTimeLists.length!=0" >
                     <div class="editBodytwo">
                         <label class="editInpText" style="width:18% !important;">选择初始时间:</label>
                         <select v-model="selectTimeValues" class="sheetName">
-                             <option v-for="(item,index) in setInitCollectTimeLists"  :value="item.id" :key="index" v-text="item.name"></option>
+                             <option v-for="(item,index) in setInitCollectTimeLists"  :value="item" :key="index" >{{timeTypeChange(item)}}</option>
                         </select>
                     </div>
                 </div>
                 <div slot="footer" class="dialog-footer">
                         <button class="editBtnS" @click="makeInitSelectTimeSure">确认</button>
-                        <button class="editBtnC" @click="initSelectTimeCancle">取消</button>
+                        <button class="editBtnC" @click="setInitTimeCancle">取消</button>
                 </div>
             </el-dialog>
 
@@ -1415,6 +1427,7 @@ export default Vue.component('commonDetail',{
             selectTimeValues:'',
             selectTimeValue:'',
             selectInitTimeValue:'',
+            selectInitTimeValues:'',
             bindPointInitList:[],
             basePointInitList:[],
             hhInitData:'',
@@ -2054,6 +2067,13 @@ export default Vue.component('commonDetail',{
         // console.log(12);
     },
     methods:{
+        timeTypeChange(val) {
+            if (val == null) {
+            return '/';
+            } else {
+            return moment(val).format("YYYY-MM-DD HH:mm:ss");
+            }
+        },
         //得到点位
         getPointName(val){
             // console.log(this.getDetailPointInfoList,'this.getDetailPointInfoList');
@@ -2205,7 +2225,7 @@ export default Vue.component('commonDetail',{
 
         },
         //获取点位历史日期
-        getHistoryDate(id){
+        getHistoryDate(time,id,startDate,endDate){
             var pointIds=[];
             pointIds.push(id);
          
@@ -2216,16 +2236,29 @@ export default Vue.component('commonDetail',{
                 },
                 params:{
                     itemId:this.itemMonitorId,
-                    startDate:null,
-                    endDate:null
+                    startDate:startDate,
+                    endDate:endDate
                 },
                 data:pointIds,
                 method:'post'
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.setInitCollectTimeLists=response.data.rt[0].historyDate;
-                    this.selectTimeValues=this.setInitCollectTimeLists[0];
-                    console.log(this.setInitCollectTimeLists,'this.setInitCollectTimeList');
+                    if(this.setInitCollectTimeLists.length==0){
+                        this.$message({
+                            type:"info",
+                            message:'当前刷选时间无历史记录'
+                        })
+                    }else{
+                         if(time){
+                            this.selectTimeValues=time;
+                        }else{
+                            this.selectTimeValues=this.setInitCollectTimeLists[0];
+                        }
+
+                    }
+                   
+                    // console.log(this.setInitCollectTimeLists,'this.setInitCollectTimeList');
                     // this.selectTimeValue=this.setInitCollectTimeList[0];
                 }
             })
@@ -2250,7 +2283,6 @@ export default Vue.component('commonDetail',{
             }).then((response)=>{
                 if(response.data.cd==0){
                     this.setInitCollectTimeList=response.data.rt[0].historyDate;
-                    console.log(this.setInitCollectTimeList,'this.setInitCollectTimeList');
                     // this.selectTimeValue=this.setInitCollectTimeList[0];
                 }
             })
@@ -3245,18 +3277,50 @@ export default Vue.component('commonDetail',{
             this.editAlertValueShow=true;
             this.getAlertArguments(id);
         },
-        editTime(id){
-            this.getHistoryDate(id);
+        editTime(time,id){
+            this.initTime=time;
+            this.initId=id;
             this.editTimeShow=true;
         },
         setInitTimeCancle(){
-
+            this.editTimeShow=false;
+            this.selectInitTimeValues='';
+            this.setInitCollectTimeLists=[];
+        },
+        selectInitTimeChange(){
+            if(this.selectInitTimeValues){
+                var startTime=this.selectInitTimeValues[0];
+                var endTime = this.selectInitTimeValues[1];
+                this.getHistoryDate(this.initTime,this.initId,startTime,endTime);
+            }
         },
         makeInitSelectTimeSure(){
+            if(this.selectTimeValues){
+                this.selectTimeValues=new Date(new Date(this.selectTimeValues).toString().split('GMT')[0]+' UTC').toISOString();
+                axios({
+                    url:this.BDMSUrl+'detectionInfo/setInitCollectTime',
+                    headers:{
+                        'token':this.token
+                    },
+                    params:{
+                        itemId:this.itemMonitorId,
+                        pointId:this.forcePointId,
+                        initDataDate:this.selectTimeValues
+                    },
+                    method:'get'
+                }).then((response)=>{
+                    if(response.data.cd==0){
+                        this.editTimeShow=false;
+                        this.$message({
+                            type:'success',
+                            message:'初始值设置成功'
+                        })
+                        
+                    }else{
 
-        },
-        initSelectTimeCancle(){
-
+                    }
+                })
+            }
         },
         editAlertValueBtn(){
             this.editAlertValueShow=true;
@@ -3847,7 +3911,6 @@ export default Vue.component('commonDetail',{
             this.editAutoForceShow=true;
             this.getInsertHistoryDate();
             this.getFormula();
-            console.log(this.getForceBindInfoList,'this.getForceBindInfoList');
             this.getForceBindInfoList.forEach((item)=>{
                 if(item.id==id){
                     this.forceId=item.id;
