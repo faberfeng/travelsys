@@ -166,10 +166,13 @@ export default new Vuex.Store({
 
         //外网测试（最新BDWork2019/10/8）
         BIMServerPort:'443',
-        QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        QJFileManageSystemURL:'http://42.159.229.194:8080/qjbim-file/',//仅供文件下载使用的路径，
+        QJFileManageSystemURL1:'http://42.159.229.194:8080/qjbim-file',
         commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
-        BDMSUrl:'http://42.159.229.191:8080/bdms-rebuild/',//仅供文件上传使用
+        // BDMSUrl:'http://42.159.229.191:8080/bdms-rebuild/',//仅供文件上传使用
+        BDMSUrl:'https://bdms.arctron.cn/bdms-rebuild/',//仅供文件上传使用
         // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
         WebGlUrl:"https://bim.arctron.cn",
         GMDUrl:"https://bim.arctron.cn",
@@ -206,11 +209,13 @@ export default new Vuex.Store({
         // userCenterUrl:'http://58.214.36.222:18080/bdmsRebuild/#/userLogin',
         // BDMSLoginUrl:'http://58.214.36.222:18080/bdmsRebuild/#/login',
 
-        //最新bdms外网地址\
+        //最新bdms外网地址\2020/2/18
 
         // BIMServerPort:'443',
-        // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
-        // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // // QJFileManageSystemURL:'https://file.arctron.cn/qjbim-file/',//仅供文件下载使用的路径，
+        // // QJFileManageSystemURL1:'https://file.arctron.cn/qjbim-file',
+        // QJFileManageSystemURL:'http://42.159.229.194:8080/qjbim-file/',//仅供文件下载使用的路径，
+        // QJFileManageSystemURL1:'http://42.159.229.194:8080/qjbim-file',
         // commomHeadPictureFile:'https://bdms.arctron.cn/arctron-usercenter',
         // BDMSUrl:'https://bdms.arctron.cn/bdms-rebuild/',//仅供文件上传使用
         // // BDMSUrl:'http://10.252.26.48:8080/bdms_war_exploded/',
