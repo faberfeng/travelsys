@@ -1,6 +1,7 @@
 <template>
   <!-- style="overflow: hidden; left: 20px" -->
   <div id="drawingPic" style="overflow: hidden; left: 20px">
+    <el-button @click="switchType">切换</el-button>
     <picView
       ref="pic"
       @load_points="loadPic"
@@ -21,22 +22,46 @@ export default {
   data() {
     return {
       paraList: {},
+      ispic:false
     };
   },
   create() {
+    
+  },
+  mounted() {
+    // this.paraList = {
+    //   type: "png",
+    //   source: "/static/images/12.jpg",
+    //   angle: 0,
+    // };
     this.paraList = {
-      type: "png",
-      source: "/static/images/12.jpg",
+      type: "pdf",
+      source: "/static/images/A1.pdf",
       angle: 0,
     };
   },
-  mounted() {},
   methods: {
     loadPic() {
       this.$refs.pic.Max_Select = 1;
     },
     drawFinish() {},
     picView_status_changed() {},
+    switchType(){
+      if(this.ispic){
+        this.paraList = {
+          type: "pdf",
+          source: "/static/images/A1.pdf",
+          angle: 0,
+        };
+      }else{
+        this.paraList = {
+          type: "png",
+          source: "/static/images/12.jpg",
+          angle: 0,
+        };
+      }
+      this.ispic=!this.ispic
+    }
   },
 };
 </script>
