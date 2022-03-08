@@ -1,7 +1,7 @@
 <template>
   <!-- style="overflow: hidden; left: 20px" -->
   <div id="drawingPic" style="overflow: hidden; left: 20px">
-    <el-button @click="switchType">切换</el-button>
+    <!-- <el-button @click="switchType">切换</el-button> -->
     <picView
       ref="pic"
       @load_points="loadPic"
@@ -35,8 +35,8 @@ export default {
     //   angle: 0,
     // };
     this.paraList = {
-      type: "pdf",
-      source: "/static/images/A1.pdf",
+      type: "png",
+      source: "/static/images/stations.jpg",
       angle: 0,
     };
   },
@@ -56,7 +56,7 @@ export default {
       }else{
         this.paraList = {
           type: "png",
-          source: "/static/images/12.jpg",
+          source: "/static/images/station.jpg",
           angle: 0,
         };
       }
@@ -71,7 +71,7 @@ export default {
   margin: 0 auto;
   overflow: auto;
   position: absolute;
-  top: 0px;
+  top: 70px;
   left: 0;
   bottom: 0;
   right: 25px;
@@ -79,7 +79,6 @@ export default {
   max-width: 1600px;
   /* height: 800px;
   width: 800px; */
-  border: 1px solid blue;
 
   /* #drawPic {
     min-width: 700px;
