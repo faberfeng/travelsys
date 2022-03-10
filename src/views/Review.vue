@@ -1,6 +1,6 @@
 <template>
   <!-- style="overflow: hidden; left: 20px" -->
-  <div id="drawingPic" style="overflow: hidden; left: 20px">
+  <div id="drawingPic" style="overflow: hidden;">
     <!-- <el-button @click="switchType">切换</el-button> -->
     <picView
       ref="pic"
@@ -36,7 +36,7 @@ export default {
     // };
     this.paraList = {
       type: "png",
-      source: "/static/images/stations.jpg",
+      source: "/static/images/stationpic.png",
       angle: 0,
     };
   },
@@ -71,10 +71,11 @@ export default {
   margin: 0 auto;
   overflow: auto;
   position: absolute;
-  top: 70px;
-  left: 0;
+  margin:10px;
+  top: 66px;
+  left: 0px;
   bottom: 0;
-  right: 25px;
+  right: 0px;
   min-width: 1000px;
   max-width: 1600px;
   /* height: 800px;

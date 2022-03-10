@@ -1,13 +1,19 @@
 <template>
-  <commonTable :tableData="tableData" :columnData="columnData"></commonTable>
+    <div class="warrper">
+        <common-from class="from" @onSubmit="onSubmit"></common-from>
+    <commonTable class="table" :tableData="tableData" :columnData="columnData"></commonTable>
+    </div>
 </template>
+
 
 <script>
 import commonTable from "@/components/commonTable.vue"
+import CommonFrom from '@/components/commonFrom.vue'
 export default {
     name:'driverList',
     components:{
-        commonTable
+        commonTable,
+        CommonFrom
     },
     data(){
         return {
@@ -60,11 +66,23 @@ export default {
                 
 
         }
+    },
+    methods:{
+        onSubmit(data){
+            console.log(data,'回调数据')
+        }
     }
-
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.warrper{
+    margin: 20px;
+    .form{
+        margin: 10px auto;
+    }
+    .table{
+        margin: 10px auto;
+    }
+}
 </style>

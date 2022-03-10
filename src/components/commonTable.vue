@@ -1,7 +1,9 @@
 <template>
+  <div>
   <el-table
     :data="tableData"
     height="450"
+    size="small"
     border
     style="width: 100%">
     <el-table-column 
@@ -12,6 +14,7 @@
       align="center">
     </el-table-column>
   </el-table>
+  </div>
 </template>
 
 <script>

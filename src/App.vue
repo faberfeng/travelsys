@@ -16,14 +16,21 @@ export default {
 
 <style lang="less">
 *{margin:0; padding:0;} 
+html,body{
+  height: 100%;
+  overflow: hidden;
+}
 #app {
   font-family: '微软雅黑', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  min-width: 1200px;
+  // background: rgba(44, 44, 44, 1);
+  // overflow: hidden;
+  min-width: 1000px;
   height: 100%;
   font-size: 12px;
+  // background: black;
 }
 </style>

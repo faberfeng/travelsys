@@ -213,7 +213,7 @@ export default {
       // console.log(this.drawList);
       // console.log(this.$refs.picView.parentNode.offsetWidth, this.$refs.picView.parentNode.offsetHeight);
 
-      console.log(this.para, "this.para.type");
+      // console.log(this.para, "this.para.type");
       // .toLowerCase()
       if (this.para.type == "pdf" || this.para.type == "PDF") {
         this.para.type = "PDF";

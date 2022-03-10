@@ -1,13 +1,13 @@
 <template>
     <div class="main" id="login">
-        <!-- <div class="loginHeader">
+        <div class="loginHeader">
             <div style="width:1200px;position:relative;margin:0 auto;height:72px;">
                 <div class="firstTitle">
-                    <span class="firstTitleText">建筑VR协同设计平台</span> 
-                    <span class="sendTitle">BIM协作支撑系统</span>
+                    <span class="firstTitleText">上海地铁一号线</span> 
+                    <span class="sendTitle">车辆轨迹实时系统</span>
                 </div>
             </div>
-        </div> -->
+        </div>
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
                 <div class="loginDialogSide"></div>

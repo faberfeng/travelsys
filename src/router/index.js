@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Review from "../views/Review.vue";
 import Login from "../views/Login.vue"
 import DriverList from "../views/driverList.vue"
-import VehicleList from "../views/DataList.vue"
+import VehicleList from "../views/vehicleList.vue"
 import Home from "../views/index.vue"
 
 Vue.use(Router)
