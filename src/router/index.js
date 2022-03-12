@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Review from "../views/Review.vue";
+import Reviews from "../views/Reviews.vue";
 import Login from "../views/Login.vue"
 import DriverList from "../views/driverList.vue"
 import VehicleList from "../views/vehicleList.vue"
@@ -30,6 +31,11 @@ const router = new Router({
           path: "/review",
           name: "Review",
           component: Review,
+        },
+        {
+          path: "/reviews",
+          name: "Reviews",
+          component: Reviews,
         },
         //司机列表
         {
