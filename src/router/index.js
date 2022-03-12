@@ -8,7 +8,7 @@ import VehicleList from "../views/vehicleList.vue"
 import Home from "../views/index.vue"
 
 Vue.use(Router)
-
+//
 const router = new Router({
   routes: [
     {

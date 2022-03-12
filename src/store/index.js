@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 Vue.use(Vuex);
-
+//
 // app全局状态
 export default new Vuex.Store({
   state: {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import store from './store.js';
 import router from '../router/index.js';
-
+//
 
 const url = store.getters.getBaseUrl;
 const token = localStorage.getItem('token');
