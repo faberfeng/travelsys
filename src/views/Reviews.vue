@@ -36,7 +36,8 @@ export default {
     // };
     this.paraList = {
       type: "png",
-      source: "/static/images/stationpic.png",
+      // source: "/static/images/stationpic.png",
+      source:"http://103.40.192.26:10081/vehicle/static/images/stationpic.png",
       angle: 0,
     };
   },

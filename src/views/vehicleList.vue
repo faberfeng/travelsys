@@ -7,7 +7,7 @@
 
 <script>
 import commonTable from "@/components/commonTable.vue"
-import CommonFrom from '@/components/commonFrom.vue'
+import CommonFrom from '@/components/commonFromVehicle.vue'
 export default {
     name:'driverList',
     components:{
@@ -18,49 +18,119 @@ export default {
         return {
             columnData:[
                 {
-                    prop:"date",
-                    name:"日期",
+                    prop:"vhnum",
+                    name:"车辆编号",
                     width:"180"
                 },
                 {
-                    prop:"name",
-                    name:"名字",
+                    prop:"location",
+                    name:"当前位置",
                     width:"180"
                 },
                 {
-                    prop:"address",
-                    name:"地址",
+                    prop:"distance",
+                    name:"当天里程",
+                },
+                {
+                    prop:"drnum",
+                    name:"司机工号",
+                },
+                {
+                    prop:"drname",
+                    name:"司机姓名",
                 }
             ],
             tableData: [{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-08',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-06',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-07',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }],
+                vhnum:'152',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'153',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'154',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'155',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                },
+                {
+                vhnum:'156',
+                location:'彭浦新村',
+                distance:'100km',
+                drnum:'001',
+                drname:'李四'
+                }],
             
                 
 

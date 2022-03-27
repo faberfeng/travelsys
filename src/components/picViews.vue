@@ -8,13 +8,20 @@
     <div id="picView" ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">
         <canvas id="picViewImage" ref="picViewImage" style="position:absolute;top:0px;left:0px"></canvas>
         <canvas id="drawCanvas" @mousedown="oncanvasmousedown" @mouseup="oncanvasmouseup" @mousemove="oncanvasmousemove" ref="drawCanvas" style="position:absolute;top:0px;left:0px"></canvas>
+        <div id="table" class="table" ref="table" style="">
+            <ul id="tableul" style="">
+                <li id="tableli" style=""></li>
+            </ul>
+        </div>
     </div>
-
+    
+    
   </div>
 </template>
 
 <script>
 var THREE = require("three");
+import {stationPositionData} from "@/mock/drawData.js";
 export default {
     name:"picView",
     props:["para"],
@@ -23,8 +30,7 @@ export default {
             old_para:'',
             Refresh_timer:0,
             baseColor:{r:0,g:170,b:0},
-
-
+            pointScale: 1.0,
         }
     },
     destoryed(){
@@ -32,6 +38,10 @@ export default {
     },
     mounted(){
         // var vm=this;
+       
+        this.points=stationPositionData;
+         console.log(this.points,stationPositionData,'data');
+        this.lastMovePostion = { x: 0, y: 0 };
         this.$refs.picView.style.width =this.$refs.picView.parentNode.offsetWidth+"px";
         this.$refs.picView.style.height=this.$refs.picView.parentNode.offsetHeight+"px";
         this.old_para="";
@@ -56,13 +66,17 @@ export default {
                     }
                     this.init(this.$refs.picView,this.para.source,this.para.type,0)
                     this.old_para = this.para.source;
+                    
                 }
             }
         },
         //初始化图片
         init(div,source,type,angle){
+            this.Koeffzient = 0.1;
             this.scale_list = [0.3,0.5,0.75,0.8,1.0,1.5,2.0,3.0] //缩放比例区间
             this.scale_list_index = 4;
+            this.scale_table_index=4;
+            this.scale_table=this.scale_list[this.scale_table_index];
             this.scale = this.scale_list[this.scale_list_index];
             this.isRender = false;
             this.status = "none";
@@ -114,12 +128,15 @@ export default {
                                     this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0,this.canvas.height,this.canvas.width);
                                     break;
                             }
+                             this.loadPoints();
+                             this.Refresh();
                             this.isRender = false;
                         }
                         break;
 
                     }
             }
+            
         },
         //根据角度初始化公共方法
         initByangle(){
@@ -149,25 +166,40 @@ export default {
                 case "rect":
                     break;
                 case "arc":
+                    console.log(this.drawType,'this.drawType');
+                    this.drawArc(this.drawcontext,this.lastMovePostion,this.pointScale,60,'red');
                     break;
                 case "img":
                     break;
             }
+            this.points.forEach((item)=>{
+                // item.position_change=this.loadPoint(item.position);
+                // item.position_down_change=this.loadPoint(item.position_down);
+                this.drawArc(this.drawcontext,item.position_change,this.pointScale,60,'red');
+                this.drawArc(this.drawcontext,item.position_down_change,this.pointScale,60,'red');
+            });
+            // console.log(this.points,'转化的点位');
+
         },
+        
         //绘画圆点
         drawArc(drawcontext,position_,pointscale,radius,color){
             var position = this.rotate_XY_display(position_);
+            // console.log(drawcontext,position_,pointscale,radius,color,position.x,position.y,'dada');
             drawcontext.lineWidth = 1;
             drawcontext.fillStyle = color;
             drawcontext.strokeStyle = color;
             drawcontext.beginPath();
+            // console.log(radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient);
             drawcontext.arc(
                 position.x*this.ResolutionScale*this.scale,
                 position.y*this.ResolutionScale*this.scale,
                 radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,
                 0,
-                2*Math.PI
+                2*Math.PI,
+                true
             );
+            drawcontext.closePath();
             drawcontext.stroke();
             drawcontext.fill();
         },
@@ -180,7 +212,7 @@ export default {
         //最外层画布鼠标操作事件
         //鼠标点下
         onmousedown(e){
-            console.log(e,'滚轮点下')
+            // console.log(e,'滚轮点下')
             if(e.button == 1||e.button==2){
                 e.preventDefault();
                 this.start_canvas.x=this.sub_div.offsetLeft;
@@ -218,15 +250,41 @@ export default {
             }else if(e.deltaY>0){
                 this.size_small()
             }
+            this.tablescale();
             this.Refresh();
         },
          //画布鼠标放下
         oncanvasmousedown(e){
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
-            console.log(e,this.ResolutionScale,this.scale,X,Y,'画布放下');
+            console.log(e,`{x:${e.layerX},y:${e.layerY}}`,'画布放下');
             var position_temp = this.rotate_XY(X,Y);
-            console.log(`位置：${position_temp.x}`)
+            X = position_temp.x;
+            Y = position_temp.y;
+            this.lastMovePostion = {x:X,y:Y};
+            this.drawType='arc';
+            if(e.button==0){
+                // console.log(`位置：${position_temp.x}`)
+                this.sub_div.style.cursor = "default";
+                this.Refresh();
+                return;
+            }
+        },
+        loadPoints(){
+            this.points.forEach((item)=>{
+                item.position_change=this.loadPoint_calculate(item.position);
+                item.position_down_change=this.loadPoint_calculate(item.position_down);
+            });
+            console.log(this.points,'转化的点位');
+        },
+        //加载点位转换
+        loadPoint_calculate(e){
+            let X = e.x / this.ResolutionScale / this.scale;
+            let Y = e.y / this.ResolutionScale / this.scale;
+            var position_temp = this.rotate_XY(X,Y);
+            X = position_temp.x;
+            Y = position_temp.y;
+            return {x:X,y:Y}
         },
         //画布移动
         oncanvasmousemove(e){
@@ -319,6 +377,8 @@ export default {
                     this.start_canvas.h = this.sub_div.offsetHeight;
                     if(this.scale_list_index+1<this.scale_list.length){
                         this.scale_list_index++;
+                        this.scale_table_index--;
+                        this.scale_table=this.scale_list[this.scale_table_index];
                         this.scale=this.scale_list[this.scale_list_index];
                         this.imageSize={
                             width:this.oldImageSize.width*this.scale,
@@ -359,6 +419,8 @@ export default {
                     this.start_canvas.h = this.sub_div.offsetHeight;
                     if(this.scale_list_index-1>0){
                         this.scale_list_index--;
+                        this.scale_table_index++;
+                        this.scale_table=this.scale_list[this.scale_table_index];
                         this.scale=this.scale_list[this.scale_list_index];
                         this.imageSize={
                             width:this.oldImageSize.width*this.scale,
@@ -387,6 +449,10 @@ export default {
                     }
                     break;
             }
+        },
+        tablescale(){
+            console.log(this.scale,'scale00');
+            this.$refs.table.style.transform='scale('+this.scale+')';
         },
         //位置计算
         position_calculate(){
@@ -438,6 +504,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.table{
+    width: 3rem;
+    height: 3rem;
+    background: red;
+    z-index: 1000;
+    position: absolute;
+    // left: 60px;
+    // top: 230px;
+}
 </style>

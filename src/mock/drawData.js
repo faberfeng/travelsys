@@ -1,33 +1,75 @@
 //1.车站位置信息
 // 1.1上路线位置
-export const stationPositionUpData=[
+export const stationPositionData=[
     {
         name:'莘庄',
-        position:{
-            x:'100',
-            y:'200'
-        }
+        position:{x:104,y:126},
+        position_down:{x:104,y:185} //下路线位置
     },
     {
         name:'外环路',
-        position:{
-            x:'100',
-            y:'200'
-        }
+        position:{x:181,y:126},
+        position_down:{x:181,y:185}
     },
     {
         name:'莲花路',
-        position:{
-            x:'100',
-            y:'200'
-        }
+        position:{x:255,y:126},
+        position_down:{x:255,y:185}
     },
     {
         name:'锦江乐园',
-        position:{
-            x:'100',
-            y:'200'
-        }
+        position:{x:406,y:126},
+        position_down:{x:406,y:185}
+    },
+    {
+        name:'上海南站',
+        position:{x:556,y:126},
+        position_down:{x:556,y:185}
+    },
+    {
+        name:'漕宝路',
+        position:{x:630,y:126},
+        position_down:{x:630,y:185}
+    },
+    {
+        name:'上海体育馆',
+        position:{x:706,y:126},
+        position_down:{x:706,y:185}
+    },
+    {
+        name:'徐家汇',
+        position:{x:853,y:126},
+        position_down:{x:853,y:185}
+    },
+    {
+        name:'衡山路',
+        position:{x:929,y:126},
+        position_down:{x:929,y:185}
+    },
+    {
+        name:'常熟路',
+        position:{x:1003,y:126},
+        position_down:{x:1003,y:185}
+    },
+    {
+        name:'陕西南路',
+        position:{x:1078,y:126},
+        position_down:{x:1078,y:185}
+    },
+    {
+        name:'一大会址',
+        position:{x:1153,y:126},
+        position_down:{x:1153,y:185}
+    },
+    {
+        name:'人民广场',
+        position:{x:1228,y:126},
+        position_down:{x:1228,y:185}
+    },
+    {
+        name:'新闸路',
+        position:{x:1302,y:126},
+        position_down:{x:1302,y:185}
     },
 ]
 // 1.2下路线位置
@@ -113,4 +155,50 @@ export const driverList=[
         name:'赵六',
         belongTraffic:'',
     }
+]
+//5.车站库
+export const stationTable=[
+    {
+        name:'莘庄',
+        position:{x:84,y:231}
+    },
+    {
+        name:'梅陇基地(前)',
+        position:{x:274,y:248}
+    },
+    {
+        name:'梅陇基地(后)',
+        position:{x:1155,y:237}
+    },
+    {
+        name:'新闸路(上行)',
+        position:{
+
+        }
+    },
+    {
+        name:'新闸路(下行)',
+        position:{
+
+        }
+    },
+    {
+        name:'上海火车站',
+        position:{
+
+        }
+    },
+    {
+        name:'富锦路',
+        position:{
+
+        }
+    },
+    {
+        name:'富锦基地',
+        position:{
+
+        }
+    }
+
 ]

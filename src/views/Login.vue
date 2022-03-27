@@ -10,7 +10,7 @@
         </div>
         <div class="loginBody">
             <div style="width:1200px;margin:0 auto;height:100%;position:relative;">
-                <div class="loginDialogSide"></div>
+                <!-- <div class="loginDialogSide"></div> -->
                 <div class="loginDialog" v-loading="loadingShow">
                     <p class="loginBodyText">系统账号登陆</p>
                     <form onsubmit="return false;" method="post">
@@ -135,7 +135,7 @@ export default {
         .loginDialogSide{
             width: 316px;
             height: 193px;
-            background: url(../assets/loginImage.png);
+            // background: url(../assets/loginImage.png);
             position: absolute;
             left: 195px;
             top: 183px;

@@ -3473,7 +3473,6 @@ export default {
     ) {
       var position = this.rotate_XY_display(position_);
       var color_ = "";
-
       if (type == "ZL") {
         color.r = 0;
         color.g = 255;
@@ -3494,7 +3493,6 @@ export default {
         color.g = 255;
         color.b = 0;
       }
-
       // if(!isSelected){
       color_ = "rgb(" + color.r + "," + color.g + "," + color.b + ")";
       // }else{
