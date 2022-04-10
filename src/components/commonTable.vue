@@ -4,6 +4,7 @@
     :data="tableData"
     height="450"
     size="small"
+    :default-sort="defaultSort"
     border
     style="width: 100%">
     <el-table-column 
@@ -11,6 +12,7 @@
       :prop="item.prop"
       :label="item.name"
       :width="item.width"
+      :sortable="item.sortable"
       align="center">
     </el-table-column>
   </el-table>
@@ -22,7 +24,8 @@
     name:'table',
     props:[
       "tableData",
-      "columnData"
+      "columnData",
+      "defaultSort"
     ],
     data() {
       return {

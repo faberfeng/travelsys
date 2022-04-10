@@ -1,7 +1,7 @@
 <template>
     <div class="warrper">
     <common-from class="from" @onSubmit="onSubmit"></common-from>
-    <commonTable class="table" :tableData="tableData" :columnData="columnData"></commonTable>
+    <commonTable class="table" :tableData="tableData" :columnData="columnData" :defaultSort="defaultSort"></commonTable>
     </div>
 </template>
 
@@ -21,7 +21,8 @@ export default {
                 {
                     prop:"drnum",
                     name:"司机工号",
-                    width:"180"
+                    width:"180",
+                    sortable:true
                 },
                 {
                     prop:"drname",
@@ -43,10 +44,12 @@ export default {
                 {
                     prop:"todaydistance",
                     name:"当天里程",
+                    sortable:true
                 },
                 {
                     prop:"totaldistance",
                     name:"累计里程",
+                    sortable:true
                 }
             ],
             tableData: [{
@@ -58,7 +61,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'002',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -66,7 +69,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'003',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -74,7 +77,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'004',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -82,7 +85,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'005',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -90,7 +93,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'006',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -98,7 +101,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'007',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -106,7 +109,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'008',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -114,7 +117,7 @@ export default {
                     todaydistance:'120',
                     totaldistance:'300'
                 },{
-                    drnum:'001',
+                    drnum:'009',
                     drname:'李四',
                     group:'第五组',
                     blvhnum:'152',
@@ -123,6 +126,7 @@ export default {
                     totaldistance:'300'
                 },
                 ],
+            defaultSort:{prop: 'drnum', order: 'descending'}
             
                 
 

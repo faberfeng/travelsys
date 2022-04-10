@@ -4,24 +4,67 @@
   position:absolute;
   width:100%;
   height:100%;
-  " @mousedown="onmousedown" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel" @contextmenu="oncontextmenu" >
-    <div id="picView" ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute">
+  " @mousedown="onmousedown" @mousemove="onmousemove" @mouseup="onmouseup" @wheel="onwheel" @contextmenu="oncontextmenu">
+    <div id="picView" ref="picView" style="width:100%;height:100%;overflow:hidden;position:absolute;cursor:pointer">
         <canvas id="picViewImage" ref="picViewImage" style="position:absolute;top:0px;left:0px"></canvas>
         <canvas id="drawCanvas" @mousedown="oncanvasmousedown" @mouseup="oncanvasmouseup" @mousemove="oncanvasmousemove" ref="drawCanvas" style="position:absolute;top:0px;left:0px"></canvas>
-        <div id="table" class="table" ref="table" style="">
-            <ul id="tableul" style="">
-                <li id="tableli" style=""></li>
-            </ul>
-        </div>
+        <ul id="table" class="table" ref="table" style="" v-if="tableshow" >
+            <!-- <li v-for="(item,index) in station_list" :key="index" :style="{'left':changScale(rotate_XY_display(item.position).x)+'px','top':changScale(rotate_XY_display(item.position).y)+'px','position':'absolute'}" @wheel="onwheelli"> -->
+            <li v-for="(item,index) in station_list" :key="index" :style="{'left':item.position.x+'px','top':item.position.y+'px','position':'absolute'}" @wheel="onwheelli">
+                <ul id="tableul" >
+                    <li id="tableli" style="" ><i class="el-icon-s-flag"></i>{{item.name}}</li>
+                    <li id="tableli">
+                        <el-row>
+                            <el-col :span="4" class="tbcol">序</el-col>
+                            <el-col :span="20" class="tbcol">司机</el-col>
+                        </el-row>
+                    </li>
+                    <li id="tableli"  v-for="(item1,index1) in item.data" :key="index1">
+                        <el-row>
+                            <el-col :span="4" class="tbcol">{{index1+1}}</el-col>
+                            <el-col :span="20" class="tbcol">{{item1.name}}</el-col>
+                        </el-row>
+                    </li>
+                </ul>
+            </li>
+        </ul>
     </div>
-    
-    
+    <el-dialog
+        title="当前车辆信息牌"
+        :visible.sync="dialogVisible"
+        width="30%"
+        :before-close="handleClose">
+        <el-card class="box-card">
+            <el-row type="flex">
+                <el-col :span="8"><i class="el-icon-s-flag"></i>车辆名称:</el-col>
+                <el-col :span="10">{{selectVel.trafficeName}}</el-col>
+                <el-col :span="6"><el-link @click="clickVel(selectVel)" type="primary">详情</el-link></el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8"><i class="el-icon-s-custom"></i>当前司机:</el-col>
+                <el-col :span="10">{{selectVel.driverName[0]}}</el-col>
+                <el-col :span="6"><el-link type="primary" @click="clickDr(selectVel)">详情</el-link></el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8"><i class="el-icon-s-promotion"></i>当前方向:</el-col>
+                <el-col :span="10">{{selectVel.direction=='up'?'下行':'上行'}}</el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8"><i class="el-icon-map-location"></i>当前位置:</el-col>
+                <el-col :span="10">{{selectVel.stationRegion.start}}--{{selectVel.stationRegion.end}}</el-col>
+            </el-row>
+         </el-card>
+        <!-- <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        </span> -->
+    </el-dialog>  
   </div>
 </template>
 
 <script>
 var THREE = require("three");
-import {stationPositionData} from "@/mock/drawData.js";
+import {stationPositionData,verhiclePositionData,stationTable,driverList} from "@/mock/drawData.js";
 export default {
     name:"picView",
     props:["para"],
@@ -29,25 +72,122 @@ export default {
         return{
             old_para:'',
             Refresh_timer:0,
+            move_timer:0,
             baseColor:{r:0,g:170,b:0},
             pointScale: 1.0,
+            basicScale:{
+                width:1420,
+                height:627
+            },
+            basicValue:'',
+            num:0,
+            station_list:stationTable,
+            tableshow:true,
+            dialogVisible:false,
+            selectVel:{
+                id:null,
+                driverName:[],
+                trafficeName:null,
+                stationRegion:{
+                    start:null,
+                    end:null
+                },
+                direction:null
+            }
         }
     },
     destoryed(){
         clearInterval(this.Refresh_timer);
     },
+    created(){
+        this.station_list.forEach((item)=>{
+            item.data=driverList;
+        })
+        console.log(this.station_list,'staionlist');
+    },
     mounted(){
         // var vm=this;
-       
         this.points=stationPositionData;
-         console.log(this.points,stationPositionData,'data');
+        this.position_list=verhiclePositionData;
+        this.basicValue=((this.$refs.picView.parentNode.offsetWidth)/(this.basicScale.width));
+        // console.log(this.$refs.picView.style.width,this.basicScale.width,this.basicValue,'基础值');
+        //根据不同分辨率初始化数据
+        this.points.forEach((item)=>{
+            item.position={x:parseInt((item.position.x)*this.basicValue),y:parseInt((item.position.y)*this.basicValue)}
+            item.position_down={x:parseInt((item.position_down.x)*this.basicValue),y:parseInt((item.position_down.y)*this.basicValue)}
+        });
+        this.position_list.forEach((item)=>{
+            item.position=this.position_listFun(this.points,item.stationRegion,item.direction)
+        })
+        this.station_list.forEach((item)=>{
+            item.position={x:parseInt((item.position.x)*this.basicValue),y:parseInt((item.position.y)*this.basicValue)}
+        })
+       
+        // console.log(this.station_list,"this.position_list");
         this.lastMovePostion = { x: 0, y: 0 };
         this.$refs.picView.style.width =this.$refs.picView.parentNode.offsetWidth+"px";
         this.$refs.picView.style.height=this.$refs.picView.parentNode.offsetHeight+"px";
         this.old_para="";
         this.Refresh_timer=setInterval(this.Refresh_timer_fun,500);
+        
+        console.log(this.points,"this.points");
     },
     methods:{
+        clickVel(){
+            this.$store.commit('changeMenus','2')
+            this.$router.push({
+                path:'/vehicleList'
+            })    
+        },
+        clickDr(){
+            this.$router.push({
+                path:'/driverList'
+            })
+            this.$store.commit('changeMenus','3')
+        },
+        handleClose(){
+            this.dialogVisible=false;
+        },
+        beginMove(){
+            // this.num=0
+            this.move_timer=setInterval(this.Move_timer_fun,1000);
+            // this.$emit('beginMove');
+        },
+        Move_timer_fun(){
+           
+            this.position_list.forEach((item)=>{
+                
+                item.stationRegion={
+                    start:this.points[item.id+this.num].num,
+                    end:this.points[item.id+1+this.num].num
+                }
+                if((item.stationRegion.start=='xzl'&&item.stationRegion.end=='hzl')||item.stationRegion.end=='xzl'&&item.stationRegion.start=='hzl'){
+                   item.position=this.position_listFun(this.points,{start:'hzl',end:'shhcz'},item.direction) 
+                }else{
+                    item.position=this.position_listFun(this.points,item.stationRegion,item.direction)
+                }
+            })
+            // num++
+            if(this.num>this.points.length-4){
+                this.num--;
+            }else{
+                this.num++;
+            }
+            console.log(this.position_list,this.num,"this.position_list");
+            // this.Refresh()
+            this.loadPoints();
+            this.Refresh();
+            // this.Refresh_timer_fun();
+        },
+        stopMove(){
+            clearInterval(this.move_timer);
+            // this.$emit('stopMove');  
+        },
+        resetMove(){
+            this.num=0;
+            this.Move_timer_fun();
+            clearInterval(this.move_timer);
+        },
         Refresh_timer_fun(){
             // console.log(this.para,'para')
             if(this.para.type == "png" || this.para.type == "jpg"){
@@ -55,7 +195,6 @@ export default {
                 if(this.para.source != this.old_para){
                     console.log(this.para,'para')
                     this.$refs.picViewImage.style.display = "block";
-                    
                     // debugger;
                     this.$refs.picView.style.width =this.$refs.picView.parentNode.offsetWidth+'px';
                     this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight+'px';
@@ -64,7 +203,7 @@ export default {
                     if(this.para.angle != undefined){
                         this.angle = parseInt(this.para.angle);
                     }
-                    this.init(this.$refs.picView,this.para.source,this.para.type,0)
+                    this.init(this.$refs.picView,this.para.source,this.para.type,0);
                     this.old_para = this.para.source;
                     
                 }
@@ -128,6 +267,9 @@ export default {
                                     this.context.drawImage(this.image,0,0,this.image.width,this.image.height,-this.canvas.height,0,this.canvas.height,this.canvas.width);
                                     break;
                             }
+                            //  this.station_list.forEach((item)=>{
+                            //         item.position =this.loadPoint_calculate(item.position);
+                            // })
                              this.loadPoints();
                              this.Refresh();
                             this.isRender = false;
@@ -156,6 +298,23 @@ export default {
                 this.drawCanvas.width = this.imageSize.height;
             }
         },
+        //车辆位置信息转换
+        position_listFun(points,stationRegion,direction){
+            var data=points.filter((item)=>{
+                return item.num==stationRegion.start||item.num==stationRegion.end
+            }).map((item)=>{
+                
+                if(direction=='up'){
+                    return item.position
+                }else{
+                    return item.position_down
+                }
+            })
+            return{
+                x:(data.reduce((prev,cur)=>{return cur.x+prev},0))/2,
+                y:(data.reduce((prev,cur)=>{return cur.y+prev},0))/2
+            } 
+        },
         //清理画布
         Refresh(){
             if(!this.drawcontext){
@@ -175,10 +334,24 @@ export default {
             this.points.forEach((item)=>{
                 // item.position_change=this.loadPoint(item.position);
                 // item.position_down_change=this.loadPoint(item.position_down);
-                this.drawArc(this.drawcontext,item.position_change,this.pointScale,60,'red');
-                this.drawArc(this.drawcontext,item.position_down_change,this.pointScale,60,'red');
+                // this.drawArc(this.drawcontext,item.position_change,this.pointScale,60,'red');
+                // this.drawArc(this.drawcontext,item.position_down_change,this.pointScale,60,'red');
+                
             });
-            // console.log(this.points,'转化的点位');
+            //车辆轨迹路线
+            this.position_list.forEach((item)=>{
+                // console.log(item,'00000');
+                this.drawRect(this.drawcontext,item.position_change,this.pointScale,{width:340,height:150},item.direction=='up'?"rgba(216,30,6,1)":"rgba(216,30,6,1)");
+                this.drawTxt(this.drawcontext,item.position_change,this.pointScale,200,item.trafficeName);
+                // let imgsrc_r='/static/images/stationIcon_right.png';
+                // let imgsrc_l='/static/images/stationIcon_left.png'
+                let imgsrc_r='http://103.40.192.26:10081/vehicle/static/images/stationIcon_right.png';
+                let imgsrc_l='http://103.40.192.26:10081/vehicle/static/images/stationIcon_left.png'
+                this.drawImg(this.drawcontext,item.position_change,this.pointScale,300,item.direction=='up'?imgsrc_r:imgsrc_l,item.direction);
+            })
+            this.tablescale()
+            
+            console.log(this.position_list,'转化的点位');
 
         },
         
@@ -203,11 +376,77 @@ export default {
             drawcontext.stroke();
             drawcontext.fill();
         },
-
-
         //绘画正方小方块
-        drawRect(drawcontext,position_,x){
+        drawRect(drawcontext,position_,pointscale,radius,color){
+            var position = this.rotate_XY_display(position_);
+            // console.log(position,position_,'22222');
+            // console
+            drawcontext.lineWidth = 1;
+            drawcontext.fillStyle = color;
+            drawcontext.strokeStyle = color;
+            drawcontext.beginPath();
+            // drawcontext.fillRect((position.x-radius.width*pointscale*this.scale*this.ResolutionScale*this.Koeffzient/2)*this.ResolutionScale*this.scale,
+            //     (position.y-radius.height*pointscale*this.scale*this.ResolutionScale*this.Koeffzient/2)*this.ResolutionScale*this.scale,radius.width*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,radius.height*pointscale*this.scale*this.ResolutionScale*this.Koeffzient);
+            drawcontext.fillRect((position.x-radius.width*pointscale*this.Koeffzient/2)*this.ResolutionScale*this.scale,
+                (position.y-radius.height*pointscale*this.Koeffzient/2)*this.ResolutionScale*this.scale,radius.width*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,radius.height*pointscale*this.scale*this.ResolutionScale*this.Koeffzient);
+            drawcontext.closePath();
+            drawcontext.stroke();
+            drawcontext.fill();
 
+        },
+        //
+
+        //绘画图片
+        drawImg(drawcontext,position_,pointscale,radius,imgsrc,direction){
+            // console.log(drawcontext,'ddddd');
+            var position = this.rotate_XY_display(position_);
+            // drawcontext.drawImage(imgsrc,position_.x,position_.y,100,100);
+            var img = new Image();
+            img.src=imgsrc;
+            // console.log(img,'999');
+            var x_width=direction=='up'?position.x+radius*pointscale*this.Koeffzient/2:position.x-radius*pointscale*this.Koeffzient*1.5
+            img.onload=(e)=>{
+                // console.log(e,'eee');
+                // drawcontext.drawImage(img,position.x*this.ResolutionScale*this.scale,position_.y*this.ResolutionScale*this.scale,20,20);
+                // drawcontext.drawImage(img,(position.x+radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient/2)*this.ResolutionScale*this.scale,(position_.y-radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient/2)*this.ResolutionScale*this.scale, radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient);
+                drawcontext.drawImage(img,x_width*this.ResolutionScale*this.scale,(position_.y-radius*pointscale*this.Koeffzient/2)*this.ResolutionScale*this.scale, radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient);
+                // radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient,radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient
+            }
+        },
+        //绘画文字
+        drawTxt(drawcontext,position_,pointscale,radius,text){
+            // console.log(text,'text');
+            var position = this.rotate_XY_display(position_);
+            // console.log(`${radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient}px`);
+            var fontsize=parseInt(radius*pointscale*this.scale*this.ResolutionScale*this.Koeffzient)+'px'
+            // console.log(fontsize,'fontsize');
+            drawcontext.font=fontsize;
+            drawcontext.fillStyle="white";
+            drawcontext.textAlign="center";
+            drawcontext.textBaseline ="middle"
+            drawcontext.fillText(text,position.x*this.ResolutionScale*this.scale,position.y*this.ResolutionScale*this.scale);
+        },
+        //图表重绘制
+        drawTable(){
+            // this.tableshow=false;
+            // console.log(this.ResolutionScale,this.scale,'ddddd');
+            // this.station_list.forEach((item)=>{
+            //     item.position={
+            //         x:this.rotate_XY_display(item.position).x,
+            //         y:this.rotate_XY_display(item.position).y
+            //     }
+            // })
+            // console.log(this.station_list,"this.station_list");
+            // this.tableshow=true;
+        },
+        changScale(value){
+            return value*this.ResolutionScale*this.scale
+        },
+        //图表缩放
+        tablescale(){
+            console.log(this.scale,'scale00');
+            this.drawTable();
+            // this.$refs.table.style.transform='scale('+this.scale+')';
         },
         //最外层画布鼠标操作事件
         //鼠标点下
@@ -250,23 +489,43 @@ export default {
             }else if(e.deltaY>0){
                 this.size_small()
             }
-            this.tablescale();
+            // this.tablescale();
             this.Refresh();
+        },
+        onwheelli(e){
+            e.stopPropagation()
+            // console.log(e,'阻止冒泡')
+
         },
          //画布鼠标放下
         oncanvasmousedown(e){
             let X = e.layerX / this.ResolutionScale / this.scale;
             let Y = e.layerY / this.ResolutionScale / this.scale;
-            console.log(e,`{x:${e.layerX},y:${e.layerY}}`,'画布放下');
+            // console.log(e,`{x:${e.layerX},y:${e.layerY}}`,'画布放下');
             var position_temp = this.rotate_XY(X,Y);
             X = position_temp.x;
             Y = position_temp.y;
             this.lastMovePostion = {x:X,y:Y};
+            console.log(e,`{x:${e.layerX},y:${e.layerY}}`,X,Y,'画布放下');
             this.drawType='arc';
+            
             if(e.button==0){
+                var selectColorID =this.drawcontext.getImageData(e.layerX,
+              e.layerY,
+              1,
+              1).data;
+              console.log(selectColorID,'selectColorID');
+              var returndata = this.position_list.filter((item)=>{
+                  return (X-20<item.position_change.x&&item.position_change.x<X+20)&&(Y-20<item.position_change.y&&item.position_change.y<Y+20)
+              })
+              if(returndata.length>0){
+                  this.selectVel=returndata[0];
+                  this.dialogVisible=true;
+              }
+              console.log(returndata,'returndata000');
                 // console.log(`位置：${position_temp.x}`)
-                this.sub_div.style.cursor = "default";
-                this.Refresh();
+                
+                // this.Refresh();
                 return;
             }
         },
@@ -275,6 +534,12 @@ export default {
                 item.position_change=this.loadPoint_calculate(item.position);
                 item.position_down_change=this.loadPoint_calculate(item.position_down);
             });
+            this.position_list.forEach((item)=>{
+                item.position_change=this.loadPoint_calculate(item.position);
+            })
+            // this.station_list.forEach((item)=>{
+            //     item.position =this.loadPoint_calculate(item.position);
+            // })
             console.log(this.points,'转化的点位');
         },
         //加载点位转换
@@ -288,7 +553,7 @@ export default {
         },
         //画布移动
         oncanvasmousemove(e){
-
+            // this.sub_div.style.cursor = "pointer";
         },
         //画布鼠标拿起
         oncanvasmouseup(e){
@@ -450,10 +715,7 @@ export default {
                     break;
             }
         },
-        tablescale(){
-            console.log(this.scale,'scale00');
-            this.$refs.table.style.transform='scale('+this.scale+')';
-        },
+       
         //位置计算
         position_calculate(){
             var Center_div ={
@@ -505,13 +767,41 @@ export default {
 </script>
 
 <style lang="less" scoped>
+*{
+    margin: 0px;
+    padding: 0px;
+}
+ul,li{
+    list-style: none;
+}
 .table{
-    width: 3rem;
-    height: 3rem;
-    background: red;
     z-index: 1000;
-    position: absolute;
+    position: relative;
     // left: 60px;
     // top: 230px;
+    #tableul{
+        width: 7rem;
+        height: 6rem;
+        // background: #935458;
+        background: #cccc66;
+         position: absolute;
+         overflow: auto;
+        #tableli{
+            // width: 3rem;
+            height: 1rem;
+            font-size: 12px;
+            white-space: nowrap;
+            text-align: center;
+            // color: white;
+            color: black;
+            line-height: 1rem;
+            border-bottom: 1px solid black;
+            .tbcol{
+                border-right: 1px solid black;
+                // color: white;
+
+            }
+        }
+    }
 }
 </style>

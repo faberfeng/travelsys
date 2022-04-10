@@ -33,4 +33,24 @@ html,body{
   font-size: 12px;
   // background: black;
 }
+  /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+    width:7px;
+    }
+    /* 滚动槽 */
+    ::-webkit-scrollbar-track {
+    box-shadow:inset 006px rgba(0, 0, 0, .5);
+    -webkit-box-shadow:inset 006px rgba(0,0,0,0.3);
+    border-radius:10px;
+    }
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+    border-radius:10px;
+    background:rgba(0,0,0,0.1);
+    box-shadow:inset 006px rgba(0, 0, 0, .5);
+    -webkit-box-shadow:inset 006px rgba(0,0,0,0.5);
+    }
+    ::-webkit-scrollbar-thumb:window-inactive {
+    background:rgba(255,0,0,0.4);
+    }
 </style>

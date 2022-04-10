@@ -1,7 +1,7 @@
 <template>
     <div class="warrper">
         <common-from class="from" @onSubmit="onSubmit"></common-from>
-        <commonTable class="table" :tableData="tableData" :columnData="columnData"></commonTable>
+        <commonTable class="table" :tableData="tableData" :columnData="columnData" :defaultSort="defaultSort"></commonTable>
     </div>
 </template>
 
@@ -20,7 +20,8 @@ export default {
                 {
                     prop:"vhnum",
                     name:"车辆编号",
-                    width:"180"
+                    width:"180",
+                    sortable:true
                 },
                 {
                     prop:"location",
@@ -30,10 +31,12 @@ export default {
                 {
                     prop:"distance",
                     name:"当天里程",
+                    sortable:true
                 },
                 {
                     prop:"drnum",
                     name:"司机工号",
+                    sortable:true
                 },
                 {
                     prop:"drname",
@@ -76,63 +79,62 @@ export default {
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'157',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'158',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'159',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'160',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'161',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'162',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'163',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 },
                 {
-                vhnum:'156',
+                vhnum:'164',
                 location:'彭浦新村',
                 distance:'100km',
                 drnum:'001',
                 drname:'李四'
                 }],
-            
-                
+            defaultSort:{prop: 'vhnum', order: 'descending'}
 
         }
     },
