@@ -1,15 +1,15 @@
 import axios from 'axios';
 import store from './store.js';
 import router from '../router/index.js';
-//
-
-const url = store.getters.getBaseUrl;
-const token = localStorage.getItem('token');
+const url = 'http://a:a@103.40.192.168:50055';
+// const url = '/api';
+// const token = localStorage.getItem('token');
 
 axios.defaults.baseURL = url;
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.post['Content-Type'] = 'application/json';
 // 在实例已创建后修改默认值
-axios.defaults.headers.common['token'] = token;
+// axios.defaults.headers.common['token'] = token;
 
 axios.interceptors.request.use(config => {
     // const mod = getMod(config);
@@ -22,7 +22,7 @@ axios.interceptors.request.use(config => {
     // if (shouldSign) {
     //   sign(config);
     // }
-    console.log(config)
+    // console.log(config)
     return config;
   });
   // 响应拦截器
@@ -47,3 +47,4 @@ axios.interceptors.response.use(function (response) {
     console.error('接口或网络错误', error); // eslint-disable-line
     return Promise.reject(error);
   });
+  export default axios;

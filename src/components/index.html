@@ -1,0 +1,385 @@
+<html>
+
+<head>
+    <title>BMI Z-Score and Percentile Calculator</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="no-cache" http-equiv="pragma">
+    <meta content="no-cache" http-equiv="cache-control">
+    <meta name="description"
+        content="Calculate percentiles and z-scores for a child's Body Mass Index (BMI), height and weight. Display pediatric growth curves.">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,400i,700,700i&amp;display=swap" rel="stylesheet">
+    <script src="jquery1.10.2.min.js"></script>
+    <script src="jquery.validate.min.js"></script>
+
+    <script src="highcharts.js"></script>
+    <script src="bmiLMSfacts.js"></script>
+    <script src="zcalcsbmi.js"></script>
+    <script src="htLMSfacts.js"></script>
+    <script src="wtLMSfacts.js"></script>
+
+    <script type="text/javascript">
+        function formSend() {
+            // Grab values from form
+            var dobTxt = document.htmlForm.DOB.value;
+            var mdateTxt = document.htmlForm.MDate.value;
+            var sexTxt = document.htmlForm.gender.value;
+            var wtTxt = document.htmlForm.weight.value;
+            var htTxt = document.htmlForm.height.value;
+            var measTxt = document.htmlForm.units.value;
+            // Calculate age and bmi and update the subject point on the chart
+            var age = ageCalc(dobTxt, mdateTxt);
+            if (age > 20 || age < 2) {
+                alert('Age is out of range');
+                clearResults();
+                return;
+            }
+            var bmi = computeBMI(wtTxt, htTxt, measTxt);
+            var chart = $('#bmichart').highcharts();
+            chart.series[6].setData([
+                [age, bmi]
+            ]);
+            chart = $('#htchart').highcharts();
+            chart.series[7].setData([
+                [age, Number(htTxt)]
+            ]);
+            chart = $('#wtchart').highcharts();
+            chart.series[7].setData([
+                [age, Number(wtTxt)]
+            ]);
+            // Calculate Z, %ile, and Energy
+            var pcnt = computeZ(age, bmi, sexTxt);
+            var pcnth = computeHtZ(age, htTxt, sexTxt, measTxt);
+            var pcntw = computeWtZ(age, wtTxt, sexTxt, measTxt);
+            EER(age, wtTxt, htTxt, pcnt, sexTxt, measTxt);
+            var cmt = commentary(age, wtTxt, htTxt, pcnt, sexTxt, measTxt, bmi);
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="bmichartstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div id="bmicontainer">
+        <div id="masthead">
+            <div id="logo">
+                <a href="https://www.bcm.edu/">Baylor College of Medicine, Houston Texas</a>
+            </div>
+            <p id="sitename"><a
+                    href="https://www.bcm.edu/departments/pediatrics/sections-divisions-centers/childrens-nutrition-research-center">Children's
+                    Nutrition Research Center</a></p>
+            <p id="labname"><a href="https://www.bcm.edu/bodycomplab/">Body Composition Laboratory</a></p>
+        </div>
+        <div id="intro">
+            <h1>Age-based Pediatric Growth Reference Charts</h1>
+
+        </div>
+
+        <div id="formleft">
+            <form action="javascript:formSend();" id="htmlForm" method="post" name="htmlForm">
+                <fieldset>
+                    <legend>Subject</legend>
+                    <ol>
+                        <li><label for="DOB">Birth Date: </label> <input type="date" name="DOB" id="DOB"
+                                placeholder="mm/dd/yyyy"></li>
+                        <li><label for="MDate">Measurement Date: </label> <input type="date" name="MDate" id="MDate"
+                                placeholder="mm/dd/yyyy"></li>
+
+                        <li id="ageerror"> </li>
+
+                        <li><label for="gender">Gender:</label> <select id="gender" name="gender"
+                                onchange="javascript:genChange();">
+                                <option selected value="0">
+                                    Female
+                                </option>
+                                <option value="1">
+                                    Male
+                                </option>
+                            </select></li>
+                    </ol>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Measurements</legend>
+                    <ol>
+                        <li><label for="units">Measurement Units: </label> <select id="units" name="units"
+                                onchange="javascript:genChange();">
+                                <option value="1">
+                                    English (in,lbs)
+                                </option>
+                                <option selected value="0">
+                                    Metric (cm,kg)
+                                </option>
+                            </select></li>
+
+                        <li><label id="heightlbl" for="height">Height:</label> <input id="height" name="height"
+                                type="text" placeholder="cm or in"></li>
+                        <li><label id="weightlbl" for="weight">Weight:</label> <input id="weight" name="weight"
+                                type="text" placeholder="kg or lbs"></li>
+                    </ol>
+                </fieldset>
+
+                <div class="buttons">
+                    <button type="submit"><img alt="" src="control_play_blue.png"> Calculate</button>
+                    <button type="button" onclick="javascript:formReset();"><img src="pencil_delete.png" alt="">
+                        Reset</button>
+                </div>
+            </form>
+
+            <fieldset id="bmcstuff">
+                <legend>BMI Results</legend>
+                <ol>
+                    <li class="results">BMI: <span class="scores" id="bmirslt"></span></li>
+                    <li class="results">
+                        Z-Score: <span class="scores" id="zrslt"></span>
+                        Percentile: <span class="scores" id="pcntrslt"></span></li>
+                </ol>
+            </fieldset>
+            <div id="bmichart"></div>
+            <script>
+                $("#htmlForm").validate({
+                    errorElement: 'div',
+                    rules: {
+                        height: {
+                            required: true,
+                            number: true,
+                            range: [20, 220]
+                        },
+                        weight: {
+                            required: true,
+                            number: true,
+                            range: [8, 350]
+                        },
+                        DOB: {
+                            required: true,
+                            date: true
+                        },
+                        MDate: {
+                            required: true,
+                            date: true
+                        }
+                    }
+                });
+            </script>
+        </div>
+
+        <div id="formright">
+            <fieldset id="bmirefguide">
+                <legend>BMI Reference Guide</legend>
+
+                <ol>
+                    <li id="bpimage">&nbsp;</li>
+                </ol>
+            </fieldset>
+
+            <h5>What is BMI?</h5>
+
+            <p><strong>Body Mass Index (BMI)</strong> is used as a screening tool to identify possible weight problems
+                in children. BMI is calculated from a person's weight and height.</p>
+
+            <p>This calculator can help to determine whether a child is at a healthy weight for his/her height, age and
+                gender. The amounts of body fat, muscle, and bone change with age, and differ between boys and girls.
+                This BMI-calculator automatically adjusts for differences in height, age and gender, making it is one of
+                the best tools for evaluating a growing child's weight.</p>
+
+            <p>Keep in mind that BMI is not a diagnostic tool. BMI and BMI-percentile-for-age do not directly measure
+                body fat. Very athletic kids can have a high BMI-for-age due to extra muscle mass, not necessarily
+                excess body fat. As a result, a child may have a high BMI for their age and gender, but to determine if
+                excess fat is a problem, a health care provider would need to perform further tests. Therefore, it's
+                important that children with a BMI-percentile-for-age over the 85th percentile be evaluated by a health
+                professional.</p>
+        </div>
+
+        <div id="bmcinfo">
+            <p>All values <strong>must</strong> be entered in order to calculate percentiles for <strong>BMI, Height and
+                    Weight</strong>.</p>
+            <p>Make sure to click the 'Calculate' button or press the 'Enter' key after entering your values.</p>
+
+            <p><span class="bmccatheader">Age Range</span><br>
+                2 - 20 yrs</p>
+
+            <p><span class="bmccatheader">Percentiles</span><br>
+                A percentile shows the relative position of the child's BMI, Weight or Height among children of the same
+                sex and age.<br>For example, a boy at the 25th percentile for height is taller than 25% of boys his age.
+                If a girl is at the 40th percentile for height, she is taller than 40% of girls at that same age.</p>
+        </div>
+
+        <div class="reset"></div>
+
+        <p>To help put a child's growth into perspective, use the charts below to further compare weight & height
+            measurements <br>with age- and gender-specific growth charts.</p>
+
+        <div class="leftcol">
+            <fieldset id="bmcstuff">
+                <legend>Height Results</legend>
+                <ol>
+                    <li class="results">
+                        Z-Score: <span class="scores" id="htzrslt"></span>
+                        Percentile: <span class="scores" id="htprslt"></span></li>
+                    <li id="hterror"> </li>
+                </ol>
+
+
+            </fieldset>
+        </div>
+        <div class="rightcol">
+            <fieldset id="bpresults">
+                <legend>Weight Results</legend>
+                <ol>
+                    <li class="results">
+                        Z-Score: <span class="scores" id="wtzrslt"></span>
+                        Percentile: <span class="scores" id="wtprslt"></span></li>
+                    <li id="hterror"> </li>
+                </ol>
+            </fieldset>
+        </div>
+
+        <div class="reset"></div>
+
+        <div class="leftcol">
+            <div id="htchart"></div>
+        </div>
+        <div class="rightcol">
+            <div id="wtchart"></div>
+        </div>
+
+        <div class="reset"></div>
+
+        <div id="adviceleft">
+            <h5>Why is BMI important?</h5>
+
+            <p>The American Academy of Pediatrics (AAP) and the U.S. Centers for Disease Control and Prevention (CDC)
+                recommend the use of BMI to screen for <strong>overweight and obesity</strong> in children beginning at
+                2 years old.</p>
+            <p>You can read more about BMI and daily energy requirements at the Children's Nutrition Research Center's
+                <a href="http://www.bcm.edu/cnrc/bodycomp/bmiz2.html" target="_blank">web site</a></p>
+
+
+        </div>
+
+        <div id="adviceright">
+            <h5>Reference Data</h5>
+
+            <p>The tools provided here are based on publicly available data from the National Health and Nutrition
+                Examination Survey (Centers for Disease Control and Prevention, U.S. Department of Health and Human
+                Services). </p>
+            <p>BMI-for-age weight status categories and their related percentile ranges are shown in the table below.
+            </p>
+        </div>
+
+        <div class="reset"></div>
+
+        <div id="intro">
+            <table class="refInfo" cellspacing="0" summary="Contacts template">
+                <tr>
+                    <td class="tableTitle" colspan="3">BMI for Age - Weight Status Categories</td>
+                </tr>
+                <tr>
+                    <td class="infoTitle" width="60%">A BMI Percentile of:</td>
+                    <td class="infoTitle" width="40%">Suggests that a child is:</td>
+                </tr>
+                <tr>
+                    <td class="infoLine">Less than the 5th percentile</td>
+                    <td class="infoLine">Underweight</td>
+                </tr>
+                <tr>
+                    <td class="infoLine">5th percentile to less than the 85th percentile</td>
+                    <td class="infoLine">Healthy Weight</td>
+                </tr>
+                <tr>
+                    <td class="infoLine">85th to less than the 95th percentile</td>
+                    <td class="infoLine">Overweight</td>
+                </tr>
+                <tr>
+                    <td class="infoLine">Equal to or greater than the 95th percentile</td>
+                    <td class="infoLine">Obese</td>
+                </tr>
+            </table>
+        </div>
+
+        <h5>Tracking your child's weight</h5>
+
+        <p>Plotting a child's BMI-for-age on the appropriate CDC growth chart can alert parents to early signs that
+            their child is gaining weight too fast, enabling them to help their child avoid developing weight
+            problems by making small changes in their family's diet and physical activity habits. According to Roman
+            Shypailo, a CNRC body composition expert who developed the calculator, parents who plot the calculator
+            results should watch for significant "drifting," either up or down, in their child's BMI-for-age
+            percentile over time.</p>
+
+        <div id="adviceleft">
+            <p>For example, a 62-pound, 50-inch tall, 8-year-old girl has a BMI of 17.5, which puts her at the 77th
+                percentile for age. This is a healthy weight for her age and her parents should expect future weight
+                gains to keep her BMI-for-age "tracking" along the 77th percentile as she gets older.</p>
+            <img src="bmiOnTrack.jpg" width="361" height="291">
+        </div>
+
+        <div id="adviceright">
+            <p>However, a BMI-for-age at the 77th percentile could be a 'red flag' for poor diet and/or physical
+                activity habits if it represents an upward drifting of her BMI-for-age percentile, perhaps from the
+                66th percentile at age 6 to the 70th at age 7 and the 77th at age 8.</p>
+            <img src="bmiOffTrack.jpg" width="361" height="291">
+            <p>This 'early warning' enables parents catch potentially unhealthy changes in a child's weight at an early
+                age, when making changes in diet and exercise to correct the problem are easier.</p>
+        </div>
+
+        <div class="reset"></div>
+
+        <h5>Please note</h5>
+
+        <p>Individual results, when compared to other children, can be affected by many factors such as the parents'
+            body sizes and the child's level of physical maturity. Thus, this software should not be used for
+            medical diagnostic or treatment purposes. Additionally, the authors and their affiliated institutions
+            are not liable for any damages to users or third parties arising from the use of this software.</p>
+
+        <p>This software is protected under international copyright law. Unauthorized duplication or distribution is
+            a violation of copyright. Entering this section of the web site implies acceptance of the conditions
+            stated above.</p>
+
+        <h5>To cite this source</h5>
+
+        <p>Shypailo RJ (2020) <em>Age-based Pediatric Growth Reference Charts.</em> Retrieved
+            <script language="JavaScript">
+                today = new Date()
+                yr = (today.getYear() % 1900) + 1900
+                day = today.getMonth() + 1 + "/" + today.getDate() + "/" + yr
+                document.write(day)
+            </script> from the Baylor College of Medicine, Children's Nutrition Research Center, Body Composition
+            Laboratory
+            Web Site:<br>
+            http://www.bcm.edu/bodycomplab/BMIapp/BMI-calculator-kids.html</p>
+
+        <h5>Supporting publications</h5>
+
+        <p>Kuczmarski RJ, Ogden CL, Grummer-Strawn LM, Flegal KM, Guo SS, Wei R, Mei Z, Curtin LR, Roche AF, Johnson
+            CL. CDC growth charts: United States. Adv Data 2000:1–27.</p>
+
+        <p>Flegal KM, Cole TJ. Construction of LMS parameters for the Centers for Disease Control and Prevention
+            2000 growth chart. National health statistics reports; no 63. Hyattsville, MD: National Center for
+            Health Statistics. 2013.</p>
+
+        <p>Flegal KM, Wei R, Ogden CL, Freedman DS, Johnson CL, Curtin LR. Characterizing extreme values of body
+            mass index-for-age by using the 2000 Centers for Disease Control and Prevention growth charts. Am J Clin
+            Nutr 2009;90:1314–20.</p>
+
+
+        <div class="reset"></div>
+    </div>
+    <hr />
+
+    <div align="center">
+        <p><a href="http://www.bcm.edu/cnrc" target="_blank">USDA/ARS
+                Children's Nutrition Research Center</a><br>
+            1100 Bates Street, Houston, Texas 77030<br>
+            &copy; 2000<script>
+                document.write("-" + new Date().getFullYear());
+            </script>
+            <a href="http://www.bcm.edu" target="_blank"> Baylor
+                College of Medicine</a>. All Rights Reserved.<br>
+            <br>
+            <a href="../index.htm" target="_top">Contact
+                Us.</a></p>
+    </div>
+
+    <p align="center">&nbsp;</p>
+</body>
+
+</html>

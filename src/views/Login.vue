@@ -125,6 +125,7 @@ export default {
         },
         loginMakeSure(){
             if(this.userName=='admin'&&this.password=='admin'){
+                this.$store.commit('changeMenus','1')
                 this.$router.push({
                     path: '/reviews'
                 })

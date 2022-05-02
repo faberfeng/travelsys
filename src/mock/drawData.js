@@ -4,171 +4,263 @@ export const stationPositionData=[
     {
         name:'莘庄', //车站的名称
         num:'xz', //车站的编号（以名称拼音第一个字母命名）
-        position:{x:104,y:126},
-        position_down:{x:104,y:185} //下路线位置 
+        position_down:{x:128,y:110},
+        position:{x:128,y:187} //下路线位置 
     },
     {
         name:'外环路',
         num:'whl',
-        position:{x:181,y:126},
-        position_down:{x:181,y:185}
+        position_down:{x:220,y:110}, 
+        position:{x:220,y:187}
     },
     {
         name:'莲花路',
         num:'lhl',
-        position:{x:255,y:126},
-        position_down:{x:255,y:185}
+        position_down:{x:255,y:110}, 
+        position:{x:255,y:187}
     },
     {
         name:'锦江乐园',
         num:'jjly',
-        position:{x:406,y:126},
-        position_down:{x:406,y:185}
+        position_down:{x:435,y:110},
+        position:{x:435,y:187}
     },
     {
         name:'上海南站',
         num:'shnz',
-        position:{x:556,y:126},
-        position_down:{x:556,y:185}
+        position_down:{x:594,y:110},
+        position:{x:594,y:187}
     },
     {
         name:'漕宝路',
         num:'cbl',
-        position:{x:630,y:126},
-        position_down:{x:630,y:185}
+        position_down:{x:671,y:110},
+        position:{x:671,y:187}
     },
     {
         name:'上海体育馆',
         num:'shtyg',
-        position:{x:706,y:126},
-        position_down:{x:706,y:185}
+        position_down:{x:746,y:110},
+        position:{x:746,y:187}
     },
     {
         name:'徐家汇',
         num:'xjh',
-        position:{x:853,y:126},
-        position_down:{x:853,y:185}
+        position_down:{x:875,y:110},
+        position:{x:875,y:187}
     },
     {
         name:'衡山路',
         num:'hsl',
-        position:{x:929,y:126},
-        position_down:{x:929,y:185}
+        position_down:{x:955,y:110},
+        position:{x:955,y:187}
     },
     {
         name:'常熟路',
         num:'csl',
-        position:{x:1003,y:126},
-        position_down:{x:1003,y:185}
+        position_down:{x:1029,y:110},
+        position:{x:1029,y:187}
     },
     {
         name:'陕西南路',
         num:'sxnl',
-        position:{x:1078,y:126},
-        position_down:{x:1078,y:185}
+        position_down:{x:1102,y:110},
+        position:{x:1102,y:187}
     },
     {
         name:'一大会址',
         num:'ydhz',
-        position:{x:1153,y:126},
-        position_down:{x:1153,y:185}
+        position_down:{x:1177,y:110},
+        position:{x:1177,y:187}
     },
     {
         name:'人民广场',
         num:'rmgc',
-        position:{x:1228,y:126},
-        position_down:{x:1228,y:185}
+        position_down:{x:1257,y:110},
+        position:{x:1257,y:187}
     },
     {
         name:'新闸路',
         num:'xzl',
-        position:{x:1302,y:126},
-        position_down:{x:1302,y:185}
+        position_down:{x:1331,y:110},
+        position:{x:1331,y:187}
     },
     {
         name:'汉中路',
         num:'hzl',
-        position:{x:68,y:422},
-        position_down:{x:68,y:481}
+        position_down:{x:72,y:405},
+        position:{x:72,y:483}
     },
     {
         name:'上海火车站',
         num:'shhcz',
-        position:{x:143,y:422},
-        position_down:{x:143,y:481}
+        position_down:{x:153,y:405},
+        position:{x:153,y:483}
     },
     {
         name:'中山北路',
         num:'zsbl',
-        position:{x:292,y:422},
-        position_down:{x:292,y:481}
+        position_down:{x:283,y:405},
+        position:{x:283,y:483}
     },
     {
         name:'延长路',
         num:'ycl',
-        position:{x:368,y:422},
-        position_down:{x:368,y:481}
+        position_down:{x:349,y:405},
+        position:{x:349,y:483}
     },
     {
         name:'上海马戏城',
         num:'shmxc',
-        position:{x:443,y:422},
-        position_down:{x:443,y:481}
+        position_down:{x:414,y:405},
+        position:{x:414,y:483}
     },
     {
         name:'汶水路',
         num:'wsl',
-        position:{x:517,y:422},
-        position_down:{x:517,y:481}
+        position_down:{x:485,y:405},
+        position:{x:485,y:483}
     },
     {
         name:'彭浦新村',
         num:'ppxc',
-        position:{x:629,y:422},
-        position_down:{x:629,y:481}
+        position_down:{x:577,y:405},
+        position:{x:577,y:483}
     },
     {
         name:'共康路',
         num:'gkl',
-        position:{x:704,y:422},
-        position_down:{x:704,y:481}
+        position_down:{x:643,y:405},
+        position:{x:643,y:483}
     },
     {
         name:'通河新村',
-        num:'thxx',
-        position:{x:778,y:422},
-        position_down:{x:778,y:481}
+        num:'thxc',
+        position_down:{x:712,y:405},
+        position:{x:712,y:483}
     },
     {
         name:'呼兰路',
         num:'hll',
-        position:{x:891,y:422},
-        position_down:{x:891,y:481}
+        position_down:{x:857,y:405},
+        position:{x:857,y:483}
     },
     {
         name:'共富新村',
         num:'gfxc',
-        position:{x:965,y:422},
-        position_down:{x:965,y:481}
+        position_down:{x:934,y:405},
+        position:{x:934,y:483}
     },
     {
         name:'宝安公路',
         num:'bagl',
-        position:{x:1041,y:422},
-        position_down:{x:1041,y:481}
+        position_down:{x:1040,y:405},
+        position:{x:1040,y:483}
     },
     {
         name:'友谊西路',
         num:'yyxl',
-        position:{x:1115,y:422},
-        position_down:{x:1115,y:481}
+        position_down:{x:1119,y:405},
+        position:{x:1119,y:483}
     },
     {
         name:'富锦路',
         num:'fjl',
-        position:{x:1190,y:422},
-        position_down:{x:1190,y:481}
+        position_down:{x:1218,y:405},
+        position:{x:1218,y:483}
     },
+    //辅助折线
+    {
+        name:'折1线',
+        num:'xzz1',
+        position_down:{x:45,y:110},
+        position:{x:45,y:110}
+    },
+    {
+        name:'折2线',
+        num:'xzz2',
+        position_down:{x:45,y:187},
+        position:{x:45,y:187}
+    },
+    {
+        name:'折3线(徐家汇)',
+        num:'xjhz3',
+        position_down:{x:800,y:137},
+        position:{x:800,y:137}
+    },
+    {
+        name:'折4线(徐家汇)',
+        num:'xjhz4',
+        position_down:{x:800,y:160},
+        position:{x:800,y:160}
+    },
+    {
+        name:'折5线(火车站)',
+        num:'hczz5',
+        position_down:{x:227,y:433},
+        position:{x:227,y:433}
+    },
+    {
+        name:'折6线(火车站)',
+        num:'hczz6',
+        position_down:{x:227,y:456},
+        position:{x:227,y:456}
+    },
+    {
+        name:'通呼存车',
+        num:'thcc',
+        position_down:{x:780,y:483},
+        position:{x:780,y:483}
+    },
+    {
+        name:'梅隆基地前出入场线下',
+        num:'mlcrx',
+        position_down:{x:520,y:137},
+        position:{x:520,y:137}
+    },
+    {
+        name:'梅隆基地前出入场线上',
+        num:'mlcrs',
+        position_down:{x:520,y:160},
+        position:{x:520,y:160}
+    },
+    {
+        name:'富锦上行线折返',
+        num:'fjszf',
+        position_down:{x:1289,y:433},
+        position:{x:1289,y:433}
+    },
+    {
+        name:'富锦下行线折返',
+        num:'fjxzf',
+        position_down:{x:1289,y:456},
+        position:{x:1289,y:456}
+    },
+    {
+        name:'折6线(徐家汇)',
+        num:'hczz6',
+        position_down:{x:1218,y:405},
+        position:{x:1218,y:483}
+    },
+    {
+        name:'富锦站前线折返中间线)',
+        num:'fjzzf',
+        position_down:{x:1213,y:445},
+        position:{x:1213,y:445}
+    },
+    //基地虚拟点
+    // {
+    //     name:'富锦路基地',
+    //     num:'fjjd',
+    //     position_down:{x:1218,y:405},
+    //     position:{x:1218,y:483}
+    // },
+    // {
+    //     name:'梅隆基地',
+    //     num:'mljd',
+    //     position_down:{x:1454,y:523},
+    //     position:{x:1454,y:523}
+    // },
 ]
 // 1.2下路线位置
 export const stationPositionDownData=[
@@ -185,7 +277,7 @@ export const verhiclePositionData=[
         driverName:['张珊'], //当前车辆所属司机
         stationRegion:{         //当前时间车辆所属车站区间
             start:'xz', //xz代表莘庄
-            end:'whl' //whl代表外环路
+            end:'xz' //whl代表外环路
         },
         direction:'up' //down下行，//up上行
     },
@@ -207,7 +299,7 @@ export const verhiclePositionData=[
         driverName:['陈武'], //当前车辆所属司机
         stationRegion:{         //当前时间车辆所属车站区间
             start:'shmxc', //xz代表莘庄
-            end:'wsl' //whl代表外环路
+            end:'shmxc' //whl代表外环路
         },
         direction:'up' //down下行，//up上行
     },
@@ -225,7 +317,7 @@ export const verhiclePositionData=[
     {
         id:5,
         trafficeId:5,   //车辆id
-        trafficeName:'104号车', //车辆名称
+        trafficeName:'128号车', //车辆名称
         driverName:['赵琦'], //当前车辆所属司机
         stationRegion:{         //当前时间车辆所属车站区间
             start:'gfxc', //xz代表莘庄
@@ -316,45 +408,60 @@ export const driverList=[
 export const stationTable=[
     {
         name:'莘庄',
-        position:{x:58,y:220}
+        num:'xz',
+        position:{x:58,y:222}
     },
     {
         name:'梅陇基地(前)',
+        num:'mljd',
         position:{x:234,y:248}
     },
     {
         name:'梅陇基地(后)',
-        position:{x:484,y:248}
+        num:'mljd',
+        position:{x:534,y:248}
     },
     {
         name:'新闸路(上行)',
+        num:'xzl',
         position:{
-            x:1100,y:220
+            x:1100,y:222
         }
     },
     {
         name:'新闸路(下行)',
+        num:'xzl',
         position:{
-            x:1237,y:220
+            x:1237,y:222
         }
     },
     {
         name:'上海火车站',
+        num:'shhcz',
         position:{
-            x:58,y:509
+            x:58,y:515
         }
     },
     {
         name:'富锦路',
+        num:'fjl',
         position:{
-            x:1100,y:509
+            x:1100,y:515
         }
     },
     {
         name:'富锦基地',
+        num:'fjl',
         position:{
-            x:1237,y:330
+            x:1237,y:515
         }
     }
-
 ]
+export function returnStation(name){
+    let data= stationPositionData.filter((item)=>{
+       if(item.num==name){
+           return item;
+       }
+   })
+   return data;
+}

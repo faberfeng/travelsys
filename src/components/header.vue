@@ -1,5 +1,5 @@
 <template>
-  <div class="header">
+  <div id="header" class="header">
       <div class="left">
           <img src="../assets/logo.png" width="180px" height="48px" />
           <div>实时动态轨迹</div>
@@ -36,7 +36,8 @@ export default {
     min-width: 800px; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.06);
     position: relative;
-    z-index: 10;
+    z-index: 10003;
+    
     // position: fixed;
     // top: 0;
     // left: 0;

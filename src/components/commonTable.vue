@@ -1,6 +1,7 @@
 <template>
   <div>
   <el-table
+    v-loading="loading"
     :data="tableData"
     height="450"
     size="small"
@@ -25,7 +26,8 @@
     props:[
       "tableData",
       "columnData",
-      "defaultSort"
+      "defaultSort",
+      "loading"
     ],
     data() {
       return {

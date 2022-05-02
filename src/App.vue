@@ -35,7 +35,7 @@ html,body{
 }
   /* 设置滚动条的样式 */
     ::-webkit-scrollbar {
-    width:7px;
+    width:0px;
     }
     /* 滚动槽 */
     ::-webkit-scrollbar-track {
@@ -53,4 +53,15 @@ html,body{
     ::-webkit-scrollbar-thumb:window-inactive {
     background:rgba(255,0,0,0.4);
     }
+// /deep/ .tps .el-tooltip__popper .is-dark{
+//         background: rgb(89,49,53) !important;
+//         color: #FFF;
+//         border: 1px solid rgb(254,211,105) !important;
+    
+// }
+.tps{
+  background: rgb(89,49,53) !important;
+  border: 1px solid rgb(254,211,105) !important;
+  padding: 5px !important;
+}
 </style>

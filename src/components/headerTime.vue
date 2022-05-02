@@ -19,10 +19,10 @@
           <el-dropdown-item>
             <i class="el-icon-back" style="font-size:16px"  @click="loginOut"></i>退出
           </el-dropdown-item>
-          <el-dropdown-item @click="setting">
+          <!-- <el-dropdown-item @click="setting">
             <i class="el-icon-s-tools" style="font-size:16px" ></i>
             设置
-          </el-dropdown-item>
+          </el-dropdown-item> -->
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -100,7 +100,7 @@ export default {
       height: 22px;
       line-height: 22px;
       text-align: center;
-      border: 1px solid #2153a8;
+      // border: 1px solid #2153a8;
       opacity: 1;
       border-radius: 4px;
     }
