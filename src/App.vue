@@ -26,7 +26,7 @@ html,body{
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  // background: rgba(44, 44, 44, 1);
+  
   // overflow: hidden;
   min-width: 1000px;
   height: 100%;

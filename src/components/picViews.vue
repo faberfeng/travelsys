@@ -12,7 +12,7 @@
             <li v-for="(item,index) in station_list" :key="index" :style="{'left':changScale(rotate_XY_display(item.position_change).x)+'px','top':changScale(rotate_XY_display(item.position_change).y)+'px','position':'absolute'}" @wheel="onwheelli">
             <!-- <li v-for="(item,index) in station_list" :key="index" :style="{'left':changScale(rotate_XY_display(item.position).x)+'px','top':changScale(rotate_XY_display(item.position).y)+'px','position':'absolute'}" @wheel="onwheelli"> -->
             <!-- <li v-for="(item,index) in station_list" :key="index" :style="{'left':item.position.x+'px','top':item.position.y+'px','position':'absolute'}" @wheel="onwheelli"> -->
-                <ul id="tableul" ref="tableul" style="" >
+                <ul id="tableul" ref="tableul" style="" v-show="(item.data.length>0||(item.num!='shnz'&&item.num!='xjh'))">
                     <li id="tableli" style="" ><i class="el-icon-s-flag"></i>{{item.name}}</li>
                     <li id="tableli">
                         <el-row>
@@ -224,13 +224,15 @@ export default {
        async Move_timer_fun(Time){
             // this.position_list=[];
             this.position_list=await this.getVerhiclePositions(Time);
-            this.position_list.forEach((item)=>{
-                if((item.stationRegion.start=='xzl'&&item.stationRegion.end=='hzl')||item.stationRegion.end=='xzl'&&item.stationRegion.start=='hzl'){
-                   item.position=this.position_listFun(this.points,{start:'hzl',end:'shhcz'},item.direction) 
-                }else{
-                    item.position=this.position_listFun(this.points,item.stationRegion,item.direction)
-                }
-            })
+            if(this.position_list.length!=0){
+                this.position_list.forEach((item)=>{
+                    if((item.stationRegion.start=='xzl'&&item.stationRegion.end=='hzl')||item.stationRegion.end=='xzl'&&item.stationRegion.start=='hzl'){
+                    item.position=this.position_listFun(this.points,{start:'hzl',end:'shhcz'},item.direction) 
+                    }else{
+                        item.position=this.position_listFun(this.points,item.stationRegion,item.direction)
+                    }
+                })
+            }
             var datas=await this.getDriverListAsyncs(this.allStation,null);
             this.station_list.forEach((item)=>{
                 item.data=datas.filter((item1)=>{
@@ -253,7 +255,9 @@ export default {
                     this.$refs.picView.style.width =this.$refs.picView.parentNode.offsetWidth+'px';
                     this.$refs.picView.style.height = this.$refs.picView.parentNode.offsetHeight+'px';
                     this.$refs.picView.style.left = "0px";
-                    this.$refs.picView.style.top = "0px";
+                    this.$refs.picView.style.top = "45px";
+                    // this.$refs.picView.style.marginTop=-(this.$refs.picView.parentNode.offsetHeight/2)+'px';
+                    // this.$refs.picView.style.transform = "translateY(-50%)";
                     if(this.para.angle != undefined){
                         this.angle = parseInt(this.para.angle);
                     }
@@ -557,7 +561,7 @@ export default {
                     this.sub_div.style.left=dx+this.start_canvas.x+"px";
                 }
                 if(dy+this.start_canvas.y>maxY){
-                    this.sub_div.style.top="0px"
+                    this.sub_div.style.top="45px"
                 }else if(dy+this.start_canvas.y<minY){
                     this.sub_div.style.top=this.sub_div.offsetTop+"px";
                 }else{
@@ -590,7 +594,7 @@ export default {
                 }
                 if(this.scale==1.0){
                     this.sub_div.style.left="0px";
-                    this.sub_div.style.top="0px";
+                    this.sub_div.style.top="45px";
                 }
                 // this.loadPoints();
                 this.Refresh();

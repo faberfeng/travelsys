@@ -409,51 +409,61 @@ export const stationTable=[
     {
         name:'莘庄',
         num:'xz',
-        position:{x:58,y:222}
+        position:{x:52,y:222}
     },
     {
-        name:'梅陇基地(前)',
+        name:'梅陇基地',
         num:'mljd',
         position:{x:234,y:248}
     },
     {
-        name:'梅陇基地(后)',
-        num:'mljd',
-        position:{x:534,y:248}
+        name:'上海南站',
+        num:'shnz',
+        position:{x:534,y:222}
     },
+    {
+        name:'徐家汇',
+        num:'xjh',
+        position:{x:834,y:222}
+    },
+    // {
+    //     name:'梅陇基地(后)',
+    //     num:'mljd',
+    //     position:{x:534,y:248}
+    // },
     {
         name:'新闸路(上行)',
         num:'xzl',
         position:{
-            x:1100,y:222
+            x:1140,y:222
         }
     },
     {
         name:'新闸路(下行)',
         num:'xzl',
         position:{
-            x:1237,y:222
+            x:1278,y:222
         }
     },
     {
         name:'上海火车站',
         num:'shhcz',
         position:{
-            x:58,y:515
+            x:52,y:515
         }
     },
     {
         name:'富锦路',
         num:'fjl',
         position:{
-            x:1100,y:515
+            x:1140,y:515
         }
     },
     {
         name:'富锦基地',
         num:'fjl',
         position:{
-            x:1237,y:515
+            x:1278,y:515
         }
     }
 ]

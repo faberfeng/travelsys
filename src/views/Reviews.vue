@@ -158,6 +158,7 @@ export default {
     
     this.paraList = {
       type: "png",
+      // source: "/static/images/stationpic.png",
       source: "http://103.40.192.26:10081/v1/vehicle/static/images/stationpic.png",
       // source:"http://103.40.192.26:10081/vehicle/static/images/stationpic.png",
       angle: 0,
@@ -277,13 +278,14 @@ export default {
   margin: 0 auto;
   overflow: auto;
   position: absolute;
-  margin:10px;
+  // margin:10px;
   top: 66px;
   left: 0px;
   bottom: 0;
   right: 0px;
   min-width: 1000px;
   max-width: 1600px;
+  background: rgba(48, 48, 59, 1);
   #downimg{
     position: absolute;
     width: 40px;
@@ -344,4 +346,5 @@ export default {
     min-height: 500px;
   }  */
 }
+
 </style>
