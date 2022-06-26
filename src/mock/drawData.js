@@ -237,7 +237,7 @@ export const stationPositionData=[
         position:{x:1289,y:456}
     },
     {
-        name:'折6线(徐家汇)',
+        name:'折6线(火车站)',
         num:'hczz6',
         position_down:{x:1218,y:405},
         position:{x:1218,y:483}
@@ -248,19 +248,19 @@ export const stationPositionData=[
         position_down:{x:1213,y:445},
         position:{x:1213,y:445}
     },
-    //基地虚拟点
-    // {
-    //     name:'富锦路基地',
-    //     num:'fjjd',
-    //     position_down:{x:1218,y:405},
-    //     position:{x:1218,y:483}
-    // },
-    // {
-    //     name:'梅隆基地',
-    //     num:'mljd',
-    //     position_down:{x:1454,y:523},
-    //     position:{x:1454,y:523}
-    // },
+    // 基地虚拟点
+    {
+        name:'富锦基地',
+        num:'fjjd',
+        position_down:{x:1372,y:349},
+        position:{x:1372,y:349}
+    },
+    {
+        name:'梅隆基地',
+        num:'mljd',
+        position_down:{x:434,y:280},
+        position:{x:434,y:280}
+    },
 ]
 // 1.2下路线位置
 export const stationPositionDownData=[

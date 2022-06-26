@@ -126,11 +126,24 @@ export default {
   watch:{
     'time':{
       handler(newVal,oldVal){
+        var vm=this;
         if(newVal<new Date(new Date().getTime()-100)){
           this.isSpeed=true;
           this.speedgap=15000;
-        }else{
+        }else if(newVal>new Date(new Date().getTime()-100)){
+          // this.resetMove();
+          // vm.time=new Date();
+          // vm.$set(vm.time,new Date())
           this.isSpeed=false;
+          // vm.$nextTick(()=>{
+          //   if(newVal!=new Date()){
+          //    vm.time=new Date();
+          //   }
+          // })
+          this.speednum=1;
+          this.speedgap=2000;
+         
+          console.log(newVal,'newVal000');
         }
       }
     },
@@ -138,6 +151,9 @@ export default {
       handler(newVal,oldVal){
         var vm=this;
         vm.speed =this.speedgap*this.speednum;
+        if(vm.time>new Date()){
+          vm.time=new Date()
+        }
       }
     }
   },

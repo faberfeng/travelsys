@@ -3,11 +3,11 @@
   <el-table
     v-loading="loading"
     :data="tableData"
-    height="450"
+    :height="tableheight"
     size="small"
     :default-sort="defaultSort"
     border
-    style="width: 100%">
+    style="width: 100%;overflow:auto">
     <el-table-column 
       v-for="(item,index) in columnData" :key="index"
       :prop="item.prop"
@@ -31,11 +31,18 @@
     ],
     data() {
       return {
+        tableheight:null
       }
     },
     create(){
-      console.log(this.columnData,'columnData');
-    }
+     
+      
+      // console.log(this.columnData,this.tableheight,'columnData');
+    },
+     mounted(){
+        this.tableheight=document.body.offsetHeight-190
+        console.log(this.columnData,this.tableheight,'columnData');
+     }
   }
 </script>
 <style>

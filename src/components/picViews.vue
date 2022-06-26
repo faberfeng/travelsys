@@ -233,7 +233,7 @@ export default {
                     }
                 })
             }
-            var datas=await this.getDriverListAsyncs(this.allStation,null);
+            var datas=await this.getDriverListAsyncs(this.allStation,Time);
             this.station_list.forEach((item)=>{
                 item.data=datas.filter((item1)=>{
                     return item.num==item1.currentLocation.start
@@ -403,8 +403,8 @@ export default {
             this.position_list.forEach((item)=>{
                 // console.log(item,'00000');
                 // rgba(216,30,6,1)
-                this.drawRect(this.drawcontext,item.position_change,this.pointScale,{width:360,height:280},item.direction=='up'?"rgba(230,33,41,1)":"rgba(230,33,41,1)");
-                this.drawTxt(this.drawcontext,item.position_change,this.pointScale,200,item.trafficId);
+                this.drawRect(this.drawcontext,item.position_change,this.pointScale,{width:400,height:280},item.direction=='up'?"rgba(230,33,41,1)":"rgba(230,33,41,1)");
+                this.drawTxt(this.drawcontext,item.position_change,this.pointScale,180,item.trafficId);
                 let imgsrc_r='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_right4.png';
                 let imgsrc_l='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_left4.png'
                 http://103.40.192.26:10081/v1/vehicle
