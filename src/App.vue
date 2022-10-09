@@ -31,7 +31,9 @@ html,body{
   min-width: 1000px;
   height: 100%;
   font-size: 12px;
-  // background: black;
+  // background: linear-gradient(270deg, #021323 0%, rgba(2, 19, 35, 0.9) 65.3%, rgba(2, 19, 35, 0) 100%);
+  background: #123667;
+  // background: linear-gradient(180deg, #021323 0%, rgba(2, 19, 35, 0.62) 73.77%, rgba(2, 19, 35, 0) 100%);
 }
   /* 设置滚动条的样式 */
     ::-webkit-scrollbar {

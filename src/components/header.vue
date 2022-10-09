@@ -1,16 +1,25 @@
 <template>
   <div id="header" class="header">
-      <div class="left">
+      <img :src="require('@/assets/imgs/header/header_bg.png')" />
+      <div class="left_nav">
+          <img class="img1" :src="require('@/assets/imgs/header/logo.png')" />
+          <img class="img2" :src="require('@/assets/imgs/header/light.png')" />
+          <img class="img3" :src="require('@/assets/imgs/header/bannertxt.png')" />
+           <img class="img4" :src="require('@/assets/imgs/header/frame.png')" />
+      </div>
+      <div class="right_nav">
+          <img class="img5" :src="require('@/assets/imgs/header/navbar_right.png')" />
+      </div>
+      <!-- <div class="left">
           <img src="../assets/logo.png" width="180px" height="48px" />
           <div>实时动态轨迹</div>
-          
-      </div>
+      </div> -->
       <div class="middle">
           <header-menu></header-menu>
       </div>
-      <div class="right">
+      <!-- <div class="right">
           <header-time></header-time>
-      </div>
+      </div> -->
   </div>
 </template>
 
@@ -26,29 +35,55 @@ export default {
 <style lang="less" scoped>
 .header{
     width: 100%;
-    height:61px;
-    background: #fff;
     color: #000;
-    // background: #272727;
-    // color: #e3e3e3;
-    // border-bottom: 2px dotted #ebeef5;
-    line-height: 60px;
-    min-width: 800px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    background: #095398;
+    height: 100%;
     position: relative;
     z-index: 10003;
-    
-    // position: fixed;
-    // top: 0;
-    // left: 0;
-    // color: black;
-    // width: 100%;
-    // height: 60px;
-    // display: flex;
-    // justify-content: flex-end;
-    // user-select: none;
-    // background: white;
-    // background: url("../assets/line.png") no-repeat center / 90%;
+     height: 119px;
+    img{
+        position: absolute;
+        width: 100%;
+       
+        left: 0px;
+        top:0px;
+    }
+    .left_nav{
+        position: absolute;
+        .img1{
+            width: 34px;
+            top:15px;
+            left: 30px;
+        }
+        .img2{
+            width: 280px;
+            left: 0px;
+            top:10px;
+        }
+        .img3{
+            width: 375px;
+            top:20px;
+            left: 70px;
+        }
+        .img4{
+            width: 80px;
+            top:42px;
+            left: 430px;
+
+        }
+
+
+    }
+    .right_nav{
+        position: absolute;
+        // right: 25px;
+        .img5{
+            width: 420px;
+            left: 1350px;
+            top:40px;
+        }
+
+    }
     .left{
         position: absolute;
         font-size: 16px;

@@ -1,5 +1,7 @@
 <template>
-  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+  <el-menu :default-active="activeIndex" class="el-menu-demo"  background-color="rgba(31, 106, 255, 0.1)"
+      text-color="#165DFF"
+      active-text-color="#ffd04b" @select="handleSelect">
       <el-menu-item index="1">首页</el-menu-item>
       <!-- <el-menu-item index="4">首页1</el-menu-item> -->
       <el-menu-item index="2">车辆统计</el-menu-item>
@@ -54,6 +56,19 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.el-menu-demo{
+//     display: flex;
+// flex-direction: column;
+// align-items: flex-start;
+// padding: 0px;
 
+// position: absolute;
+// width: 265px;
+// left: 0px;
+// top: 0px;
+// bottom: -1px;
+
+// background: rgba(31, 106, 255, 0.1);
+}
 </style>
