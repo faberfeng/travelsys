@@ -32,7 +32,7 @@
         </el-date-picker> 
     </el-form-item>
     <el-form-item>
-        <el-button size="small" icon="el-icon-search" type="primary" @click="onSubmit">查询</el-button>
+        <el-button size="small" icon="el-icon-search" class="bgcolor" type="primary" @click="onSubmit">查询</el-button>
     </el-form-item>
     </el-form>
 </template>
@@ -103,5 +103,16 @@ export default {
 }
 /deep/ .el-picker-panel__sidebar{
  background-color: rgb(28, 53, 100);
+}
+/deep/ .bgcolor{
+  background: #165DFF;
+  border: none;
+}
+/deep/ .el-form-item__label{
+  color: #fff;
+}
+/deep/ .el-select-dropdown.el-popper{
+  background: none;
+  border:1px solid rgb(28, 53, 100);
 }
 </style>

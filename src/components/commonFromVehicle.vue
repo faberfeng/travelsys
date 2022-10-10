@@ -27,7 +27,7 @@
         
     </el-form-item>
     <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+        <el-button size="small" class="bgcolor" icon="el-icon-search" @click="onSubmit">查询</el-button>
     </el-form-item>
     </el-form>
 </template>
@@ -96,5 +96,17 @@ export default {
 }
 /deep/ .el-picker-panel__sidebar{
  background-color: rgb(28, 53, 100);
+}
+/deep/ .el-form-item__label{
+  color: #fff;
+}
+/deep/ .bgcolor{
+  background: #165DFF;
+  border: none;
+  color: white;
+}
+/deep/ .el-select-dropdown{
+  background: none;
+  border:1px solid rgb(28, 53, 100);
 }
 </style>

@@ -107,6 +107,7 @@ export default {
 <style lang="less" scoped>
 .warrper{
     margin: 20px;
+    // height: 400px;
     .form{
         margin: 10px auto;
     }

@@ -14,9 +14,9 @@
           <img src="../assets/logo.png" width="180px" height="48px" />
           <div>实时动态轨迹</div>
       </div> -->
-      <div class="middle">
+      <!-- <div class="middle">
           <header-menu></header-menu>
-      </div>
+      </div> -->
       <!-- <div class="right">
           <header-time></header-time>
       </div> -->
