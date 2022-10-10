@@ -1,9 +1,11 @@
 <template>
   <!-- style="overflow: hidden; left: 20px" -->
   <div id="drawingPic" style="overflow: hidden;">
+    <sidebar></sidebar>
     <!-- <el-button @click="switchType">切换</el-button> -->
+     <!-- v-loading="loading" -->
     <picView
-      v-loading="loading"
+     
       ref="pic"
       @load_points="loadPic"
       @finish="drawFinish"
@@ -13,7 +15,11 @@
       :iswheel="startshow"
       :time="time"
     ></picView>
-    <img id="downimg" @mousemove="imgmove"  v-show="!showtool" :src="require('@/assets/down.png')">
+    <div class="tooltxt" v-show="!showtool">
+      <span style="color:white;z-index:2;;margin-top:5px">展开工具箱</span>
+      <img id="downimg" @mousemove="imgmove"   :src="require('@/assets/rectangle.png')">
+      <img id="downimg" style="color:white;z-index:1;margin-top:25px" @mousemove="imgmove"  :src="require('@/assets/rondown.png')">
+    </div>
     <!-- <i class="el-icon-arrow-down" style="color:white;font-size:30px"></i> -->
     <div @mousemove="toolmove"  @mouseleave="toolover">
     <el-row id="drawingrow" v-show="showtool"    style="">
@@ -34,13 +40,13 @@
                 :picker-options="pickerOptions">
               </el-date-picker>
               <!-- &&startshow -->
-              <el-tag size="small" style="cursor:pointer"  @click="backTime(1)">-1</el-tag>
-              <el-tag size="small" style="cursor:pointer"  @click="backTime(5)">-5</el-tag>
+              <el-tag size="small" class="iconcolor" style="cursor:pointer"  @click="backTime(1)">-1</el-tag>
+              <el-tag size="small" class="iconcolor" style="cursor:pointer"  @click="backTime(5)">-5</el-tag>
               <span v-if="isSpeed" class="spantxt" style="margin-left:12px">倍速:</span>
               <el-input-number v-if="isSpeed" :precision="1" :step="0.5" size="mini" v-model="speednum" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number>
               <el-button style="margin-left:10px" v-show="startshow" type="success" icon="el-icon-video-play" size="mini" @click="startMove">开始</el-button>
-              <el-button v-show="!startshow" type="danger" icon="el-icon-video-pause" size="mini" @click="endMove">停止</el-button>
-              <el-button type="info" icon="el-icon-refresh-right" size="mini" @click="resetMove">重置</el-button>
+              <el-button v-show="!startshow" class="iconcolor" type="danger" icon="el-icon-video-pause" size="mini" @click="endMove">停止</el-button>
+              <el-button type="info" class="iconcolor" icon="el-icon-refresh-right" size="mini" @click="resetMove">重置</el-button>
               <el-switch
                 style="margin-left:30px"
                 v-model="switchvalue"
@@ -74,14 +80,16 @@
 <script>
 import moment from "moment";
 import picView from "@/components/picViews.vue";
+import sidebar from "./siderbar.vue"
 export default {
   name: "review",
   components: {
     picView,
+    sidebar
   },
   data() {
     return {
-      showtool:false,
+      showtool:true,
       paraList: {},
       loading:true,
       ispic:false,
@@ -174,8 +182,9 @@ export default {
     
     this.paraList = {
       type: "png",
-      // source: "/static/images/stationpic.png",
-      source: "http://103.40.192.26:10081/v1/vehicle/static/images/stationpic.png",
+      // source:"2",
+      source: "/static/images/bgdata1.png",
+      // source: "http://103.40.192.26:10081/v1/vehicle/static/images/stationpic.png",
       // source:"http://103.40.192.26:10081/vehicle/static/images/stationpic.png",
       angle: 0,
     };
@@ -290,25 +299,35 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 #drawingPic {
-  margin: 0 auto;
+  // margin: 0 auto;
   overflow: auto;
   position: absolute;
   // margin:10px;
-  top: 66px;
+  top: 120px;
   left: 0px;
   bottom: 0;
   right: 0px;
-  min-width: 1000px;
-  max-width: 1600px;
-  background: rgba(48, 48, 59, 1);
-  #downimg{
+  // min-width: 1000px;
+  // max-width: 1600px;
+  // background: rgba(48, 48, 59, 1);
+  .tooltxt{
+    display: flex;
+    // flex-direction: column;
+    justify-content: center;
+    // align-items: center;
+    color: white;
+    #downimg{
     position: absolute;
-    width: 40px;
-    height: 40px;
+    // width: 40px;
+    // height: 40px;
     cursor: pointer;
 
   }
+
+  }
+  
   #drawingrow{
     position: absolute;
     left:50%;
@@ -322,17 +341,34 @@ export default {
     // margin-bottom: 10px;
     line-height: 40px;
     padding: 5px 15px;
-    border:1px solid #ebebeb;
+    // border:1px solid #ebebeb;
     box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.1);
     border-radius: 4px;
-    background: white;
+    // background: white;
+    // background: rgb(13, 37, 74);
+    background: linear-gradient(180deg, rgba(31, 106, 255, 0.2) 0%, rgba(31, 106, 255, 0) 100%), #011F3B;
+    border: 0.607812px solid rgba(31, 106, 255, 0.9);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: white;
     i{
       &:hover{
         color: red;
       }
+    }
+   /deep/ .el-input__inner{
+      background: rgba(31, 106, 255, 0.9);
+      color: white;
+      border:none;
+    }
+    /deep/ .el-input-number__decrease, .el-input-number__increase{
+      background: none;
+      color: white;
+    }
+    
+    /deep/ .el-input-number__decrease.is-disabled, .el-input-number__increase.is-disabled{
+      color: white;
     }
     .iclose{
       position: absolute;
@@ -352,6 +388,11 @@ export default {
         margin-right: 3px;
         background: red;
       }
+    }
+    .iconcolor{
+      background: rgba(31, 106, 255, 0.9);
+      color: white;
+      border: none;
     }
   }
   /* height: 800px;

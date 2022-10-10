@@ -62,8 +62,11 @@ html,body{
     
 // }
 .tps{
-  background: rgb(89,49,53) !important;
-  border: 1px solid rgb(254,211,105) !important;
+  // background: rgb(89,49,53) !important;
+  // border: 1px solid rgb(254,211,105) !important;
+  background:rgba(44, 86, 196, 0.8) !important;
+  border: 1px solid rgba(217, 217, 217, 1) !important;
   padding: 5px !important;
+  color: rgba(201, 226, 250, 1) !important;
 }
 </style>

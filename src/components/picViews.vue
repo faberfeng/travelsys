@@ -68,7 +68,8 @@
             <el-button @click="dialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
         </span> -->
-    </el-dialog>  
+    </el-dialog>
+
   </div>
 </template>
 
@@ -86,6 +87,7 @@ export default {
             Refresh_timer:0,
             baseColor:{r:0,g:170,b:0},
             pointScale: 1.0,
+            scaleNum:4,
             basicScale:{
                 width:1420,
                 height:627
@@ -403,14 +405,16 @@ export default {
             this.position_list.forEach((item)=>{
                 // console.log(item,'00000');
                 // rgba(216,30,6,1)
-                this.drawRect(this.drawcontext,item.position_change,this.pointScale,{width:400,height:280},item.direction=='up'?"rgba(230,33,41,1)":"rgba(230,33,41,1)");
-                this.drawTxt(this.drawcontext,item.position_change,this.pointScale,180,item.trafficId);
-                let imgsrc_r='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_right4.png';
-                let imgsrc_l='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_left4.png'
+                this.drawRect(this.drawcontext,item.position_change,this.pointScale,{width:400*this.scaleNum,height:280*this.scaleNum},item.direction=='up'?"rgba(225, 2, 2, 1)":"rgba(225, 2, 2, 1)");
+                this.drawTxt(this.drawcontext,item.position_change,this.pointScale,180*this.scaleNum,item.trafficId);
+                // let imgsrc_r='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_right4.png';
+                // let imgsrc_l='http://103.40.192.26:10081/v1/vehicle/static/images/stationIcon_left4.png';
+                let imgsrc_r='/static/images/stationIcon_right5.png';
+                let imgsrc_l='/static/images/stationIcon_left5.png';
                 http://103.40.192.26:10081/v1/vehicle
                 // let imgsrc_r='http://103.40.192.26:10081/vehicle/static/images/stationIcon_right.png';
                 // let imgsrc_l='http://103.40.192.26:10081/vehicle/static/images/stationIcon_left.png'
-                this.drawImg(this.drawcontext,item.position_change,this.pointScale,280,item.direction=='up'?imgsrc_r:imgsrc_l,item.direction);
+                this.drawImg(this.drawcontext,item.position_change,this.pointScale,280*this.scaleNum,item.direction=='up'?imgsrc_r:imgsrc_l,item.direction);
             })
             //图表重绘
             this.tablescale();
@@ -937,18 +941,22 @@ ul,li{
     position: relative;
     #tableul{
         width: 100px;
-        height: 100px;
+        height: 130px;
         // background: #935458;
-        background: #cccc66;
+        // background: #cccc66;
+        background: linear-gradient(0deg, rgba(17, 133, 240, 0) -2.72%, rgba(31, 106, 255, 0.2) 100%);
          position: absolute;
          overflow: auto;
          font-size: 12px;
+         border:1px solid rgba(17, 133, 240, 1);
+         padding: 10px;
         #tableli{
             white-space: nowrap;
             text-align: center;
             // color: white;
-            color: black;
-            border-bottom: 1px solid black;
+            color: white;
+            line-height: 24px;
+            border-bottom: 1px dashed white;
             .tbcol{
                 // border-right: 1px solid black;
                 // color: white;

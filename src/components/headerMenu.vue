@@ -59,7 +59,11 @@ export default {
             if(key==4){
                 this.routerLink('/review');
             }else if(key==1){
-                this.routerLink('/reviews');
+                const routeUrl=this.$router.resolve({
+                    path:"/reviews"
+                })
+                window.open(routeUrl.href,"_blank");
+                // this.routerLink('/reviews');
             }else if(key=='2-1'){
                 this.routerLink('/vehicleList');
             }else if(key=='3-1'){

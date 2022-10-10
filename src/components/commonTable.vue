@@ -6,6 +6,7 @@
     :height="tableheight"
     size="small"
     :stripe="true"
+    :fit="true"
     :default-sort="defaultSort"
     :header-cell-style="{background:'rgb(21, 41, 76)',color:'#FFFFFF',height:'42px',borderBottom: '1px solid #1F6AFF'}"
     style="width: 100%;">

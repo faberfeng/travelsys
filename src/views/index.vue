@@ -2,11 +2,12 @@
   <div>
       <Header/>
       <el-container>
-        <HeaderMenu/>
+        <HeaderMenu v-if="dashborad"/>
         <el-container>
             <el-main> 
-                <Tabs />
-                <router-view :key="$route.path" /></el-main>
+                <!-- <Tabs /> -->
+                <router-view :key="$route.path" />
+            </el-main>
         </el-container>
     </el-container>
       <!-- <div class="homebox">
@@ -24,15 +25,27 @@ export default {
     name:'home',
     data(){
         return{
-
+            dashborad:true
         }
     },
     components:{
         Header,
         HeaderMenu,
         Tabs
+    },
+    watch:{
+        $route:{
+            handler(to,from){
+                if(to.path=='/reviews'){
+                    this.dashborad=false
+                }else{
+                    this.dashborad=true
+                }
+                console.log(to.path,'watch')
+            },
+            immediate:true
+        }
     }
-
 }
 </script>
 
