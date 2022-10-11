@@ -1,6 +1,6 @@
 <template>
   <div>
-      <Header/>
+      <Header :dashborad="dashborad" />
       <el-container>
         <HeaderMenu v-if="dashborad"/>
         <el-container>

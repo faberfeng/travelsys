@@ -1,5 +1,13 @@
 <template>
   <div class="siberbar" ref="siderbarRef" style="">
+    <img style="height:38px" :src="require('@/assets/banner.png')">
+    <el-input
+    style="margin:20px 0px"
+    placeholder="请输入内容查询"
+    size="small"
+    suffix-icon="el-icon-search"
+    v-model="searchvalue">
+  </el-input>
     <commonTable class="table" :loading="loading" :tableData="tableData" :columnData="columnData" :defaultSort="defaultSort"></commonTable>
     <div class="barswitch">
         <div v-show="!showbar" class="content" @click="switchbar">
@@ -26,6 +34,7 @@ export default {
     data(){
         return{
             showbar:true,
+            searchvalue:null,
             columnData:[
                 {
                     prop:"driverId",
@@ -144,5 +153,11 @@ export default {
         }
 
     }
+}
+/deep/ .el-input__inner{
+    background-color: rgba(18, 39, 67, 1);
+    border:none;
+    // border-radius: 10%;
+    color: white;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="warrper">
     <common-from :formdata="formdata" class="from" @onSubmit="onSubmit"></common-from>
-    <commonTable class="table" :loading="loading" :tableData="tableData" :columnData="columnData" :defaultSort="defaultSort"></commonTable>
+    <commonTable class="table" :loading="loading" :tableData="tableData" :columnData="columnData" :defaultSort="defaultSort" :ispagination="true"></commonTable>
     </div>
 </template>
 

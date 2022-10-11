@@ -12,20 +12,16 @@
         <span>{{currents[0]}}</span><span>{{currents[1]}}</span>
       </div>
     </div>
-    <div class="setting">
+    <!-- <div class="setting">
       <el-dropdown>
         <i class="el-icon-user-solid" style="font-size:20px"></i>
         <el-dropdown-menu>
           <el-dropdown-item>
             <i class="el-icon-back" style="font-size:16px"  @click="loginOut"></i>退出
           </el-dropdown-item>
-          <!-- <el-dropdown-item @click="setting">
-            <i class="el-icon-s-tools" style="font-size:16px" ></i>
-            设置
-          </el-dropdown-item> -->
         </el-dropdown-menu>
       </el-dropdown>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -74,6 +70,11 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  color: white;
+  background: url('../assets/imgs/header/timebanner.png') no-repeat;
+  background-size:100% 100%;
+  padding:0px 30px ;
+  width: 300px;
   // color: black;
   .date_info {
     font-size: 13px;

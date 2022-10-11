@@ -23,12 +23,13 @@
       @current-change="handleCurrentChange"
       :current-page="currentPage4" -->
   <el-pagination
+      v-if="ispagination"
     style="margin:40px auto;float:right"
       background  
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+      :page-sizes="[10, 20, 30, 40]"
+      :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
+      :total="40">
     </el-pagination>
   </div>
 </template>
@@ -40,7 +41,8 @@
       "tableData",
       "columnData",
       "defaultSort",
-      "loading"
+      "loading",
+      "ispagination"
     ],
     data() {
       return {
@@ -91,8 +93,18 @@ border-bottom: 1px solid #1F6AFF;
 /deep/ .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
 background: none !important;
 }
+/deep/ .el-pagination.is-background .btn-prev{
+  background: none !important;
+}
 /deep/ .el-pagination button:disabled{
 background: none;
+}
+/deep/ .el-pagination__total{
+  color: white;
+}
+/deep/ .el-pagination__jump{
+  color: white;
+
 }
 /deep/ .el-input__inner{
   background-color: rgba(31, 106, 255, 0.4);

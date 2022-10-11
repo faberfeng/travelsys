@@ -362,7 +362,11 @@ export default {
       color: white;
       border:none;
     }
-    /deep/ .el-input-number__decrease, .el-input-number__increase{
+    /deep/ .el-input-number__decrease{
+      background: none;
+      color: white;
+    }
+    /deep/ .el-input-number__increase{
       background: none;
       color: white;
     }
